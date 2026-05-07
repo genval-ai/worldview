@@ -1,0 +1,1305 @@
+core:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.0.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+
+# =============================================================================
+# OVERVIEW
+#
+# This package defines the domain-general vocabulary for authoring falsifiable,
+# evidence-backed worldview snapshots under the Kanonak Protocol. A worldview
+# snapshot is a point-in-time record of "what we believe and why" - a list of
+# falsifiable theses, each with explicit invalidation conditions and supporting
+# evidence, plus an overarching narrative.
+#
+# The ontology has six concentric layers:
+#
+#   1. Snapshot / Thesis - the top-level units of authorship.
+#   2. Evidence base + four generic Evidence subclasses - the typed claims
+#      that support theses.
+#   3. Status and Strength enumerations - small categorical vocabularies.
+#   4. Reference vocabulary stubs - abstract classes (Indicator, EventType,
+#      Institution, GovernmentBody, Location, Party, Role) whose concrete
+#      instances live in domain-specific packages (e.g. worldview.genval.ai/
+#      finance for finance-domain instances).
+#   5. Condition DSL - a tagged-union expression tree that turns prose
+#      invalidation conditions into something a rules engine can evaluate.
+#   6. Generic seed instances - small enumerations the DSL itself depends on
+#      (Comparator, TimeUnit, Durability, EvaluationState, DerivedIndicatorKind)
+#      plus broad PolicyType / Role members usable across domains.
+#
+# Domain extensions (finance, climate, scientific, etc.) import this package,
+# subclass Evidence / Indicator / EventType for their domain, and add named
+# instances of the abstract reference classes.
+#
+# This package is the canonical source of truth. Reference documentation
+# (markdown / HTML / JSON) is DERIVED from these `comment:` fields via
+# transformations - never authored separately.
+# =============================================================================
+
+
+# =============================================================================
+# 1. SNAPSHOT AND THESIS
+# =============================================================================
+
+WorldviewSnapshot:
+  type: rdfs.Class
+  label: Worldview Snapshot
+  comment: >
+    A point-in-time record of a complete worldview. Conventionally a worldview
+    package contains exactly ONE WorldviewSnapshot named `snapshot` plus a list
+    of WorldviewThesis instances and the Evidence instances those theses cite.
+    The snapshot's `observedAt` timestamp + the package's semver version
+    together define the snapshot's identity. Snapshot package versions are
+    immutable - a refresh writes a new version, never edits an existing one,
+    so `git log` doubles as the audit trail of evolving belief.
+
+WorldviewThesis:
+  type: rdfs.Class
+  label: Worldview Thesis
+  comment: >
+    A single falsifiable claim within a worldview. Carries the prose statement
+    (`thesisStatement`), an explicit machine-evaluable `invalidationCondition`
+    that defines when the thesis breaks, a list of `supportingEvidence` URIs
+    backing the claim, a calibrated `confidence` (0.0-1.0), and a `status`
+    (active / retired / invalidated). A thesis without an invalidationCondition
+    is unfalsifiable belief, not analysis.
+
+# --- WorldviewSnapshot properties ---
+
+observedAt:
+  type: owl.DatatypeProperty
+  domain: WorldviewSnapshot
+  range: xsd.dateTime
+  label: Observed At
+  comment: >
+    ISO-8601 timestamp marking the moment the snapshot was authored. Should
+    reflect the data cutoff, not the file write time - a snapshot built from
+    a market close should carry that close time.
+
+narrative:
+  type: owl.DatatypeProperty
+  domain: WorldviewSnapshot
+  range: xsd.string
+  label: Narrative
+  comment: >
+    A 1-3 paragraph human-readable summary of the regime, the day's pivotal
+    events, and the rationale behind any confidence shifts since the prior
+    snapshot. The narrative is for humans; the structured theses and evidence
+    are for tools.
+
+hasThesis:
+  type: owl.ObjectProperty
+  domain: WorldviewSnapshot
+  range: WorldviewThesis
+  label: Has Thesis
+  comment: >
+    Ordered list of theses included in this snapshot. Order is significant
+    only insofar as it affects the rendering order in transformations; the
+    set is the source of truth, not the sequence.
+
+# --- WorldviewThesis properties ---
+
+thesisStatement:
+  type: owl.DatatypeProperty
+  domain: WorldviewThesis
+  range: xsd.string
+  label: Thesis Statement
+  comment: >
+    Prose statement of the thesis. 2-4 sentences, falsifiable in spirit (the
+    structured `invalidationCondition` makes "falsifiable" precise). Authored
+    in plain language so a human reader can grasp the claim without parsing
+    YAML.
+
+supportingEvidence:
+  type: owl.ObjectProperty
+  domain: WorldviewThesis
+  range: Evidence
+  label: Supporting Evidence
+  comment: >
+    Ordered list of references to Evidence instances (typically defined in the
+    same snapshot package). Each cited Evidence should genuinely support the
+    thesis - over-citing weak or tangential evidence weakens the thesis's
+    credibility, not strengthens it.
+
+invalidationCondition:
+  type: owl.ObjectProperty
+  domain: WorldviewThesis
+  range: Condition
+  label: Invalidation Condition
+  comment: >
+    The structured machine-evaluable condition under which this thesis is
+    invalidated. A `Condition` is a tagged-union expression tree (see
+    Condition / ConditionKind below). When a rules engine evaluates the
+    condition tree against current data and the engine returns `satisfied`,
+    the thesis SHOULD be flagged for human review and a status flip to
+    `cp.invalidated`. Partial / unsatisfied / unknown states are diagnostic
+    inputs to thesis-confidence decisions but do not auto-mutate state.
+
+confidence:
+  type: owl.DatatypeProperty
+  domain: WorldviewThesis
+  range: xsd.decimal
+  label: Confidence
+  comment: >
+    Decimal in 0.0-1.0 expressing the author's conviction. Calibration scale
+    (working heuristic, not a formal Brier-style target):
+      0.9-1.0 - thesis would survive any one of its invalidation conditions firing.
+      0.75-0.85 - high conviction; act on it; multiple independent supports.
+      0.5-0.7 - working hypothesis; size modestly.
+      0.3-0.45 - watching; one or two structural supports; invalidation in motion.
+      0.1-0.25 - mostly invalidated; consider retiring.
+      0.0 - should be `status: invalidated`, not active with low confidence.
+
+status:
+  type: owl.ObjectProperty
+  domain: WorldviewThesis
+  range: ThesisStatus
+  label: Status
+  comment: >
+    The thesis's lifecycle state. Transitions allowed - active to retired,
+    active to invalidated. Not allowed - invalidated back to active (a
+    falsified thesis stays falsified; if the same idea becomes valid again
+    it deserves a new thesis with a new name and fresh framing).
+
+
+# =============================================================================
+# 2. THESIS STATUS ENUM
+# =============================================================================
+
+ThesisStatus:
+  type: rdfs.Class
+  label: Thesis Status
+  comment: >
+    Lifecycle state of a thesis. Closed enumeration - the three named instances
+    below are the only valid values.
+
+active:
+  type: ThesisStatus
+  label: Active
+  comment: >
+    Thesis is in force, supporting evidence is current, invalidation condition
+    has not fired. The default state for any thesis appearing in `hasThesis`.
+
+retired:
+  type: ThesisStatus
+  label: Retired
+  comment: >
+    Thesis is no longer in force but was NOT falsified - it lost relevance
+    because the regime shifted, the framing became obsolete, or a follow-on
+    thesis subsumed it. A retired thesis remains in the snapshot's `hasThesis`
+    for history; consumers should not treat it as informing current allocation.
+
+invalidated:
+  type: ThesisStatus
+  label: Invalidated
+  comment: >
+    Thesis's invalidation condition fired and the thesis is now falsified.
+    Stays in the snapshot's `hasThesis` permanently - the falsification record
+    is part of the audit trail. A NEW thesis with a different framing should
+    be authored if a related claim returns to relevance later.
+
+
+# =============================================================================
+# 3. EVIDENCE BASE AND COMMON PROPERTIES
+# =============================================================================
+
+Evidence:
+  type: rdfs.Class
+  label: Evidence
+  comment: >
+    Abstract base for any typed claim that supports or weakens a thesis. Never
+    instantiated directly - authors instantiate one of the typed subclasses
+    (PolicyEvidence, GeopoliticalEvidence, OfficialStatementEvidence,
+    EconomicDataEvidence in this package; finance-specific subclasses in
+    worldview.genval.ai/finance; future climate-specific subclasses in a
+    climate package). Picking the most specific subclass is what lets future
+    query tooling slice "show me all AnalystEvidence about gold targets in
+    Q1" or "show me all GeopoliticalEvidence involving Iran in 2026".
+
+evidenceStatement:
+  type: owl.DatatypeProperty
+  domain: Evidence
+  range: xsd.string
+  label: Evidence Statement
+  comment: >
+    A 1-3 sentence prose claim distilled from the underlying source. NOT a
+    paste of the full source. The statement is what the worldview reasons
+    over; the `citation` URI is where to verify it. Keep statements specific
+    and quantitative where possible.
+
+evidenceStrength:
+  type: owl.ObjectProperty
+  domain: Evidence
+  range: EvidenceStrength
+  label: Evidence Strength
+  comment: >
+    The author's assessment of how strongly this evidence supports the claim,
+    derived primarily from source reputation and primacy (primary source vs.
+    aggregator vs. anonymous). See EvidenceStrength named instances for the
+    calibration heuristic.
+
+evidenceObservedAt:
+  type: owl.DatatypeProperty
+  domain: Evidence
+  range: xsd.dateTime
+  label: Evidence Observed At
+  comment: >
+    ISO-8601 timestamp of when the underlying fact was observed (price close
+    time, news publication time, official meeting time, etc.). Optional but
+    strongly preferred - a fact without a timestamp is hard to age out of
+    relevance.
+
+citation:
+  type: owl.DatatypeProperty
+  domain: Evidence
+  range: xsd.string
+  label: Citation
+  comment: >
+    URI or other primary-source identifier (typically a URL) that a future
+    auditor can follow to verify the recorded statement. The audit pointer.
+    Optional but strongly preferred for evidence drawn from external sources.
+
+
+# =============================================================================
+# 4. EVIDENCE STRENGTH ENUM
+# =============================================================================
+
+EvidenceStrength:
+  type: rdfs.Class
+  label: Evidence Strength
+  comment: >
+    Categorical assessment of how strongly an Evidence instance supports its
+    cited claim. Closed enumeration with three levels.
+
+evidence-strong:
+  type: EvidenceStrength
+  label: Strong
+  comment: >
+    Primary source, official press release, audited filing, or tier-1 wire
+    (Reuters, Bloomberg, WSJ, FT, AP). Confirmed government action with named
+    issuing body. The default level for evidence drawn directly from the
+    institution that produced the fact.
+
+evidence-moderate:
+  type: EvidenceStrength
+  label: Moderate
+  comment: >
+    Tier-2 financial press (CNBC, MarketWatch, Yahoo Finance), industry trade
+    press, or analyst notes without primary attribution. Suggestive but
+    deserving of corroboration before driving high-confidence theses.
+
+evidence-weak:
+  type: EvidenceStrength
+  label: Weak
+  comment: >
+    Blog, secondary aggregation, anonymous source, or unverified social
+    media. Should rarely raise thesis confidence on its own; useful as a
+    leading indicator pending corroboration.
+
+
+# =============================================================================
+# 5. GENERIC EVIDENCE SUBCLASSES
+# =============================================================================
+
+PolicyEvidence:
+  type: rdfs.Class
+  subClassOf: Evidence
+  label: Policy Evidence
+  comment: >
+    A government action - executive order, appointment, sanction, budget
+    appropriation, regulatory ruling, treaty signing. Captures the policy as
+    a discrete event rather than as a market reaction to it.
+
+GeopoliticalEvidence:
+  type: rdfs.Class
+  subClassOf: Evidence
+  label: Geopolitical Evidence
+  comment: >
+    A geopolitical event - war, peace, military operation, election outcome,
+    diplomatic accord. Distinct from PolicyEvidence in that it captures
+    multi-party events between state-level actors rather than a single
+    state's internal policy action.
+
+OfficialStatementEvidence:
+  type: rdfs.Class
+  subClassOf: Evidence
+  label: Official Statement Evidence
+  comment: >
+    A direct quote or attributable statement from a named official -
+    politician, executive, central banker, regulator, judge. The quote
+    itself is the evidence; the statement's effects on markets are
+    captured separately as MarketDataEvidence (in finance) or other
+    domain-specific subclasses.
+
+EconomicDataEvidence:
+  type: rdfs.Class
+  subClassOf: Evidence
+  label: Economic Data Evidence
+  comment: >
+    A macro economic data release - CPI, NFP, GDP, unemployment, treasury
+    yield curve, breakeven inflation. Indicator-based rather than entity-
+    based. The `indicatorName` should reference an Indicator instance
+    (typically defined in a domain-specific package).
+
+# --- PolicyEvidence properties ---
+
+issuingBody:
+  type: owl.ObjectProperty
+  domain: PolicyEvidence
+  range: GovernmentBody
+  label: Issuing Body
+  comment: >
+    The government body or executive office that issued the policy.
+    Reference to a GovernmentBody instance (typically defined in a
+    domain-specific or country-specific package).
+
+policyType:
+  type: owl.ObjectProperty
+  domain: PolicyEvidence
+  range: PolicyType
+  label: Policy Type
+  comment: >
+    Categorical type of policy action. References a PolicyType named
+    instance. Generic types (appointment, executive-order, budget,
+    sanction, treaty, investigation) live in this package; domain-
+    specific types may be added in extension packages.
+
+effectiveDate:
+  type: owl.DatatypeProperty
+  domain: PolicyEvidence
+  range: xsd.date
+  label: Effective Date
+  comment: >
+    Date the policy took or takes effect. Distinct from announcement date
+    when the two differ. Optional - some policies (public-pressure,
+    fiscal-guidance) have no formal effective date.
+
+# --- GeopoliticalEvidence properties ---
+
+eventLocation:
+  type: owl.ObjectProperty
+  domain: GeopoliticalEvidence
+  range: Location
+  label: Event Location
+  comment: >
+    Reference to a Location instance describing where the event took place.
+    Locations are typed entities, not free-form strings - use the Location
+    class to enable cross-evidence queries like "all events in the Persian
+    Gulf in 2026".
+
+partiesInvolved:
+  type: owl.ObjectProperty
+  domain: GeopoliticalEvidence
+  range: Party
+  label: Parties Involved
+  comment: >
+    Ordered list of references to Party instances representing actors in the
+    event. Parties are typed entities (nations, organizations, individuals)
+    rather than free-form strings.
+
+geopoliticalEventDate:
+  type: owl.DatatypeProperty
+  domain: GeopoliticalEvidence
+  range: xsd.date
+  label: Geopolitical Event Date
+  comment: >
+    Date the event occurred. For events with duration (campaigns, sieges,
+    negotiations), use the start date and capture duration in the prose
+    `evidenceStatement`. v2 may add structured duration.
+
+# --- OfficialStatementEvidence properties ---
+
+speaker:
+  type: owl.ObjectProperty
+  domain: OfficialStatementEvidence
+  range: Party
+  label: Speaker
+  comment: >
+    The named official making the statement. References a Party instance.
+    Use a Party rather than a free-form string so the same speaker across
+    multiple statements is unambiguously the same entity.
+
+speakerRole:
+  type: owl.ObjectProperty
+  domain: OfficialStatementEvidence
+  range: Role
+  label: Speaker Role
+  comment: >
+    The role the speaker held at the time of the statement. References a
+    Role instance. Use Role rather than a free-form string to disambiguate
+    "Fed Chair" vs "Fed Chair (outgoing)" vs "Fed Chair nominee" - those are
+    distinct Role instances reflecting position in a transition lifecycle.
+
+statementVenue:
+  type: owl.DatatypeProperty
+  domain: OfficialStatementEvidence
+  range: xsd.string
+  label: Statement Venue
+  comment: >
+    Where the statement was delivered (press conference, hearing, written
+    release, interview). String for v1; v2 may upgrade to a typed Venue
+    class once usage patterns stabilize.
+
+statementDate:
+  type: owl.DatatypeProperty
+  domain: OfficialStatementEvidence
+  range: xsd.date
+  label: Statement Date
+  comment: >
+    Date of the statement. Distinct from `evidenceObservedAt` (the article
+    publication time) when a statement is reported after the fact.
+
+# --- EconomicDataEvidence properties ---
+
+indicatorName:
+  type: owl.ObjectProperty
+  domain: EconomicDataEvidence
+  range: Indicator
+  label: Indicator
+  comment: >
+    The named Indicator this datapoint observes. References an Indicator
+    instance defined in a domain package (e.g. `fin.10y-treasury-yield`,
+    `fin.unemployment-rate`). Indicators are typed so multiple readings of
+    the same indicator across snapshots are unambiguously comparable.
+
+indicatorValue:
+  type: owl.DatatypeProperty
+  domain: EconomicDataEvidence
+  range: xsd.decimal
+  label: Indicator Value
+  comment: >
+    The numeric reading. Units are carried by the Indicator instance, not
+    the value - "4.42% 10y yield" stores `4.42` here and `pct` on the
+    Indicator. Avoid stuffing units, qualifiers, or ranges into the value.
+    For range readings, use evidenceStatement prose; v2 may add a
+    structured range type.
+
+indicatorPeriod:
+  type: owl.DatatypeProperty
+  domain: EconomicDataEvidence
+  range: xsd.string
+  label: Indicator Period
+  comment: >
+    String describing the reading's reporting period (e.g. "April 2026",
+    "Q1 2026", "trailing 25-30 years"). Free-form for v1; v2 may upgrade
+    to a typed FiscalPeriod / RangeRef.
+
+
+# =============================================================================
+# 6. REFERENCE VOCABULARY STUBS
+#
+# Abstract classes whose concrete instances are typically defined in
+# domain-specific packages. This package defines NO instances of these
+# classes - finance, climate, scientific extensions add their own.
+# =============================================================================
+
+GovernmentBody:
+  type: rdfs.Class
+  label: Government Body
+  comment: >
+    A government body - executive office, legislature, regulatory agency,
+    judicial body, sovereign wealth manager. Typically defined per-country
+    in domain extensions (e.g. `gov-us.white-house`, `gov-us.dod`,
+    `gov-us.fed`). The class itself is in core so PolicyEvidence can have a
+    typed `issuingBody` regardless of country.
+
+Location:
+  type: rdfs.Class
+  label: Location
+  comment: >
+    A geographic or jurisdictional location - country, region, body of water,
+    airspace, building, or named area. Locations are typed so the same place
+    (e.g. "Persian Gulf") referenced across many GeopoliticalEvidence
+    instances is unambiguously a single entity.
+
+Party:
+  type: rdfs.Class
+  label: Party
+  comment: >
+    A party in a geopolitical or institutional sense - nation, organization,
+    or individual official. Used by GeopoliticalEvidence.partiesInvolved and
+    OfficialStatementEvidence.speaker. Concrete Party instances live in
+    domain packages.
+
+Role:
+  type: rdfs.Class
+  label: Role
+  comment: >
+    An office, title, or functional role held by a Party (typically an
+    individual). Roles can be lifecycle-specific - "Fed Chair", "Fed Chair
+    (outgoing)", and "Fed Chair nominee" are distinct Role instances during
+    a transition because they carry different policy weight.
+
+Institution:
+  type: rdfs.Class
+  label: Institution
+  comment: >
+    A persistent organization - corporation, central bank, sell-side analyst
+    house, multilateral body, NGO. Domain extensions subclass this for typed
+    differentiation (CentralBank, AnalystInstitution, etc.).
+
+Indicator:
+  type: rdfs.Class
+  label: Indicator
+  comment: >
+    A named, repeatedly-observed numeric series - a market price, a yield, a
+    macro statistic, an aggregate flow. Indicators are typed so cross-
+    snapshot comparisons of "the same indicator" are unambiguous. Concrete
+    Indicator instances live in domain packages; this package only declares
+    the abstract class.
+
+EventType:
+  type: rdfs.Class
+  label: Event Type
+  comment: >
+    A named category of event the runtime can detect against a curated event
+    log. Used by Condition's event-condition kind. Concrete EventType
+    instances (e.g. `fin-events.hormuz-reopened`,
+    `fin-events.opec-supply-increase-material`) live in domain packages.
+
+
+# =============================================================================
+# 7. POLICY-TYPE ENUMERATION (generic; finance and other domains can add more)
+# =============================================================================
+
+PolicyType:
+  type: rdfs.Class
+  label: Policy Type
+  comment: >
+    Categorical type of government action. Open enumeration - this package
+    seeds widely-applicable types; domain extensions can add specialized
+    types via additional named instances of PolicyType.
+
+appointment:
+  type: PolicyType
+  label: Appointment
+  comment: >
+    Naming or confirming an individual to a government office or seat -
+    cabinet appointments, judicial nominations, central bank chair
+    nominations, board seats.
+
+executive-order:
+  type: PolicyType
+  label: Executive Order
+  comment: >
+    A directive issued by a head of state with the force of law within
+    their constitutional authority. Captures both new orders and revocations.
+
+budget:
+  type: PolicyType
+  label: Budget
+  comment: >
+    Formal budget appropriation or budget request - whether enacted, vetoed,
+    or in process. The `effectiveDate` carries the fiscal year start.
+
+sanction:
+  type: PolicyType
+  label: Sanction
+  comment: >
+    Economic or trade sanction imposed on a target party (nation,
+    organization, individual). Sanctions removal is a separate PolicyType
+    instance (`sanction-lifted`).
+
+sanction-lifted:
+  type: PolicyType
+  label: Sanction Lifted
+  comment: >
+    Removal or suspension of a previously-imposed sanction.
+
+treaty:
+  type: PolicyType
+  label: Treaty
+  comment: >
+    A formal international agreement - signed, ratified, withdrawn, or
+    amended. Captures bilateral and multilateral instruments alike.
+
+investigation:
+  type: PolicyType
+  label: Investigation
+  comment: >
+    A formal investigative action - opening, halting, settling, or closing
+    an inquiry. Investigations of officials are PolicyEvidence; the
+    underlying conduct may also generate other Evidence types.
+
+regulatory-ruling:
+  type: PolicyType
+  label: Regulatory Ruling
+  comment: >
+    A formal ruling, order, or rulemaking by an executive-branch regulator.
+    Distinct from `executive-order` (which is from the head of state).
+
+public-pressure:
+  type: PolicyType
+  label: Public Pressure
+  comment: >
+    A government actor publicly pressuring another institution for an
+    outcome - executive criticizing the central bank, legislator demanding
+    agency action. No formal force of law but materially shapes expectations.
+
+fiscal-pressure:
+  type: PolicyType
+  label: Fiscal Pressure
+  comment: >
+    A structural fiscal condition acting as a constraint on policy choices -
+    e.g. a debt-service obligation that materially limits fiscal headroom.
+    Captures the constraint, not a specific action.
+
+
+# =============================================================================
+# 8. CONDITION DSL
+#
+# A tagged-union expression tree for invalidation conditions. The single
+# Condition class with a `kind` discriminator avoids deep subclass
+# hierarchies that would conflict with the EmbeddedKanonakNoExplicitType
+# validator rule on deeply-nested condition trees.
+# =============================================================================
+
+Condition:
+  type: rdfs.Class
+  label: Condition
+  comment: >
+    A node in a boolean condition tree. The `kind` property discriminates
+    which concrete behavior this instance represents. A runtime evaluator
+    walks the tree against current data plus an event log and returns an
+    EvaluationState (satisfied, partially-satisfied, unsatisfied, unknown)
+    plus a structured trace.
+
+ConditionKind:
+  type: rdfs.Class
+  label: Condition Kind
+  comment: >
+    Discriminator vocabulary for Condition. Named instances below enumerate
+    the v1 set. New kinds are added by declaring new named instances and
+    teaching the runtime evaluator the corresponding handler.
+
+# --- Properties on Condition (each kind uses a subset) ---
+
+kind:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: ConditionKind
+  label: Kind
+  comment: Discriminator. Required on every Condition instance.
+
+operands:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: Operands
+  comment: >
+    (kind=and-condition, or-condition) Ordered list of child Conditions
+    composed by the boolean operator.
+
+operand:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: Operand
+  comment: >
+    (kind=not-condition) The single child Condition to negate.
+
+observable:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Indicator
+  label: Observable
+  comment: >
+    (kind=threshold-condition) The Indicator whose value is compared
+    against `threshold` using `comparator`.
+
+comparator:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Comparator
+  label: Comparator
+  comment: >
+    (kind=threshold-condition, indicator-comparison) The comparison operator
+    applied between the left and right sides.
+
+threshold:
+  type: owl.DatatypeProperty
+  domain: Condition
+  range: xsd.decimal
+  label: Threshold
+  comment: >
+    (kind=threshold-condition) Numeric value compared against the observable.
+
+thresholdHigh:
+  type: owl.DatatypeProperty
+  domain: Condition
+  range: xsd.decimal
+  label: Threshold High
+  comment: >
+    (kind=threshold-condition with comparator=between) Upper bound of the
+    range. Lower bound is given by `threshold`. The condition is satisfied
+    when the observable lies in [threshold, thresholdHigh] inclusive.
+
+unit:
+  type: owl.DatatypeProperty
+  domain: Condition
+  range: xsd.string
+  label: Unit
+  comment: >
+    (kind=threshold-condition, indicator-comparison) Free-form unit string
+    documenting the threshold's units (e.g. "usd-per-bbl", "pct"). For
+    informational and rendering use; the underlying Indicator carries the
+    canonical unit. v2 may upgrade to a typed Unit class.
+
+persistence:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: PersistenceWindow
+  label: Persistence
+  comment: >
+    (kind=threshold-condition, indicator-comparison) Optional window during
+    which the comparator must remain true before the condition is `satisfied`.
+    Without a persistence window, a single satisfying reading flips the
+    condition to satisfied; with one, the condition is `partially-satisfied`
+    inside the window and `satisfied` only after the window elapses.
+
+left:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Indicator
+  label: Left
+  comment: >
+    (kind=indicator-comparison) The left-hand-side observable in a cross-
+    indicator comparison. May be either an Indicator or a DerivedIndicator.
+
+right:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Indicator
+  label: Right
+  comment: >
+    (kind=indicator-comparison) The right-hand-side observable. Typically a
+    DerivedIndicator (e.g. a moving average of `left`) when the comparison
+    expresses a technical-analysis condition.
+
+eventType:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: EventType
+  label: Event Type
+  comment: >
+    (kind=event-condition) The category of event the condition tests for.
+    Resolved against a runtime-curated event log.
+
+durability:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Durability
+  label: Durability
+  comment: >
+    (kind=event-condition) Optional. Requires the matched event to carry
+    the specified durability classification (durable, transient, unspecified).
+    Filters the event log to events that have been judged durable - useful
+    for "after durable peace" semantics where a transient ceasefire shouldn't
+    satisfy the condition.
+
+withinWindow:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: TimeWindow
+  label: Within Window
+  comment: >
+    (kind=event-condition, sequenced-condition, indicator-available)
+    Optional. Requires the event or sequenced satisfaction to occur within
+    the specified time window relative to evaluation time.
+
+after:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: After
+  comment: >
+    (kind=sequenced-condition) The prerequisite Condition that must become
+    satisfied at some time T0 before `then` is evaluated. The runtime
+    tracks T0 in the event log so re-evaluation across days is consistent.
+
+then:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: Then
+  comment: >
+    (kind=sequenced-condition) The Condition evaluated against time >= T0
+    (where T0 is when `after` first became satisfied). Optionally bounded
+    by `withinWindow`.
+
+before:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: Before
+  comment: >
+    (kind=before-condition) The deadline Condition - if `before` becomes
+    satisfied before `mustOccur` does, the before-condition is satisfied
+    (i.e. the deadline passed without the prerequisite occurring).
+
+mustOccur:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Condition
+  label: Must Occur
+  comment: >
+    (kind=before-condition) The prerequisite that must become satisfied
+    before `before` does, otherwise the before-condition fires.
+
+indicator:
+  type: owl.ObjectProperty
+  domain: Condition
+  range: Indicator
+  label: Indicator
+  comment: >
+    (kind=indicator-available) The Indicator whose data freshness is being
+    asserted. Satisfied if the indicator has at least one observation
+    within `withinWindow` (if specified) or any observation at all (if not).
+
+# --- ConditionKind named instances ---
+
+and-condition:
+  type: ConditionKind
+  label: And
+  comment: >
+    Boolean AND. Satisfied iff every operand is satisfied. Unsatisfied if
+    any operand is unsatisfied. Unknown if any operand is unknown (and no
+    operand is unsatisfied). Otherwise partially-satisfied.
+
+or-condition:
+  type: ConditionKind
+  label: Or
+  comment: >
+    Boolean OR. Satisfied if any operand is satisfied. Unsatisfied iff every
+    operand is unsatisfied. Unknown if any operand is unknown (and no
+    operand is satisfied). Otherwise partially-satisfied.
+
+not-condition:
+  type: ConditionKind
+  label: Not
+  comment: >
+    Boolean NOT. Inverts satisfied / unsatisfied. Partial stays partial;
+    unknown stays unknown.
+
+threshold-condition:
+  type: ConditionKind
+  label: Threshold
+  comment: >
+    Numeric threshold check. Reads `observable`'s most recent value and
+    compares to `threshold` using `comparator`. With `persistence`, the
+    condition is partially-satisfied inside the persistence window and
+    satisfied only after duration elapses with the comparator continuously
+    true.
+
+indicator-comparison:
+  type: ConditionKind
+  label: Indicator Comparison
+  comment: >
+    Cross-indicator comparison. Compares `left` observable against `right`
+    observable using `comparator`. Same persistence semantics as threshold-
+    condition. Typical use: technical-analysis predicates ("SPY below 50d MA")
+    where right is a DerivedIndicator on left.
+
+event-condition:
+  type: ConditionKind
+  label: Event
+  comment: >
+    Event-log presence check. Satisfied if an event of `eventType` (with
+    the optionally-specified `durability`) has been recorded in the event
+    log within `withinWindow` if specified, or ever otherwise. The event
+    log itself is runtime infrastructure outside this ontology.
+
+sequenced-condition:
+  type: ConditionKind
+  label: Sequenced
+  comment: >
+    Temporal sequencing. Satisfied when `after` first became satisfied at
+    some time T0 AND `then` is satisfied evaluated against time >= T0
+    (optionally within `withinWindow` of T0). Unknown until T0 is recorded.
+    Used for "X following durable Y" patterns.
+
+before-condition:
+  type: ConditionKind
+  label: Before
+  comment: >
+    Deadline check. Satisfied if `before` becomes satisfied before
+    `mustOccur` does - i.e. the deadline passed without the prerequisite
+    materializing. The mirror of sequenced-condition for invalidations
+    that fire on the absence of an expected event.
+
+indicator-available:
+  type: ConditionKind
+  label: Indicator Available
+  comment: >
+    Data-freshness guard. Satisfied if `indicator` has at least one
+    observation within `withinWindow` (if specified). Used as a wrapper
+    around threshold-condition leaves to prevent false-unsatisfied results
+    when the underlying data feed is stale.
+
+always-satisfied:
+  type: ConditionKind
+  label: Always Satisfied
+  comment: >
+    Constant. Always returns satisfied. Useful for testing condition trees
+    and for placeholder leaves during incremental authoring.
+
+always-unsatisfied:
+  type: ConditionKind
+  label: Always Unsatisfied
+  comment: >
+    Constant. Always returns unsatisfied. Mirror of always-satisfied.
+
+
+# =============================================================================
+# 9. COMPARATOR
+# =============================================================================
+
+Comparator:
+  type: rdfs.Class
+  label: Comparator
+  comment: >
+    Numeric comparison operator. Closed enumeration - the six instances
+    below are the v1 set.
+
+lt:
+  type: Comparator
+  label: Less Than
+  comment: Strict less-than. Threshold value is exclusive.
+
+lte:
+  type: Comparator
+  label: Less Than or Equal
+  comment: Less-than-or-equal. Threshold value is inclusive.
+
+gt:
+  type: Comparator
+  label: Greater Than
+  comment: Strict greater-than. Threshold value is exclusive.
+
+gte:
+  type: Comparator
+  label: Greater Than or Equal
+  comment: Greater-than-or-equal. Threshold value is inclusive.
+
+eq:
+  type: Comparator
+  label: Equal
+  comment: >
+    Numeric equality. Use sparingly with floats; prefer between with a small
+    tolerance band when checking near-equality.
+
+between:
+  type: Comparator
+  label: Between
+  comment: >
+    Range membership. Requires both `threshold` (low bound) and
+    `thresholdHigh` (high bound). Inclusive on both ends.
+
+
+# =============================================================================
+# 10. TIME UNIT
+# =============================================================================
+
+TimeUnit:
+  type: rdfs.Class
+  label: Time Unit
+  comment: >
+    Duration unit for PersistenceWindow and TimeWindow. Open enumeration -
+    domain extensions can add specialized units (e.g. fomc-meetings in
+    finance) where the abstract calendar units are insufficient.
+
+minutes:
+  type: TimeUnit
+  label: Minutes
+  comment: One minute = 60 seconds.
+
+hours:
+  type: TimeUnit
+  label: Hours
+  comment: One hour = 60 minutes.
+
+trading-days:
+  type: TimeUnit
+  label: Trading Days
+  comment: >
+    Days the relevant market is open. Implementation depends on the
+    Indicator's market calendar; the runtime is responsible for resolving
+    "5 trading days" against the appropriate calendar.
+
+calendar-days:
+  type: TimeUnit
+  label: Calendar Days
+  comment: 24-hour calendar days, regardless of market or business calendar.
+
+months:
+  type: TimeUnit
+  label: Months
+  comment: >
+    Calendar months. "3 months" means three calendar-month boundaries have
+    been crossed since the start of the window.
+
+fiscal-quarters:
+  type: TimeUnit
+  label: Fiscal Quarters
+  comment: >
+    Standard quarterly periods (Q1, Q2, Q3, Q4). For entities on non-calendar
+    fiscal years, the runtime should resolve against the relevant entity's
+    fiscal calendar.
+
+
+# =============================================================================
+# 11. DURABILITY
+# =============================================================================
+
+Durability:
+  type: rdfs.Class
+  label: Durability
+  comment: >
+    Classification of how long an event's effects are expected to last.
+    Used by event-condition to filter the event log. The judgment is the
+    event-log curator's, not auto-derived.
+
+durable:
+  type: Durability
+  label: Durable
+  comment: >
+    The event's effects persist over a meaningful timeframe. Examples - a
+    signed treaty, a confirmed appointment, a structurally-implemented
+    sanction, a regulatory rulemaking that takes effect.
+
+transient:
+  type: Durability
+  label: Transient
+  comment: >
+    The event has occurred but its effects are not expected to persist.
+    Examples - a verbal pause in operations, a preliminary indication of
+    intent, a non-binding statement of position.
+
+unspecified:
+  type: Durability
+  label: Unspecified
+  comment: >
+    The curator has not yet judged durability. Default for newly-recorded
+    events. event-condition with durability=unspecified matches any event of
+    the type regardless of durability classification.
+
+
+# =============================================================================
+# 12. EVALUATION STATE
+# =============================================================================
+
+EvaluationState:
+  type: rdfs.Class
+  label: Evaluation State
+  comment: >
+    The four possible outcomes of evaluating a Condition tree. Carried in
+    ConditionResult instances at runtime. Closed enumeration.
+
+satisfied:
+  type: EvaluationState
+  label: Satisfied
+  comment: >
+    The condition is fully satisfied against current data. For an
+    invalidationCondition root, this signals the thesis SHOULD be flagged
+    for human review and a status flip to invalidated.
+
+partially-satisfied:
+  type: EvaluationState
+  label: Partially Satisfied
+  comment: >
+    The condition is not yet satisfied but is making progress toward
+    satisfaction (e.g. inside a persistence window with the underlying
+    comparator currently true; sequenced-condition with `after` satisfied
+    but `then` not yet). A leading indicator that the thesis may invalidate.
+
+unsatisfied:
+  type: EvaluationState
+  label: Unsatisfied
+  comment: >
+    The condition is not satisfied and not currently making progress toward
+    satisfaction. The thesis remains intact under this dimension.
+
+unknown:
+  type: EvaluationState
+  label: Unknown
+  comment: >
+    The condition cannot be evaluated due to missing or stale data, or an
+    unresolved event-log query. Distinct from unsatisfied - "we don't know"
+    is operationally important to surface rather than silently treating as
+    unsatisfied.
+
+
+# =============================================================================
+# 13. PERSISTENCE WINDOW AND TIME WINDOW
+# =============================================================================
+
+PersistenceWindow:
+  type: rdfs.Class
+  label: Persistence Window
+  comment: >
+    A duration over which a condition's underlying comparator must remain
+    continuously true before the condition is satisfied. Composes a
+    `duration` (integer) with a TimeUnit reference.
+
+duration:
+  type: owl.DatatypeProperty
+  domain: PersistenceWindow
+  range: xsd.integer
+  label: Duration
+  comment: Number of TimeUnit-units to persist. Positive integer.
+
+windowUnit:
+  type: owl.ObjectProperty
+  domain: PersistenceWindow
+  range: TimeUnit
+  label: Window Unit
+  comment: >
+    The TimeUnit that scales `duration`. Together they define the window
+    size (e.g. duration=30, windowUnit=calendar-days = 30 calendar days).
+
+TimeWindow:
+  type: rdfs.Class
+  label: Time Window
+  comment: >
+    A bounded duration relative to evaluation time, used by event-condition
+    and sequenced-condition to constrain "within the past N units" matching.
+    Composes a `windowDuration` with a `windowTimeUnit`.
+
+windowDuration:
+  type: owl.DatatypeProperty
+  domain: TimeWindow
+  range: xsd.integer
+  label: Window Duration
+  comment: Number of TimeUnit-units the window spans.
+
+windowTimeUnit:
+  type: owl.ObjectProperty
+  domain: TimeWindow
+  range: TimeUnit
+  label: Window Time Unit
+  comment: The TimeUnit that scales `windowDuration`.
+
+
+# =============================================================================
+# 14. DERIVED INDICATOR
+# =============================================================================
+
+DerivedIndicator:
+  type: rdfs.Class
+  subClassOf: Indicator
+  label: Derived Indicator
+  comment: >
+    An Indicator whose value is computed at evaluation time from another
+    Indicator plus a derivation kind. Distinct from a base Indicator (whose
+    values come from a data feed). v1 supports moving-average; future
+    derivations (rolling-stdev, percent-change, z-score) are added by
+    declaring new DerivedIndicatorKind named instances.
+
+DerivedIndicatorKind:
+  type: rdfs.Class
+  label: Derived Indicator Kind
+  comment: Discriminator vocabulary for DerivedIndicator.
+
+derivedKind:
+  type: owl.ObjectProperty
+  domain: DerivedIndicator
+  range: DerivedIndicatorKind
+  label: Derived Kind
+  comment: Which derivation this DerivedIndicator computes.
+
+of:
+  type: owl.ObjectProperty
+  domain: DerivedIndicator
+  range: Indicator
+  label: Of
+  comment: The source Indicator the derivation operates on.
+
+period:
+  type: owl.DatatypeProperty
+  domain: DerivedIndicator
+  range: xsd.integer
+  label: Period
+  comment: >
+    The lookback period for the derivation, expressed in TimeUnit-units of
+    the periodUnit. For moving-average, the number of bars in the average
+    (50, 200, etc.).
+
+periodUnit:
+  type: owl.ObjectProperty
+  domain: DerivedIndicator
+  range: TimeUnit
+  label: Period Unit
+  comment: TimeUnit scaling `period`. Most commonly `trading-days`.
+
+moving-average:
+  type: DerivedIndicatorKind
+  label: Moving Average
+  comment: >
+    Simple moving average of the source Indicator over `period` units of
+    `periodUnit`. The runtime computes by averaging the trailing `period`
+    observations.
+
+
+# =============================================================================
+# 15. ROLE - generic seed instances
+#
+# A few broadly-applicable Role instances any worldview can reference.
+# Domain extensions add specialized roles (head-of-state-of-us, central-
+# bank-chair, etc.).
+# =============================================================================
+
+head-of-state:
+  type: Role
+  label: Head of State
+  comment: >
+    Generic role for the chief executive of a sovereign nation. Specialize
+    per country in domain extensions when the role-name disambiguation
+    matters (President-of-US vs Prime-Minister-of-UK).
+
+legislator:
+  type: Role
+  label: Legislator
+  comment: Generic role for an elected member of a legislative body.
+
+regulator:
+  type: Role
+  label: Regulator
+  comment: >
+    Generic role for an executive-branch regulator at the agency or
+    director level.
+
+central-banker:
+  type: Role
+  label: Central Banker
+  comment: >
+    Generic role for a member of a central bank's policymaking committee.
+    Specialize in finance extensions when chair vs governor vs regional-
+    president disambiguation matters.
+
+judge:
+  type: Role
+  label: Judge
+  comment: Generic role for a judicial officer.
+
+journalist:
+  type: Role
+  label: Journalist
+  comment: >
+    Generic role for an attributable financial-press author. Used when
+    the press is the speaker rather than the venue.
