@@ -39,7 +39,7 @@ finance:
 #      named instances of each.
 #   5. Seeded named instances for the magic-string vocabularies the audit
 #      called out: MarketMetric, CorporateMetric, FiscalPeriod, ForecastHorizon,
-#      finance-specific FinPolicyType, Indicator, FinEventType, Role.
+#      finance-specific Policy additions, Indicator, MarketEvent, Role.
 #   6. A handful of seeded GovernmentBody instances relevant to financial
 #      policy (US-centric for v1).
 #   7. A VoteCount composite for CentralBankEvidence.voteCount, replacing
@@ -144,13 +144,18 @@ InstitutionalFlowEvidence:
 
 aboutSecurity:
   type: owl.ObjectProperty
-  domain: MarketDataEvidence
+  domain: wv.Evidence
   range: Security
   label: About Security
   comment: >
-    The Security this market datapoint observes. Optional - aggregate
-    metrics (sector returns, broad-market correlations) may not have a
-    single Security in scope.
+    The Security this evidence is about. Used by MarketDataEvidence
+    (observed price/return/volume), CorporateEvidence (the issuer being
+    reported on), AnalystEvidence (the forecast target — also exposed via
+    the alias `forecastTarget` for forecast-specific semantics), and
+    InstitutionalFlowEvidence (the instrument the flow is into or out of).
+    Optional - aggregate readings (sector returns, broad-market
+    correlations, index-level earnings stats) may not have a single
+    Security in scope.
 
 marketMetric:
   type: owl.ObjectProperty
@@ -175,17 +180,8 @@ observedValue:
     the prose `evidenceStatement` and pick the most representative scalar.
 
 # --- CorporateEvidence properties ---
-
-aboutSecurityCorporate:
-  type: owl.ObjectProperty
-  domain: CorporateEvidence
-  range: Security
-  label: About Security
-  comment: >
-    The Security this corporate datapoint references. Reused by both
-    aboutSecurity (above) and aboutSecurityCorporate to keep domain/range
-    typing clean. v2 may consolidate via property-level subsumption once
-    the OWL toolchain supports it more cleanly.
+# (CorporateEvidence reuses aboutSecurity declared above — single property
+# with domain=wv.Evidence for all subclasses that point at a Security.)
 
 corporateMetric:
   type: owl.ObjectProperty
@@ -1032,20 +1028,20 @@ abstainCount:
 
 
 # =============================================================================
-# 14. FINANCE EVENT TYPES (seed FinEventType named instances)
+# 14. MARKET EVENTS (seed MarketEvent named instances)
 # =============================================================================
 
-FinEventType:
+MarketEvent:
   type: rdfs.Class
-  subClassOf: wv.EventType
-  label: Finance Event Type
+  subClassOf: wv.Event
+  label: Market Event
   comment: >
-    Subclass of wv.EventType for finance-domain event categories. Instances
-    below are abstract event types - the runtime event log records concrete
-    event instances classified by these types.
+    Subclass of wv.Event for finance-domain event categories. Named instances
+    below are categories of market-relevant events; the runtime event log
+    records concrete event occurrences classified by these categories.
 
 evt-strait-of-hormuz-reopened:
-  type: FinEventType
+  type: MarketEvent
   label: Strait of Hormuz Reopened
   comment: >
     Strait of Hormuz reopens to commercial shipping after a closure event.
@@ -1053,12 +1049,12 @@ evt-strait-of-hormuz-reopened:
     reopening to be classified as durable rather than transient.
 
 evt-strait-of-hormuz-closed:
-  type: FinEventType
+  type: MarketEvent
   label: Strait of Hormuz Closed
   comment: Strait of Hormuz closes to commercial shipping (formal or de facto).
 
 evt-opec-supply-shock:
-  type: FinEventType
+  type: MarketEvent
   label: OPEC Supply Shock
   comment: >
     Material OPEC+ supply increase or decrease that materially shifts the
@@ -1066,14 +1062,14 @@ evt-opec-supply-shock:
     change, but the runtime threshold is curator-judged).
 
 evt-fomc-statement-released:
-  type: FinEventType
+  type: MarketEvent
   label: FOMC Statement Released
   comment: >
     Scheduled FOMC policy statement is published. Used by sequenced-
     conditions that wait for the next FOMC meeting.
 
 evt-us-iran-peace-agreement-implemented:
-  type: FinEventType
+  type: MarketEvent
   label: US-Iran Peace Agreement Implemented
   comment: >
     A formal, durable US-Iran peace agreement takes effect. Distinct from
@@ -1081,14 +1077,14 @@ evt-us-iran-peace-agreement-implemented:
     (which may not be implemented). Pair with `durability: durable`.
 
 evt-us-china-export-controls-extended:
-  type: FinEventType
+  type: MarketEvent
   label: US-China Export Controls Extended
   comment: >
     The US announces or implements an extension of export controls on
     semiconductors or other strategic technologies to China.
 
 evt-fed-chair-continuity-signal:
-  type: FinEventType
+  type: MarketEvent
   label: Fed Chair Continuity Signal
   comment: >
     A new Fed Chair delivers a public statement that markets read as
@@ -1096,7 +1092,7 @@ evt-fed-chair-continuity-signal:
     based on the speech content and market reaction.
 
 evt-fed-credibility-restored:
-  type: FinEventType
+  type: MarketEvent
   label: Fed Credibility Restored
   comment: >
     Curator-judged composite event - market-implied Fed credibility
@@ -1192,11 +1188,11 @@ us-representative:
 
 
 # =============================================================================
-# 17. FINANCE-SPECIFIC POLICY TYPES (additions to wv.PolicyType)
+# 17. FINANCE-SPECIFIC POLICY CATEGORIES (additions to wv.Policy)
 # =============================================================================
 
 revenue-share-export-license:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Revenue-Share Export License
   comment: >
     A novel licensing arrangement where the US government issues export
@@ -1205,7 +1201,7 @@ revenue-share-export-license:
     mechanism.
 
 procurement-expansion:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Procurement Expansion
   comment: >
     A government procurement order increase for materiel - munitions,
@@ -1213,14 +1209,14 @@ procurement-expansion:
     because procurement-expansion happens within an existing appropriation.
 
 military-operations-pause:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Military Operations Pause
   comment: >
     A pause or suspension of an ongoing military operation, typically
     announced in connection with diplomatic progress.
 
 nomination-advancement:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Nomination Advancement
   comment: >
     A Senate committee vote to advance a presidential nomination to the
@@ -1228,13 +1224,13 @@ nomination-advancement:
     and from full-Senate confirmation.
 
 nomination-vote-scheduling:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Nomination Vote Scheduling
   comment: >
     A formal scheduling of the full-Senate confirmation vote.
 
 procedural-hold-lift:
-  type: wv.PolicyType
+  type: wv.Policy
   label: Procedural Hold Lift
   comment: >
     A senator's lifting of a procedural hold on a nomination or bill.

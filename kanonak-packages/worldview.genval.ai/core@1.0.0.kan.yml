@@ -33,7 +33,7 @@ core:
 #   2. Evidence base + four generic Evidence subclasses - the typed claims
 #      that support theses.
 #   3. Status and Strength enumerations - small categorical vocabularies.
-#   4. Reference vocabulary stubs - abstract classes (Indicator, EventType,
+#   4. Reference vocabulary stubs - abstract classes (Indicator, Event,
 #      Institution, GovernmentBody, Location, Party, Role) whose concrete
 #      instances live in domain-specific packages (e.g. worldview.genval.ai/
 #      finance for finance-domain instances).
@@ -41,10 +41,10 @@ core:
 #      invalidation conditions into something a rules engine can evaluate.
 #   6. Generic seed instances - small enumerations the DSL itself depends on
 #      (Comparator, TimeUnit, Durability, EvaluationState, DerivedIndicatorKind)
-#      plus broad PolicyType / Role members usable across domains.
+#      plus broad Policy / Role members usable across domains.
 #
 # Domain extensions (finance, climate, scientific, etc.) import this package,
-# subclass Evidence / Indicator / EventType for their domain, and add named
+# subclass Evidence / Indicator / Event for their domain, and add named
 # instances of the abstract reference classes.
 #
 # This package is the canonical source of truth. Reference documentation
@@ -369,16 +369,16 @@ issuingBody:
     Reference to a GovernmentBody instance (typically defined in a
     domain-specific or country-specific package).
 
-policyType:
+policy:
   type: owl.ObjectProperty
   domain: PolicyEvidence
-  range: PolicyType
-  label: Policy Type
+  range: Policy
+  label: Policy Category
   comment: >
-    Categorical type of policy action. References a PolicyType named
-    instance. Generic types (appointment, executive-order, budget,
-    sanction, treaty, investigation) live in this package; domain-
-    specific types may be added in extension packages.
+    Categorical type of policy action. References a Policy named instance.
+    Generic categories (appointment, executive-order, budget, sanction,
+    treaty, investigation) live in this package; domain-specific categories
+    may be added in extension packages.
 
 effectiveDate:
   type: owl.DatatypeProperty
@@ -564,30 +564,34 @@ Indicator:
     Indicator instances live in domain packages; this package only declares
     the abstract class.
 
-EventType:
+Event:
   type: rdfs.Class
-  label: Event Type
+  label: Event
   comment: >
     A named category of event the runtime can detect against a curated event
-    log. Used by Condition's event-condition kind. Concrete EventType
-    instances (e.g. `fin-events.hormuz-reopened`,
-    `fin-events.opec-supply-increase-material`) live in domain packages.
+    log. Used by Condition's event-condition kind. Concrete Event instances
+    (e.g. `fin.evt-strait-of-hormuz-reopened`, `fin.evt-opec-supply-shock`)
+    live in domain packages. Each named instance is a CATEGORY of event;
+    specific event occurrences live in the runtime event log.
 
 
 # =============================================================================
 # 7. POLICY-TYPE ENUMERATION (generic; finance and other domains can add more)
 # =============================================================================
 
-PolicyType:
+Policy:
   type: rdfs.Class
-  label: Policy Type
+  label: Policy
   comment: >
-    Categorical type of government action. Open enumeration - this package
-    seeds widely-applicable types; domain extensions can add specialized
-    types via additional named instances of PolicyType.
+    A category of government action. Open enumeration - this package
+    seeds widely-applicable categories; domain extensions can add specialized
+    ones via additional named instances. Named instances represent KINDS of
+    policy actions (executive-order, appointment, treaty), not specific
+    policies; a specific policy action is a PolicyEvidence instance whose
+    `policy` property points at the relevant Policy named instance.
 
 appointment:
-  type: PolicyType
+  type: Policy
   label: Appointment
   comment: >
     Naming or confirming an individual to a government office or seat -
@@ -595,42 +599,42 @@ appointment:
     nominations, board seats.
 
 executive-order:
-  type: PolicyType
+  type: Policy
   label: Executive Order
   comment: >
     A directive issued by a head of state with the force of law within
     their constitutional authority. Captures both new orders and revocations.
 
 budget:
-  type: PolicyType
+  type: Policy
   label: Budget
   comment: >
     Formal budget appropriation or budget request - whether enacted, vetoed,
     or in process. The `effectiveDate` carries the fiscal year start.
 
 sanction:
-  type: PolicyType
+  type: Policy
   label: Sanction
   comment: >
     Economic or trade sanction imposed on a target party (nation,
-    organization, individual). Sanctions removal is a separate PolicyType
+    organization, individual). Sanctions removal is a separate Policy
     instance (`sanction-lifted`).
 
 sanction-lifted:
-  type: PolicyType
+  type: Policy
   label: Sanction Lifted
   comment: >
     Removal or suspension of a previously-imposed sanction.
 
 treaty:
-  type: PolicyType
+  type: Policy
   label: Treaty
   comment: >
     A formal international agreement - signed, ratified, withdrawn, or
     amended. Captures bilateral and multilateral instruments alike.
 
 investigation:
-  type: PolicyType
+  type: Policy
   label: Investigation
   comment: >
     A formal investigative action - opening, halting, settling, or closing
@@ -638,14 +642,14 @@ investigation:
     underlying conduct may also generate other Evidence types.
 
 regulatory-ruling:
-  type: PolicyType
+  type: Policy
   label: Regulatory Ruling
   comment: >
     A formal ruling, order, or rulemaking by an executive-branch regulator.
     Distinct from `executive-order` (which is from the head of state).
 
 public-pressure:
-  type: PolicyType
+  type: Policy
   label: Public Pressure
   comment: >
     A government actor publicly pressuring another institution for an
@@ -653,7 +657,7 @@ public-pressure:
     agency action. No formal force of law but materially shapes expectations.
 
 fiscal-pressure:
-  type: PolicyType
+  type: Policy
   label: Fiscal Pressure
   comment: >
     A structural fiscal condition acting as a constraint on policy choices -
@@ -792,14 +796,15 @@ right:
     DerivedIndicator (e.g. a moving average of `left`) when the comparison
     expresses a technical-analysis condition.
 
-eventType:
+event:
   type: owl.ObjectProperty
   domain: Condition
-  range: EventType
-  label: Event Type
+  range: Event
+  label: Event
   comment: >
-    (kind=event-condition) The category of event the condition tests for.
-    Resolved against a runtime-curated event log.
+    (kind=event-condition) The category of event the condition tests for,
+    referencing an Event named instance. Resolved at evaluation time
+    against a runtime-curated event log.
 
 durability:
   type: owl.ObjectProperty
@@ -920,7 +925,7 @@ event-condition:
   type: ConditionKind
   label: Event
   comment: >
-    Event-log presence check. Satisfied if an event of `eventType` (with
+    Event-log presence check. Satisfied if an event matching `event` (with
     the optionally-specified `durability`) has been recorded in the event
     log within `withinWindow` if specified, or ever otherwise. The event
     log itself is runtime infrastructure outside this ontology.
