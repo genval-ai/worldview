@@ -1,0 +1,1240 @@
+finance:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.0.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+
+# =============================================================================
+# OVERVIEW
+#
+# Finance-domain extensions to the worldview core ontology. Adds:
+#
+#   1. Security - the typed reference for tradable instruments cited by
+#      finance Evidence subclasses.
+#   2. Five finance-specific Evidence subclasses (subClassOf wv.Evidence):
+#      MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow.
+#   3. Their type-specific properties.
+#   4. Institution subclasses (CentralBank-the-class as subclass of
+#      wv.Institution; AnalystInstitution; ConsensusAggregator) plus seeded
+#      named instances of each.
+#   5. Seeded named instances for the magic-string vocabularies the audit
+#      called out: MarketMetric, CorporateMetric, FiscalPeriod, ForecastHorizon,
+#      finance-specific FinPolicyType, Indicator, FinEventType, Role.
+#   6. A handful of seeded GovernmentBody instances relevant to financial
+#      policy (US-centric for v1).
+#   7. A VoteCount composite for CentralBankEvidence.voteCount, replacing
+#      the "8-4" magic-string pattern.
+#
+# Domain extensions for non-financial worldviews (climate, geopolitical,
+# scientific) DO NOT import this package - they import wv directly and
+# define their own vocabularies. This package is one example of how a
+# domain extends the core ontology.
+# =============================================================================
+
+
+# =============================================================================
+# 1. SECURITY
+# =============================================================================
+
+Security:
+  type: rdfs.Class
+  label: Security
+  comment: >
+    A tradable financial instrument - common stock, ETF, index, futures
+    contract, currency pair. Used by finance Evidence subclasses' `aboutSecurity`
+    and `forecastTarget` properties. Concrete Security instances live in a
+    securities package (typically per-publisher, organized by market) so the
+    finance vocabulary itself does not pin specific tickers; the Security
+    class is the typed contract.
+
+ticker:
+  type: owl.DatatypeProperty
+  domain: Security
+  range: xsd.string
+  label: Ticker
+  comment: >
+    Canonical exchange ticker (uppercase). The instance NAME is kebab-case
+    lowercase (`spy`, `lmt`); the `ticker` property carries the
+    market-canonical form (`SPY`, `LMT`).
+
+assetClass:
+  type: owl.DatatypeProperty
+  domain: Security
+  range: xsd.string
+  label: Asset Class
+  comment: >
+    Free-form classification of the instrument (equity, etf, index, futures,
+    currency-pair). v1 uses a string; v2 may upgrade to a typed AssetClass
+    enumeration once usage stabilizes.
+
+
+# =============================================================================
+# 2. FINANCE EVIDENCE SUBCLASSES
+# =============================================================================
+
+MarketDataEvidence:
+  type: rdfs.Class
+  subClassOf: wv.Evidence
+  label: Market Data Evidence
+  comment: >
+    A price, return, volume, volatility, correlation, valuation, or aggregate-
+    flow reading. The most common Evidence subclass in financial worldviews.
+    Pairs `marketMetric` (categorical type) with `observedValue` (numeric)
+    and optional `aboutSecurity` (which instrument).
+
+CorporateEvidence:
+  type: rdfs.Class
+  subClassOf: wv.Evidence
+  label: Corporate Evidence
+  comment: >
+    A company-specific reported number or event - earnings results, revenue,
+    EPS, backlog, partnership announcement, executive order targeting a
+    company, capex commitment. Pairs `corporateMetric` with `reportingPeriod`.
+
+AnalystEvidence:
+  type: rdfs.Class
+  subClassOf: wv.Evidence
+  label: Analyst Evidence
+  comment: >
+    A sell-side analyst rating, price target, or forecast. Distinct from
+    AnalystEvidence-on-other-side: the forecast itself is the evidence;
+    the eventual market reaction is captured separately as
+    MarketDataEvidence.
+
+CentralBankEvidence:
+  type: rdfs.Class
+  subClassOf: wv.Evidence
+  label: Central Bank Evidence
+  comment: >
+    A central-bank rate decision, dot-plot, official statement, or vote
+    breakdown. Captures the structural fact (rate held, cut, hiked; vote
+    count) plus its reference to the issuing CentralBank instance.
+
+InstitutionalFlowEvidence:
+  type: rdfs.Class
+  subClassOf: wv.Evidence
+  label: Institutional Flow Evidence
+  comment: >
+    Large positioning data - central bank gold buying, ETF flows, hedge
+    fund concentration, retail bar-and-coin demand. Distinct from
+    MarketDataEvidence in that it captures the FLOW (who's buying/selling
+    and how much) rather than the price.
+
+# --- MarketDataEvidence properties ---
+
+aboutSecurity:
+  type: owl.ObjectProperty
+  domain: MarketDataEvidence
+  range: Security
+  label: About Security
+  comment: >
+    The Security this market datapoint observes. Optional - aggregate
+    metrics (sector returns, broad-market correlations) may not have a
+    single Security in scope.
+
+marketMetric:
+  type: owl.ObjectProperty
+  domain: MarketDataEvidence
+  range: MarketMetric
+  label: Market Metric
+  comment: >
+    Categorical type of market reading. References a MarketMetric named
+    instance. Replaces the prior magic-string-valued metric field; the
+    typed instance enables cross-snapshot queries like "all close-price
+    readings of SPY across 2026 worldviews".
+
+observedValue:
+  type: owl.DatatypeProperty
+  domain: MarketDataEvidence
+  range: xsd.decimal
+  label: Observed Value
+  comment: >
+    The numeric reading. Units are implied by the marketMetric (e.g.
+    `close-price` is in the security's quote currency; `ytd-return` is a
+    decimal fraction). For range readings or multi-value composites, use
+    the prose `evidenceStatement` and pick the most representative scalar.
+
+# --- CorporateEvidence properties ---
+
+aboutSecurityCorporate:
+  type: owl.ObjectProperty
+  domain: CorporateEvidence
+  range: Security
+  label: About Security
+  comment: >
+    The Security this corporate datapoint references. Reused by both
+    aboutSecurity (above) and aboutSecurityCorporate to keep domain/range
+    typing clean. v2 may consolidate via property-level subsumption once
+    the OWL toolchain supports it more cleanly.
+
+corporateMetric:
+  type: owl.ObjectProperty
+  domain: CorporateEvidence
+  range: CorporateMetric
+  label: Corporate Metric
+  comment: >
+    Categorical type of company-reported metric. References a
+    CorporateMetric named instance.
+
+reportingPeriod:
+  type: owl.ObjectProperty
+  domain: CorporateEvidence
+  range: FiscalPeriod
+  label: Reporting Period
+  comment: >
+    The fiscal period the metric covers. References a FiscalPeriod
+    instance (Q1, Q2, full-year, etc.). For non-fiscal-aligned readings
+    (production-capacity ramp dated by a real-world event), the period
+    is the date range of relevance.
+
+# --- AnalystEvidence properties ---
+
+analystInstitution:
+  type: owl.ObjectProperty
+  domain: AnalystEvidence
+  range: AnalystInstitution
+  label: Analyst Institution
+  comment: >
+    The institution publishing the rating or forecast. References an
+    AnalystInstitution named instance (not a free-form string). Aggregator
+    consensuses (Bloomberg consensus, FactSet aggregation) are typed as
+    ConsensusAggregator subclass.
+
+forecastTarget:
+  type: owl.ObjectProperty
+  domain: AnalystEvidence
+  range: Security
+  label: Forecast Target
+  comment: >
+    The Security the forecast is about. Optional - some forecasts are
+    macro (e.g. Brent crude target) and reference an Indicator or commodity
+    rather than a specific Security; in that case use prose
+    `evidenceStatement`.
+
+forecastValue:
+  type: owl.DatatypeProperty
+  domain: AnalystEvidence
+  range: xsd.decimal
+  label: Forecast Value
+  comment: >
+    The forecast's primary numeric value. For range forecasts (base
+    $5,000 / bull $7,000), use the base case here and capture the range
+    in `evidenceStatement` until v2 introduces a structured RangeForecast.
+
+forecastHorizon:
+  type: owl.ObjectProperty
+  domain: AnalystEvidence
+  range: ForecastHorizon
+  label: Forecast Horizon
+  comment: >
+    The forecast's time horizon. References a ForecastHorizon named
+    instance (12-month, full-year-2026, q1-2026-print, etc.).
+
+# --- CentralBankEvidence properties ---
+
+centralBank:
+  type: owl.ObjectProperty
+  domain: CentralBankEvidence
+  range: CentralBank
+  label: Central Bank
+  comment: >
+    The central bank or policy-setting committee whose action is being
+    recorded. References a CentralBank named instance.
+
+meetingDate:
+  type: owl.DatatypeProperty
+  domain: CentralBankEvidence
+  range: xsd.date
+  label: Meeting Date
+  comment: Date of the policy meeting.
+
+voteCount:
+  type: owl.ObjectProperty
+  domain: CentralBankEvidence
+  range: VoteCount
+  label: Vote Count
+  comment: >
+    The structured vote breakdown. Replaces the "8-4" magic-string pattern
+    with separate yea/nay/abstain integers so dissent counts are
+    machine-comparable across meetings.
+
+# --- InstitutionalFlowEvidence properties ---
+
+flowInstitution:
+  type: owl.ObjectProperty
+  domain: InstitutionalFlowEvidence
+  range: wv.Institution
+  label: Flow Institution
+  comment: >
+    The institution or aggregate of institutions whose flow is being
+    recorded. References an Institution instance (CentralBank, retail
+    aggregate, hedge-fund composite, etc.).
+
+flowDirection:
+  type: owl.ObjectProperty
+  domain: InstitutionalFlowEvidence
+  range: FlowDirection
+  label: Flow Direction
+  comment: >
+    Direction of the flow (buying / selling / forward-buying-intent /
+    rebalancing). References a FlowDirection named instance.
+
+flowMagnitudeValue:
+  type: owl.DatatypeProperty
+  domain: InstitutionalFlowEvidence
+  range: xsd.decimal
+  label: Flow Magnitude Value
+  comment: >
+    Numeric magnitude. Pairs with `flowMagnitudeUnit` for unit context.
+    Replaces the "474 tonnes in Q1 2026 (+42% YoY)" magic string with a
+    structured value; the YoY change and reporting period belong in the
+    prose `evidenceStatement` or in a separate Evidence instance.
+
+flowMagnitudeUnit:
+  type: owl.DatatypeProperty
+  domain: InstitutionalFlowEvidence
+  range: xsd.string
+  label: Flow Magnitude Unit
+  comment: >
+    Unit string for `flowMagnitudeValue` (tonnes, usd, units, etc.).
+    String for v1; v2 may upgrade to typed Unit class.
+
+
+# =============================================================================
+# 3. INSTITUTION SUBCLASSES
+# =============================================================================
+
+CentralBank:
+  type: rdfs.Class
+  subClassOf: wv.Institution
+  label: Central Bank
+  comment: >
+    A monetary policy authority. Typically the named instance refers to
+    the policy-setting body (e.g. FOMC, ECB Governing Council) rather than
+    the broader central banking system - the broader system is captured
+    separately as a GovernmentBody when cited by PolicyEvidence.
+
+AnalystInstitution:
+  type: rdfs.Class
+  subClassOf: wv.Institution
+  label: Analyst Institution
+  comment: >
+    A sell-side research provider, primary-source analyst house, or
+    industry-research firm.
+
+ConsensusAggregator:
+  type: rdfs.Class
+  subClassOf: wv.Institution
+  label: Consensus Aggregator
+  comment: >
+    An aggregator of multiple analysts' or institutions' views (Bloomberg
+    consensus, FactSet aggregation, market consensus). Distinct subclass
+    so worldview readers can filter "analyst views from primary houses
+    only" vs "consensus aggregations".
+
+
+# =============================================================================
+# 4. CENTRAL BANK NAMED INSTANCES (seed)
+# =============================================================================
+
+fomc:
+  type: CentralBank
+  label: Federal Open Market Committee
+  comment: >
+    The US Federal Reserve System's monetary policymaking committee. Sets
+    the federal funds rate target. Composed of seven Board of Governors
+    plus five rotating regional Federal Reserve Bank presidents. The Fed
+    Chair chairs the FOMC ex officio.
+
+ecb-governing-council:
+  type: CentralBank
+  label: ECB Governing Council
+  comment: >
+    The European Central Bank's policymaking body, composed of the six
+    Executive Board members plus the governors of the national central
+    banks of the euro area.
+
+boj-monetary-board:
+  type: CentralBank
+  label: BoJ Monetary Policy Board
+  comment: >
+    Bank of Japan's policymaking board. Sets the policy rate and yield
+    curve control parameters.
+
+boe-mpc:
+  type: CentralBank
+  label: BoE Monetary Policy Committee
+  comment: >
+    Bank of England's Monetary Policy Committee. Sets Bank Rate and
+    quantitative policy.
+
+
+# =============================================================================
+# 5. ANALYST INSTITUTION NAMED INSTANCES (seed)
+# =============================================================================
+
+goldman-sachs-research:
+  type: AnalystInstitution
+  label: Goldman Sachs Research
+  comment: Sell-side research arm of Goldman Sachs.
+
+jpmorgan-research:
+  type: AnalystInstitution
+  label: JPMorgan Research
+  comment: Sell-side research arm of JPMorgan Chase.
+
+citi-research:
+  type: AnalystInstitution
+  label: Citi Research
+  comment: Sell-side research arm of Citigroup.
+
+morgan-stanley-research:
+  type: AnalystInstitution
+  label: Morgan Stanley Research
+  comment: Sell-side research arm of Morgan Stanley.
+
+ubs-research:
+  type: AnalystInstitution
+  label: UBS Research
+  comment: Sell-side research arm of UBS.
+
+gartner-research:
+  type: AnalystInstitution
+  label: Gartner Research
+  comment: Industry-research firm covering technology and adjacent sectors.
+
+bloomberg-consensus:
+  type: ConsensusAggregator
+  label: Bloomberg Consensus
+  comment: Bloomberg's aggregation of sell-side estimates.
+
+factset-aggregation:
+  type: ConsensusAggregator
+  label: FactSet Aggregation
+  comment: FactSet's aggregation of sell-side estimates and earnings stats.
+
+market-consensus:
+  type: ConsensusAggregator
+  label: Market Consensus
+  comment: >
+    Generic placeholder for "the prevailing market view" when the source is
+    not a specific named aggregator. Use sparingly - typed aggregators are
+    preferred when the source is identifiable.
+
+
+# =============================================================================
+# 6. GOVERNMENT BODY NAMED INSTANCES (seed; US-centric for v1)
+# =============================================================================
+
+us-federal-reserve:
+  type: wv.GovernmentBody
+  label: US Federal Reserve System
+  comment: >
+    The central banking system of the United States as an institutional
+    body, distinct from FOMC (the policy-setting committee). Cited as
+    `issuingBody` for non-rate-decision Fed actions (regulatory rulings,
+    Board of Governors statements outside FOMC).
+
+us-treasury:
+  type: wv.GovernmentBody
+  label: US Department of the Treasury
+  comment: >
+    The US Treasury - issues treasuries, manages public debt, runs OFAC
+    sanctions programs.
+
+us-congress:
+  type: wv.GovernmentBody
+  label: US Congress
+  comment: >
+    The US legislative body. Issues budget appropriations, tax laws, and
+    binding directives to executive agencies.
+
+us-omb:
+  type: wv.GovernmentBody
+  label: US Office of Management and Budget
+  comment: >
+    Executive Office of the President's budget-and-management body. Sources
+    of fiscal projections (e.g. annual interest-bill estimates).
+
+us-department-of-defense:
+  type: wv.GovernmentBody
+  label: US Department of Defense
+  comment: >
+    DoD. Procurement decisions, budget executions, and policy actions
+    regarding the US military.
+
+us-department-of-justice:
+  type: wv.GovernmentBody
+  label: US Department of Justice
+  comment: >
+    DOJ. Investigations, indictments, settlements, and enforcement actions.
+
+us-white-house:
+  type: wv.GovernmentBody
+  label: US White House
+  comment: >
+    The Executive Office of the President as an institutional body. Cited
+    as `issuingBody` for executive orders, appointments, and presidential
+    directives. The current administration's identity (Trump, Biden, etc.)
+    is carried in prose `evidenceStatement` rather than baked into the
+    GovernmentBody name.
+
+
+# =============================================================================
+# 7. INDICATOR NAMED INSTANCES (seed)
+# =============================================================================
+
+# --- Treasury yields ---
+
+ind-10y-treasury-yield:
+  type: wv.Indicator
+  label: 10-Year US Treasury Yield
+  comment: >
+    Constant-maturity 10-year US Treasury note yield. Closing value at
+    market close.
+
+ind-30y-treasury-yield:
+  type: wv.Indicator
+  label: 30-Year US Treasury Yield
+  comment: >
+    Constant-maturity 30-year US Treasury bond yield. Closing value at
+    market close.
+
+ind-2y-treasury-yield:
+  type: wv.Indicator
+  label: 2-Year US Treasury Yield
+  comment: 2-year constant-maturity yield. Closing value.
+
+ind-5y-breakeven-inflation:
+  type: wv.Indicator
+  label: 5-Year Breakeven Inflation
+  comment: >
+    Market-implied 5-year inflation expectation, computed from nominal vs
+    TIPS yields.
+
+ind-10y-breakeven-inflation:
+  type: wv.Indicator
+  label: 10-Year Breakeven Inflation
+  comment: >
+    Market-implied 10-year inflation expectation, computed from nominal vs
+    TIPS yields.
+
+# --- Energy ---
+
+ind-wti-close:
+  type: wv.Indicator
+  label: WTI Crude Front-Month Close
+  comment: >
+    Front-month NYMEX WTI crude futures contract close, US dollars per
+    barrel.
+
+ind-brent-close:
+  type: wv.Indicator
+  label: Brent Crude Front-Month Close
+  comment: >
+    Front-month ICE Brent crude futures contract close, US dollars per
+    barrel.
+
+# --- Equities ---
+
+ind-spy-close:
+  type: wv.Indicator
+  label: SPY Close
+  comment: SPY ETF closing price, US dollars per share.
+
+ind-spx-close:
+  type: wv.Indicator
+  label: S&P 500 Index Close
+  comment: S&P 500 index level at the closing print.
+
+ind-vix-close:
+  type: wv.Indicator
+  label: VIX Close
+  comment: CBOE Volatility Index closing value.
+
+ind-gld-close:
+  type: wv.Indicator
+  label: GLD Close
+  comment: SPDR Gold Shares ETF closing price, US dollars per share.
+
+ind-gold-spot:
+  type: wv.Indicator
+  label: Gold Spot Price
+  comment: London PM gold spot fix, US dollars per troy ounce.
+
+# --- Macro ---
+
+ind-unemployment-rate:
+  type: wv.Indicator
+  label: US Unemployment Rate
+  comment: BLS U-3 unemployment rate, monthly release.
+
+ind-core-pce-yoy:
+  type: wv.Indicator
+  label: Core PCE YoY
+  comment: >
+    Core Personal Consumption Expenditures price index, year-over-year
+    percent change. Fed's preferred inflation gauge.
+
+ind-headline-cpi-yoy:
+  type: wv.Indicator
+  label: Headline CPI YoY
+  comment: BLS Consumer Price Index, all items, year-over-year percent.
+
+# --- Fed-specific ---
+
+ind-fomc-dissent-count:
+  type: wv.Indicator
+  label: FOMC Dissent Count
+  comment: >
+    Number of FOMC voting members who dissented from the policy decision
+    at a given meeting. Standardized count (0-4 typical).
+
+# --- Fiscal ---
+
+ind-dod-outlays-yoy-change:
+  type: wv.Indicator
+  label: DoD Outlays YoY Change
+  comment: >
+    Year-over-year percent change in DoD outlays. Quarterly readings from
+    Treasury Statement.
+
+ind-us-fiscal-deficit-trailing-12m:
+  type: wv.Indicator
+  label: US Fiscal Deficit Trailing 12 Months
+  comment: >
+    US federal government deficit, trailing 12-month sum, US dollars.
+
+
+# =============================================================================
+# 8. MARKET METRIC NAMED INSTANCES (seed; consolidates 20 magic strings to ~16)
+# =============================================================================
+
+MarketMetric:
+  type: rdfs.Class
+  label: Market Metric
+  comment: >
+    Categorical type for a MarketDataEvidence reading. Open enumeration -
+    add new instances when a genuinely new metric type is needed; resist
+    adding near-duplicates of existing metrics.
+
+close-price:
+  type: MarketMetric
+  label: Close Price
+  comment: >
+    Official market close, in the security's quote currency. Use this for
+    end-of-session price readings of equities, ETFs, indices, and futures.
+
+intraday-high:
+  type: MarketMetric
+  label: Intraday High
+  comment: Highest trade price during the regular session.
+
+intraday-low:
+  type: MarketMetric
+  label: Intraday Low
+  comment: Lowest trade price during the regular session.
+
+session-percent-move:
+  type: MarketMetric
+  label: Session Percent Move
+  comment: >
+    Close-vs-prior-close percent change. The standard "today's move".
+    Decimal fraction (0.05 = +5%).
+
+after-hours-percent-move:
+  type: MarketMetric
+  label: After-Hours Percent Move
+  comment: >
+    Percent change in extended/after-hours trading relative to the regular-
+    session close. Decimal fraction.
+
+ytd-return:
+  type: MarketMetric
+  label: Year-to-Date Return
+  comment: Total return year-to-date. Decimal fraction.
+
+yoy-return:
+  type: MarketMetric
+  label: Year-over-Year Return
+  comment: Total return over the trailing 12 months. Decimal fraction.
+
+cumulative-return:
+  type: MarketMetric
+  label: Cumulative Return
+  comment: >
+    Cumulative total return from a stated start date through the
+    observation date. Use prose `evidenceStatement` to record the start
+    date.
+
+quarterly-average-price:
+  type: MarketMetric
+  label: Quarterly Average Price
+  comment: >
+    Average price across a fiscal or calendar quarter (e.g. LBMA quarterly
+    PM gold fix average). Pair with `reportingPeriod` semantics if added
+    in v2.
+
+volatility-level:
+  type: MarketMetric
+  label: Volatility Level
+  comment: >
+    Implied or realized volatility level (e.g. VIX, MOVE). Decimal points
+    rather than percent (16.88, not 0.1688).
+
+correlation:
+  type: MarketMetric
+  label: Correlation
+  comment: >
+    Statistical correlation coefficient between two series (decimal in
+    -1.0 to 1.0). Use prose `evidenceStatement` to record the two series
+    and the lookback window.
+
+valuation-ratio:
+  type: MarketMetric
+  label: Valuation Ratio
+  comment: >
+    A multiple (P/E, P/B, EV/EBITDA, etc.). Use prose `evidenceStatement`
+    to record which ratio.
+
+earnings-beat-rate:
+  type: MarketMetric
+  label: Earnings Beat Rate
+  comment: >
+    Percent of an index's reporting companies that beat consensus EPS.
+    Decimal fraction (0.84 = 84%).
+
+earnings-beat-magnitude:
+  type: MarketMetric
+  label: Earnings Beat Magnitude
+  comment: >
+    Average percent by which actual EPS exceeded consensus across an
+    index's reporting companies. Decimal fraction.
+
+eps-growth:
+  type: MarketMetric
+  label: EPS Growth
+  comment: >
+    Aggregate (index) or single-company EPS growth, year-over-year. Decimal
+    fraction.
+
+net-profit-margin:
+  type: MarketMetric
+  label: Net Profit Margin
+  comment: >
+    Net income / revenue. Decimal fraction. For index aggregates, the
+    blended margin across reporting companies.
+
+aggregate-demand-dollars:
+  type: MarketMetric
+  label: Aggregate Demand (Dollars)
+  comment: >
+    Total dollar demand for an asset class over a period (e.g. World Gold
+    Council quarterly demand value). Use unit notes in prose if non-USD.
+
+sector-relative-return:
+  type: MarketMetric
+  label: Sector Relative Return
+  comment: >
+    Return of a sector ETF relative to a benchmark (e.g. XLE vs S&P 500
+    YTD). Decimal fraction.
+
+rate-path-expectations:
+  type: MarketMetric
+  label: Rate Path Expectations
+  comment: >
+    Market-implied count of rate moves expected within a stated horizon.
+    Integer (positive = cuts, negative = hikes). Use prose to record the
+    horizon and instrument (Fed funds futures, OIS, etc.).
+
+
+# =============================================================================
+# 9. CORPORATE METRIC NAMED INSTANCES (seed)
+# =============================================================================
+
+CorporateMetric:
+  type: rdfs.Class
+  label: Corporate Metric
+  comment: >
+    Categorical type for a CorporateEvidence reading. Open enumeration.
+
+revenue:
+  type: CorporateMetric
+  label: Revenue
+  comment: Total reported revenue for the period. Currency in evidenceStatement.
+
+segment-revenue:
+  type: CorporateMetric
+  label: Segment Revenue
+  comment: >
+    Revenue from a single reporting segment (e.g. AMD Data Center). Use
+    prose `evidenceStatement` to record which segment.
+
+geographic-revenue:
+  type: CorporateMetric
+  label: Geographic Revenue
+  comment: >
+    Revenue from a geographic segment (e.g. NVIDIA China revenue). Use
+    prose `evidenceStatement` for region.
+
+net-income:
+  type: CorporateMetric
+  label: Net Income
+  comment: GAAP net income for the period.
+
+eps:
+  type: CorporateMetric
+  label: Earnings Per Share (GAAP)
+  comment: GAAP diluted earnings per share for the period.
+
+eps-non-gaap:
+  type: CorporateMetric
+  label: Earnings Per Share (Non-GAAP)
+  comment: Non-GAAP / adjusted diluted earnings per share for the period.
+
+gross-margin:
+  type: CorporateMetric
+  label: Gross Margin
+  comment: Gross profit / revenue. Decimal fraction.
+
+operating-margin:
+  type: CorporateMetric
+  label: Operating Margin
+  comment: Operating income / revenue. Decimal fraction.
+
+backlog:
+  type: CorporateMetric
+  label: Backlog
+  comment: >
+    Reported backlog (committed but undelivered orders) as of period end.
+    Currency in evidenceStatement.
+
+production-capacity:
+  type: CorporateMetric
+  label: Production Capacity
+  comment: >
+    Stated production capacity (e.g. units per year, megawatts, tonnes).
+    Use prose for units.
+
+charge:
+  type: CorporateMetric
+  label: One-Time Charge
+  comment: >
+    A one-time charge taken in the period (writedown, impairment,
+    restructuring expense, inventory writedown).
+
+guidance-revenue:
+  type: CorporateMetric
+  label: Guidance - Revenue
+  comment: Forward revenue guidance. Currency and period in prose.
+
+guidance-eps:
+  type: CorporateMetric
+  label: Guidance - EPS
+  comment: Forward EPS guidance.
+
+partnership-announcement:
+  type: CorporateMetric
+  label: Partnership Announcement
+  comment: >
+    A material partnership, supply agreement, or distribution deal. The
+    metric is categorical rather than numeric; observedValue may be
+    omitted or set to a nominal magnitude (e.g. compute capacity in
+    gigawatts).
+
+buyback:
+  type: CorporateMetric
+  label: Buyback
+  comment: >
+    Stock repurchase program - announced authorization or executed buyback.
+    Use observedValue for the dollar amount.
+
+
+# =============================================================================
+# 10. FISCAL PERIOD NAMED INSTANCES
+# =============================================================================
+
+FiscalPeriod:
+  type: rdfs.Class
+  label: Fiscal Period
+  comment: >
+    A standardized reporting period. v1 covers calendar-aligned quarters
+    and full years; companies on non-calendar fiscal years should still
+    map to the closest standardized period and document the fiscal-vs-
+    calendar offset in prose.
+
+q1-2026:
+  type: FiscalPeriod
+  label: Q1 2026
+  comment: First calendar quarter of 2026 (January-March).
+
+q2-2026:
+  type: FiscalPeriod
+  label: Q2 2026
+  comment: Second calendar quarter of 2026 (April-June).
+
+q3-2026:
+  type: FiscalPeriod
+  label: Q3 2026
+  comment: Third calendar quarter of 2026 (July-September).
+
+q4-2026:
+  type: FiscalPeriod
+  label: Q4 2026
+  comment: Fourth calendar quarter of 2026 (October-December).
+
+fy-2026:
+  type: FiscalPeriod
+  label: Full Year 2026
+  comment: Full calendar year 2026.
+
+q4-2025:
+  type: FiscalPeriod
+  label: Q4 2025
+  comment: Fourth calendar quarter of 2025.
+
+q1-2025:
+  type: FiscalPeriod
+  label: Q1 2025
+  comment: First calendar quarter of 2025.
+
+
+# =============================================================================
+# 11. FORECAST HORIZON
+# =============================================================================
+
+ForecastHorizon:
+  type: rdfs.Class
+  label: Forecast Horizon
+  comment: >
+    The time horizon a forecast covers. Open enumeration; add specific
+    horizons as needed.
+
+horizon-12-month:
+  type: ForecastHorizon
+  label: 12-Month
+  comment: 12-month forecast horizon from the date of issuance.
+
+horizon-6-month:
+  type: ForecastHorizon
+  label: 6-Month
+  comment: 6-month forecast horizon.
+
+horizon-3-month:
+  type: ForecastHorizon
+  label: 3-Month
+  comment: 3-month forecast horizon.
+
+horizon-q1-print:
+  type: ForecastHorizon
+  label: Q1 Earnings Print
+  comment: Q1 quarterly earnings announcement.
+
+horizon-q2-print:
+  type: ForecastHorizon
+  label: Q2 Earnings Print
+  comment: Q2 quarterly earnings announcement.
+
+horizon-full-year:
+  type: ForecastHorizon
+  label: Full Year
+  comment: Full fiscal year.
+
+
+# =============================================================================
+# 12. FLOW DIRECTION
+# =============================================================================
+
+FlowDirection:
+  type: rdfs.Class
+  label: Flow Direction
+  comment: >
+    Direction of an institutional flow. Closed enumeration of the four
+    typical states.
+
+flow-buying:
+  type: FlowDirection
+  label: Buying
+  comment: Net buying activity over the reporting period.
+
+flow-selling:
+  type: FlowDirection
+  label: Selling
+  comment: Net selling activity over the reporting period.
+
+flow-rebalancing:
+  type: FlowDirection
+  label: Rebalancing
+  comment: >
+    Two-sided rebalancing (buying and selling) without a clear net
+    direction, often during sector rotations.
+
+flow-forward-buying-intent:
+  type: FlowDirection
+  label: Forward Buying Intent
+  comment: >
+    Stated forward intent to buy (e.g. survey result of central banks
+    planning to increase reserves). Distinct from observed flows.
+
+
+# =============================================================================
+# 13. VOTE COUNT (composite for CentralBankEvidence.voteCount)
+# =============================================================================
+
+VoteCount:
+  type: rdfs.Class
+  label: Vote Count
+  comment: >
+    Structured vote breakdown. Replaces the "8-4" magic-string pattern -
+    yea/nay/abstain are individually queryable for cross-meeting dissent
+    analysis.
+
+yeaCount:
+  type: owl.DatatypeProperty
+  domain: VoteCount
+  range: xsd.integer
+  label: Yea Count
+  comment: Number of votes in favor.
+
+nayCount:
+  type: owl.DatatypeProperty
+  domain: VoteCount
+  range: xsd.integer
+  label: Nay Count
+  comment: Number of dissenting votes.
+
+abstainCount:
+  type: owl.DatatypeProperty
+  domain: VoteCount
+  range: xsd.integer
+  label: Abstain Count
+  comment: Number of abstentions or absences.
+
+
+# =============================================================================
+# 14. FINANCE EVENT TYPES (seed FinEventType named instances)
+# =============================================================================
+
+FinEventType:
+  type: rdfs.Class
+  subClassOf: wv.EventType
+  label: Finance Event Type
+  comment: >
+    Subclass of wv.EventType for finance-domain event categories. Instances
+    below are abstract event types - the runtime event log records concrete
+    event instances classified by these types.
+
+evt-strait-of-hormuz-reopened:
+  type: FinEventType
+  label: Strait of Hormuz Reopened
+  comment: >
+    Strait of Hormuz reopens to commercial shipping after a closure event.
+    Pair with `durability: durable` in event-condition to require the
+    reopening to be classified as durable rather than transient.
+
+evt-strait-of-hormuz-closed:
+  type: FinEventType
+  label: Strait of Hormuz Closed
+  comment: Strait of Hormuz closes to commercial shipping (formal or de facto).
+
+evt-opec-supply-shock:
+  type: FinEventType
+  label: OPEC Supply Shock
+  comment: >
+    Material OPEC+ supply increase or decrease that materially shifts the
+    front-month oil price (typical threshold - 1+ million bpd of capacity
+    change, but the runtime threshold is curator-judged).
+
+evt-fomc-statement-released:
+  type: FinEventType
+  label: FOMC Statement Released
+  comment: >
+    Scheduled FOMC policy statement is published. Used by sequenced-
+    conditions that wait for the next FOMC meeting.
+
+evt-us-iran-peace-agreement-implemented:
+  type: FinEventType
+  label: US-Iran Peace Agreement Implemented
+  comment: >
+    A formal, durable US-Iran peace agreement takes effect. Distinct from
+    a ceasefire (which can be transient) or a memorandum of understanding
+    (which may not be implemented). Pair with `durability: durable`.
+
+evt-us-china-export-controls-extended:
+  type: FinEventType
+  label: US-China Export Controls Extended
+  comment: >
+    The US announces or implements an extension of export controls on
+    semiconductors or other strategic technologies to China.
+
+evt-fed-chair-continuity-signal:
+  type: FinEventType
+  label: Fed Chair Continuity Signal
+  comment: >
+    A new Fed Chair delivers a public statement that markets read as
+    continuity-signaling rather than regime-changing. Curator-judged event
+    based on the speech content and market reaction.
+
+evt-fed-credibility-restored:
+  type: FinEventType
+  label: Fed Credibility Restored
+  comment: >
+    Curator-judged composite event - market-implied Fed credibility
+    metrics improve, no further dissent escalation, no further political
+    pressure incidents. Soft event; no automated detection in v1.
+
+
+# =============================================================================
+# 15. FINANCE-SPECIFIC TIME UNITS
+# =============================================================================
+
+fomc-meetings:
+  type: wv.TimeUnit
+  label: FOMC Meetings
+  comment: >
+    Scheduled FOMC meetings. "1 fomc-meeting" advances to the next
+    scheduled meeting in the FOMC calendar. The runtime is responsible for
+    resolving against the published meeting schedule.
+
+earnings-quarters:
+  type: wv.TimeUnit
+  label: Earnings Quarters
+  comment: >
+    Quarterly earnings reporting cycles. "1 earnings-quarter" advances to
+    the next reporting cycle for the relevant company.
+
+
+# =============================================================================
+# 16. FINANCE-SPECIFIC ROLES (seed)
+# =============================================================================
+
+fed-chair:
+  type: wv.Role
+  label: Fed Chair
+  comment: Sitting Chair of the Federal Reserve System.
+
+fed-chair-outgoing:
+  type: wv.Role
+  label: Fed Chair (Outgoing)
+  comment: >
+    Sitting Chair whose term is ending and a successor has been nominated.
+    Distinct from `fed-chair` because lame-duck statements carry less
+    forward policy weight.
+
+fed-chair-nominee:
+  type: wv.Role
+  label: Fed Chair Nominee
+  comment: >
+    Confirmed nominee for Fed Chair, pending Senate confirmation.
+    Statements may carry forward policy implications.
+
+fed-vice-chair:
+  type: wv.Role
+  label: Fed Vice Chair
+  comment: Vice Chair of the Federal Reserve.
+
+fed-governor:
+  type: wv.Role
+  label: Fed Governor
+  comment: Member of the Federal Reserve Board of Governors.
+
+fomc-voting-member:
+  type: wv.Role
+  label: FOMC Voting Member
+  comment: >
+    Voting member of the FOMC at a given meeting (governor or rotating
+    regional president).
+
+treasury-secretary:
+  type: wv.Role
+  label: Treasury Secretary
+  comment: US Secretary of the Treasury.
+
+ceo:
+  type: wv.Role
+  label: Chief Executive Officer
+  comment: Generic CEO role for OfficialStatementEvidence about company executives.
+
+cfo:
+  type: wv.Role
+  label: Chief Financial Officer
+  comment: Generic CFO role.
+
+us-senator:
+  type: wv.Role
+  label: US Senator
+  comment: Member of the US Senate.
+
+us-representative:
+  type: wv.Role
+  label: US Representative
+  comment: Member of the US House of Representatives.
+
+
+# =============================================================================
+# 17. FINANCE-SPECIFIC POLICY TYPES (additions to wv.PolicyType)
+# =============================================================================
+
+revenue-share-export-license:
+  type: wv.PolicyType
+  label: Revenue-Share Export License
+  comment: >
+    A novel licensing arrangement where the US government issues export
+    licenses for restricted technology in exchange for a revenue share
+    on the affected sales. Captures the NVDA/AMD 15% China revenue-share
+    mechanism.
+
+procurement-expansion:
+  type: wv.PolicyType
+  label: Procurement Expansion
+  comment: >
+    A government procurement order increase for materiel - munitions,
+    platforms, services. Distinct from `budget` (which is the appropriation)
+    because procurement-expansion happens within an existing appropriation.
+
+military-operations-pause:
+  type: wv.PolicyType
+  label: Military Operations Pause
+  comment: >
+    A pause or suspension of an ongoing military operation, typically
+    announced in connection with diplomatic progress.
+
+nomination-advancement:
+  type: wv.PolicyType
+  label: Nomination Advancement
+  comment: >
+    A Senate committee vote to advance a presidential nomination to the
+    full Senate. Distinct from `appointment` (the original nomination)
+    and from full-Senate confirmation.
+
+nomination-vote-scheduling:
+  type: wv.PolicyType
+  label: Nomination Vote Scheduling
+  comment: >
+    A formal scheduling of the full-Senate confirmation vote.
+
+procedural-hold-lift:
+  type: wv.PolicyType
+  label: Procedural Hold Lift
+  comment: >
+    A senator's lifting of a procedural hold on a nomination or bill.
