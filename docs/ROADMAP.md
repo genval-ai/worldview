@@ -10,9 +10,9 @@ Parent issue: [genval-ai/kanonak#34](https://github.com/genval-ai/kanonak/issues
 
 ### 1. Invalidation condition expression DSL
 
-**Status:** spec drafted ([docs/specs/invalidation-condition-dsl.md](specs/invalidation-condition-dsl.md)); awaiting review.
+**Status:** vocabulary designed (see [genval-ai/kanonak#34](https://github.com/genval-ai/kanonak/issues/34) for design discussion); not yet authored as a package.
 
-The single highest-leverage piece of the new ontology — turns prose `invalidationCondition` into a structured tree a rules engine can evaluate. v1 vocabulary covers all 7 invalidations from the existing private worldview snapshots.
+The single highest-leverage piece of the new ontology — turns prose `invalidationCondition` into a structured tree a rules engine can evaluate. v1 vocabulary covers all 7 invalidations from the existing private worldview snapshots. Will land directly as Class / Property / named-instance definitions in `worldview.genval.ai/core@1.0.0` with `comment:` fields carrying the spec narrative — the package is the source of truth, and any markdown / HTML / JSON reference docs are derived via transformations.
 
 ### 2. Typed instance vocabularies (magic-string elimination)
 
