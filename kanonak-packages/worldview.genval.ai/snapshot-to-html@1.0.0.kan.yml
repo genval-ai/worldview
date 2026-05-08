@@ -119,7 +119,15 @@ snapshot-to-html-transformation:
                             body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
                             a{color:var(--accent);text-decoration:none}
                             a:hover{color:var(--accent-2)}
-                            article.snapshot{max-width:1180px;margin:0 auto;padding:64px 32px 96px;counter-reset:thesis-counter}
+                            /* SITE NAV */
+                            nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
+                            .site-nav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+                            a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+                            ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
+                            ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;transition:color 120ms;font-weight:500}
+                            ul.site-nav-links a:hover{color:var(--fg)}
+                            @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
+                            article.snapshot{max-width:1180px;margin:0 auto;padding:48px 32px 96px;counter-reset:thesis-counter}
                             @media (max-width:760px){article.snapshot{padding:32px 20px 64px}}
                             /* HERO */
                             .hero{padding:0 0 56px;border-bottom:1px solid var(--border);position:relative;margin-bottom:56px}
@@ -252,14 +260,24 @@ snapshot-to-html-transformation:
                             <svg class="svg-defs" aria-hidden="true"><defs><linearGradient id="conf-gradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0ea5e9"/><stop offset="0.5" stop-color="#7dd3fc"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs></svg>
 
                         # =====================================================
-                        # ARTICLE OPEN + HERO
+                        # SITE NAV + ARTICLE OPEN + HERO
                         # =====================================================
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
                             <article class="snapshot">
                             <header class="hero">
                             <div class="hero-meta">
-                            <span class="eyebrow">Portfolio Ops &middot; Worldview Snapshot</span>
+                            <span class="eyebrow">Worldview Snapshot</span>
                             <time datetime="
                         - type: tx.PropertyRead
                           tx.readSource:

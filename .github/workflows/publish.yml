@@ -42,15 +42,12 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 2. For each WorldviewSnapshot-bearing package, render an HTML
-      # snapshot via the snapshot-to-html transformation. Output goes
-      # to _site/<package-name>@<version>/snapshot.html. The package
-      # detection is heuristic - we match any file named example-*
-      # (sample worldviews) or worldview@* (production worldviews if
-      # any are eventually added) and skip the ontology / transformation
-      # files themselves.
+      # 2. For every WorldviewSnapshot-bearing package, render an HTML
+      # snapshot via the snapshot-to-html transformation. Each output
+      # lives at its canonical path _site/<package>@<version>/snapshot.html
+      # so it is permanently linkable. The /snapshots/ index links here.
       # ---------------------------------------------------------------
-      - name: Render WorldviewSnapshots
+      - name: Render WorldviewSnapshots (canonical per-package paths)
         run: |
           set -e
           mkdir -p _site
@@ -58,15 +55,13 @@ jobs:
             base=$(basename "$pkg_file" .kan.yml)
             # Skip ontology / transformation / non-snapshot packages
             case "$base" in
-              core@*|finance@*|snapshot-to-html@*) continue ;;
+              core@*|finance@*|snapshot-to-html@*|landing-page@*) continue ;;
             esac
             # Only render packages that contain a WorldviewSnapshot.
-            # Quick grep test before invoking the transformation.
             if ! grep -q "type: wv\.WorldviewSnapshot\|type: worldview\.genval\.ai/core/WorldviewSnapshot" "$pkg_file"; then
               echo "Skipping $base (no WorldviewSnapshot)"
               continue
             fi
-            # Extract package URI - filename is "<name>@<version>"
             pkg_uri="worldview.genval.ai/${base}"
             out_dir="_site/${base}"
             echo "Rendering $pkg_uri -> $out_dir"
@@ -78,14 +73,43 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 3. Stage the publisher manifest + index.txt + a placeholder
-      # landing page so the static site doubles as the Kanonak Protocol
-      # publisher origin (https://worldview.genval.ai/).
-      #
-      # The packages themselves are mirrored under their canonical paths
-      # (https://worldview.genval.ai/<package>/<version>.kan.yml) so any
-      # consumer can `import worldview.genval.ai/core@^1.0.0` and have
-      # it resolve over HTTPS.
+      # 3. Render the LATEST WorldviewSnapshot to _site/index.html so
+      # the domain root always reflects the freshest worldview directly
+      # (rather than a list of links). "Latest" is currently picked from
+      # the highest-versioned example-macro@*.kan.yml — the canonical
+      # multi-thesis production worldview. Once additional canonical
+      # snapshot packages exist, swap this for an observedAt sort.
+      # ---------------------------------------------------------------
+      - name: Render latest snapshot to /index.html
+        run: |
+          set -e
+          latest_file=$(ls kanonak-packages/worldview.genval.ai/example-macro@*.kan.yml 2>/dev/null | sort -V | tail -1 || true)
+          if [ -z "$latest_file" ]; then
+            echo "No example-macro package found - writing fallback index.html"
+            cat > _site/index.html <<'HTML'
+          <!doctype html><html><head><meta charset="utf-8"><title>worldview.genval.ai</title></head>
+          <body><h1>worldview.genval.ai</h1><p>No snapshots published yet.</p></body></html>
+          HTML
+            exit 0
+          fi
+          base=$(basename "$latest_file" .kan.yml)
+          pkg_uri="worldview.genval.ai/${base}"
+          echo "Latest worldview package: $pkg_uri"
+          tmpdir=$(mktemp -d)
+          kanonak transform run \
+            worldview.genval.ai/snapshot-to-html/snapshot-to-html-transformation \
+            --scope "$pkg_uri" \
+            --format html \
+            --out "$tmpdir/"
+          # Transformation emits snapshot.html — install it as the root index.html
+          mv "$tmpdir/snapshot.html" _site/index.html
+
+      # ---------------------------------------------------------------
+      # 4. Stage the publisher manifest + index.txt + CNAME + a mirror
+      # of every package file at its canonical Kanonak path so the static
+      # site doubles as the protocol publisher origin (consumers can
+      # `import worldview.genval.ai/core@^1.0.0` and have it resolve
+      # over HTTPS).
       # ---------------------------------------------------------------
       - name: Stage publisher manifest + package mirror
         run: |
@@ -95,16 +119,11 @@ jobs:
           cp index.txt _site/index.txt
           # GitHub Pages custom-domain binding requires a CNAME file in
           # the deployed artifact root. Without it, each deploy invalidates
-          # the custom-domain validation even though the Pages settings
-          # still record the cname. Write it directly here rather than
-          # tracking a CNAME file in the repo, so the source of truth is
-          # the workflow (not a sometimes-out-of-sync file).
+          # the custom-domain validation.
           echo "worldview.genval.ai" > _site/CNAME
           # Mirror each package file at its canonical path.
           for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
-            # Filename is "<name>@<version>"; canonical path is
-            # https://worldview.genval.ai/<name>/<version>.kan.yml
             name="${base%@*}"
             version="${base#*@}"
             mkdir -p "_site/${name}"
@@ -112,34 +131,163 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 4. Render the landing page via the landing-page SetTransformation.
-      # Scopes to example-macro (the rich production-grade demo) - the
+      # 5. Render the snapshots index (the historical list of every
+      # published snapshot) at /snapshots/. The landing-page
       # SetTransformation aggregates only WorldviewSnapshot instances
-      # within the scoped package, so a single rich snapshot package is
-      # what the landing currently shows. Multi-package aggregation needs
-      # SDK support for either multiple --scope args or for SetTransformation
-      # to look across transitively-imported packages; tracked as a separate
-      # protocol issue.
+      # within the scoped package — multi-package aggregation is tracked
+      # as a protocol issue. With one canonical snapshot package, the
+      # current scope is example-macro.
       # ---------------------------------------------------------------
-      - name: Render landing page
+      - name: Render snapshots index to /snapshots/
         run: |
           set -e
-          # Pick the most recently authored example-macro-* package as the
-          # landing scope. The example-ai-capex snapshot is still rendered
-          # at its own canonical path via the per-package loop above; users
-          # can navigate there directly via the index.txt listing.
+          mkdir -p _site/snapshots
           landing_scope="worldview.genval.ai/example-macro"
           if [ ! -f kanonak-packages/worldview.genval.ai/example-macro@1.0.0.kan.yml ]; then
-            echo "No example-macro package found - skipping landing page render"
-            echo "<h1>worldview.genval.ai</h1><p>No snapshots published yet.</p>" > _site/index.html
+            echo "<h1>Snapshots</h1><p>No snapshots published yet.</p>" > _site/snapshots/index.html
             exit 0
           fi
-          echo "Rendering landing page scoped to $landing_scope"
+          echo "Rendering snapshots index scoped to $landing_scope"
           kanonak transform run \
             worldview.genval.ai/landing-page/landing-page-transformation \
             --scope "$landing_scope" \
             --format html \
-            --out "_site/"
+            --out "_site/snapshots/"
+
+      # ---------------------------------------------------------------
+      # 6. Write the About page. Static HTML; same visual language as
+      # the transformation outputs. Describes the ontology, the
+      # tooling packages, and how to consume the publisher.
+      # ---------------------------------------------------------------
+      - name: Write About page
+        run: |
+          set -e
+          mkdir -p _site/about
+          cat > _site/about/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>About &mdash; worldview.genval.ai</title>
+          <style>
+          :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--border:#1e293b;--border-soft:#162033;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
+          *{box-sizing:border-box;margin:0;padding:0}
+          html,body{background:var(--bg)}
+          body{color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh}
+          a{color:var(--accent);text-decoration:none;transition:color 120ms}
+          a:hover{color:var(--accent-2)}
+          nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
+          .site-nav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+          a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+          ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
+          ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
+          ul.site-nav-links a:hover{color:var(--fg)}
+          ul.site-nav-links a.active{color:var(--fg)}
+          @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
+          article.about{max-width:880px;margin:0 auto;padding:48px 32px 96px}
+          @media (max-width:760px){article.about{padding:32px 20px 64px}}
+          header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
+          header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+          .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+          h1{font-family:var(--font-display);font-size:56px;font-weight:400;letter-spacing:-0.025em;margin-bottom:28px;line-height:1.05;color:var(--fg)}
+          @media (max-width:760px){h1{font-size:38px}}
+          .lead{font-size:18px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+          section.about-section{margin-top:56px}
+          .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+          .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+          section.about-section p{margin-bottom:14px;color:var(--fg-dim);line-height:1.7}
+          section.about-section ul{list-style:none;padding:0;margin:8px 0}
+          section.about-section ul li{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:20px 24px;margin-bottom:12px}
+          section.about-section ul li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:8px;letter-spacing:0.02em}
+          section.about-section ul li span{font-size:14px;color:var(--fg-dim);line-height:1.6;display:block}
+          section.about-section ul li a{font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-top:10px;display:inline-block;letter-spacing:0.05em}
+          section.about-section pre{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;padding:14px 18px;font-family:var(--font-mono);font-size:13px;color:var(--fg);margin:12px 0;overflow-x:auto}
+          footer.about-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+          footer.about-footer a{color:var(--accent)}
+          </style>
+          </head>
+          <body>
+          <nav class="site-nav">
+          <div class="site-nav-inner">
+          <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+          <ul class="site-nav-links">
+          <li><a href="/">Latest</a></li>
+          <li><a href="/snapshots/">Snapshots</a></li>
+          <li><a href="/about/" class="active">About</a></li>
+          </ul>
+          </div>
+          </nav>
+          <article class="about">
+          <header class="intro">
+          <span class="eyebrow">About</span>
+          <h1>worldview.genval.ai</h1>
+          <p class="lead">A public Kanonak Protocol publisher. Defines a vocabulary for falsifiable, evidence-backed worldview snapshots &mdash; <code>WorldviewSnapshot</code>, <code>WorldviewThesis</code>, <code>Evidence</code> &mdash; plus a structured invalidation-condition DSL so a rules engine can flag when a thesis is approaching invalidation.</p>
+          </header>
+
+          <section class="about-section">
+          <h2 class="section-title">The ontology</h2>
+          <p>The vocabulary is split across two packages so consumers can adopt the abstract layer without inheriting any domain bias:</p>
+          <ul>
+          <li>
+          <code>worldview.genval.ai/core@1.0.0</code>
+          <span>Domain-general vocabulary &mdash; Snapshot, Thesis, Evidence base, Condition DSL with proper subclassing (And/Or/Not, Threshold, Event, Sequenced, IndicatorAvailable, Persistence, Durability), status / strength / comparator / time-unit enums, and abstract reference-vocabulary stubs (Indicator, Event, Institution, etc.).</span>
+          <a href="/core/1.0.0.kan.yml">core/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/finance@1.0.0</code>
+          <span>Finance-domain extension &mdash; Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), the Security class with named instances, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, FiscalPeriod, ForecastHorizon, FlowDirection).</span>
+          <a href="/finance/1.0.0.kan.yml">finance/1.0.0.kan.yml &rarr;</a>
+          </li>
+          </ul>
+          </section>
+
+          <section class="about-section">
+          <h2 class="section-title">Tooling</h2>
+          <p>Two transformations turn the raw ontology + snapshots into the static site you're reading:</p>
+          <ul>
+          <li>
+          <code>worldview.genval.ai/snapshot-to-html@1.0.0</code>
+          <span>An InstanceTransformation that emits a self-contained HTML report from any <code>WorldviewSnapshot</code>. Inline CSS, dynamic SVG confidence bars, structured rendering of invalidation-condition trees down to three levels of nesting.</span>
+          <a href="/snapshot-to-html/1.0.0.kan.yml">snapshot-to-html/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/landing-page@1.0.0</code>
+          <span>A SetTransformation that aggregates every WorldviewSnapshot in scope into the snapshots index. v3's first set-theoretic primitive use in a public Kanonak package.</span>
+          <a href="/landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml &rarr;</a>
+          </li>
+          </ul>
+          </section>
+
+          <section class="about-section">
+          <h2 class="section-title">Consuming the publisher</h2>
+          <p>worldview.genval.ai is a static Kanonak Protocol origin. Any Kanonak-compatible tool can import these packages directly:</p>
+          <pre>imports:
+            - publisher: worldview.genval.ai
+              packages:
+                - package: core
+                  match: ^
+                  version: 1.0.0
+                  alias: wv</pre>
+          <p>Each package file is fetchable at its canonical Kanonak path:</p>
+          <pre>https://worldview.genval.ai/&lt;package&gt;/&lt;version&gt;.kan.yml</pre>
+          <p><a href="/index.txt">index.txt</a> &middot; <a href="/.well-known/kanonak.json">.well-known/kanonak.json</a></p>
+          </section>
+
+          <section class="about-section">
+          <h2 class="section-title">What's coming</h2>
+          <p>The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime narrative shifts &mdash; needs a few protocol primitives that haven't shipped yet (chiefly arithmetic and string-diffing for the chart layer). The textual portion lands first; the chart-heavy version follows when the underlying primitives become available.</p>
+          </section>
+
+          <footer class="about-footer">
+          <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+          <span>Apache 2.0</span>
+          <span><a href="https://kanonak.org">kanonak.org</a></span>
+          </footer>
+          </article>
+          </body>
+          </html>
+          HTML
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

@@ -113,7 +113,16 @@ landing-page-transformation:
                             body{color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh}
                             a{color:var(--accent);text-decoration:none;transition:color 120ms}
                             a:hover{color:var(--accent-2)}
-                            article.landing{max-width:1180px;margin:0 auto;padding:64px 32px 96px}
+                            /* SITE NAV */
+                            nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
+                            .site-nav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+                            a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+                            ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
+                            ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
+                            ul.site-nav-links a:hover{color:var(--fg)}
+                            ul.site-nav-links a.active{color:var(--fg)}
+                            @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
+                            article.landing{max-width:1180px;margin:0 auto;padding:48px 32px 96px}
                             @media (max-width:760px){article.landing{padding:32px 20px 64px}}
                             header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
                             header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
@@ -148,15 +157,25 @@ landing-page-transformation:
                             footer.landing-footer a{color:var(--accent)}
                             .timeline-pending{padding:20px 24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:6px;color:var(--fg-faint);font-size:13px;line-height:1.55;font-style:italic}
                             </style>
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/" class="active">Snapshots</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
                             <article class="landing">
                             <header class="intro">
-                            <span class="eyebrow">Kanonak Protocol Publisher</span>
-                            <h1>worldview.genval.ai</h1>
-                            <p class="lead">A public ontology for falsifiable, evidence-backed worldview snapshots. Defines a vocabulary for recording &ldquo;what we believe and why&rdquo; at a moment in time &mdash; <code>WorldviewSnapshot</code>, <code>WorldviewThesis</code>, <code>Evidence</code> &mdash; plus a structured invalidation-condition DSL so a rules engine can flag when a thesis is approaching invalidation. <a href="https://github.com/genval-ai/worldview">Source on GitHub</a>.</p>
+                            <span class="eyebrow">Snapshots</span>
+                            <h1>Worldview snapshots</h1>
+                            <p class="lead">Every published snapshot, newest first. Each entry is a self-contained record of theses, evidence, and invalidation conditions at a single point in time &mdash; immutable once published.</p>
                             </header>
 
                             <section class="snapshots">
-                            <h2 class="section-title">Snapshots</h2>
+                            <h2 class="section-title">All snapshots</h2>
                             <ol class="snapshot-list">
 
                         # =====================================================
@@ -255,26 +274,9 @@ landing-page-transformation:
                             </ol>
                             </section>
 
-                            <section class="ecosystem">
-                            <h2 class="section-title">Packages</h2>
-                            <ul>
-                            <li><code>worldview.genval.ai/core@1.0.0</code><span class="pkg-purpose">Domain-general vocabulary &mdash; Snapshot/Thesis/Evidence base, Condition DSL with proper subclassing (AndCondition, OrCondition, ThresholdCondition, EventCondition, SequencedCondition, etc.), status/strength enums, abstract reference vocabulary stubs.</span><a href="core/1.0.0.kan.yml">core/1.0.0.kan.yml</a></li>
-                            <li><code>worldview.genval.ai/finance@1.0.0</code><span class="pkg-purpose">Finance-specific Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), Security class with seeded named instances, finance-domain typed-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, CentralBank instances, AnalystInstitution instances).</span><a href="finance/1.0.0.kan.yml">finance/1.0.0.kan.yml</a></li>
-                            <li><code>worldview.genval.ai/snapshot-to-html@1.0.0</code><span class="pkg-purpose">Per-snapshot rendering &mdash; an InstanceTransformation that emits a single self-contained HTML report from any wv.WorldviewSnapshot. Inline CSS, dynamic SVG confidence bars, progressive-disclosure invalidation + supporting evidence sections.</span><a href="snapshot-to-html/1.0.0.kan.yml">snapshot-to-html/1.0.0.kan.yml</a></li>
-                            <li><code>worldview.genval.ai/landing-page@1.0.0</code><span class="pkg-purpose">This page &mdash; a SetTransformation that aggregates every WorldviewSnapshot in scope into the canonical index. v3's first set-theoretic primitive use in a public package.</span><a href="landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml</a></li>
-                            </ul>
-                            </section>
-
-                            <section class="ecosystem">
-                            <h2 class="section-title">What's coming</h2>
-                            <div class="timeline-pending">
-                              The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime-narrative shifts &mdash; needs a few SDK primitives that haven't shipped yet (chiefly arithmetic and string-diffing for the chart layer). The textual portion will land first; the chart-heavy version follows when the underlying primitives become available.
-                            </div>
-                            </section>
-
                             <footer class="landing-footer">
+                            <span><a href="/about/">About this publisher</a></span>
                             <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
                             <span>Apache 2.0</span>
-                            <span><a href="index.txt">index.txt</a> &middot; <a href=".well-known/kanonak.json">manifest</a></span>
                             </footer>
                             </article>
