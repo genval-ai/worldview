@@ -1,4 +1,5 @@
 core/1.0.0
 finance/1.0.0
 snapshot-to-html/1.0.0
+landing-page/1.0.0
 example-ai-capex/1.0.0

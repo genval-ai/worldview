@@ -2,7 +2,7 @@
 
 ## Pre-release (current state)
 
-The vocabulary is being extracted from a working private implementation in [`genval-ai/kanonak`](https://github.com/genval-ai/kanonak), where it shipped three snapshot versions inside `portfolio-ops.kanonak.com`. This repo is the new public home for the domain-general parts.
+The vocabulary was extracted from a working private implementation where it shipped multiple snapshot versions. This repo is the new public home for the domain-general parts.
 
 Parent issue: [genval-ai/kanonak#34](https://github.com/genval-ai/kanonak/issues/34) — captures the publisher-extraction plan and magic-string audit.
 
@@ -45,7 +45,7 @@ The Kanonak Protocol expects a publisher to serve `index.txt` and `<package>/<ve
 
 ## Acceptance test
 
-A new worldview snapshot in `genval-ai/kanonak/portfolio-ops.kanonak.com/worldview@2.0.0.kan.yml` that imports `worldview.genval.ai/core` + `worldview.genval.ai/finance`, uses the new structured invalidationCondition end-to-end, and renders cleanly via the moved snapshot-to-html transformation.
+A worldview snapshot package authored against `worldview.genval.ai/core` + `worldview.genval.ai/finance` that uses the new structured invalidationCondition end-to-end and renders cleanly via the snapshot-to-html transformation. The first such package is `worldview.genval.ai/example-ai-capex@1.0.0`.
 
 ## Out of scope (for v1)
 

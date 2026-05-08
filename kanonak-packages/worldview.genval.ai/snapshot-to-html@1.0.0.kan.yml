@@ -1496,7 +1496,7 @@ snapshot-to-html-transformation:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             <footer class="snapshot-footer">
-                            <span>Generated from <span class="snapshot-uri">portfolio-ops.kanonak.com/worldview</span></span>
+                            <span>Rendered by <span class="snapshot-uri">worldview.genval.ai/snapshot-to-html</span></span>
                             <time datetime="
                         - type: tx.PropertyRead
                           tx.readSource:

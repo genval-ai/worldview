@@ -112,76 +112,45 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 4. A minimal placeholder landing page. The proper aggregate
-      # landing page that lists every snapshot, and the timeline-view
-      # that visualizes how the worldview changes over time, are both
-      # blocked on the kanonak-protocol aggregate-transformation
-      # feature (filed as a separate issue). When that ships, this
-      # placeholder is replaced by transformation-generated output.
+      # 4. Render the landing page via the landing-page SetTransformation.
+      # Aggregates every WorldviewSnapshot in scope, sorts by observedAt
+      # descending, and emits _site/index.html. This replaces the prior
+      # placeholder and is itself the public ontology being eaten by the
+      # publisher.
       # ---------------------------------------------------------------
-      - name: Write placeholder landing page
+      - name: Render landing page
         run: |
-          cat > _site/index.html <<'HTML'
-          <!doctype html>
-          <html lang="en">
-          <head>
-          <meta charset="utf-8">
-          <title>worldview.genval.ai</title>
-          <meta name="viewport" content="width=device-width,initial-scale=1">
-          <style>
-          body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:780px;margin:64px auto;padding:0 24px;color:#111;line-height:1.55;background:#fafafa}
-          h1{font-weight:300;font-size:42px;letter-spacing:-0.02em}
-          h2{font-size:14px;letter-spacing:0.15em;text-transform:uppercase;color:#666;margin-top:48px}
-          a{color:#0070f3}
-          code{background:#eef;padding:1px 6px;border-radius:3px;font-size:0.9em}
-          ul{padding-left:20px}
-          li{margin:4px 0}
-          .note{background:#fff8dc;border:1px solid #f0e0a0;padding:12px 16px;border-radius:6px;font-size:14px;color:#665500}
-          </style>
-          </head>
-          <body>
-          <h1>worldview.genval.ai</h1>
-          <p>A public Kanonak Protocol publisher providing an ontology and tooling for falsifiable, evidence-backed worldview snapshots.</p>
-          <h2>Packages</h2>
-          <ul>
-            <li><code>worldview.genval.ai/core@1.0.0</code> &mdash; abstract vocabulary (Snapshot/Thesis/Evidence base, Condition DSL, status / strength enums)</li>
-            <li><code>worldview.genval.ai/finance@1.0.0</code> &mdash; finance-specific Evidence subclasses, Security class, named-instance vocabularies</li>
-            <li><code>worldview.genval.ai/snapshot-to-html@1.0.0</code> &mdash; renders any WorldviewSnapshot to a single-page HTML report</li>
-          </ul>
-          <h2>Sample Snapshots</h2>
-          <p>Worldview snapshots authored against the public ontology. Click to see the rendered report.</p>
-          <ul id="samples"></ul>
-          <h2>Spec / source</h2>
-          <ul>
-            <li><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a> &mdash; source repo</li>
-            <li><a href="index.txt">index.txt</a> &mdash; Kanonak Protocol package index</li>
-            <li><a href=".well-known/kanonak.json">.well-known/kanonak.json</a> &mdash; publisher manifest</li>
-          </ul>
-          <p class="note">A proper landing page that aggregates every snapshot version and a timeline view showing how the worldview changes over time are both blocked on a Kanonak Protocol feature for aggregate-over-set transformations. See the source repo for current status.</p>
-          <script>
-          // Sample-snapshot detection via index.txt (lists every package).
-          // Filter to "example-*" entries; turn each into a link to its rendered HTML.
-          (async () => {
-            const r = await fetch('index.txt');
-            const lines = (await r.text()).split('\n').filter(Boolean);
-            const samples = lines.filter(l => l.startsWith('example-'));
-            const ul = document.getElementById('samples');
-            if (samples.length === 0) {
-              ul.innerHTML = '<li><em>None yet.</em></li>';
-              return;
-            }
-            samples.forEach(s => {
-              // s is "example-name/1.0.0"; the rendered HTML lives at "<name>@<version>/snapshot.html"
-              const [name, version] = s.split('/');
-              const li = document.createElement('li');
-              li.innerHTML = `<a href="${name}@${version}/snapshot.html">${name}@${version}</a>`;
-              ul.appendChild(li);
-            });
-          })();
-          </script>
-          </body>
-          </html>
-          HTML
+          set -e
+          # Scope the SetTransformation across every worldview.genval.ai
+          # package; the input pattern filters to wv.WorldviewSnapshot, so
+          # only snapshot-bearing packages contribute. Output: index.html
+          # at the artifact root (overwrites any prior placeholder).
+          # Each example-* package's own snapshot is matched.
+          # The transformation reads the inputs sorted by observedAt desc,
+          # so "newest snapshot first" ordering is structural.
+          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
+            base=$(basename "$pkg_file" .kan.yml)
+            case "$base" in
+              core@*|finance@*|snapshot-to-html@*|landing-page@*) continue ;;
+            esac
+            if grep -q "type: wv\.WorldviewSnapshot" "$pkg_file"; then
+              # Each contributing package needs to be in the loaded scope -
+              # we pass them as comma-separated --scope arguments.
+              scopes="${scopes}${scopes:+,}worldview.genval.ai/${base}"
+            fi
+          done
+          if [ -z "$scopes" ]; then
+            echo "No WorldviewSnapshot packages found - skipping landing page render"
+            # write a minimal placeholder so the site still has an index.html
+            echo "<h1>worldview.genval.ai</h1><p>No snapshots published yet.</p>" > _site/index.html
+            exit 0
+          fi
+          echo "Rendering landing page over scopes: $scopes"
+          kanonak transform run \
+            worldview.genval.ai/landing-page/landing-page-transformation \
+            --scope "$scopes" \
+            --format html \
+            --out "_site/"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

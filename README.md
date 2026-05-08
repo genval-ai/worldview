@@ -28,7 +28,7 @@ This publisher provides:
 
 ## Status
 
-**Pre-release.** The vocabulary is being extracted from a working private implementation (`portfolio-ops.kanonak.com`) where it has shipped three snapshot versions. See [docs/ROADMAP.md](docs/ROADMAP.md) for current state.
+**Pre-release.** The vocabulary was extracted from a working private implementation where it shipped multiple snapshot versions. See [docs/ROADMAP.md](docs/ROADMAP.md) for current state.
 
 ## Using this ontology
 

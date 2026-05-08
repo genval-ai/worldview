@@ -1,0 +1,298 @@
+landing-page:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.0.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.0.0
+          alias: docast
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+
+# =============================================================================
+# Landing-page SetTransformation.
+#
+# Reads every wv.WorldviewSnapshot in scope (across all packages), sorts by
+# observedAt descending, and emits a single index.html that lists every
+# snapshot as a rich card with date, narrative excerpt, and thesis count
+# (computed via tx.Count over wv.hasThesis - the v3 set-theoretic primitive
+# that unblocked aggregate transformations and is what makes this page
+# possible at all).
+#
+# v1 caveats:
+#
+#   * Per-snapshot deep links can't be generated server-side because v3
+#     Expression has no primitive that yields the input subject's package
+#     URI. Each card carries a `data-snapshot-id` attribute (the snapshot's
+#     instance URI's local name); a tiny embedded JS at the bottom fetches
+#     index.txt and pairs them to package paths to wire up clickthroughs.
+#     If the workflow's `_site/<package>/snapshot.html` convention holds,
+#     this works.
+#
+#   * The "narrative" property is a multi-paragraph block of prose. We trim
+#     the trailing newline and let CSS clamp it to a few lines via line-clamp
+#     (graceful overflow with ellipsis). v2 may add an explicit
+#     `narrativeSummary` short-form property if the prose is genuinely
+#     unwieldy.
+#
+#   * No regime markers, no per-thesis breakdowns, no narrative-diff column,
+#     no SVG sparklines for confidence trajectories - those need either
+#     arithmetic (for SVG coordinates) or string-diffing primitives that
+#     v3 didn't ship. The placeholder timeline section at the bottom of the
+#     page references those followups.
+# =============================================================================
+
+landing-page-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.descending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        # =====================================================
+                        # STYLE BLOCK + PAGE HEADER
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <style>
+                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--border:#1e293b;--border-soft:#162033;--radius:8px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
+                            *{box-sizing:border-box;margin:0;padding:0}
+                            html,body{background:var(--bg)}
+                            body{color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh}
+                            a{color:var(--accent);text-decoration:none;transition:color 120ms}
+                            a:hover{color:var(--accent-2)}
+                            article.landing{max-width:1180px;margin:0 auto;padding:64px 32px 96px}
+                            @media (max-width:760px){article.landing{padding:32px 20px 64px}}
+                            header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
+                            header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                            header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+                            header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                            @media (max-width:760px){header.intro h1{font-size:42px}}
+                            header.intro .lead{font-size:19px;max-width:840px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                            header.intro .lead a{color:var(--accent);font-weight:400}
+                            section.snapshots,section.packages,section.ecosystem{margin-top:64px}
+                            .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                            .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                            ol.snapshot-list{list-style:none;padding:0;margin:0;counter-reset:snapshot-counter}
+                            li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:32px;margin-bottom:16px;counter-increment:snapshot-counter;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative;cursor:pointer}
+                            li.snapshot-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15);transform:translateY(-1px)}
+                            li.snapshot-card.linked::after{content:"\2192";position:absolute;top:32px;right:32px;font-family:var(--font-mono);font-size:14px;color:var(--accent);transition:transform 120ms}
+                            li.snapshot-card.linked:hover::after{transform:translateX(4px)}
+                            li.snapshot-card.unlinked{cursor:default}
+                            @media (max-width:760px){li.snapshot-card{padding:24px 20px}}
+                            .snapshot-card-header{display:flex;align-items:baseline;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+                            .snapshot-num::before{content:counter(snapshot-counter,decimal-leading-zero);font-family:var(--font-mono);color:var(--fg-faint);font-size:13px;letter-spacing:0.05em}
+                            time.snapshot-date{font-family:var(--font-mono);font-size:13px;letter-spacing:0.04em;color:var(--accent);font-weight:500}
+                            .snapshot-stats{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.08em;margin-left:auto}
+                            .snapshot-stats .stat-value{color:var(--fg);font-weight:600;font-size:14px;text-transform:none}
+                            p.snapshot-narrative{font-size:15px;line-height:1.7;color:var(--fg-dim);max-width:78ch;font-weight:300;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;white-space:pre-line}
+                            section.ecosystem ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+                            section.ecosystem li{padding:18px 20px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px}
+                            section.ecosystem li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:6px;font-weight:500}
+                            section.ecosystem li .pkg-purpose{font-size:13px;color:var(--fg-dim);line-height:1.55}
+                            section.ecosystem li a{color:var(--accent)}
+                            footer.landing-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                            footer.landing-footer a{color:var(--accent)}
+                            .timeline-pending{padding:20px 24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:6px;color:var(--fg-faint);font-size:13px;line-height:1.55;font-style:italic}
+                            </style>
+                            <article class="landing">
+                            <header class="intro">
+                            <span class="eyebrow">Kanonak Protocol Publisher</span>
+                            <h1>worldview.genval.ai</h1>
+                            <p class="lead">A public ontology for falsifiable, evidence-backed worldview snapshots. Defines a vocabulary for recording &ldquo;what we believe and why&rdquo; at a moment in time &mdash; <code>WorldviewSnapshot</code>, <code>WorldviewThesis</code>, <code>Evidence</code> &mdash; plus a structured invalidation-condition DSL so a rules engine can flag when a thesis is approaching invalidation. <a href="https://github.com/genval-ai/worldview">Source on GitHub</a>.</p>
+                            </header>
+
+                            <section class="snapshots">
+                            <h2 class="section-title">Snapshots</h2>
+                            <ol class="snapshot-list">
+
+                        # =====================================================
+                        # PER-SNAPSHOT CARD - one per matched WorldviewSnapshot
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snapshot
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+
+                              # Card open + numbered counter + date.
+                              # No data-snapshot-id - tx.UriName on a subject
+                              # binding returns empty in v3 (it expects a
+                              # reference, not a subject). The clickthrough JS
+                              # at the bottom of the page does order-based
+                              # matching against index.txt instead.
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  <li class="snapshot-card unlinked">
+                                  <div class="snapshot-card-header">
+                                  <span class="snapshot-num"></span>
+                                  <time class="snapshot-date" datetime="
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                                tx.readProp: wv.observedAt
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                                tx.readProp: wv.observedAt
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </time>
+                                  <div class="snapshot-stats">
+                                  <span class="stat"><span class="stat-value">
+
+                              # Count of theses (using v3's tx.Count primitive!)
+                              - type: tx.Count
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.hasThesis
+
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </span> theses</span>
+                                  </div>
+                                  </div>
+                                  <p class="snapshot-narrative">
+                              - type: tx.Normalize
+                                tx.normKind: tx.trim-end
+                                tx.normSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.narrative
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </p>
+                                  </li>
+
+                        # =====================================================
+                        # CLOSE SNAPSHOT LIST + ECOSYSTEM SECTION + FOOTER
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            </ol>
+                            </section>
+
+                            <section class="ecosystem">
+                            <h2 class="section-title">Packages</h2>
+                            <ul>
+                            <li><code>worldview.genval.ai/core@1.0.0</code><span class="pkg-purpose">Domain-general vocabulary &mdash; Snapshot/Thesis/Evidence base, Condition DSL with proper subclassing (AndCondition, OrCondition, ThresholdCondition, EventCondition, SequencedCondition, etc.), status/strength enums, abstract reference vocabulary stubs.</span><a href="core/1.0.0.kan.yml">core/1.0.0.kan.yml</a></li>
+                            <li><code>worldview.genval.ai/finance@1.0.0</code><span class="pkg-purpose">Finance-specific Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), Security class with seeded named instances, finance-domain typed-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, CentralBank instances, AnalystInstitution instances).</span><a href="finance/1.0.0.kan.yml">finance/1.0.0.kan.yml</a></li>
+                            <li><code>worldview.genval.ai/snapshot-to-html@1.0.0</code><span class="pkg-purpose">Per-snapshot rendering &mdash; an InstanceTransformation that emits a single self-contained HTML report from any wv.WorldviewSnapshot. Inline CSS, dynamic SVG confidence bars, progressive-disclosure invalidation + supporting evidence sections.</span><a href="snapshot-to-html/1.0.0.kan.yml">snapshot-to-html/1.0.0.kan.yml</a></li>
+                            <li><code>worldview.genval.ai/landing-page@1.0.0</code><span class="pkg-purpose">This page &mdash; a SetTransformation that aggregates every WorldviewSnapshot in scope into the canonical index. v3's first set-theoretic primitive use in a public package.</span><a href="landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml</a></li>
+                            </ul>
+                            </section>
+
+                            <section class="ecosystem">
+                            <h2 class="section-title">What's coming</h2>
+                            <div class="timeline-pending">
+                              The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime-narrative shifts &mdash; needs a few SDK primitives that haven't shipped yet. See <a href="https://github.com/kanonak-protocol/typescript/issues">protocol issues</a> for what's tracked.
+                            </div>
+                            </section>
+
+                            <footer class="landing-footer">
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            <span><a href="index.txt">index.txt</a> &middot; <a href=".well-known/kanonak.json">manifest</a></span>
+                            </footer>
+                            </article>
+
+                            <script>
+                            // Lazy-link snapshot cards to their rendered HTML pages.
+                            // Each card has data-snapshot-id; we fetch index.txt to find
+                            // packages and assume the workflow's `<package-base-name>/snapshot.html`
+                            // convention. If a card's snapshot ID matches a known package's
+                            // contained snapshot, wire up the click.
+                            (async () => {
+                              try {
+                                const r = await fetch('index.txt');
+                                const lines = (await r.text()).split('\n').filter(Boolean);
+                                // Filter out non-snapshot packages by skipping known ontology / transformation names.
+                                const skip = ['core', 'finance', 'snapshot-to-html', 'landing-page'];
+                                const snapshotPackages = lines
+                                  .map(l => l.split('/'))
+                                  .filter(([name]) => !skip.includes(name))
+                                  .map(([name, version]) => ({ name, version, slug: name + '@' + version }));
+                                // For now, link every card to its corresponding package by ORDER -
+                                // since both the cards and the package list are sorted, and there's
+                                // typically one snapshot per package, this works. Robust matching by
+                                // snapshot-ID requires either (a) consistent unique snapshot names
+                                // across packages or (b) an SDK primitive that exposes the source
+                                // package URI in the SetTransformation rule.
+                                const cards = Array.from(document.querySelectorAll('li.snapshot-card'));
+                                cards.forEach((card, idx) => {
+                                  const pkg = snapshotPackages[idx];
+                                  if (!pkg) return;
+                                  card.classList.remove('unlinked');
+                                  card.classList.add('linked');
+                                  card.addEventListener('click', () => {
+                                    window.location.href = pkg.slug + '/snapshot.html';
+                                  });
+                                });
+                              } catch (e) {
+                                console.warn('Could not wire up snapshot links:', e);
+                              }
+                            })();
+                            </script>
