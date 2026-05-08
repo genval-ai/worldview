@@ -138,6 +138,8 @@ landing-page-transformation:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |
                             <style>
+                            /* Suppress the CLI's default metadata frontmatter render — the title is consumed via <title>, we don't want it duplicated as visible body content */
+                            dl.metadata{display:none!important}
                             :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--border:#1e293b;--border-soft:#162033;--radius:8px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
                             *{box-sizing:border-box;margin:0;padding:0}
                             html,body{background:var(--bg)}
