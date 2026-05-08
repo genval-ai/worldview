@@ -163,7 +163,7 @@ landing-page-transformation:
                             header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
                             header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
                             @media (max-width:760px){header.intro h1{font-size:42px}}
-                            header.intro .lead{font-size:19px;max-width:840px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                            header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
                             header.intro .lead a{color:var(--accent);font-weight:400}
                             section.snapshots,section.packages,section.ecosystem{margin-top:64px}
                             .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
@@ -181,7 +181,7 @@ landing-page-transformation:
                             time.snapshot-date{font-family:var(--font-mono);font-size:13px;letter-spacing:0.04em;color:var(--accent);font-weight:500}
                             .snapshot-stats{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.08em;margin-left:auto}
                             .snapshot-stats .stat-value{color:var(--fg);font-weight:600;font-size:14px;text-transform:none}
-                            p.snapshot-narrative{font-size:15px;line-height:1.7;color:var(--fg-dim);max-width:78ch;font-weight:300;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;white-space:pre-line}
+                            p.snapshot-narrative{font-size:15px;line-height:1.7;color:var(--fg-dim);font-weight:300;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;white-space:pre-line}
                             section.ecosystem ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
                             section.ecosystem li{padding:18px 20px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px}
                             section.ecosystem li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:6px;font-weight:500}
