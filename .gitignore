@@ -5,6 +5,9 @@ dist/
 # Local kanonak CLI cache
 .kanonak/
 
+# Local working notes / scratch (issues, drafts, fetched specs)
+research/
+
 # Node
 node_modules/
 npm-debug.log*
