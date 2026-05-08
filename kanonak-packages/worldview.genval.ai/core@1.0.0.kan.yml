@@ -118,6 +118,23 @@ hasThesis:
     only insofar as it affects the rendering order in transformations; the
     set is the source of truth, not the sequence.
 
+previousSnapshot:
+  type: owl.ObjectProperty
+  domain: WorldviewSnapshot
+  range: WorldviewSnapshot
+  label: Previous Snapshot
+  comment: >
+    Optional explicit reference to the WorldviewSnapshot this snapshot
+    succeeds. The conventional package version chain (1.0.0 -> 1.0.1 ->
+    1.0.2) implicitly carries succession order, but this property makes
+    it machine-walkable without inferring from version numbers and
+    handles non-linear cases (a forked experimental branch that
+    diverges and rejoins, or a regime-shift major version bump that
+    skips intermediate patches). Time-series transformations should
+    prefer this property when present; fall back to semver order when
+    absent. If absent for a package's first snapshot, that's correct
+    (no predecessor).
+
 # --- WorldviewThesis properties ---
 
 thesisStatement:
@@ -181,6 +198,36 @@ status:
     active to invalidated. Not allowed - invalidated back to active (a
     falsified thesis stays falsified; if the same idea becomes valid again
     it deserves a new thesis with a new name and fresh framing).
+
+confidenceRationale:
+  type: owl.DatatypeProperty
+  domain: WorldviewThesis
+  range: xsd.string
+  label: Confidence Rationale
+  comment: >
+    Optional 1-2 sentence prose explaining why confidence shifted in this
+    snapshot relative to the prior one. Splitting the rationale onto each
+    thesis (vs. burying it in the snapshot's global narrative) lets a
+    time-series view show "thesis X moved 0.5 -> 0.7 because $reason" per
+    version without parsing free-form prose. Authors may leave this blank
+    and use the snapshot's narrative for the same purpose; the property
+    is for tooling that wants the rationale machine-attached to the
+    confidence value.
+
+statusTransitionEvidence:
+  type: owl.ObjectProperty
+  domain: WorldviewThesis
+  range: Evidence
+  label: Status Transition Evidence
+  comment: >
+    Optional reference to the Evidence instance that triggered the most
+    recent status transition (active -> retired, or active -> invalidated).
+    Set when status changes; left absent on initial-active status. Time-
+    series visualizations use this to annotate the timeline ("thesis
+    invalidated by $evidence on $date") rather than parsing the
+    invalidationCondition tree to figure out which condition fired. May
+    be a list in v2 if multiple evidence trigger together; v1 single ref
+    is the simpler case and covers most patterns.
 
 
 # =============================================================================
