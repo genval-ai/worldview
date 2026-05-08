@@ -93,6 +93,13 @@ jobs:
           mkdir -p _site/.well-known
           cp .well-known/kanonak.json _site/.well-known/kanonak.json
           cp index.txt _site/index.txt
+          # GitHub Pages custom-domain binding requires a CNAME file in
+          # the deployed artifact root. Without it, each deploy invalidates
+          # the custom-domain validation even though the Pages settings
+          # still record the cname. Write it directly here rather than
+          # tracking a CNAME file in the repo, so the source of truth is
+          # the workflow (not a sometimes-out-of-sync file).
+          echo "worldview.genval.ai" > _site/CNAME
           # Mirror each package file at its canonical path.
           for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
