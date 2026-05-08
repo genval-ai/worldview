@@ -113,42 +113,31 @@ jobs:
 
       # ---------------------------------------------------------------
       # 4. Render the landing page via the landing-page SetTransformation.
-      # Aggregates every WorldviewSnapshot in scope, sorts by observedAt
-      # descending, and emits _site/index.html. This replaces the prior
-      # placeholder and is itself the public ontology being eaten by the
-      # publisher.
+      # Scopes to example-macro (the rich production-grade demo) - the
+      # SetTransformation aggregates only WorldviewSnapshot instances
+      # within the scoped package, so a single rich snapshot package is
+      # what the landing currently shows. Multi-package aggregation needs
+      # SDK support for either multiple --scope args or for SetTransformation
+      # to look across transitively-imported packages; tracked as a separate
+      # protocol issue.
       # ---------------------------------------------------------------
       - name: Render landing page
         run: |
           set -e
-          # Scope the SetTransformation across every worldview.genval.ai
-          # package; the input pattern filters to wv.WorldviewSnapshot, so
-          # only snapshot-bearing packages contribute. Output: index.html
-          # at the artifact root (overwrites any prior placeholder).
-          # Each example-* package's own snapshot is matched.
-          # The transformation reads the inputs sorted by observedAt desc,
-          # so "newest snapshot first" ordering is structural.
-          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
-            base=$(basename "$pkg_file" .kan.yml)
-            case "$base" in
-              core@*|finance@*|snapshot-to-html@*|landing-page@*) continue ;;
-            esac
-            if grep -q "type: wv\.WorldviewSnapshot" "$pkg_file"; then
-              # Each contributing package needs to be in the loaded scope -
-              # we pass them as comma-separated --scope arguments.
-              scopes="${scopes}${scopes:+,}worldview.genval.ai/${base}"
-            fi
-          done
-          if [ -z "$scopes" ]; then
-            echo "No WorldviewSnapshot packages found - skipping landing page render"
-            # write a minimal placeholder so the site still has an index.html
+          # Pick the most recently authored example-macro-* package as the
+          # landing scope. The example-ai-capex snapshot is still rendered
+          # at its own canonical path via the per-package loop above; users
+          # can navigate there directly via the index.txt listing.
+          landing_scope="worldview.genval.ai/example-macro"
+          if [ ! -f kanonak-packages/worldview.genval.ai/example-macro@1.0.0.kan.yml ]; then
+            echo "No example-macro package found - skipping landing page render"
             echo "<h1>worldview.genval.ai</h1><p>No snapshots published yet.</p>" > _site/index.html
             exit 0
           fi
-          echo "Rendering landing page over scopes: $scopes"
+          echo "Rendering landing page scoped to $landing_scope"
           kanonak transform run \
             worldview.genval.ai/landing-page/landing-page-transformation \
-            --scope "$scopes" \
+            --scope "$landing_scope" \
             --format html \
             --out "_site/"
 

@@ -1,0 +1,857 @@
+example-macro:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+        - package: finance
+          match: ^
+          version: 1.0.0
+          alias: fin
+
+# =============================================================================
+# Example worldview snapshot - multi-thesis macro view, May 8 2026.
+#
+# Demonstrates the worldview.genval.ai ontology in production-grade depth:
+# seven theses across the dominant macro themes (defense rearmament cycle,
+# energy premium, stagflation / Fed independence, gold structural bid,
+# AI capex with China tail, equity melt-up versus recession, Fed leadership
+# transition), each with structured invalidation conditions composed using
+# the Condition DSL subclasses (And / Or / Sequenced / Threshold / Event /
+# IndicatorComparison / PersistenceWindow), and dozens of typed Evidence
+# instances drawing from the finance Evidence subclass library.
+#
+# Sister to example-ai-capex@1.0.0 - that package is the minimum-viable
+# single-thesis demonstration; this one is the everything-on demonstration.
+# =============================================================================
+
+snapshot:
+  type: wv.WorldviewSnapshot
+  observedAt: 2026-05-08T20:30:00Z
+  narrative: |
+    Macro state as of May 8 2026. Seven theses dominate allocation:
+    Iran rearmament cycle still in motion despite peace progress; energy
+    premium has eased materially as the 2-week ceasefire holds (WTI $95.33,
+    Brent ~$100); stagflation pressure abating modestly with oil retreat
+    but Fed faces transition stress with Warsh full Senate vote scheduled
+    Monday May 11; gold structural bid remains intact (above $4,700, Q1
+    central-bank buying a record 244 tonnes); AI capex thesis confirmed
+    strong by AMD and NVDA Q1 prints; equity melt-up extending (SPX
+    7,389.24 fresh ATH, VIX 17.18); Powell-to-Warsh handoff window now
+    days away.
+  hasThesis:
+    - iran-war-rearmament
+    - persistent-energy-shock
+    - stagflation-risk
+    - gold-debasement-bid
+    - ai-capex-cycle-with-china-tail
+    - equity-melt-up-vs-recession-risk
+    - powell-warsh-transition-risk
+
+# =============================================================================
+# THESES
+# =============================================================================
+
+iran-war-rearmament:
+  type: wv.WorldviewThesis
+  label: Iran war rearmament cycle
+  thesisStatement: 'The US-Iran war that began Feb 28 2026 (Operation Epic Fury) triggered a multi-year defense spending cycle that benefits prime contractors with missile and missile-defense exposure regardless of whether the May 6 14-point MOU framework holds and whether the Pakistan-mediated 2-week ceasefire converts to a durable peace, because depleted munitions stockpiles must be replenished and Golden Dome ($185B) is now a multi-year program. The procurement cycle persists through diplomatic resolution unless DoD outlays meaningfully reverse.'
+  confidence: 0.75
+  status: wv.active
+  confidenceRationale: 'Steady at 0.75. Peace framework active but not yet durable; backlogs at LMT $194B and RTX $271B point to multi-year delivery commitments that survive a ceasefire.'
+  supportingEvidence:
+    - ev-operation-epic-fury-feb28
+    - ev-iran-tomahawks-fired-2026q1
+    - ev-fy2026-defense-budget-1t
+    - ev-fy2027-defense-budget-projection
+    - ev-lmt-backlog-194b-q1-2026
+    - ev-rtx-backlog-271b-q1-2026
+    - ev-trump-buyback-eo
+  invalidationCondition:
+    type: wv.AndCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-us-iran-peace-agreement-implemented
+        durability: wv.durable
+      - type: wv.ThresholdCondition
+        observable: fin.ind-dod-outlays-yoy-change
+        comparator: wv.lt
+        threshold: 0
+        persistence:
+          wv.duration: 2
+          wv.windowUnit: wv.fiscal-quarters
+
+persistent-energy-shock:
+  type: wv.WorldviewThesis
+  label: Persistent energy premium
+  thesisStatement: Oil prices remain structurally elevated as long as the Strait of Hormuz reopening sequence is incomplete and Iranian retaliation risk is intact. The May 8 close (WTI $95.33) reflects a partial unwinding of the wartime premium following the Pakistan-mediated 2-week ceasefire and 14-point MOU framework, but the supply-side reset hasn't materialized and Goldman's $77.50 Brent target sits 25%+ below spot.
+  confidence: 0.45
+  status: wv.active
+  confidenceRationale: 'Stepped down from 0.5 last refresh - oil has now traded below the $100 baseline for a sustained interval, the ceasefire holds, and the MOU framework progresses. Still above the invalidation threshold of $80 and the 30-day persistence window has not started.'
+  supportingEvidence:
+    - ev-strait-of-hormuz-closed-march4
+    - ev-trump-project-freedom-pause-may6
+    - ev-iran-mou-14-point
+    - ev-pakistan-mediated-ceasefire
+    - ev-wti-95-may8
+    - ev-brent-100-may8
+    - ev-goldman-brent-target-raise
+  invalidationCondition:
+    type: wv.OrCondition
+    operands:
+      - type: wv.SequencedCondition
+        after:
+          type: wv.EventCondition
+          event: fin.evt-strait-of-hormuz-reopened
+          durability: wv.durable
+        then:
+          type: wv.ThresholdCondition
+          observable: fin.ind-wti-close
+          comparator: wv.lt
+          threshold: 80
+          persistence:
+            wv.duration: 30
+            wv.windowUnit: wv.calendar-days
+      - type: wv.EventCondition
+        event: fin.evt-opec-supply-shock
+
+stagflation-risk:
+  type: wv.WorldviewThesis
+  label: Stagflation risk and Fed independence stress
+  thesisStatement: 'The Fed faces a hard mandate balance with energy-driven inflation moderating only on the May ceasefire and unemployment at 4.3-4.4%. Political pressure on Fed independence intensifies into the May 15 transition - 8-4 dissent on April 29 was the highest since 1992, the Senate Banking 13-11 party-line advance was historically partisan for a Fed Chair nominee, and Trump rate-cut pressure is sustained. Real assets and defensive positioning benefit; long duration is exposed.'
+  confidence: 0.65
+  status: wv.active
+  confidenceRationale: 'Stepped down from 0.7 - oil retreat reduces the inflation-pressure side of the thesis. Fed-independence side intact and tightening as the Warsh full-Senate vote looms.'
+  supportingEvidence:
+    - ev-fed-held-april29-with-dissent
+    - ev-fomc-dissent-miran-cut
+    - ev-warsh-banking-cmte-13-11
+    - ev-warsh-senate-vote-confirmed-may11
+    - ev-powell-exit-warsh-nominated-may15
+    - ev-doj-powell-investigation-halted
+    - ev-fomc-statement-inflation-elevated-energy
+    - ev-market-prices-zero-2026-cuts
+    - ev-unemployment-mid-4pct-april-2026
+    - ev-core-inflation-above-2pct-25y
+    - ev-30y-yield-5pct-may5
+    - ev-trump-12t-interest-bill
+  invalidationCondition:
+    type: wv.OrCondition
+    operands:
+      - type: wv.AndCondition
+        operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-core-pce-yoy
+            comparator: wv.lt
+            threshold: 2.5
+            persistence:
+              wv.duration: 3
+              wv.windowUnit: wv.months
+          - type: wv.ThresholdCondition
+            observable: fin.ind-unemployment-rate
+            comparator: wv.between
+            threshold: 4.0
+            thresholdHigh: 4.5
+            persistence:
+              wv.duration: 3
+              wv.windowUnit: wv.months
+      - type: wv.AndCondition
+        operands:
+          - type: wv.EventCondition
+            event: fin.evt-us-iran-peace-agreement-implemented
+            durability: wv.durable
+          - type: wv.ThresholdCondition
+            observable: fin.ind-wti-close
+            comparator: wv.lt
+            threshold: 80
+            persistence:
+              wv.duration: 30
+              wv.windowUnit: wv.calendar-days
+
+gold-debasement-bid:
+  type: wv.WorldviewThesis
+  label: Gold structural debasement bid
+  thesisStatement: 'Gold sits in mid-cycle of a multi-year structural bull market driven by central-bank buying, sovereign de-dollarization, $39T US debt, stock-bond correlation breakdown, and Fed independence concerns. Q1 2026 set records on multiple dimensions - LBMA quarterly average $4,873/oz, central-bank net purchases 244 tonnes (highest Q1 ever, +17% QoQ), aggregate Q1 demand value $193B. Spot held above $4,700 May 8 even as oil retreated. Major bank targets all imply materially higher levels (JPM $5,055-$6,300, UBS $6,200, Citi $5,000-$7,000).'
+  confidence: 0.85
+  status: wv.active
+  confidenceRationale: 'Steady at 0.85. Three structural drivers (durable peace, Fed credibility restored, deficit declining) are all dependencies that have not moved meaningfully. Holding above $4,700 despite oil retreat is itself confirming evidence.'
+  supportingEvidence:
+    - ev-gold-spot-4700-may8
+    - ev-lbma-q1-record-4873
+    - ev-cb-q1-2026-244t-buying-record
+    - ev-cb-survey-95pct-reserves-up
+    - ev-gold-q1-2026-record-demand-193b
+    - ev-stock-bond-correlation-30y-high
+    - ev-jpm-gold-target-5055-6300
+    - ev-ubs-gold-target-6200
+    - ev-citi-gold-target-5000-7000
+    - ev-bar-coin-demand-474-tonnes-q1
+  invalidationCondition:
+    type: wv.AndCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-us-iran-peace-agreement-implemented
+        durability: wv.durable
+      - type: wv.EventCondition
+        event: fin.evt-fed-credibility-restored
+      - type: wv.ThresholdCondition
+        observable: fin.ind-us-fiscal-deficit-trailing-12m
+        comparator: wv.lt
+        threshold: 0
+        persistence:
+          wv.duration: 6
+          wv.windowUnit: wv.months
+
+ai-capex-cycle-with-china-tail:
+  type: wv.WorldviewThesis
+  label: AI capex sustained but with China decoupling tail risk
+  thesisStatement: 'Hyperscaler AI capex continues at elevated pace into 2026 (NVDA $725B+, Gartner $1.3T+ semis with 30% AI share). AMD Q1 2026 (May 5 AH) materially confirmed the thesis - revenue $10.3B vs $9.88B consensus, Data Center +57% YoY at $5.8B vs $5.4B consensus, Q2 guide $11.2B vs $10.3B consensus. NVIDIA China revenue remains effectively zero structurally; the H20 / MI308 15% revenue-share deal partially monetizes the export-control impairment. Tail risk remains escalation of US-China export controls beyond H20.'
+  confidence: 0.75
+  status: wv.active
+  confidenceRationale: 'Steady at 0.75. AMD Q1 inverted the soft-side invalidation; the only surviving invalidation path is China export-control extension (the named tail). Confirmed-strong state.'
+  supportingEvidence:
+    - ev-amd-q1-2026-blowout
+    - ev-amd-q1-data-center-58b
+    - ev-amd-q2-guide-112b
+    - ev-amd-stock-plus18-ah
+    - ev-amd-su-tens-of-billions-quote
+    - ev-nvda-china-revenue-zero
+    - ev-nvda-h20-charge-45b
+    - ev-nvda-amd-15pct-china-revshare
+    - ev-gartner-semi-revenue-1t-plus-2026
+    - ev-anthropic-meta-ai-partnerships
+    - ev-openai-6gw-supply-agreement
+  invalidationCondition:
+    type: wv.EventCondition
+    event: fin.evt-us-china-export-controls-extended
+    durability: wv.durable
+
+equity-melt-up-vs-recession-risk:
+  type: wv.WorldviewThesis
+  label: Equity melt-up versus building recession risk
+  thesisStatement: 'S&P 500 closed at a fresh ATH 7,389.24 on May 8 (+0.71%) with VIX 17.18 - sustained risk-on as the Iran ceasefire holds and oil retreats. Q1 2026 earnings season concluded at 84% beat rate (highest since Q2 2021), 27.1% blended EPS growth, blended net margin (May 7 FactSet refresh) 13.4%. The melt-up case dominates the misplaced-euphoria warning at this point; invalidation requires either a vol-expansion break (VIX > 25 with SPY breaking 50d MA) or unimpeded melt-up confirmation (SPX > 7,300 with VIX < 15).'
+  confidence: 0.75
+  status: wv.active
+  confidenceRationale: 'Stepped up from 0.7 - SPX cleared 7,300 on a sustained basis with new ATH May 8 and VIX still in the 15-20 normal range. The melt-up half of the binary invalidation is closer to satisfied.'
+  supportingEvidence:
+    - ev-sp500-ath-7389-may8
+    - ev-sp500-ath-7230-may1
+    - ev-spx-may6-record-7365
+    - ev-vix-1718-may8
+    - ev-q1-2026-84pct-beat-rate
+    - ev-q1-2026-eps-growth-271pct
+    - ev-q1-2026-net-margin-revised-134pct
+    - ev-q1-2026-magnitude-of-beats-207
+    - ev-q1-2026-forward-guide-21-23
+    - ev-fortune-stopped-caring-iran-quote
+    - ev-sen-misplaced-euphoria-quote
+    - ev-pe-multidecade-norm-above-avg
+  invalidationCondition:
+    type: wv.OrCondition
+    operands:
+      - type: wv.AndCondition
+        operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-vix-close
+            comparator: wv.gt
+            threshold: 25
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+          - type: wv.IndicatorComparison
+            left: fin.ind-spy-close
+            right:
+              type: wv.MovingAverage
+              wv.of: fin.ind-spy-close
+              wv.period: 50
+              wv.periodUnit: wv.trading-days
+            comparator: wv.lt
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+      - type: wv.AndCondition
+        operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-spx-close
+            comparator: wv.gt
+            threshold: 7300
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+          - type: wv.ThresholdCondition
+            observable: fin.ind-vix-close
+            comparator: wv.lt
+            threshold: 15
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+
+powell-warsh-transition-risk:
+  type: wv.WorldviewThesis
+  label: Fed leadership transition policy uncertainty
+  thesisStatement: 'Kevin Warsh full Senate vote scheduled Monday May 11 at 3 PM. Republicans hold a 53-seat majority; confirmation widely expected before Powell term expires May 15. The transition window through August FOMC is structurally higher-vol than normal because every Warsh comment will be priced as new information; the 13-11 party-line Banking Committee advance was the first fully partisan Fed-Chair vote in committee history. Warsh confirmation hearing framing - "won''t be sock puppet" / "room to cut without inflation" - introduces a dovish-tilt risk to the dollar / long-duration cross.'
+  confidence: 0.55
+  status: wv.active
+  confidenceRationale: 'Steady at 0.55. Confirmation now days away; transition risk premium is concentrated and front-loaded into next 30 days. Watch first speech and FOMC vote pattern.'
+  supportingEvidence:
+    - ev-powell-exit-warsh-nominated-may15
+    - ev-warsh-banking-cmte-13-11
+    - ev-warsh-senate-vote-confirmed-may11
+    - ev-warsh-sock-puppet-quote
+    - ev-warsh-room-to-cut-quote
+    - ev-fed-held-april29-with-dissent
+    - ev-fomc-dissent-miran-cut
+    - ev-doj-powell-investigation-halted
+    - ev-trump-fed-pressure-housing-debt
+    - ev-warsh-historically-hawkish
+    - ev-tillis-hold-lifted
+  invalidationCondition:
+    type: wv.AndCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-fed-chair-continuity-signal
+      - type: wv.ThresholdCondition
+        observable: fin.ind-fomc-dissent-count
+        comparator: wv.lte
+        threshold: 2
+        persistence:
+          wv.duration: 1
+          wv.windowUnit: wv.fomc-meetings
+
+# =============================================================================
+# EVIDENCE - geopolitical / Iran
+# =============================================================================
+
+ev-operation-epic-fury-feb28:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: US-Israel coordinated airstrikes on Iran (Operation Epic Fury) commenced 2026-02-28, targeting military facilities, nuclear sites, and leadership. Supreme Leader Ali Khamenei reported killed.
+  evidenceObservedAt: 2026-02-28T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  geopoliticalEventDate: 2026-02-28
+
+ev-iran-tomahawks-fired-2026q1:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: US fired 850+ Tomahawk missiles in the first phase of the US-Iran war (Operation Epic Fury) - the highest single-campaign Tomahawk usage in history.
+  evidenceObservedAt: 2026-03-15T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  geopoliticalEventDate: 2026-03-01
+
+ev-strait-of-hormuz-closed-march4:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: Iran formally closed the Strait of Hormuz on 2026-03-04, threatening any vessel attempting passage. IRGC issued passage prohibitions, boarded merchant ships, and laid sea mines. Brent surged past $120/bbl on the closure; QatarEnergy declared force majeure on all exports.
+  evidenceObservedAt: 2026-03-04T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  geopoliticalEventDate: 2026-03-04
+
+ev-trump-project-freedom-pause-may6:
+  type: wv.PolicyEvidence
+  evidenceStatement: Trump announced a temporary pause in "Project Freedom" (US Navy escort operation through the Strait of Hormuz) on 2026-05-06, citing "great progress" toward a comprehensive agreement with Iran.
+  evidenceObservedAt: 2026-05-06T13:00:00Z
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2026-05-06
+
+ev-iran-mou-14-point:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: White House reported nearing a one-page 14-point memorandum of understanding with Iran to end the war and establish a framework for more detailed nuclear talks.
+  evidenceObservedAt: 2026-05-06T13:00:00Z
+  evidenceStrength: wv.evidence-strong
+  geopoliticalEventDate: 2026-05-06
+
+ev-pakistan-mediated-ceasefire:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: Pakistan-mediated 2-week ceasefire active as of May 8 2026. Latest peace proposal involves Iran moratorium on nuclear enrichment, US lifting sanctions, both sides lifting Hormuz transit restrictions; 30-day negotiation period for detailed terms. Iran reviewing.
+  evidenceObservedAt: 2026-05-08T12:00:00Z
+  evidenceStrength: wv.evidence-strong
+  geopoliticalEventDate: 2026-05-08
+
+# =============================================================================
+# EVIDENCE - market data
+# =============================================================================
+
+ev-wti-95-may8:
+  type: fin.MarketDataEvidence
+  evidenceStatement: WTI crude closed at $95.33 on 2026-05-08, +0.55% on the day. Down from $104 on May 5, reflecting the May 6-8 ceasefire / MOU progression and a partial unwinding of the wartime premium. Still well above the $80 invalidation threshold.
+  evidenceObservedAt: 2026-05-08T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 95.33
+
+ev-brent-100-may8:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Brent crude trading near $100 per barrel May 8 2026, down from the $112-114 range in early May.
+  evidenceObservedAt: 2026-05-08T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 100.0
+
+ev-sp500-ath-7389-may8:
+  type: fin.MarketDataEvidence
+  evidenceStatement: S&P 500 closed at a fresh all-time high of 7,389.24 on May 8 2026, +0.71% (+52.13 points). Closed above the 7,300 melt-up threshold for several consecutive sessions.
+  evidenceObservedAt: 2026-05-08T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7389.24
+
+ev-sp500-ath-7230-may1:
+  type: fin.MarketDataEvidence
+  evidenceStatement: S&P 500 hit an all-time high of 7,230 on May 1 2026.
+  evidenceObservedAt: 2026-05-01T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7230.0
+
+ev-spx-may6-record-7365:
+  type: fin.MarketDataEvidence
+  evidenceStatement: SPX closed at a record 7,365.12 on May 6 2026 (+1.46%) on Iran ceasefire euphoria and AMD Q1 follow-through.
+  evidenceObservedAt: 2026-05-06T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7365.12
+
+ev-vix-1718-may8:
+  type: fin.MarketDataEvidence
+  evidenceStatement: VIX at 17.18 on 2026-05-08 (+0.59%, basically flat). Sits in the 15-20 normal-business-conditions range despite the active Iran negotiations and the imminent Fed transition.
+  evidenceObservedAt: 2026-05-08T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.vix
+  fin.marketMetric: fin.volatility-level
+  fin.observedValue: 17.18
+
+ev-gold-spot-4700-may8:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Spot gold rose above $4,700/oz on 2026-05-08 after sharp volatility in the prior session, holding firm even as oil retreated and the Iran ceasefire held.
+  evidenceObservedAt: 2026-05-08T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4700.0
+
+ev-30y-yield-5pct-may5:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: 30-year US Treasury yield reached 5% on 2026-05-05; long-end fiscal premium at the highest level since Q2 2025. Trump's annual interest bill projected at $1.2 trillion.
+  evidenceObservedAt: 2026-05-05T20:00:00Z
+  evidenceStrength: wv.evidence-strong
+  indicatorPeriod: 2026-05-05 close
+
+ev-pe-multidecade-norm-above-avg:
+  type: fin.MarketDataEvidence
+  evidenceStatement: S&P 500 P/E ratios at multi-decade norms but above the long-run historical average.
+  evidenceObservedAt: 2026-05-05T00:00:00Z
+  evidenceStrength: wv.evidence-moderate
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.valuation-ratio
+
+# =============================================================================
+# EVIDENCE - Q1 2026 earnings season
+# =============================================================================
+
+ev-q1-2026-84pct-beat-rate:
+  type: fin.MarketDataEvidence
+  evidenceStatement: With 63% of S&P 500 companies reporting, 84% beat EPS estimates - well above the 5-year (78%) and 10-year (76%) averages. Highest beat rate since Q2 2021's 87% (FactSet, May 1).
+  evidenceObservedAt: 2026-05-01T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.earnings-beat-rate
+  fin.observedValue: 0.84
+
+ev-q1-2026-eps-growth-271pct:
+  type: fin.MarketDataEvidence
+  evidenceStatement: S&P 500 Q1 2026 blended earnings growth at 27.1% - highest since Q4 2021. Up sharply from 13.1% projection at end of March (FactSet).
+  evidenceObservedAt: 2026-05-01T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.eps-growth
+  fin.observedValue: 0.271
+
+ev-q1-2026-magnitude-of-beats-207:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Q1 2026 S&P 500 earnings beat consensus by 20.7% in aggregate magnitude - highest since Q1 2021 (FactSet).
+  evidenceObservedAt: 2026-05-01T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.earnings-beat-magnitude
+  fin.observedValue: 0.207
+
+ev-q1-2026-net-margin-revised-134pct:
+  type: fin.MarketDataEvidence
+  evidenceStatement: 'S&P 500 Q1 2026 blended net margin revised to 13.4% in the May 7 FactSet refresh, down from the May 1 reading of 14.7% as more companies reported. Still well above the 12.3% 5-year average.'
+  evidenceObservedAt: 2026-05-07T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.spx
+  fin.marketMetric: fin.net-profit-margin
+  fin.observedValue: 0.134
+
+ev-q1-2026-forward-guide-21-23:
+  type: fin.AnalystEvidence
+  evidenceStatement: Analysts project S&P 500 forward earnings growth of 21.3% (Q2), 23.0% (Q3), 20.6% (Q4 2026) per FactSet aggregation.
+  evidenceObservedAt: 2026-05-01T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.factset-aggregation
+  fin.forecastValue: 0.213
+  fin.forecastHorizon: fin.horizon-full-year
+
+ev-fortune-stopped-caring-iran-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Fortune (May 5 2026) reported the market had "largely stopped caring about Iran" - characterizing it as remarkable - while the S&P 500 closed at a fresh all-time high May 1 powered by AAPL and tech.'
+  evidenceObservedAt: 2026-05-05T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  statementVenue: Fortune market commentary
+  statementDate: 2026-05-05
+
+ev-sen-misplaced-euphoria-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: Senator characterized current equity positioning as "extremely misplaced euphoria" given the unresolved oil shock and Fed transition uncertainty.
+  evidenceStrength: wv.evidence-moderate
+  statementVenue: public commentary
+
+# =============================================================================
+# EVIDENCE - AI capex
+# =============================================================================
+
+ev-amd-q1-2026-blowout:
+  type: fin.CorporateEvidence
+  evidenceStatement: AMD reported Q1 2026 results May 5 after-hours - revenue $10.3B (vs $9.88B consensus), gross margin 53% GAAP / 55% non-GAAP, GAAP diluted EPS $0.84, non-GAAP diluted EPS $1.37. Material beat across the board.
+  evidenceObservedAt: 2026-05-05T20:30:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.amd
+  fin.corporateMetric: fin.revenue
+  fin.reportingPeriod: fin.q1-2026
+
+ev-amd-q1-data-center-58b:
+  type: fin.CorporateEvidence
+  evidenceStatement: AMD Data Center segment revenue Q1 2026 reached $5.8B, up 57% year-over-year, beat consensus $5.4B by ~7%.
+  evidenceObservedAt: 2026-05-05T20:30:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.amd
+  fin.corporateMetric: fin.segment-revenue
+  fin.reportingPeriod: fin.q1-2026
+
+ev-amd-q2-guide-112b:
+  type: fin.CorporateEvidence
+  evidenceStatement: AMD Q2 2026 revenue guidance $11.2B (+/- $0.3B), materially above $10.3B consensus midpoint.
+  evidenceObservedAt: 2026-05-05T20:30:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.amd
+  fin.corporateMetric: fin.guidance-revenue
+  fin.reportingPeriod: fin.q2-2026
+
+ev-amd-stock-plus18-ah:
+  type: fin.MarketDataEvidence
+  evidenceStatement: AMD stock rose approximately 18% in extended/after-hours trading on 2026-05-05 following the Q1 print and Q2 guidance.
+  evidenceObservedAt: 2026-05-05T22:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.amd
+  fin.marketMetric: fin.after-hours-percent-move
+  fin.observedValue: 0.18
+
+ev-amd-su-tens-of-billions-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: AMD CEO Lisa Su stated on the Q1 2026 earnings call that the company has "strong and increasing confidence" in reaching tens of billions of dollars in data center AI revenue next year and exceeding the long-term growth target of greater than 80%.
+  evidenceObservedAt: 2026-05-05T21:00:00Z
+  evidenceStrength: wv.evidence-strong
+  speakerRole: fin.ceo
+  statementVenue: Q1 2026 earnings call
+  statementDate: 2026-05-05
+
+ev-nvda-china-revenue-zero:
+  type: fin.CorporateEvidence
+  evidenceStatement: NVIDIA China revenue collapsed from $19.67B (FY2025) to $0 due to expanded US export controls.
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.nvda
+  fin.corporateMetric: fin.geographic-revenue
+  fin.reportingPeriod: fin.fy-2026
+
+ev-nvda-h20-charge-45b:
+  type: fin.CorporateEvidence
+  evidenceStatement: NVIDIA incurred a $4.5B charge in Q1 FY2026 associated with H20 excess inventory and purchase obligations as China demand collapsed; an additional $2.5B of H20 revenue was unable to ship.
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.nvda
+  fin.corporateMetric: fin.charge
+  fin.reportingPeriod: fin.q1-2026
+
+ev-nvda-amd-15pct-china-revshare:
+  type: wv.PolicyEvidence
+  evidenceStatement: NVDA and AMD agreed (Aug 2025) to pay the US government 15% of revenue from China semiconductor sales in exchange for export licenses (H20, MI308, later H200 with 25% cut). Despite the deal, sales have stalled amid security scrutiny in both countries.
+  evidenceObservedAt: 2025-08-10T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2025-08-10
+
+ev-gartner-semi-revenue-1t-plus-2026:
+  type: fin.AnalystEvidence
+  evidenceStatement: Gartner forecasts global semiconductor revenue will exceed $1.3T in 2026, with AI semiconductors making up 30% of total.
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.gartner-research
+  fin.forecastValue: 1300.0
+  fin.forecastHorizon: fin.horizon-full-year
+
+ev-anthropic-meta-ai-partnerships:
+  type: fin.CorporateEvidence
+  evidenceStatement: Anthropic and Meta announced AI compute partnerships with hyperscalers, grounding sustained demand for AI accelerators.
+  evidenceStrength: wv.evidence-moderate
+  fin.corporateMetric: fin.partnership-announcement
+  fin.reportingPeriod: fin.fy-2026
+
+ev-openai-6gw-supply-agreement:
+  type: fin.CorporateEvidence
+  evidenceStatement: OpenAI announced a 6 gigawatt compute supply agreement, anchoring multi-year AI capex demand.
+  evidenceStrength: wv.evidence-moderate
+  fin.corporateMetric: fin.partnership-announcement
+  fin.reportingPeriod: fin.fy-2026
+
+# =============================================================================
+# EVIDENCE - defense / rearmament
+# =============================================================================
+
+ev-fy2026-defense-budget-1t:
+  type: wv.PolicyEvidence
+  evidenceStatement: FY2026 US defense budget reached $1T, an inflection from the typical ~$850B baseline of the prior decade.
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2025-10-01
+
+ev-fy2027-defense-budget-projection:
+  type: wv.PolicyEvidence
+  evidenceStatement: FY2027 US defense budget projected at $1.5T+, continuing the multi-year defense spending ramp.
+  evidenceStrength: wv.evidence-moderate
+  effectiveDate: 2026-10-01
+
+ev-lmt-backlog-194b-q1-2026:
+  type: fin.CorporateEvidence
+  evidenceStatement: Lockheed Martin backlog at a record $194B as of Q1 2026 - more than 2.5x annual sales. Q1 revenue >$18B, segment operating profit $1.8B.
+  evidenceObservedAt: 2026-04-30T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.lmt
+  fin.corporateMetric: fin.backlog
+  fin.reportingPeriod: fin.q1-2026
+
+ev-rtx-backlog-271b-q1-2026:
+  type: fin.CorporateEvidence
+  evidenceStatement: RTX (Raytheon Technologies) backlog grew to a record $271B as of Q1 2026. Double-digit organic sales growth; full-year EPS guidance raised to $6.70-$6.90, sales to $92.5-$93.5B.
+  evidenceObservedAt: 2026-04-30T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.rtx
+  fin.corporateMetric: fin.backlog
+  fin.reportingPeriod: fin.q1-2026
+
+ev-trump-buyback-eo:
+  type: wv.PolicyEvidence
+  evidenceStatement: Trump executive order limits defense-contractor stock buybacks until production capacity catches up to procurement orders, forcing capex into manufacturing.
+  evidenceStrength: wv.evidence-strong
+
+# =============================================================================
+# EVIDENCE - Fed / monetary policy
+# =============================================================================
+
+ev-fed-held-april29-with-dissent:
+  type: fin.CentralBankEvidence
+  evidenceStatement: Fed held the federal funds rate at 3.50-3.75% on April 29 2026 with an 8-4 dissent vote - the most dissents on a single FOMC decision since October 1992.
+  evidenceObservedAt: 2026-04-29T18:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-04-29
+
+ev-fomc-dissent-miran-cut:
+  type: fin.CentralBankEvidence
+  evidenceStatement: April 29 FOMC dissent breakdown - Stephen Miran preferred a 1/4 percentage point cut at the meeting; Beth Hammack, Neel Kashkari, and Lorie Logan supported holding but opposed inclusion of an easing bias in the statement.
+  evidenceObservedAt: 2026-04-29T18:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-04-29
+
+ev-fomc-statement-inflation-elevated-energy:
+  type: fin.CentralBankEvidence
+  evidenceStatement: 'April 29 FOMC statement said "Inflation is elevated, in part reflecting the recent increase in global energy prices." Explicitly attributes the elevated print to the post-Iran-war oil shock.'
+  evidenceObservedAt: 2026-04-29T18:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-04-29
+
+ev-market-prices-zero-2026-cuts:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Market is pricing zero rate moves in 2026 and one cut in December 2027, indicating a higher-for-longer rate path.
+  evidenceObservedAt: 2026-05-05T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.marketMetric: fin.rate-path-expectations
+  fin.observedValue: 0.0
+
+ev-unemployment-mid-4pct-april-2026:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: US unemployment rate sitting at 4.3-4.4% - elevated relative to recent cycle lows but not recession-territory.
+  evidenceObservedAt: 2026-04-30T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  indicatorPeriod: April 2026
+
+ev-core-inflation-above-2pct-25y:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: Core inflation has run above the Fed's 2% target for 25-30 years, with the recent pickup making the target appear structurally unreachable.
+  evidenceStrength: wv.evidence-strong
+  indicatorPeriod: trailing 25-30 years
+
+ev-trump-12t-interest-bill:
+  type: wv.PolicyEvidence
+  evidenceStatement: Trump White House annual interest bill on US debt projected at $1.2 trillion - structural fiscal pressure that motivates rate-cut political pressure on the Fed.
+  evidenceObservedAt: 2026-05-05T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+
+ev-trump-fed-pressure-housing-debt:
+  type: wv.PolicyEvidence
+  evidenceStatement: Trump White House continues public pressure on the Fed to support housing and labor markets and to provide debt-servicing relief through lower rates.
+  evidenceStrength: wv.evidence-moderate
+
+# =============================================================================
+# EVIDENCE - Warsh transition
+# =============================================================================
+
+ev-powell-exit-warsh-nominated-may15:
+  type: wv.PolicyEvidence
+  evidenceStatement: Jerome Powell exits as Fed Chair on May 15 2026; Kevin Warsh nominated as successor. Powell remains on Board of Governors through 2028 (governor term).
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2026-05-15
+
+ev-warsh-banking-cmte-13-11:
+  type: wv.PolicyEvidence
+  evidenceStatement: Senate Banking Committee voted 13-11 along party lines on 2026-04-29 to advance Kevin Warsh's nomination - the first fully partisan committee vote on a Fed Chair nominee in committee history.
+  evidenceObservedAt: 2026-04-29T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2026-04-29
+
+ev-warsh-senate-vote-confirmed-may11:
+  type: wv.PolicyEvidence
+  evidenceStatement: Full Senate scheduled to vote on Warsh confirmation Monday May 11 2026 at 3 PM. Republicans hold 53-seat majority; simple majority required; confirmation widely expected before Powell's term expires May 15.
+  evidenceObservedAt: 2026-05-08T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  effectiveDate: 2026-05-11
+
+ev-warsh-sock-puppet-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: Warsh told senators at his confirmation hearing he "won't be Trump's sock puppet" and would act independently of presidential pressure.
+  evidenceObservedAt: 2026-04-21T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  speakerRole: fin.fed-chair-nominee
+  statementVenue: Senate Banking confirmation hearing
+  statementDate: 2026-04-21
+
+ev-warsh-room-to-cut-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: Warsh argued in confirmation testimony that there is room to cut interest rates without sparking more inflation - a dovish-leaning frame given current 8-4 dissent split.
+  evidenceObservedAt: 2026-04-21T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  speakerRole: fin.fed-chair-nominee
+  statementVenue: Senate Banking confirmation hearing
+  statementDate: 2026-04-21
+
+ev-doj-powell-investigation-halted:
+  type: wv.PolicyEvidence
+  evidenceStatement: DOJ Powell investigation has been halted, clearing the path for the Warsh confirmation. Creates political subtext to the Fed transition.
+  evidenceStrength: wv.evidence-strong
+
+ev-tillis-hold-lifted:
+  type: wv.PolicyEvidence
+  evidenceStatement: Senator Thom Tillis dropped his hold on the Warsh nomination after DOJ dropped its criminal investigation into Powell - clearing the procedural path for the April 29 committee vote.
+  evidenceObservedAt: 2026-04-28T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+
+ev-warsh-historically-hawkish:
+  type: fin.AnalystEvidence
+  evidenceStatement: Kevin Warsh has historically been more hawkish than the current dovish-leaning FOMC median, though his "room to cut without inflation" testimony introduces a nuance.
+  evidenceStrength: wv.evidence-moderate
+  fin.analystInstitution: fin.market-consensus
+  fin.forecastHorizon: fin.horizon-12-month
+
+# =============================================================================
+# EVIDENCE - gold / debasement
+# =============================================================================
+
+ev-lbma-q1-record-4873:
+  type: fin.MarketDataEvidence
+  evidenceStatement: LBMA (PM) gold price set a new quarterly average record of $4,873/oz in Q1 2026.
+  evidenceObservedAt: 2026-04-15T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.aboutSecurity: fin.gld
+  fin.marketMetric: fin.quarterly-average-price
+  fin.observedValue: 4873.0
+
+ev-cb-q1-2026-244t-buying-record:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: 'Central banks added 244 tonnes of gold to official reserves in Q1 2026 - the strongest Q1 for sovereign gold buying on record per World Gold Council. +17% QoQ, +3% YoY.'
+  evidenceObservedAt: 2026-04-15T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.flowDirection: fin.flow-buying
+  fin.flowMagnitudeValue: 244.0
+  fin.flowMagnitudeUnit: tonnes
+
+ev-cb-survey-95pct-reserves-up:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: World Gold Council 2026 survey - 95% of central banks expect global official gold reserves to increase over next 12 months; record 43% indicate plans to increase their own holdings.
+  evidenceObservedAt: 2026-04-15T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.flowDirection: fin.flow-forward-buying-intent
+
+ev-gold-q1-2026-record-demand-193b:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Q1 2026 gold demand reached a record $193B in dollar terms, up 74% year-over-year.
+  evidenceObservedAt: 2026-04-15T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.marketMetric: fin.aggregate-demand-dollars
+  fin.observedValue: 193000000000.0
+
+ev-bar-coin-demand-474-tonnes-q1:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: Q1 2026 retail gold bar and coin demand reached 474 tonnes, up 42% year-over-year.
+  evidenceStrength: wv.evidence-strong
+  fin.flowDirection: fin.flow-buying
+  fin.flowMagnitudeValue: 474.0
+  fin.flowMagnitudeUnit: tonnes
+
+ev-stock-bond-correlation-30y-high:
+  type: fin.MarketDataEvidence
+  evidenceStatement: Rolling stock-bond correlation is at 30-year highs - traditional 60/40 diversification has structurally broken.
+  evidenceObservedAt: 2026-05-05T00:00:00Z
+  evidenceStrength: wv.evidence-strong
+  fin.marketMetric: fin.correlation
+
+ev-jpm-gold-target-5055-6300:
+  type: fin.AnalystEvidence
+  evidenceStatement: JPMorgan gold price targets range from $5,055 to $6,300.
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.jpmorgan-research
+  fin.forecastTarget: fin.gld
+  fin.forecastValue: 5677.5
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-ubs-gold-target-6200:
+  type: fin.AnalystEvidence
+  evidenceStatement: UBS gold price target of $6,200.
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.ubs-research
+  fin.forecastTarget: fin.gld
+  fin.forecastValue: 6200.0
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-citi-gold-target-5000-7000:
+  type: fin.AnalystEvidence
+  evidenceStatement: Citi gold price targets - base case $5,000, bull case $7,000.
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.citi-research
+  fin.forecastTarget: fin.gld
+  fin.forecastValue: 5000.0
+  fin.forecastHorizon: fin.horizon-12-month
+
+# =============================================================================
+# EVIDENCE - oil / Goldman target
+# =============================================================================
+
+ev-goldman-brent-target-raise:
+  type: fin.AnalystEvidence
+  evidenceStatement: Goldman Sachs raised Brent crude price forecast from $61 to $77.50 following the Iran war and Hormuz disruption. Spot remains well above this target after the May ceasefire as of May 8.
+  evidenceStrength: wv.evidence-strong
+  fin.analystInstitution: fin.goldman-sachs-research
+  fin.forecastValue: 77.50
+  fin.forecastHorizon: fin.horizon-12-month
