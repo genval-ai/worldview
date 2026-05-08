@@ -15,7 +15,7 @@ snapshot-to-html:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.1.0
+          version: 3.2.0
           alias: tx
         - package: document-ast
           match: ^

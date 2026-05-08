@@ -15,7 +15,7 @@ landing-page:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.1.0
+          version: 3.2.0
           alias: tx
         - package: document-ast
           match: ^
@@ -168,8 +168,8 @@ landing-page-transformation:
                             section.snapshots,section.packages,section.ecosystem{margin-top:64px}
                             .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
                             .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
-                            ol.snapshot-list{list-style:none;padding:0;margin:0;counter-reset:snapshot-counter}
-                            li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:16px;counter-increment:snapshot-counter;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative}
+                            ol.snapshot-list{list-style:none;padding:0;margin:0}
+                            li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:16px;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative}
                             li.snapshot-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15);transform:translateY(-1px)}
                             li.snapshot-card::after{content:"\2192";position:absolute;top:32px;right:32px;font-family:var(--font-mono);font-size:14px;color:var(--accent);transition:transform 120ms;pointer-events:none}
                             li.snapshot-card:hover::after{transform:translateX(4px)}
@@ -177,7 +177,7 @@ landing-page-transformation:
                             a.snapshot-card-link:hover{color:inherit}
                             @media (max-width:760px){a.snapshot-card-link{padding:24px 20px}}
                             .snapshot-card-header{display:flex;align-items:baseline;gap:16px;margin-bottom:16px;flex-wrap:wrap}
-                            .snapshot-num::before{content:counter(snapshot-counter,decimal-leading-zero);font-family:var(--font-mono);color:var(--fg-faint);font-size:13px;letter-spacing:0.05em}
+                            .snapshot-version{font-family:var(--font-mono);color:var(--accent);font-size:13px;letter-spacing:0.05em;background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);padding:2px 8px;border-radius:4px}
                             time.snapshot-date{font-family:var(--font-mono);font-size:13px;letter-spacing:0.04em;color:var(--accent);font-weight:500}
                             .snapshot-stats{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.08em;margin-left:auto}
                             .snapshot-stats .stat-value{color:var(--fg);font-weight:600;font-size:14px;text-transform:none}
@@ -256,7 +256,14 @@ landing-page-transformation:
                                 tx.stringLiteral: |-
                                   ">
                                   <div class="snapshot-card-header">
-                                  <span class="snapshot-num"></span>
+                                  <span class="snapshot-version">v
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </span>
                                   <time class="snapshot-date" datetime="
                               - type: tx.PropertyRead
                                 tx.readSource:
