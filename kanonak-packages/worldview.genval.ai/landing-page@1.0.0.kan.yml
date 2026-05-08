@@ -15,7 +15,7 @@ landing-page:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.0.0
+          version: 3.1.0
           alias: tx
         - package: document-ast
           match: ^
@@ -40,13 +40,14 @@ landing-page:
 #
 # v1 caveats:
 #
-#   * Per-snapshot deep links can't be generated server-side because v3
-#     Expression has no primitive that yields the input subject's package
-#     URI. Each card carries a `data-snapshot-id` attribute (the snapshot's
-#     instance URI's local name); a tiny embedded JS at the bottom fetches
-#     index.txt and pairs them to package paths to wire up clickthroughs.
-#     If the workflow's `_site/<package>/snapshot.html` convention holds,
-#     this works.
+#   * Each snapshot card is wrapped in an `<a class="snapshot-card-link">`
+#     whose href is a protocol-relative absolute URL composed from the
+#     snapshot's tx.SubjectUri (added in transformations@3.1.0 via
+#     kanonak-protocol/typescript#8) plus a ".html" suffix - which works
+#     because the workflow mirrors each rendered HTML at the canonical path
+#     `<publisher>/<package>@<version>/snapshot.html`. Robust against
+#     multi-snapshot-per-package and any future shape change in the
+#     matched set.
 #
 #   * The "narrative" property is a multi-paragraph block of prose. We trim
 #     the trailing newline and let CSS clamp it to a few lines via line-clamp
@@ -125,12 +126,13 @@ landing-page-transformation:
                             .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
                             .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
                             ol.snapshot-list{list-style:none;padding:0;margin:0;counter-reset:snapshot-counter}
-                            li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:32px;margin-bottom:16px;counter-increment:snapshot-counter;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative;cursor:pointer}
+                            li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:16px;counter-increment:snapshot-counter;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative}
                             li.snapshot-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15);transform:translateY(-1px)}
-                            li.snapshot-card.linked::after{content:"\2192";position:absolute;top:32px;right:32px;font-family:var(--font-mono);font-size:14px;color:var(--accent);transition:transform 120ms}
-                            li.snapshot-card.linked:hover::after{transform:translateX(4px)}
-                            li.snapshot-card.unlinked{cursor:default}
-                            @media (max-width:760px){li.snapshot-card{padding:24px 20px}}
+                            li.snapshot-card::after{content:"\2192";position:absolute;top:32px;right:32px;font-family:var(--font-mono);font-size:14px;color:var(--accent);transition:transform 120ms;pointer-events:none}
+                            li.snapshot-card:hover::after{transform:translateX(4px)}
+                            a.snapshot-card-link{display:block;padding:32px;color:inherit;text-decoration:none}
+                            a.snapshot-card-link:hover{color:inherit}
+                            @media (max-width:760px){a.snapshot-card-link{padding:24px 20px}}
                             .snapshot-card-header{display:flex;align-items:baseline;gap:16px;margin-bottom:16px;flex-wrap:wrap}
                             .snapshot-num::before{content:counter(snapshot-counter,decimal-leading-zero);font-family:var(--font-mono);color:var(--fg-faint);font-size:13px;letter-spacing:0.05em}
                             time.snapshot-date{font-family:var(--font-mono);font-size:13px;letter-spacing:0.04em;color:var(--accent);font-weight:500}
@@ -170,14 +172,31 @@ landing-page-transformation:
                             tx.parts:
 
                               # Card open + numbered counter + date.
-                              # No data-snapshot-id - tx.UriName on a subject
-                              # binding returns empty in v3 (it expects a
-                              # reference, not a subject). The clickthrough JS
-                              # at the bottom of the page does order-based
-                              # matching against index.txt instead.
+                              # Each card is a real <a> link via tx.SubjectUri
+                              # (added in transformations@3.1.0). The href is
+                              # composed from the SubjectUri (e.g.
+                              # "worldview.genval.ai/example-ai-capex@1.0.0/snapshot")
+                              # + ".html" suffix, prefixed with "//" to form a
+                              # protocol-relative absolute URL. The static-site
+                              # workflow mirrors each rendered HTML at the
+                              # canonical Kanonak path, so the link resolves
+                              # correctly when the publisher origin serves it.
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<li class="snapshot-card"><a class="snapshot-card-link" href="//'
+                              - type: tx.SubjectUri
+                                tx.subjectOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |-
-                                  <li class="snapshot-card unlinked">
+                                  .html" data-snapshot-name="
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  ">
                                   <div class="snapshot-card-header">
                                   <span class="snapshot-num"></span>
                                   <time class="snapshot-date" datetime="
@@ -225,6 +244,7 @@ landing-page-transformation:
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |-
                                   </p>
+                                  </a>
                                   </li>
 
                         # =====================================================
@@ -258,41 +278,3 @@ landing-page-transformation:
                             <span><a href="index.txt">index.txt</a> &middot; <a href=".well-known/kanonak.json">manifest</a></span>
                             </footer>
                             </article>
-
-                            <script>
-                            // Lazy-link snapshot cards to their rendered HTML pages.
-                            // Each card has data-snapshot-id; we fetch index.txt to find
-                            // packages and assume the workflow's `<package-base-name>/snapshot.html`
-                            // convention. If a card's snapshot ID matches a known package's
-                            // contained snapshot, wire up the click.
-                            (async () => {
-                              try {
-                                const r = await fetch('index.txt');
-                                const lines = (await r.text()).split('\n').filter(Boolean);
-                                // Filter out non-snapshot packages by skipping known ontology / transformation names.
-                                const skip = ['core', 'finance', 'snapshot-to-html', 'landing-page'];
-                                const snapshotPackages = lines
-                                  .map(l => l.split('/'))
-                                  .filter(([name]) => !skip.includes(name))
-                                  .map(([name, version]) => ({ name, version, slug: name + '@' + version }));
-                                // For now, link every card to its corresponding package by ORDER -
-                                // since both the cards and the package list are sorted, and there's
-                                // typically one snapshot per package, this works. Robust matching by
-                                // snapshot-ID requires either (a) consistent unique snapshot names
-                                // across packages or (b) an SDK primitive that exposes the source
-                                // package URI in the SetTransformation rule.
-                                const cards = Array.from(document.querySelectorAll('li.snapshot-card'));
-                                cards.forEach((card, idx) => {
-                                  const pkg = snapshotPackages[idx];
-                                  if (!pkg) return;
-                                  card.classList.remove('unlinked');
-                                  card.classList.add('linked');
-                                  card.addEventListener('click', () => {
-                                    window.location.href = pkg.slug + '/snapshot.html';
-                                  });
-                                });
-                              } catch (e) {
-                                console.warn('Could not wire up snapshot links:', e);
-                              }
-                            })();
-                            </script>

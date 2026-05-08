@@ -15,7 +15,7 @@ snapshot-to-html:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.0.0
+          version: 3.1.0
           alias: tx
         - package: document-ast
           match: ^
@@ -565,28 +565,22 @@ snapshot-to-html-transformation:
                                 tx.stringLiteral: |
                                   </p>
 
-                              # --- INVALIDATION (structured) ---
+                              # --- INVALIDATION (structured; conditional) ---
                               # invalidationCondition is a structured Condition
                               # tree. We render only the top-level type as a hint;
                               # full recursive rendering of the condition tree is
                               # deferred until the SDK ships arithmetic + string-
                               # diffing primitives needed to draw it well.
                               #
-                              # Rendered unconditionally (no IsSet guard) because
-                              # tx.IsSet on object-valued properties returns false
-                              # in v3 even when the embedded value is present
-                              # (worth investigating; followup outside this port).
-                              # Theses are expected to have invalidationConditions
-                              # by design - a thesis without one is unfalsifiable.
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: |-
-                                  <details class="invalidation">
-                                  <summary>Invalidation condition (configured)</summary>
-                                  <p class="invalidation-note">Structured invalidation condition of type <code class="condition-type">
-                              - type: tx.UriName
-                                tx.uriNameOf:
-                                  type: tx.PropertyRead
-                                  tx.readSource:
+                              # Restored to conditional rendering after
+                              # kanonak-protocol/typescript#7 fixed the
+                              # PropertyRead-on-EmbeddedStatement gap that made
+                              # tx.IsSet always return false on object-valued
+                              # properties in earlier 3.x.
+                              - type: tx.When
+                                tx.condition:
+                                  type: tx.IsSet
+                                  tx.checkExpr:
                                     type: tx.PropertyRead
                                     tx.readSource:
                                       type: tx.ResolveRef
@@ -594,11 +588,30 @@ snapshot-to-html-transformation:
                                         type: tx.VarRef
                                         tx.varName: thesisRefMain
                                     tx.readProp: wv.invalidationCondition
-                                  tx.readProp: rdfs.type
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: |
-                                  </code> set on this thesis. See source YAML for the full condition tree.</p>
-                                  </details>
+                                tx.thenBuild:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: |-
+                                        <details class="invalidation">
+                                        <summary>Invalidation condition (configured)</summary>
+                                        <p class="invalidation-note">Structured invalidation condition of type <code class="condition-type">
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: wv.invalidationCondition
+                                        tx.readProp: rdfs.type
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: |
+                                        </code> set on this thesis. See source YAML for the full condition tree.</p>
+                                        </details>
 
                               # --- SUPPORTING EVIDENCE (collapsible, open default) ---
                               - type: tx.When
