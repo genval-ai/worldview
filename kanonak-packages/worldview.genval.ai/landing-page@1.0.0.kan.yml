@@ -188,6 +188,11 @@ landing-page-transformation:
                             section.ecosystem li .pkg-purpose{font-size:13px;color:var(--fg-dim);line-height:1.55}
                             section.ecosystem li a{color:var(--accent)}
                             footer.landing-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                            /* SOURCE LINKS (GitHub blob) — injected by inline script */
+                            li.snapshot-card{position:relative}
+                            a.source-link{position:absolute;top:14px;right:14px;background:var(--bg-elev);border:1px solid var(--border);padding:4px 10px;border-radius:4px;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;transition:color 120ms,border-color 120ms;display:inline-flex;align-items:center;gap:5px;z-index:5}
+                            a.source-link::before{content:"<>";opacity:0.6}
+                            a.source-link:hover{color:var(--accent);border-color:var(--accent)}
                             footer.landing-footer a{color:var(--accent)}
                             .timeline-pending{padding:20px 24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:6px;color:var(--fg-faint);font-size:13px;line-height:1.55;font-style:italic}
                             </style>
@@ -340,5 +345,27 @@ landing-page-transformation:
                               }
                               walk(document.body);
                               if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                              // GitHub source link per snapshot card. The card-link href is
+                              // built from tx.SubjectUri + ".html"; we strip "//" prefix and
+                              // ".html" suffix to recover the SubjectUri, then trim the local
+                              // name to get the package URI.
+                              document.querySelectorAll('li.snapshot-card a.snapshot-card-link').forEach(function(link) {
+                                var href = link.getAttribute('href') || '';
+                                var m = href.match(/^\/\/(.+)\.html$/);
+                                if (!m) return;
+                                var subj = m[1];
+                                var slash = subj.lastIndexOf('/');
+                                var pkgUri = slash > 0 ? subj.substring(0, slash) : subj;
+                                var ghUrl = 'https://github.com/genval-ai/worldview/blob/main/kanonak-packages/' + pkgUri + '.kan.yml';
+                                var card = link.closest('li.snapshot-card');
+                                if (!card) return;
+                                var src = document.createElement('a');
+                                src.className = 'source-link';
+                                src.href = ghUrl;
+                                src.target = '_blank';
+                                src.rel = 'noopener';
+                                src.textContent = 'source';
+                                card.appendChild(src);
+                              });
                             })();
                             </script>

@@ -308,6 +308,12 @@ snapshot-to-html-transformation:
                             .ev-type[data-type=""]::before{content:"Evidence"}
                             /* FOOTER */
                             footer.snapshot-footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:8px}
+                            /* SOURCE LINKS (GitHub blob) — injected by inline script */
+                            a.source-link{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;transition:color 120ms;display:inline-flex;align-items:center;gap:5px}
+                            a.source-link::before{content:"<>";opacity:0.6}
+                            a.source-link:hover{color:var(--accent)}
+                            li.snapshot-card a.source-link{position:absolute;top:14px;right:14px;background:var(--bg-elev);border:1px solid var(--border);padding:4px 10px;border-radius:4px;z-index:5;font-size:10px}
+                            li.snapshot-card a.source-link:hover{border-color:var(--accent)}
                             footer.snapshot-footer .snapshot-uri{color:var(--accent)}
                             /* SVG defs once (gradient referenced by all confidence bars) */
                             .svg-defs{position:absolute;width:0;height:0;overflow:hidden}
@@ -329,7 +335,14 @@ snapshot-to-html-transformation:
                             </ul>
                             </div>
                             </nav>
-                            <article class="snapshot">
+                            <article class="snapshot" data-snapshot-uri="
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ">
                             <header class="hero">
                             <div class="hero-meta">
                             <span class="eyebrow">Worldview Snapshot</span>
@@ -2756,5 +2769,25 @@ snapshot-to-html-transformation:
                               document.querySelectorAll('ol.evidence-items').forEach(function(ol){
                                 Array.prototype.slice.call(ol.children).reverse().forEach(function(li){ ol.appendChild(li); });
                               });
+                              // GitHub source link in the snapshot footer. Built from data-snapshot-uri
+                              // (set via tx.SubjectUri); strips the trailing /<local-name> to get the
+                              // package URI, then maps to the canonical kanonak-packages/ path on main.
+                              var article = document.querySelector('article.snapshot');
+                              if (article && article.dataset.snapshotUri) {
+                                var subj = article.dataset.snapshotUri;
+                                var slash = subj.lastIndexOf('/');
+                                var pkgUri = slash > 0 ? subj.substring(0, slash) : subj;
+                                var ghUrl = 'https://github.com/genval-ai/worldview/blob/main/kanonak-packages/' + pkgUri + '.kan.yml';
+                                var footer = article.querySelector('footer.snapshot-footer');
+                                if (footer) {
+                                  var src = document.createElement('a');
+                                  src.className = 'source-link';
+                                  src.href = ghUrl;
+                                  src.target = '_blank';
+                                  src.rel = 'noopener';
+                                  src.textContent = 'View source';
+                                  footer.appendChild(src);
+                                }
+                              }
                             })();
                             </script>
