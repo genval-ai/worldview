@@ -4,3 +4,4 @@ snapshot-to-html/1.0.0
 landing-page/1.0.0
 snapshot/1.0.0
 snapshot/1.0.1
+snapshot/1.0.2
