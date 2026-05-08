@@ -40,7 +40,7 @@ core:
 #   5. Condition DSL - a tagged-union expression tree that turns prose
 #      invalidation conditions into something a rules engine can evaluate.
 #   6. Generic seed instances - small enumerations the DSL itself depends on
-#      (Comparator, TimeUnit, Durability, EvaluationState, DerivedIndicatorKind)
+#      (Comparator, TimeUnit, Durability, EvaluationState, Derivation)
 #      plus broad Policy / Role members usable across domains.
 #
 # Domain extensions (finance, climate, scientific, etc.) import this package,
@@ -145,7 +145,7 @@ invalidationCondition:
   comment: >
     The structured machine-evaluable condition under which this thesis is
     invalidated. A `Condition` is a tagged-union expression tree (see
-    Condition / ConditionKind below). When a rules engine evaluates the
+    Condition / ConditionForm below). When a rules engine evaluates the
     condition tree against current data and the engine returns `satisfied`,
     the thesis SHOULD be flagged for human review and a status flip to
     `cp.invalidated`. Partial / unsatisfied / unknown states are diagnostic
@@ -684,20 +684,22 @@ Condition:
     EvaluationState (satisfied, partially-satisfied, unsatisfied, unknown)
     plus a structured trace.
 
-ConditionKind:
+ConditionForm:
   type: rdfs.Class
-  label: Condition Kind
+  label: Condition Form
   comment: >
-    Discriminator vocabulary for Condition. Named instances below enumerate
-    the v1 set. New kinds are added by declaring new named instances and
-    teaching the runtime evaluator the corresponding handler.
+    The discriminator vocabulary for Condition - one named instance per
+    structural form a Condition can take (and-condition, or-condition,
+    threshold-condition, event-condition, ...). The class doesn't conflict
+    with the Condition union class; the bare noun would (Condition is
+    already the union), so this is the closest non-suffixed name.
 
 # --- Properties on Condition (each kind uses a subset) ---
 
 kind:
   type: owl.ObjectProperty
   domain: Condition
-  range: ConditionKind
+  range: ConditionForm
   label: Kind
   comment: Discriminator. Required on every Condition instance.
 
@@ -877,10 +879,10 @@ indicator:
     asserted. Satisfied if the indicator has at least one observation
     within `withinWindow` (if specified) or any observation at all (if not).
 
-# --- ConditionKind named instances ---
+# --- ConditionForm named instances ---
 
 and-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: And
   comment: >
     Boolean AND. Satisfied iff every operand is satisfied. Unsatisfied if
@@ -888,7 +890,7 @@ and-condition:
     operand is unsatisfied). Otherwise partially-satisfied.
 
 or-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Or
   comment: >
     Boolean OR. Satisfied if any operand is satisfied. Unsatisfied iff every
@@ -896,14 +898,14 @@ or-condition:
     operand is satisfied). Otherwise partially-satisfied.
 
 not-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Not
   comment: >
     Boolean NOT. Inverts satisfied / unsatisfied. Partial stays partial;
     unknown stays unknown.
 
 threshold-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Threshold
   comment: >
     Numeric threshold check. Reads `observable`'s most recent value and
@@ -913,7 +915,7 @@ threshold-condition:
     true.
 
 indicator-comparison:
-  type: ConditionKind
+  type: ConditionForm
   label: Indicator Comparison
   comment: >
     Cross-indicator comparison. Compares `left` observable against `right`
@@ -922,7 +924,7 @@ indicator-comparison:
     where right is a DerivedIndicator on left.
 
 event-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Event
   comment: >
     Event-log presence check. Satisfied if an event matching `event` (with
@@ -931,7 +933,7 @@ event-condition:
     log itself is runtime infrastructure outside this ontology.
 
 sequenced-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Sequenced
   comment: >
     Temporal sequencing. Satisfied when `after` first became satisfied at
@@ -940,7 +942,7 @@ sequenced-condition:
     Used for "X following durable Y" patterns.
 
 before-condition:
-  type: ConditionKind
+  type: ConditionForm
   label: Before
   comment: >
     Deadline check. Satisfied if `before` becomes satisfied before
@@ -949,7 +951,7 @@ before-condition:
     that fire on the absence of an expected event.
 
 indicator-available:
-  type: ConditionKind
+  type: ConditionForm
   label: Indicator Available
   comment: >
     Data-freshness guard. Satisfied if `indicator` has at least one
@@ -958,14 +960,14 @@ indicator-available:
     when the underlying data feed is stale.
 
 always-satisfied:
-  type: ConditionKind
+  type: ConditionForm
   label: Always Satisfied
   comment: >
     Constant. Always returns satisfied. Useful for testing condition trees
     and for placeholder leaves during incremental authoring.
 
 always-unsatisfied:
-  type: ConditionKind
+  type: ConditionForm
   label: Always Unsatisfied
   comment: >
     Constant. Always returns unsatisfied. Mirror of always-satisfied.
@@ -1211,22 +1213,26 @@ DerivedIndicator:
   label: Derived Indicator
   comment: >
     An Indicator whose value is computed at evaluation time from another
-    Indicator plus a derivation kind. Distinct from a base Indicator (whose
+    Indicator plus a Derivation. Distinct from a base Indicator (whose
     values come from a data feed). v1 supports moving-average; future
     derivations (rolling-stdev, percent-change, z-score) are added by
-    declaring new DerivedIndicatorKind named instances.
+    declaring new Derivation named instances.
 
-DerivedIndicatorKind:
+Derivation:
   type: rdfs.Class
-  label: Derived Indicator Kind
-  comment: Discriminator vocabulary for DerivedIndicator.
+  label: Derivation
+  comment: >
+    A way of deriving an indicator from another indicator - simple moving
+    average, rolling standard deviation, percent-change-over-period,
+    z-score. Named instances below enumerate the v1 vocabulary; add new
+    instances when a new derivation is needed.
 
-derivedKind:
+derivation:
   type: owl.ObjectProperty
   domain: DerivedIndicator
-  range: DerivedIndicatorKind
-  label: Derived Kind
-  comment: Which derivation this DerivedIndicator computes.
+  range: Derivation
+  label: Derivation
+  comment: Which Derivation this DerivedIndicator computes.
 
 of:
   type: owl.ObjectProperty
@@ -1253,7 +1259,7 @@ periodUnit:
   comment: TimeUnit scaling `period`. Most commonly `trading-days`.
 
 moving-average:
-  type: DerivedIndicatorKind
+  type: Derivation
   label: Moving Average
   comment: >
     Simple moving average of the source Indicator over `period` units of
