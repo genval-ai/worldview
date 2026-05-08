@@ -82,6 +82,37 @@ landing-page-transformation:
     type: tx.BuildAstNode
     tx.astClass: docast.Document
     tx.set:
+
+      # =========================================================
+      # METADATA — read by the HTML backend for the <title> tag.
+      # Static title; this page is always the snapshots index.
+      # =========================================================
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: "Snapshots · worldview.genval.ai"
+
       - tx.field: docast.children
         tx.bindValue:
           type: tx.Concat
