@@ -687,7 +687,7 @@ snapshot-to-html-transformation:
                                   tx.parts:
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |-
-                                        <details class="invalidation" open>
+                                        <details class="invalidation">
                                         <summary>Invalidation condition</summary>
                                         <div class="cond-tree">
 
@@ -1507,7 +1507,7 @@ snapshot-to-html-transformation:
                                   tx.parts:
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
-                                        <details class="evidence-list" open>
+                                        <details class="evidence-list">
                                         <summary>Supporting evidence</summary>
                                         <ol class="evidence-items">
 
@@ -2750,5 +2750,10 @@ snapshot-to-html-transformation:
                               }
                               walk(document.body);
                               if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                              // Display evidence newest-first. YAML stays in author-chronological order;
+                              // reader sees the most recent observations at the top of each thesis.
+                              document.querySelectorAll('ol.evidence-items').forEach(function(ol){
+                                Array.prototype.slice.call(ol.children).reverse().forEach(function(li){ ol.appendChild(li); });
+                              });
                             })();
                             </script>
