@@ -42,9 +42,9 @@ landing-page:
 #
 #   * Each snapshot card is wrapped in an `<a class="snapshot-card-link">`
 #     whose href is a protocol-relative absolute URL composed from the
-#     snapshot's tx.SubjectUri (added in transformations@3.1.0 via
-#     kanonak-protocol/typescript#8) plus a ".html" suffix - which works
-#     because the workflow mirrors each rendered HTML at the canonical path
+#     snapshot's tx.SubjectUri (added in transformations@3.1.0) plus a
+#     ".html" suffix - which works because the workflow mirrors each
+#     rendered HTML at the canonical path
 #     `<publisher>/<package>@<version>/snapshot.html`. Robust against
 #     multi-snapshot-per-package and any future shape change in the
 #     matched set.
@@ -268,7 +268,7 @@ landing-page-transformation:
                             <section class="ecosystem">
                             <h2 class="section-title">What's coming</h2>
                             <div class="timeline-pending">
-                              The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime-narrative shifts &mdash; needs a few SDK primitives that haven't shipped yet. See <a href="https://github.com/kanonak-protocol/typescript/issues">protocol issues</a> for what's tracked.
+                              The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime-narrative shifts &mdash; needs a few SDK primitives that haven't shipped yet (chiefly arithmetic and string-diffing for the chart layer). The textual portion will land first; the chart-heavy version follows when the underlying primitives become available.
                             </div>
                             </section>
 

@@ -572,9 +572,9 @@ snapshot-to-html-transformation:
                               # deferred until the SDK ships arithmetic + string-
                               # diffing primitives needed to draw it well.
                               #
-                              # Restored to conditional rendering after
-                              # kanonak-protocol/typescript#7 fixed the
-                              # PropertyRead-on-EmbeddedStatement gap that made
+                              # Restored to conditional rendering after the
+                              # transformations@3.1.0 SDK update fixed the
+                              # PropertyRead-on-embedded-property gap that made
                               # tx.IsSet always return false on object-valued
                               # properties in earlier 3.x.
                               - type: tx.When
