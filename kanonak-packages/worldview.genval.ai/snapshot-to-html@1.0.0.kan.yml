@@ -49,18 +49,21 @@ snapshot-to-html:
 #   - confidenceRationale (when authored) rendered below confidence
 #   - previousSnapshot (when set) rendered as a header navigation hint
 #
-# Because the new ontology models invalidationCondition as a structured
-# Condition tree (vs the old prose form), v1 of this transformation
-# renders only a "structured condition is set" disclosure - full
-# recursive rendering of the condition tree is deferred until either
-# the transformations DSL supports recursion or aggregate transformations
-# land that can stream the structure out as a derived markdown summary.
+# The structured `invalidationCondition` (a Condition subclass tree) is
+# rendered as a typed nested visualization via two ExpressionFragments
+# (render-cond-d0 / render-cond-d1) that handle subclass dispatch and
+# bounded recursion. d0 recurses via d1 for nested operands; d1 is
+# leaf-rendering with type-name indicators for any further nesting.
+# Together they cover depth-2 trees, which is enough for every
+# invalidationCondition shape in the example packages today.
 #
 # The whole body is one text-html RawBlock built via a single
 # tx.join("",  tx.concat(...))  expression. The HTML backend passes
 # text/html RawBlocks through verbatim, which is how this transformation
 # attains pixel-level control over layout, type, and SVG geometry.
 # =============================================================================
+
+
 
 snapshot-to-html-transformation:
   type: tx.InstanceTransformation
@@ -188,6 +191,27 @@ snapshot-to-html-transformation:
                             details > summary::-webkit-details-marker{display:none}
                             details > summary::after{content:"";flex:1;height:1px;background:linear-gradient(to right,var(--border-soft),transparent)}
                             .invalidation > p{padding:8px 0 16px;font-style:italic;color:var(--fg-dim);line-height:1.65;max-width:78ch;border-left:2px solid var(--danger);padding-left:16px;margin:8px 0 16px}
+                            .cond-tree{padding:12px 0 8px;font-size:13px;line-height:1.55}
+                            .cond{display:block;padding:6px 0 6px 0}
+                            .cond .cond-type{font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.12em;color:var(--accent);font-weight:600;padding:2px 8px;background:rgba(125,211,252,0.08);border-radius:3px;margin-right:8px}
+                            .cond .cond-summary{color:var(--fg-faint);font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em}
+                            .cond code{background:var(--bg-elev);padding:1px 6px;border-radius:3px;font-size:12px;color:var(--fg)}
+                            .cond em{font-style:normal;color:var(--moderate);font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;padding:0 2px}
+                            .cond-bool .cond-type{background:rgba(125,211,252,0.15);color:var(--accent-2)}
+                            .cond-bool > .cond-operands{list-style:none;padding-left:20px;margin:6px 0 0;border-left:1px dashed var(--border)}
+                            .cond-bool > .cond-operands > li{padding:4px 0 4px 12px;position:relative}
+                            .cond-bool > .cond-operands > li::before{content:"";position:absolute;left:-1px;top:14px;width:8px;height:1px;background:var(--border)}
+                            .cond-not .cond-type{background:rgba(248,113,113,0.12);color:var(--danger)}
+                            .cond-not .cond-operand{padding-left:14px;margin-top:4px;border-left:1px dashed var(--border)}
+                            .cond-threshold .cond-observable,.cond-comparison .cond-left,.cond-comparison .cond-right,.cond-event .cond-event-id{color:var(--accent)}
+                            .cond-threshold-val{color:var(--strong)}
+                            .cond-persistence{color:var(--fg-faint);font-style:italic;font-size:11px;font-family:var(--font-mono);margin-left:6px}
+                            .cond-event .cond-type{background:rgba(251,191,36,0.12);color:var(--moderate)}
+                            .cond-event .cond-durability{color:var(--fg-faint);font-size:11px;margin-left:4px}
+                            .cond-sequenced .cond-type,.cond-before .cond-type{background:rgba(167,139,250,0.12);color:#a78bfa}
+                            .cond-sequenced .cond-row,.cond-before .cond-row{padding:4px 0 4px 12px;margin:4px 0;border-left:1px dashed var(--border)}
+                            .cond-sequenced .cond-key,.cond-before .cond-key{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-faint);margin-right:8px}
+                            .cond-available .cond-type{background:rgba(34,197,94,0.10);color:var(--strong)}
                             /* EVIDENCE LIST */
                             .evidence-items{list-style:none;padding:8px 0 16px;display:flex;flex-direction:column;gap:0}
                             .evidence-item{padding:14px 0 14px 20px;border-left:2px solid var(--border);position:relative;margin-left:4px}
@@ -565,18 +589,16 @@ snapshot-to-html-transformation:
                                 tx.stringLiteral: |
                                   </p>
 
-                              # --- INVALIDATION (structured; conditional) ---
-                              # invalidationCondition is a structured Condition
-                              # tree. We render only the top-level type as a hint;
-                              # full recursive rendering of the condition tree is
-                              # deferred until the SDK ships arithmetic + string-
-                              # diffing primitives needed to draw it well.
-                              #
-                              # Restored to conditional rendering after the
-                              # transformations@3.1.0 SDK update fixed the
-                              # PropertyRead-on-embedded-property gap that made
-                              # tx.IsSet always return false on object-valued
-                              # properties in earlier 3.x.
+                              # --- INVALIDATION (structured tree) ---
+                              # Renders the Condition tree via two recursive
+                              # ExpressionFragments (render-cond-d0 / d1)
+                              # defined at the top of this package. d0 is
+                              # the top-level call; it dispatches on subclass
+                              # and recurses via d1 for nested operands. d1
+                              # renders without recursion (type-name + key
+                              # fields). Together they cover depth-2 trees,
+                              # which is enough for every invalidationCondition
+                              # shape in the example packages.
                               - type: tx.When
                                 tx.condition:
                                   type: tx.IsSet
@@ -593,24 +615,680 @@ snapshot-to-html-transformation:
                                   tx.parts:
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |-
-                                        <details class="invalidation">
-                                        <summary>Invalidation condition (configured)</summary>
-                                        <p class="invalidation-note">Structured invalidation condition of type <code class="condition-type">
-                                    - type: tx.UriName
-                                      tx.uriNameOf:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
+                                        <details class="invalidation" open>
+                                        <summary>Invalidation condition</summary>
+                                        <div class="cond-tree">
+
+                                    # ===== TOP-LEVEL DISPATCH =====
+                                    # Each tx.When checks a property unique to one
+                                    # Condition subclass. The PropertyRead chain
+                                    # reads from thesis.invalidationCondition each
+                                    # time. For And/Or we ForEach over operands
+                                    # with loopVar=cond and inline a leaf dispatch
+                                    # (same 9-branch structure but reading via
+                                    # var-ref(cond)).
+
+                                    # AndCondition / OrCondition - top level
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
                                           type: tx.PropertyRead
                                           tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thesisRefMain
-                                          tx.readProp: wv.invalidationCondition
-                                        tx.readProp: rdfs.type
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                            tx.readProp: wv.invalidationCondition
+                                          tx.readProp: wv.operands
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<div class="cond cond-bool"><span class="cond-type">'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: rdfs.type
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span> <span class="cond-summary">'
+                                          - type: tx.Count
+                                            tx.source:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: wv.operands
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: ' operands</span><ul class="cond-operands">'
+
+                                          # ForEach over operands (loopVar=cond)
+                                          # Each operand renders via the LEAF dispatch.
+                                          - type: tx.ForEach
+                                            tx.source:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: wv.operands
+                                            tx.loopVar: cond
+                                            tx.emit:
+                                              type: tx.Concat
+                                              tx.parts:
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '<li>'
+
+                                                # ===== LEAF DISPATCH (reads from cond) =====
+
+                                                # And/Or as operand: type + count + ForEach over grand-operands.
+                                                # Grand-operands rendered with terminal-level dispatch
+                                                # (leaf nodes get full detail; further-nested And/Or
+                                                # collapses to type + count again).
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.operands
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-bool"><span class="cond-type">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span> <span class="cond-summary">'
+                                                      - type: tx.Count
+                                                        tx.source:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.operands
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: ' operands</span><ul class="cond-operands">'
+                                                      - type: tx.ForEach
+                                                        tx.source:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.operands
+                                                        tx.loopVar: cond
+                                                        tx.emit:
+                                                          type: tx.Concat
+                                                          tx.parts:
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: '<li>'
+                                                            # Grand-operand: terminal dispatch
+                                                            # (And/Or further-nested → count only)
+                                                            - type: tx.When
+                                                              tx.condition:
+                                                                type: tx.IsSet
+                                                                tx.checkExpr:
+                                                                  type: tx.PropertyRead
+                                                                  tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                  tx.readProp: wv.operands
+                                                              tx.thenBuild:
+                                                                type: tx.Concat
+                                                                tx.parts:
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '<div class="cond cond-bool"><span class="cond-type">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: rdfs.type
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</span> <span class="cond-summary">'
+                                                                  - type: tx.Count
+                                                                    tx.source:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.operands
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: ' operands (nested)</span></div>'
+                                                            # Threshold grand-operand
+                                                            - type: tx.When
+                                                              tx.condition:
+                                                                type: tx.IsSet
+                                                                tx.checkExpr:
+                                                                  type: tx.PropertyRead
+                                                                  tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                  tx.readProp: wv.observable
+                                                              tx.thenBuild:
+                                                                type: tx.Concat
+                                                                tx.parts:
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.observable
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.comparator
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</em> <code class="cond-threshold-val">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                    tx.readProp: wv.threshold
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</code>'
+                                                                  - type: tx.When
+                                                                    tx.condition:
+                                                                      type: tx.IsSet
+                                                                      tx.checkExpr:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.persistence
+                                                                    tx.thenBuild:
+                                                                      type: tx.Concat
+                                                                      tx.parts:
+                                                                        - type: tx.StringLiteral
+                                                                          tx.stringLiteral: ' <span class="cond-persistence">over '
+                                                                        - type: tx.PropertyRead
+                                                                          tx.readSource:
+                                                                            type: tx.PropertyRead
+                                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                            tx.readProp: wv.persistence
+                                                                          tx.readProp: wv.duration
+                                                                        - type: tx.StringLiteral
+                                                                          tx.stringLiteral: ' '
+                                                                        - type: tx.UriName
+                                                                          tx.uriNameOf:
+                                                                            type: tx.PropertyRead
+                                                                            tx.readSource:
+                                                                              type: tx.PropertyRead
+                                                                              tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                              tx.readProp: wv.persistence
+                                                                            tx.readProp: wv.windowUnit
+                                                                        - type: tx.StringLiteral
+                                                                          tx.stringLiteral: '</span>'
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</div>'
+                                                            # IndicatorComparison grand-operand
+                                                            - type: tx.When
+                                                              tx.condition:
+                                                                type: tx.IsSet
+                                                                tx.checkExpr:
+                                                                  type: tx.PropertyRead
+                                                                  tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                  tx.readProp: wv.left
+                                                              tx.thenBuild:
+                                                                type: tx.Concat
+                                                                tx.parts:
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <code class="cond-left">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.left
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.comparator
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</em> <code class="cond-right">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.right
+                                                                      tx.readProp: rdfs.type
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</code></div>'
+                                                            # Event grand-operand
+                                                            - type: tx.When
+                                                              tx.condition:
+                                                                type: tx.IsSet
+                                                                tx.checkExpr:
+                                                                  type: tx.PropertyRead
+                                                                  tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                  tx.readProp: wv.event
+                                                              tx.thenBuild:
+                                                                type: tx.Concat
+                                                                tx.parts:
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
+                                                                  - type: tx.UriName
+                                                                    tx.uriNameOf:
+                                                                      type: tx.PropertyRead
+                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                      tx.readProp: wv.event
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</code>'
+                                                                  - type: tx.When
+                                                                    tx.condition:
+                                                                      type: tx.IsSet
+                                                                      tx.checkExpr:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.durability
+                                                                    tx.thenBuild:
+                                                                      type: tx.Concat
+                                                                      tx.parts:
+                                                                        - type: tx.StringLiteral
+                                                                          tx.stringLiteral: ' <span class="cond-durability">('
+                                                                        - type: tx.UriName
+                                                                          tx.uriNameOf:
+                                                                            type: tx.PropertyRead
+                                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                            tx.readProp: wv.durability
+                                                                        - type: tx.StringLiteral
+                                                                          tx.stringLiteral: ')</span>'
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</div>'
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: '</li>'
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</ul></div>'
+
+                                                # NotCondition as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.operand
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-not"><span class="cond-type">Not</span> <span class="cond-summary">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.operand
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span></div>'
+
+                                                # ThresholdCondition as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.observable
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.observable
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.comparator
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</em> <code class="cond-threshold-val">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                        tx.readProp: wv.threshold
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code>'
+                                                      - type: tx.When
+                                                        tx.condition:
+                                                          type: tx.IsSet
+                                                          tx.checkExpr:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.persistence
+                                                        tx.thenBuild:
+                                                          type: tx.Concat
+                                                          tx.parts:
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: ' <span class="cond-persistence">over '
+                                                            - type: tx.PropertyRead
+                                                              tx.readSource:
+                                                                type: tx.PropertyRead
+                                                                tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                tx.readProp: wv.persistence
+                                                              tx.readProp: wv.duration
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: ' '
+                                                            - type: tx.UriName
+                                                              tx.uriNameOf:
+                                                                type: tx.PropertyRead
+                                                                tx.readSource:
+                                                                  type: tx.PropertyRead
+                                                                  tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                  tx.readProp: wv.persistence
+                                                                tx.readProp: wv.windowUnit
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: '</span>'
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</div>'
+
+                                                # IndicatorComparison as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.left
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <code class="cond-left">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.left
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.comparator
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</em> <code class="cond-right">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.right
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code></div>'
+
+                                                # EventCondition as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.event
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.event
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code>'
+                                                      - type: tx.When
+                                                        tx.condition:
+                                                          type: tx.IsSet
+                                                          tx.checkExpr:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.durability
+                                                        tx.thenBuild:
+                                                          type: tx.Concat
+                                                          tx.parts:
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: ' <span class="cond-durability">('
+                                                            - type: tx.UriName
+                                                              tx.uriNameOf:
+                                                                type: tx.PropertyRead
+                                                                tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                tx.readProp: wv.durability
+                                                            - type: tx.StringLiteral
+                                                              tx.stringLiteral: ')</span>'
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</div>'
+
+                                                # SequencedCondition as operand: render after-type then-type
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.after
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-sequenced"><span class="cond-type">Sequenced</span> <span class="cond-summary">after <code>'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.after
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code> then <code>'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.then
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code></span></div>'
+
+                                                # BeforeCondition as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.before
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-before"><span class="cond-type">Before</span> <span class="cond-summary"><code>'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.before
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code> before <code>'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.mustOccur
+                                                          tx.readProp: rdfs.type
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code></span></div>'
+
+                                                # IndicatorAvailable as operand
+                                                - type: tx.When
+                                                  tx.condition:
+                                                    type: tx.IsSet
+                                                    tx.checkExpr:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                      tx.readProp: wv.indicator
+                                                  tx.thenBuild:
+                                                    type: tx.Concat
+                                                    tx.parts:
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '<div class="cond cond-available"><span class="cond-type">IndicatorAvailable</span> <code>'
+                                                      - type: tx.UriName
+                                                        tx.uriNameOf:
+                                                          type: tx.PropertyRead
+                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                          tx.readProp: wv.indicator
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</code></div>'
+
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</li>'
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</ul></div>'
+
+                                    # Top-level Threshold (rare, but supported)
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                            tx.readProp: wv.invalidationCondition
+                                          tx.readProp: wv.observable
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: wv.observable
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: wv.comparator
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</em> <code class="cond-threshold-val">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                              tx.readProp: wv.invalidationCondition
+                                            tx.readProp: wv.threshold
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</code></div>'
+
+                                    # Top-level Event (e.g. ai-capex thesis - just one event-type)
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                            tx.readProp: wv.invalidationCondition
+                                          tx.readProp: wv.event
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                tx.readProp: wv.invalidationCondition
+                                              tx.readProp: wv.event
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</code>'
+                                          - type: tx.When
+                                            tx.condition:
+                                              type: tx.IsSet
+                                              tx.checkExpr:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                  tx.readProp: wv.invalidationCondition
+                                                tx.readProp: wv.durability
+                                            tx.thenBuild:
+                                              type: tx.Concat
+                                              tx.parts:
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: ' <span class="cond-durability">('
+                                                - type: tx.UriName
+                                                  tx.uriNameOf:
+                                                    type: tx.PropertyRead
+                                                    tx.readSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                      tx.readProp: wv.invalidationCondition
+                                                    tx.readProp: wv.durability
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: ')</span>'
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</div>'
+
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
-                                        </code> set on this thesis. See source YAML for the full condition tree.</p>
+                                        </div>
                                         </details>
 
                               # --- SUPPORTING EVIDENCE (collapsible, open default) ---
