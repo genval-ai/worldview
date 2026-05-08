@@ -1,7 +1,7 @@
-example-macro:
+snapshot:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.0.0
+  version: 1.0.1
   imports:
     - publisher: worldview.genval.ai
       packages:
@@ -15,22 +15,22 @@ example-macro:
           alias: fin
 
 # =============================================================================
-# Example worldview snapshot - multi-thesis macro view, May 8 2026.
+# Worldview snapshot - 2026-05-08
 #
-# Demonstrates the worldview.genval.ai ontology in production-grade depth:
-# seven theses across the dominant macro themes (defense rearmament cycle,
-# energy premium, stagflation / Fed independence, gold structural bid,
-# AI capex with China tail, equity melt-up versus recession, Fed leadership
-# transition), each with structured invalidation conditions composed using
-# the Condition DSL subclasses (And / Or / Sequenced / Threshold / Event /
-# IndicatorComparison / PersistenceWindow), and dozens of typed Evidence
-# instances drawing from the finance Evidence subclass library.
+# Multi-thesis macro view. Seven theses across the dominant macro themes:
+# Iran rearmament cycle, persistent energy premium, stagflation / Fed
+# independence pressure, gold structural bid, AI capex with China tail,
+# equity melt-up vs recession risk, Fed leadership transition risk. Each
+# carries a structured invalidationCondition composed from the Condition
+# DSL subclasses (And / Or / Sequenced / Threshold / Event / IndicatorAvailable
+# / Persistence) plus dozens of typed Evidence instances drawn from the
+# finance Evidence subclass library.
 #
-# Sister to example-ai-capex@1.0.0 - that package is the minimum-viable
-# single-thesis demonstration; this one is the everything-on demonstration.
+# Each version of this package is the worldview AS PUBLISHED on a
+# specific date. Versions are immutable; new dates produce new versions.
 # =============================================================================
 
-snapshot:
+view:
   type: wv.WorldviewSnapshot
   observedAt: 2026-05-08T20:30:00Z
   narrative: |

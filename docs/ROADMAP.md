@@ -45,7 +45,7 @@ The Kanonak Protocol expects a publisher to serve `index.txt` and `<package>/<ve
 
 ## Acceptance test
 
-A worldview snapshot package authored against `worldview.genval.ai/core` + `worldview.genval.ai/finance` that uses the new structured invalidationCondition end-to-end and renders cleanly via the snapshot-to-html transformation. The first such package is `worldview.genval.ai/example-ai-capex@1.0.0`.
+A worldview snapshot package authored against `worldview.genval.ai/core` + `worldview.genval.ai/finance` that uses the new structured invalidationCondition end-to-end and renders cleanly via the snapshot-to-html transformation. The first such package is `worldview.genval.ai/snapshot@1.0.0` (each version is the worldview as published on a specific date).
 
 ## Out of scope (for v1)
 

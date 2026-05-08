@@ -194,7 +194,7 @@ landing-page-transformation:
                               # Each card is a real <a> link via tx.SubjectUri
                               # (added in transformations@3.1.0). The href is
                               # composed from the SubjectUri (e.g.
-                              # "worldview.genval.ai/example-ai-capex@1.0.0/snapshot")
+                              # "worldview.genval.ai/snapshot@1.0.1/view")
                               # + ".html" suffix, prefixed with "//" to form a
                               # protocol-relative absolute URL. The static-site
                               # workflow mirrors each rendered HTML at the

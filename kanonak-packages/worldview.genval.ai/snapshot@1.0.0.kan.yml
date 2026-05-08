@@ -1,4 +1,4 @@
-example-ai-capex:
+snapshot:
   type: Package
   publisher: worldview.genval.ai
   version: 1.0.0
@@ -15,19 +15,18 @@ example-ai-capex:
           alias: fin
 
 # =============================================================================
-# Example worldview snapshot - AI capex thesis, pre-AMD-Q1 print.
+# Worldview snapshot - 2026-05-04
 #
-# Demonstrates the worldview.genval.ai ontology end-to-end: a Snapshot
-# with one Thesis, structured invalidationCondition, three typed Evidence
-# instances. Used as a regression test for the snapshot-to-html
-# transformation. Anyone reading this package gets a concrete worked
-# example of how to author a worldview against the public ontology.
+# Pre-AMD Q1 print (Q1 2026 reports May 5 after hours). Thesis is the AI
+# capex cycle with a China decoupling tail. AMD Data Center revenue vs
+# the $5.4B consensus is the binary that moves confidence materially.
+# Confidence at 0.50 pending the print.
 #
-# Companion - see example-ai-capex@1.0.1 for the snapshot AFTER the
-# AMD Q1 print, demonstrating confidence shift and evidence accumulation.
+# Each version of this package is the worldview AS PUBLISHED on a
+# specific date. Versions are immutable; new dates produce new versions.
 # =============================================================================
 
-snapshot:
+view:
   type: wv.WorldviewSnapshot
   observedAt: 2026-05-04T20:00:00Z
   narrative: |

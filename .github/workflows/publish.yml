@@ -70,22 +70,27 @@ jobs:
               --scope "$pkg_uri" \
               --format html \
               --out "$out_dir/"
+            # snapshot-to-html emits snapshot.html (artifactName); rename to
+            # view.html so the file matches the instance URI used by
+            # landing-page deep links (SubjectUri ends in /view).
+            if [ -f "$out_dir/snapshot.html" ]; then
+              mv "$out_dir/snapshot.html" "$out_dir/view.html"
+            fi
           done
 
       # ---------------------------------------------------------------
       # 3. Render the LATEST WorldviewSnapshot to _site/index.html so
       # the domain root always reflects the freshest worldview directly
-      # (rather than a list of links). "Latest" is currently picked from
-      # the highest-versioned example-macro@*.kan.yml — the canonical
-      # multi-thesis production worldview. Once additional canonical
-      # snapshot packages exist, swap this for an observedAt sort.
+      # (rather than a list of links). "Latest" is the highest-versioned
+      # snapshot@*.kan.yml — each version is the worldview as published
+      # on a specific date, so version order tracks chronological order.
       # ---------------------------------------------------------------
       - name: Render latest snapshot to /index.html
         run: |
           set -e
-          latest_file=$(ls kanonak-packages/worldview.genval.ai/example-macro@*.kan.yml 2>/dev/null | sort -V | tail -1 || true)
+          latest_file=$(ls kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml 2>/dev/null | sort -V | tail -1 || true)
           if [ -z "$latest_file" ]; then
-            echo "No example-macro package found - writing fallback index.html"
+            echo "No snapshot package found - writing fallback index.html"
             cat > _site/index.html <<'HTML'
           <!doctype html><html><head><meta charset="utf-8"><title>worldview.genval.ai</title></head>
           <body><h1>worldview.genval.ai</h1><p>No snapshots published yet.</p></body></html>
@@ -131,22 +136,25 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 5. Render the snapshots index (the historical list of every
-      # published snapshot) at /snapshots/. The landing-page
+      # 5. Render the snapshots index at /snapshots/. The landing-page
       # SetTransformation aggregates only WorldviewSnapshot instances
-      # within the scoped package — multi-package aggregation is tracked
-      # as a protocol issue. With one canonical snapshot package, the
-      # current scope is example-macro.
+      # within the SCOPED package — without multi-package scope support
+      # (filed as a protocol issue) the index can only show snapshots
+      # from a single snapshot version at a time. Until that lands, we
+      # scope to the highest-versioned snapshot package; older versions
+      # remain reachable via their canonical paths and via index.txt.
       # ---------------------------------------------------------------
       - name: Render snapshots index to /snapshots/
         run: |
           set -e
           mkdir -p _site/snapshots
-          landing_scope="worldview.genval.ai/example-macro"
-          if [ ! -f kanonak-packages/worldview.genval.ai/example-macro@1.0.0.kan.yml ]; then
+          latest_file=$(ls kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml 2>/dev/null | sort -V | tail -1 || true)
+          if [ -z "$latest_file" ]; then
             echo "<h1>Snapshots</h1><p>No snapshots published yet.</p>" > _site/snapshots/index.html
             exit 0
           fi
+          base=$(basename "$latest_file" .kan.yml)
+          landing_scope="worldview.genval.ai/${base}"
           echo "Rendering snapshots index scoped to $landing_scope"
           kanonak transform run \
             worldview.genval.ai/landing-page/landing-page-transformation \
