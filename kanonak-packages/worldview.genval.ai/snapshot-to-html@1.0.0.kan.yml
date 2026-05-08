@@ -257,6 +257,13 @@ snapshot-to-html-transformation:
                             .cond-not .cond-type{background:rgba(248,113,113,0.12);color:var(--danger)}
                             .cond-not .cond-operand{padding-left:14px;margin-top:4px;border-left:1px dashed var(--border)}
                             .cond-threshold .cond-observable,.cond-comparison .cond-left,.cond-comparison .cond-right,.cond-event .cond-event-id{color:var(--accent)}
+                            /* RESOURCE TOOLTIPS - hover reveals the rdfs.comment of any referenced typed instance */
+                            .resource{position:relative;display:inline-block;cursor:help;border-bottom:1px dotted var(--border)}
+                            .resource > .resource-tip{position:absolute;bottom:calc(100% + 6px);left:0;background:var(--bg-elev);border:1px solid var(--border);padding:10px 14px;border-radius:6px;font-size:12px;line-height:1.55;color:var(--fg);font-family:var(--font-sans);font-style:normal;font-weight:400;text-transform:none;letter-spacing:normal;width:320px;max-width:calc(100vw - 48px);opacity:0;pointer-events:none;transition:opacity 120ms,transform 120ms;z-index:50;box-shadow:0 6px 20px -4px rgba(0,0,0,0.5);transform:translateY(4px);white-space:normal}
+                            .resource > .resource-tip::after{content:"";position:absolute;top:100%;left:18px;border:5px solid transparent;border-top-color:var(--bg-elev)}
+                            .resource:hover > .resource-tip,.resource:focus-within > .resource-tip{opacity:1;transform:translateY(0)}
+                            .resource > .resource-tip:empty{display:none}
+                            @media (max-width:600px){.resource > .resource-tip{width:240px}}
                             .cond-threshold-val{color:var(--strong)}
                             .cond-persistence{color:var(--fg-faint);font-style:italic;font-size:11px;font-family:var(--font-mono);margin-left:6px}
                             .cond-event .cond-type{background:rgba(251,191,36,0.12);color:var(--moderate)}
@@ -836,14 +843,27 @@ snapshot-to-html-transformation:
                                                                 type: tx.Concat
                                                                 tx.parts:
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
-                                                                  - type: tx.UriName
-                                                                    tx.uriNameOf:
-                                                                      type: tx.PropertyRead
-                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                                      tx.readProp: wv.observable
+                                                                    tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <span class="resource"><code class="cond-observable">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.observable
+                                                                    tx.readProp: rdfs.label
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                                    tx.stringLiteral: '</code><span class="resource-tip">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.observable
+                                                                    tx.readProp: rdfs.comment
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</span></span> <em class="cond-comparator">'
                                                                   - type: tx.UriName
                                                                     tx.uriNameOf:
                                                                       type: tx.PropertyRead
@@ -900,14 +920,27 @@ snapshot-to-html-transformation:
                                                                 type: tx.Concat
                                                                 tx.parts:
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <code class="cond-left">'
-                                                                  - type: tx.UriName
-                                                                    tx.uriNameOf:
-                                                                      type: tx.PropertyRead
-                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                                      tx.readProp: wv.left
+                                                                    tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <span class="resource"><code class="cond-left">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.left
+                                                                    tx.readProp: rdfs.label
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                                    tx.stringLiteral: '</code><span class="resource-tip">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.left
+                                                                    tx.readProp: rdfs.comment
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</span></span> <em class="cond-comparator">'
                                                                   - type: tx.UriName
                                                                     tx.uriNameOf:
                                                                       type: tx.PropertyRead
@@ -937,14 +970,27 @@ snapshot-to-html-transformation:
                                                                 type: tx.Concat
                                                                 tx.parts:
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
-                                                                  - type: tx.UriName
-                                                                    tx.uriNameOf:
-                                                                      type: tx.PropertyRead
-                                                                      tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                                      tx.readProp: wv.event
+                                                                    tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <span class="resource"><code class="cond-event-id">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.event
+                                                                    tx.readProp: rdfs.label
                                                                   - type: tx.StringLiteral
-                                                                    tx.stringLiteral: '</code>'
+                                                                    tx.stringLiteral: '</code><span class="resource-tip">'
+                                                                  - type: tx.PropertyRead
+                                                                    tx.readSource:
+                                                                      type: tx.ResolveRef
+                                                                      tx.resolveSource:
+                                                                        type: tx.PropertyRead
+                                                                        tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                                        tx.readProp: wv.event
+                                                                    tx.readProp: rdfs.comment
+                                                                  - type: tx.StringLiteral
+                                                                    tx.stringLiteral: '</span></span>'
                                                                   - type: tx.When
                                                                     tx.condition:
                                                                       type: tx.IsSet
@@ -1007,14 +1053,27 @@ snapshot-to-html-transformation:
                                                     type: tx.Concat
                                                     tx.parts:
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
-                                                      - type: tx.UriName
-                                                        tx.uriNameOf:
-                                                          type: tx.PropertyRead
-                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                          tx.readProp: wv.observable
+                                                        tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <span class="resource"><code class="cond-observable">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.observable
+                                                        tx.readProp: rdfs.label
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                        tx.stringLiteral: '</code><span class="resource-tip">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.observable
+                                                        tx.readProp: rdfs.comment
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span></span> <em class="cond-comparator">'
                                                       - type: tx.UriName
                                                         tx.uriNameOf:
                                                           type: tx.PropertyRead
@@ -1072,14 +1131,27 @@ snapshot-to-html-transformation:
                                                     type: tx.Concat
                                                     tx.parts:
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <code class="cond-left">'
-                                                      - type: tx.UriName
-                                                        tx.uriNameOf:
-                                                          type: tx.PropertyRead
-                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                          tx.readProp: wv.left
+                                                        tx.stringLiteral: '<div class="cond cond-comparison"><span class="cond-type">IndicatorComparison</span> <span class="resource"><code class="cond-left">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.left
+                                                        tx.readProp: rdfs.label
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                                        tx.stringLiteral: '</code><span class="resource-tip">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.left
+                                                        tx.readProp: rdfs.comment
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span></span> <em class="cond-comparator">'
                                                       - type: tx.UriName
                                                         tx.uriNameOf:
                                                           type: tx.PropertyRead
@@ -1110,14 +1182,27 @@ snapshot-to-html-transformation:
                                                     type: tx.Concat
                                                     tx.parts:
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
-                                                      - type: tx.UriName
-                                                        tx.uriNameOf:
-                                                          type: tx.PropertyRead
-                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                          tx.readProp: wv.event
+                                                        tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <span class="resource"><code class="cond-event-id">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.event
+                                                        tx.readProp: rdfs.label
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '</code>'
+                                                        tx.stringLiteral: '</code><span class="resource-tip">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.event
+                                                        tx.readProp: rdfs.comment
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span></span>'
                                                       - type: tx.When
                                                         tx.condition:
                                                           type: tx.IsSet
@@ -1220,14 +1305,27 @@ snapshot-to-html-transformation:
                                                     type: tx.Concat
                                                     tx.parts:
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '<div class="cond cond-available"><span class="cond-type">IndicatorAvailable</span> <code>'
-                                                      - type: tx.UriName
-                                                        tx.uriNameOf:
-                                                          type: tx.PropertyRead
-                                                          tx.readSource: { type: tx.VarRef, tx.varName: cond }
-                                                          tx.readProp: wv.indicator
+                                                        tx.stringLiteral: '<div class="cond cond-available"><span class="cond-type">IndicatorAvailable</span> <span class="resource"><code>'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.indicator
+                                                        tx.readProp: rdfs.label
                                                       - type: tx.StringLiteral
-                                                        tx.stringLiteral: '</code></div>'
+                                                        tx.stringLiteral: '</code><span class="resource-tip">'
+                                                      - type: tx.PropertyRead
+                                                        tx.readSource:
+                                                          type: tx.ResolveRef
+                                                          tx.resolveSource:
+                                                            type: tx.PropertyRead
+                                                            tx.readSource: { type: tx.VarRef, tx.varName: cond }
+                                                            tx.readProp: wv.indicator
+                                                        tx.readProp: rdfs.comment
+                                                      - type: tx.StringLiteral
+                                                        tx.stringLiteral: '</span></span></div>'
 
                                                 - type: tx.StringLiteral
                                                   tx.stringLiteral: '</li>'
@@ -1251,19 +1349,37 @@ snapshot-to-html-transformation:
                                         type: tx.Concat
                                         tx.parts:
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <code class="cond-observable">'
-                                          - type: tx.UriName
-                                            tx.uriNameOf:
-                                              type: tx.PropertyRead
-                                              tx.readSource:
+                                            tx.stringLiteral: '<div class="cond cond-threshold"><span class="cond-type">Threshold</span> <span class="resource"><code class="cond-observable">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
                                                 type: tx.PropertyRead
                                                 tx.readSource:
-                                                  type: tx.ResolveRef
-                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
-                                                tx.readProp: wv.invalidationCondition
-                                              tx.readProp: wv.observable
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                  tx.readProp: wv.invalidationCondition
+                                                tx.readProp: wv.observable
+                                            tx.readProp: rdfs.label
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '</code> <em class="cond-comparator">'
+                                            tx.stringLiteral: '</code><span class="resource-tip">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                  tx.readProp: wv.invalidationCondition
+                                                tx.readProp: wv.observable
+                                            tx.readProp: rdfs.comment
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></span> <em class="cond-comparator">'
                                           - type: tx.UriName
                                             tx.uriNameOf:
                                               type: tx.PropertyRead
@@ -1304,19 +1420,37 @@ snapshot-to-html-transformation:
                                         type: tx.Concat
                                         tx.parts:
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <code class="cond-event-id">'
-                                          - type: tx.UriName
-                                            tx.uriNameOf:
-                                              type: tx.PropertyRead
-                                              tx.readSource:
+                                            tx.stringLiteral: '<div class="cond cond-event"><span class="cond-type">Event</span> <span class="resource"><code class="cond-event-id">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
                                                 type: tx.PropertyRead
                                                 tx.readSource:
-                                                  type: tx.ResolveRef
-                                                  tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
-                                                tx.readProp: wv.invalidationCondition
-                                              tx.readProp: wv.event
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                  tx.readProp: wv.invalidationCondition
+                                                tx.readProp: wv.event
+                                            tx.readProp: rdfs.label
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '</code>'
+                                            tx.stringLiteral: '</code><span class="resource-tip">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource: { type: tx.VarRef, tx.varName: thesisRefMain }
+                                                  tx.readProp: wv.invalidationCondition
+                                                tx.readProp: wv.event
+                                            tx.readProp: rdfs.comment
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></span>'
                                           - type: tx.When
                                             tx.condition:
                                               type: tx.IsSet
@@ -1496,18 +1630,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Security</span><span class="ev-fact-value">'
-                                                - type: tx.UriName
-                                                  tx.uriNameOf:
-                                                    type: tx.PropertyRead
-                                                    tx.readSource:
-                                                      type: tx.ResolveRef
-                                                      tx.resolveSource:
-                                                        type: tx.VarRef
-                                                        tx.varName: evRef
-                                                    tx.readProp: fin.aboutSecurity
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Security</span><span class="ev-fact-value resource">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.aboutSecurity
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.aboutSecurity
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           # --- MarketDataEvidence ---
                                           - type: tx.When
@@ -1525,16 +1676,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.marketMetric
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.marketMetric
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.marketMetric
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1578,16 +1748,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Source</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Source</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.analystInstitution
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.analystInstitution
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.analystInstitution
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1604,18 +1793,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Target</span><span class="ev-fact-value">'
-                                                - type: tx.UriName
-                                                  tx.uriNameOf:
-                                                    type: tx.PropertyRead
-                                                    tx.readSource:
-                                                      type: tx.ResolveRef
-                                                      tx.resolveSource:
-                                                        type: tx.VarRef
-                                                        tx.varName: evRef
-                                                    tx.readProp: fin.forecastTarget
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Target</span><span class="ev-fact-value resource">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.forecastTarget
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.forecastTarget
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1658,16 +1864,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Horizon</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Horizon</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.forecastHorizon
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.forecastHorizon
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.forecastHorizon
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           # --- CorporateEvidence ---
                                           - type: tx.When
@@ -1685,16 +1910,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.corporateMetric
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.corporateMetric
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.corporateMetric
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1711,16 +1955,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Period</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Period</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.reportingPeriod
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.reportingPeriod
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.reportingPeriod
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           # --- PolicyEvidence ---
                                           - type: tx.When
@@ -1738,16 +2001,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Issued by</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Issued by</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.issuingBody
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.issuingBody
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.issuingBody
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1764,16 +2046,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Policy</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Policy</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.policy
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.policy
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.policy
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1817,16 +2118,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Bank</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Bank</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.centralBank
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.centralBank
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.centralBank
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1896,16 +2216,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Location</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Location</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.eventLocation
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.eventLocation
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.eventLocation
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -1975,16 +2314,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Speaker</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Speaker</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.speaker
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.speaker
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.speaker
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -2001,16 +2359,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Role</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Role</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.speakerRole
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.speakerRole
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.speakerRole
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -2027,16 +2404,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Venue</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Venue</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.statementVenue
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.statementVenue
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.statementVenue
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -2080,16 +2476,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Institution</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Institution</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.flowInstitution
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.flowInstitution
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.flowInstitution
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -2106,16 +2521,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Direction</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Direction</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: fin.flowDirection
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.flowDirection
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: fin.flowDirection
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
@@ -2159,16 +2593,35 @@ snapshot-to-html-transformation:
                                               type: tx.Concat
                                               tx.parts:
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Indicator</span><span class="ev-fact-value">'
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Indicator</span><span class="ev-fact-value resource">'
                                                 - type: tx.PropertyRead
                                                   tx.readSource:
                                                     type: tx.ResolveRef
                                                     tx.resolveSource:
-                                                      type: tx.VarRef
-                                                      tx.varName: evRef
-                                                  tx.readProp: wv.indicatorName
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.indicatorName
+                                                  tx.readProp: rdfs.label
                                                 - type: tx.StringLiteral
-                                                  tx.stringLiteral: '</span></li>'
+                                                  tx.stringLiteral: '<span class="resource-tip">'
+                                                - type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.PropertyRead
+                                                      tx.readSource:
+                                                        type: tx.ResolveRef
+                                                        tx.resolveSource:
+                                                          type: tx.VarRef
+                                                          tx.varName: evRef
+                                                      tx.readProp: wv.indicatorName
+                                                  tx.readProp: rdfs.comment
+                                                - type: tx.StringLiteral
+                                                  tx.stringLiteral: '</span></span></li>'
 
                                           - type: tx.When
                                             tx.condition:
