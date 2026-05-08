@@ -232,20 +232,21 @@ jobs:
           <header class="intro">
           <span class="eyebrow">About</span>
           <h1>worldview.genval.ai</h1>
-          <p class="lead">A public Kanonak Protocol publisher. Defines a vocabulary for falsifiable, evidence-backed worldview snapshots &mdash; <code>WorldviewSnapshot</code>, <code>WorldviewThesis</code>, <code>Evidence</code> &mdash; plus a structured invalidation-condition DSL so a rules engine can flag when a thesis is approaching invalidation.</p>
+          <p class="lead">A record of what we believe is going on in the world, and why &mdash; published as immutable, falsifiable snapshots over time. Each thesis carries an explicit machine-evaluable condition that says when it should be considered broken, plus the typed evidence behind the claim.</p>
+          <p class="lead">Built on the <a href="https://kanonak.org">Kanonak Protocol</a>; every package is fetchable from this origin and importable into any Kanonak-compatible tool. <a href="/">Read the latest worldview &rarr;</a></p>
           </header>
 
           <section class="about-section">
           <h2 class="section-title">The ontology</h2>
-          <p>The vocabulary is split across two packages so consumers can adopt the abstract layer without inheriting any domain bias:</p>
+          <p>Domain-general vocabulary plus a finance extension. Consumers can adopt the abstract layer alone without inheriting any domain bias.</p>
           <ul>
           <li>
-          <code>worldview.genval.ai/core@1.0.0</code>
-          <span>Domain-general vocabulary &mdash; Snapshot, Thesis, Evidence base, Condition DSL with proper subclassing (And/Or/Not, Threshold, Event, Sequenced, IndicatorAvailable, Persistence, Durability), status / strength / comparator / time-unit enums, and abstract reference-vocabulary stubs (Indicator, Event, Institution, etc.).</span>
+          <code>worldview.genval.ai/core</code>
+          <span>Snapshot, Thesis, Evidence base; the Condition DSL (And / Or / Not, Threshold, Event, Sequenced, IndicatorAvailable, Persistence, Durability); status / strength / comparator / time-unit enums; and abstract reference-vocabulary stubs (Indicator, Event, Institution, etc.).</span>
           <a href="/core/1.0.0.kan.yml">core/1.0.0.kan.yml &rarr;</a>
           </li>
           <li>
-          <code>worldview.genval.ai/finance@1.0.0</code>
+          <code>worldview.genval.ai/finance</code>
           <span>Finance-domain extension &mdash; Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), the Security class with named instances, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, FiscalPeriod, ForecastHorizon, FlowDirection).</span>
           <a href="/finance/1.0.0.kan.yml">finance/1.0.0.kan.yml &rarr;</a>
           </li>
@@ -253,17 +254,29 @@ jobs:
           </section>
 
           <section class="about-section">
-          <h2 class="section-title">Tooling</h2>
-          <p>Two transformations turn the raw ontology + snapshots into the static site you're reading:</p>
+          <h2 class="section-title">The data</h2>
+          <p>The published worldview itself lives in a single canonical package, version-bumped per observation. Each version is immutable; refreshing the worldview produces a new version rather than editing an existing one, so the version chain doubles as the audit trail of evolving belief.</p>
           <ul>
           <li>
-          <code>worldview.genval.ai/snapshot-to-html@1.0.0</code>
-          <span>An InstanceTransformation that emits a self-contained HTML report from any <code>WorldviewSnapshot</code>. Inline CSS, dynamic SVG confidence bars, structured rendering of invalidation-condition trees down to three levels of nesting.</span>
+          <code>worldview.genval.ai/snapshot</code>
+          <span>One <code>WorldviewSnapshot</code> per package version. The version number tracks observation order, the <code>observedAt</code> timestamp pins the data cutoff, and the <code>git</code> history of this repository is the long-form audit trail.</span>
+          <a href="/index.txt">index.txt &rarr;</a>
+          </li>
+          </ul>
+          </section>
+
+          <section class="about-section">
+          <h2 class="section-title">Tooling</h2>
+          <p>Two transformations turn the raw ontology and snapshot data into the static site you're reading. Both are themselves Kanonak packages, importable and reusable.</p>
+          <ul>
+          <li>
+          <code>worldview.genval.ai/snapshot-to-html</code>
+          <span>An InstanceTransformation that emits a self-contained HTML report from any <code>WorldviewSnapshot</code>: inline CSS, dynamic SVG confidence bars, structured rendering of invalidation-condition trees down to three levels of nesting, evidence cards with hover tooltips for typed-instance references.</span>
           <a href="/snapshot-to-html/1.0.0.kan.yml">snapshot-to-html/1.0.0.kan.yml &rarr;</a>
           </li>
           <li>
-          <code>worldview.genval.ai/landing-page@1.0.0</code>
-          <span>A SetTransformation that aggregates every WorldviewSnapshot in scope into the snapshots index. v3's first set-theoretic primitive use in a public Kanonak package.</span>
+          <code>worldview.genval.ai/landing-page</code>
+          <span>A SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending.</span>
           <a href="/landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml &rarr;</a>
           </li>
           </ul>
@@ -285,8 +298,22 @@ jobs:
           </section>
 
           <section class="about-section">
-          <h2 class="section-title">What's coming</h2>
-          <p>The unique-to-Kanonak feature this publisher is building toward &mdash; a time-series visualization showing how each thesis's confidence evolves across snapshot versions, when theses appear / retire / invalidate, and how the regime narrative shifts &mdash; needs a few protocol primitives that haven't shipped yet (chiefly arithmetic and string-diffing for the chart layer). The textual portion lands first; the chart-heavy version follows when the underlying primitives become available.</p>
+          <h2 class="section-title">Roadmap</h2>
+          <p>What's on the bench for the next few snapshots:</p>
+          <ul>
+          <li>
+          <code>Time-series visualization</code>
+          <span>A chart layer across <code>snapshot</code> versions showing how each thesis's confidence evolves, when theses appear / retire / invalidate, and how the regime narrative shifts. Cross-version aggregation already works; the chart layer is the next piece.</span>
+          </li>
+          <li>
+          <code>More evidence sources</code>
+          <span>Additional research-skill integrations beyond market-data fetches &mdash; FRED economic data, SEC EDGAR filings, structured news feeds &mdash; so refreshing a snapshot is a single command rather than a research session.</span>
+          </li>
+          <li>
+          <code>Programmatic consumers</code>
+          <span>Worked examples for downstream tools that read the published packages directly: rules-engine evaluation of invalidation conditions against live data, comparative-confidence dashboards, regime-change detectors.</span>
+          </li>
+          </ul>
           </section>
 
           <footer class="about-footer">
