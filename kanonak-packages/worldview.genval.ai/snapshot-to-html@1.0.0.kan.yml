@@ -2724,3 +2724,31 @@ snapshot-to-html-transformation:
                             </time>
                             </footer>
                             </article>
+                            <script>
+                            // Reformat ISO datetimes to readable form. Pure presentation —
+                            // raw timestamps stay in the source YAML for tools that want them.
+                            (function(){
+                              var RE = /\b(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z\b/g;
+                              var DAY_OPTS = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+                              var DT_OPTS = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' };
+                              function fmt(_, y, m, d, hh, mm, ss){
+                                var date = new Date(y+'-'+m+'-'+d+'T'+hh+':'+mm+':'+ss+'Z');
+                                if (hh === '00' && mm === '00' && ss === '00') {
+                                  return date.toLocaleDateString('en-US', DAY_OPTS);
+                                }
+                                return date.toLocaleString('en-US', DT_OPTS);
+                              }
+                              function walk(node){
+                                if (node.nodeType === 3) {
+                                  if (RE.test(node.nodeValue)) { RE.lastIndex = 0; node.nodeValue = node.nodeValue.replace(RE, fmt); }
+                                  return;
+                                }
+                                if (node.nodeType === 1 && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+                                  var c = node.firstChild;
+                                  while (c) { var n = c.nextSibling; walk(c); c = n; }
+                                }
+                              }
+                              walk(document.body);
+                              if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                            })();
+                            </script>
