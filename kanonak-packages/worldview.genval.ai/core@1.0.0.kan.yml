@@ -37,11 +37,16 @@ core:
 #      Institution, GovernmentBody, Location, Party, Role) whose concrete
 #      instances live in domain-specific packages (e.g. worldview.genval.ai/
 #      finance for finance-domain instances).
-#   5. Condition DSL - a tagged-union expression tree that turns prose
-#      invalidation conditions into something a rules engine can evaluate.
+#   5. Condition DSL - a boolean condition tree (Condition + 11 concrete
+#      subclasses arranged through three abstract intermediates:
+#      NaryBoolCondition, ComparisonCondition, TimeBoundCondition) that
+#      turns prose invalidation conditions into a structure a rules engine
+#      can evaluate.
 #   6. Generic seed instances - small enumerations the DSL itself depends on
-#      (Comparator, TimeUnit, Durability, EvaluationState, Derivation)
-#      plus broad Policy / Role members usable across domains.
+#      (Comparator, TimeUnit, Durability, EvaluationState) plus broad Policy
+#      and Role members usable across domains. DerivedIndicator subclasses
+#      (MovingAverage, etc.) are real classes rather than tagged-union
+#      discriminators.
 #
 # Domain extensions (finance, climate, scientific, etc.) import this package,
 # subclass Evidence / Indicator / Event for their domain, and add named
@@ -668,309 +673,332 @@ fiscal-pressure:
 # =============================================================================
 # 8. CONDITION DSL
 #
-# A tagged-union expression tree for invalidation conditions. The single
-# Condition class with a `kind` discriminator avoids deep subclass
-# hierarchies that would conflict with the EmbeddedKanonakNoExplicitType
-# validator rule on deeply-nested condition trees.
+# A boolean condition tree for thesis invalidation. Each form (And, Or,
+# Threshold, Event, Sequenced, ...) is a real subclass of Condition with
+# its own properties. Embedded Conditions inside `operands` / `after` /
+# `then` / etc. declare their concrete subclass via `type:` per the
+# kanonak-protocol@1.1.0 embedded-type-must-narrow-range rule.
 # =============================================================================
 
 Condition:
   type: rdfs.Class
   label: Condition
   comment: >
-    A node in a boolean condition tree. The `kind` property discriminates
-    which concrete behavior this instance represents. A runtime evaluator
-    walks the tree against current data plus an event log and returns an
-    EvaluationState (satisfied, partially-satisfied, unsatisfied, unknown)
-    plus a structured trace.
+    Abstract base for nodes in a boolean condition tree. Never instantiated
+    directly - authors instantiate one of the subclasses below. A runtime
+    evaluator walks the tree against current data plus an event log and
+    returns an EvaluationState (satisfied, partially-satisfied, unsatisfied,
+    unknown) plus a structured trace.
 
-ConditionForm:
+# --- Boolean composition ---
+
+NaryBoolCondition:
   type: rdfs.Class
-  label: Condition Form
+  subClassOf: Condition
+  label: N-ary Boolean Condition
   comment: >
-    The discriminator vocabulary for Condition - one named instance per
-    structural form a Condition can take (and-condition, or-condition,
-    threshold-condition, event-condition, ...). The class doesn't conflict
-    with the Condition union class; the bare noun would (Condition is
-    already the union), so this is the closest non-suffixed name.
+    Abstract intermediate for boolean conditions that compose N child
+    conditions via a single connective (AND, OR). Captures the shared
+    `operands` property so AndCondition and OrCondition don't redeclare it.
 
-# --- Properties on Condition (each kind uses a subset) ---
-
-kind:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: ConditionForm
-  label: Kind
-  comment: Discriminator. Required on every Condition instance.
-
-operands:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: Operands
-  comment: >
-    (kind=and-condition, or-condition) Ordered list of child Conditions
-    composed by the boolean operator.
-
-operand:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: Operand
-  comment: >
-    (kind=not-condition) The single child Condition to negate.
-
-observable:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Indicator
-  label: Observable
-  comment: >
-    (kind=threshold-condition) The Indicator whose value is compared
-    against `threshold` using `comparator`.
-
-comparator:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Comparator
-  label: Comparator
-  comment: >
-    (kind=threshold-condition, indicator-comparison) The comparison operator
-    applied between the left and right sides.
-
-threshold:
-  type: owl.DatatypeProperty
-  domain: Condition
-  range: xsd.decimal
-  label: Threshold
-  comment: >
-    (kind=threshold-condition) Numeric value compared against the observable.
-
-thresholdHigh:
-  type: owl.DatatypeProperty
-  domain: Condition
-  range: xsd.decimal
-  label: Threshold High
-  comment: >
-    (kind=threshold-condition with comparator=between) Upper bound of the
-    range. Lower bound is given by `threshold`. The condition is satisfied
-    when the observable lies in [threshold, thresholdHigh] inclusive.
-
-unit:
-  type: owl.DatatypeProperty
-  domain: Condition
-  range: xsd.string
-  label: Unit
-  comment: >
-    (kind=threshold-condition, indicator-comparison) Free-form unit string
-    documenting the threshold's units (e.g. "usd-per-bbl", "pct"). For
-    informational and rendering use; the underlying Indicator carries the
-    canonical unit. v2 may upgrade to a typed Unit class.
-
-persistence:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: PersistenceWindow
-  label: Persistence
-  comment: >
-    (kind=threshold-condition, indicator-comparison) Optional window during
-    which the comparator must remain true before the condition is `satisfied`.
-    Without a persistence window, a single satisfying reading flips the
-    condition to satisfied; with one, the condition is `partially-satisfied`
-    inside the window and `satisfied` only after the window elapses.
-
-left:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Indicator
-  label: Left
-  comment: >
-    (kind=indicator-comparison) The left-hand-side observable in a cross-
-    indicator comparison. May be either an Indicator or a DerivedIndicator.
-
-right:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Indicator
-  label: Right
-  comment: >
-    (kind=indicator-comparison) The right-hand-side observable. Typically a
-    DerivedIndicator (e.g. a moving average of `left`) when the comparison
-    expresses a technical-analysis condition.
-
-event:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Event
-  label: Event
-  comment: >
-    (kind=event-condition) The category of event the condition tests for,
-    referencing an Event named instance. Resolved at evaluation time
-    against a runtime-curated event log.
-
-durability:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Durability
-  label: Durability
-  comment: >
-    (kind=event-condition) Optional. Requires the matched event to carry
-    the specified durability classification (durable, transient, unspecified).
-    Filters the event log to events that have been judged durable - useful
-    for "after durable peace" semantics where a transient ceasefire shouldn't
-    satisfy the condition.
-
-withinWindow:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: TimeWindow
-  label: Within Window
-  comment: >
-    (kind=event-condition, sequenced-condition, indicator-available)
-    Optional. Requires the event or sequenced satisfaction to occur within
-    the specified time window relative to evaluation time.
-
-after:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: After
-  comment: >
-    (kind=sequenced-condition) The prerequisite Condition that must become
-    satisfied at some time T0 before `then` is evaluated. The runtime
-    tracks T0 in the event log so re-evaluation across days is consistent.
-
-then:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: Then
-  comment: >
-    (kind=sequenced-condition) The Condition evaluated against time >= T0
-    (where T0 is when `after` first became satisfied). Optionally bounded
-    by `withinWindow`.
-
-before:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: Before
-  comment: >
-    (kind=before-condition) The deadline Condition - if `before` becomes
-    satisfied before `mustOccur` does, the before-condition is satisfied
-    (i.e. the deadline passed without the prerequisite occurring).
-
-mustOccur:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Condition
-  label: Must Occur
-  comment: >
-    (kind=before-condition) The prerequisite that must become satisfied
-    before `before` does, otherwise the before-condition fires.
-
-indicator:
-  type: owl.ObjectProperty
-  domain: Condition
-  range: Indicator
-  label: Indicator
-  comment: >
-    (kind=indicator-available) The Indicator whose data freshness is being
-    asserted. Satisfied if the indicator has at least one observation
-    within `withinWindow` (if specified) or any observation at all (if not).
-
-# --- ConditionForm named instances ---
-
-and-condition:
-  type: ConditionForm
+AndCondition:
+  type: rdfs.Class
+  subClassOf: NaryBoolCondition
   label: And
   comment: >
     Boolean AND. Satisfied iff every operand is satisfied. Unsatisfied if
     any operand is unsatisfied. Unknown if any operand is unknown (and no
     operand is unsatisfied). Otherwise partially-satisfied.
 
-or-condition:
-  type: ConditionForm
+OrCondition:
+  type: rdfs.Class
+  subClassOf: NaryBoolCondition
   label: Or
   comment: >
     Boolean OR. Satisfied if any operand is satisfied. Unsatisfied iff every
     operand is unsatisfied. Unknown if any operand is unknown (and no
     operand is satisfied). Otherwise partially-satisfied.
 
-not-condition:
-  type: ConditionForm
+NotCondition:
+  type: rdfs.Class
+  subClassOf: Condition
   label: Not
   comment: >
-    Boolean NOT. Inverts satisfied / unsatisfied. Partial stays partial;
-    unknown stays unknown.
+    Boolean NOT. Inverts satisfied / unsatisfied of its single `operand`.
+    Partial stays partial; unknown stays unknown.
 
-threshold-condition:
-  type: ConditionForm
+operands:
+  type: owl.ObjectProperty
+  domain: NaryBoolCondition
+  range: Condition
+  label: Operands
+  comment: >
+    Ordered list of child Conditions composed by the boolean connective.
+    Used by AndCondition (all-must-pass) and OrCondition (any-passes).
+
+operand:
+  type: owl.ObjectProperty
+  domain: NotCondition
+  range: Condition
+  label: Operand
+  comment: The single child Condition negated by NotCondition.
+
+# --- Comparison conditions ---
+
+ComparisonCondition:
+  type: rdfs.Class
+  subClassOf: Condition
+  label: Comparison Condition
+  comment: >
+    Abstract intermediate for conditions that apply a Comparator to two
+    sides plus an optional persistence window. Captures the shared
+    `comparator`, `persistence`, `unit` properties used by both
+    ThresholdCondition (right side is a literal value) and
+    IndicatorComparison (right side is another Indicator).
+
+ThresholdCondition:
+  type: rdfs.Class
+  subClassOf: ComparisonCondition
   label: Threshold
   comment: >
     Numeric threshold check. Reads `observable`'s most recent value and
     compares to `threshold` using `comparator`. With `persistence`, the
     condition is partially-satisfied inside the persistence window and
-    satisfied only after duration elapses with the comparator continuously
+    satisfied only after the window elapses with the comparator continuously
     true.
 
-indicator-comparison:
-  type: ConditionForm
+IndicatorComparison:
+  type: rdfs.Class
+  subClassOf: ComparisonCondition
   label: Indicator Comparison
   comment: >
     Cross-indicator comparison. Compares `left` observable against `right`
-    observable using `comparator`. Same persistence semantics as threshold-
-    condition. Typical use: technical-analysis predicates ("SPY below 50d MA")
-    where right is a DerivedIndicator on left.
+    observable using `comparator`. Same persistence semantics as
+    ThresholdCondition. Typical use: technical-analysis predicates
+    ("SPY below 50d MA") where right is a DerivedIndicator on left.
 
-event-condition:
-  type: ConditionForm
+comparator:
+  type: owl.ObjectProperty
+  domain: ComparisonCondition
+  range: Comparator
+  label: Comparator
+  comment: The comparison operator applied between the two sides.
+
+persistence:
+  type: owl.ObjectProperty
+  domain: ComparisonCondition
+  range: PersistenceWindow
+  label: Persistence
+  comment: >
+    Optional window during which the comparator must remain true before the
+    condition is `satisfied`. Without a persistence window, a single
+    satisfying reading flips the condition to satisfied; with one, the
+    condition is `partially-satisfied` inside the window and `satisfied`
+    only after the window elapses.
+
+unit:
+  type: owl.DatatypeProperty
+  domain: ComparisonCondition
+  range: xsd.string
+  label: Unit
+  comment: >
+    Free-form unit string documenting the threshold's units (e.g.
+    "usd-per-bbl", "pct"). Informational; the underlying Indicator carries
+    the canonical unit. v2 may upgrade to a typed Unit class.
+
+observable:
+  type: owl.ObjectProperty
+  domain: ThresholdCondition
+  range: Indicator
+  label: Observable
+  comment: The Indicator whose value is compared against `threshold`.
+
+threshold:
+  type: owl.DatatypeProperty
+  domain: ThresholdCondition
+  range: xsd.decimal
+  label: Threshold
+  comment: Numeric value compared against the observable.
+
+thresholdHigh:
+  type: owl.DatatypeProperty
+  domain: ThresholdCondition
+  range: xsd.decimal
+  label: Threshold High
+  comment: >
+    With comparator=between, the upper bound. Lower bound is `threshold`.
+    The condition is satisfied when the observable lies in
+    [threshold, thresholdHigh] inclusive.
+
+left:
+  type: owl.ObjectProperty
+  domain: IndicatorComparison
+  range: Indicator
+  label: Left
+  comment: >
+    The left-hand-side observable. May be either a base Indicator or a
+    DerivedIndicator.
+
+right:
+  type: owl.ObjectProperty
+  domain: IndicatorComparison
+  range: Indicator
+  label: Right
+  comment: >
+    The right-hand-side observable. Typically a DerivedIndicator (e.g. a
+    moving average of `left`) when the comparison expresses a
+    technical-analysis condition.
+
+# --- Time-bound conditions (event-log queries + temporal sequencing) ---
+
+TimeBoundCondition:
+  type: rdfs.Class
+  subClassOf: Condition
+  label: Time-Bound Condition
+  comment: >
+    Abstract intermediate for conditions that may be bounded by a `withinWindow`
+    relative to evaluation time. Captures the shared `withinWindow` property.
+    Concrete subclasses: EventCondition, SequencedCondition, IndicatorAvailable.
+
+EventCondition:
+  type: rdfs.Class
+  subClassOf: TimeBoundCondition
   label: Event
   comment: >
     Event-log presence check. Satisfied if an event matching `event` (with
-    the optionally-specified `durability`) has been recorded in the event
-    log within `withinWindow` if specified, or ever otherwise. The event
-    log itself is runtime infrastructure outside this ontology.
+    the optionally-specified `durability`) has been recorded in the event log
+    within `withinWindow` if specified, or ever otherwise. The event log
+    itself is runtime infrastructure outside this ontology.
 
-sequenced-condition:
-  type: ConditionForm
+SequencedCondition:
+  type: rdfs.Class
+  subClassOf: TimeBoundCondition
   label: Sequenced
   comment: >
     Temporal sequencing. Satisfied when `after` first became satisfied at
-    some time T0 AND `then` is satisfied evaluated against time >= T0
+    some time T0 AND `then` is satisfied when evaluated against time >= T0
     (optionally within `withinWindow` of T0). Unknown until T0 is recorded.
     Used for "X following durable Y" patterns.
 
-before-condition:
-  type: ConditionForm
-  label: Before
-  comment: >
-    Deadline check. Satisfied if `before` becomes satisfied before
-    `mustOccur` does - i.e. the deadline passed without the prerequisite
-    materializing. The mirror of sequenced-condition for invalidations
-    that fire on the absence of an expected event.
-
-indicator-available:
-  type: ConditionForm
+IndicatorAvailable:
+  type: rdfs.Class
+  subClassOf: TimeBoundCondition
   label: Indicator Available
   comment: >
     Data-freshness guard. Satisfied if `indicator` has at least one
     observation within `withinWindow` (if specified). Used as a wrapper
-    around threshold-condition leaves to prevent false-unsatisfied results
+    around ThresholdCondition leaves to prevent false-unsatisfied results
     when the underlying data feed is stale.
 
-always-satisfied:
-  type: ConditionForm
+withinWindow:
+  type: owl.ObjectProperty
+  domain: TimeBoundCondition
+  range: TimeWindow
+  label: Within Window
+  comment: >
+    Optional. Bounds the evaluation to a time window relative to evaluation
+    time. For EventCondition - event must be recorded within. For
+    SequencedCondition - then-condition must be satisfied within (relative
+    to T0). For IndicatorAvailable - the indicator must have at least one
+    observation within.
+
+event:
+  type: owl.ObjectProperty
+  domain: EventCondition
+  range: Event
+  label: Event
+  comment: >
+    The category of event the condition tests for, referencing an Event
+    named instance. Resolved at evaluation time against a runtime-curated
+    event log.
+
+durability:
+  type: owl.ObjectProperty
+  domain: EventCondition
+  range: Durability
+  label: Durability
+  comment: >
+    Optional. Requires the matched event to carry the specified durability
+    classification. Filters the event log to events that have been judged
+    durable - useful for "after durable peace" semantics where a transient
+    ceasefire shouldn't satisfy the condition.
+
+after:
+  type: owl.ObjectProperty
+  domain: SequencedCondition
+  range: Condition
+  label: After
+  comment: >
+    The prerequisite Condition that must become satisfied at some time T0
+    before `then` is evaluated. The runtime tracks T0 so re-evaluation
+    across days is consistent.
+
+then:
+  type: owl.ObjectProperty
+  domain: SequencedCondition
+  range: Condition
+  label: Then
+  comment: >
+    The Condition evaluated against time >= T0 (where T0 is when `after`
+    first became satisfied). Optionally bounded by `withinWindow`.
+
+indicator:
+  type: owl.ObjectProperty
+  domain: IndicatorAvailable
+  range: Indicator
+  label: Indicator
+  comment: >
+    The Indicator whose data freshness is being asserted. Satisfied if the
+    indicator has at least one observation within `withinWindow` (if
+    specified) or any observation at all (if not).
+
+# --- Deadline check ---
+
+BeforeCondition:
+  type: rdfs.Class
+  subClassOf: Condition
+  label: Before
+  comment: >
+    Deadline check. Satisfied if `before` becomes satisfied before
+    `mustOccur` does - i.e. the deadline passed without the prerequisite
+    materializing. The mirror of SequencedCondition for invalidations
+    that fire on the absence of an expected event.
+
+before:
+  type: owl.ObjectProperty
+  domain: BeforeCondition
+  range: Condition
+  label: Before
+  comment: >
+    The deadline Condition - if `before` becomes satisfied before
+    `mustOccur` does, BeforeCondition is satisfied (i.e. the deadline
+    passed without the prerequisite occurring).
+
+mustOccur:
+  type: owl.ObjectProperty
+  domain: BeforeCondition
+  range: Condition
+  label: Must Occur
+  comment: >
+    The prerequisite that must become satisfied before `before` does,
+    otherwise BeforeCondition fires.
+
+# --- Constants ---
+
+AlwaysSatisfied:
+  type: rdfs.Class
+  subClassOf: Condition
   label: Always Satisfied
   comment: >
     Constant. Always returns satisfied. Useful for testing condition trees
     and for placeholder leaves during incremental authoring.
 
-always-unsatisfied:
-  type: ConditionForm
+AlwaysUnsatisfied:
+  type: rdfs.Class
+  subClassOf: Condition
   label: Always Unsatisfied
   comment: >
-    Constant. Always returns unsatisfied. Mirror of always-satisfied.
+    Constant. Always returns unsatisfied. Mirror of AlwaysSatisfied.
 
 
 # =============================================================================
@@ -1162,14 +1190,20 @@ PersistenceWindow:
   comment: >
     A duration over which a condition's underlying comparator must remain
     continuously true before the condition is satisfied. Composes a
-    `duration` (integer) with a TimeUnit reference.
+    `duration` (integer) with a TimeUnit reference. Authors using this
+    package must reference the `duration` property with the package alias
+    (e.g. `wv.duration: 30`) because the bare name collides with
+    `xsd:duration` (the built-in XSD datatype).
 
 duration:
   type: owl.DatatypeProperty
   domain: PersistenceWindow
   range: xsd.integer
   label: Duration
-  comment: Number of TimeUnit-units to persist. Positive integer.
+  comment: >
+    Number of TimeUnit-units to persist. Positive integer. Must be
+    referenced as `wv.duration` (or whatever alias your import uses) due
+    to the bare-name collision with `xsd:duration`.
 
 windowUnit:
   type: owl.ObjectProperty
@@ -1212,27 +1246,22 @@ DerivedIndicator:
   subClassOf: Indicator
   label: Derived Indicator
   comment: >
-    An Indicator whose value is computed at evaluation time from another
-    Indicator plus a Derivation. Distinct from a base Indicator (whose
-    values come from a data feed). v1 supports moving-average; future
-    derivations (rolling-stdev, percent-change, z-score) are added by
-    declaring new Derivation named instances.
+    Abstract subclass of Indicator for indicators whose values are computed
+    at evaluation time from another Indicator. Distinct from a base Indicator
+    whose values come from a data feed. Concrete subclasses (currently
+    MovingAverage; future RollingStdev, PercentChange, ZScore) capture
+    the specific derivation logic. Embedded DerivedIndicator instances
+    declare their concrete subclass via `type:` per the
+    kanonak-protocol@1.1.0 embedded-type-must-narrow-range rule.
 
-Derivation:
+MovingAverage:
   type: rdfs.Class
-  label: Derivation
+  subClassOf: DerivedIndicator
+  label: Moving Average
   comment: >
-    A way of deriving an indicator from another indicator - simple moving
-    average, rolling standard deviation, percent-change-over-period,
-    z-score. Named instances below enumerate the v1 vocabulary; add new
-    instances when a new derivation is needed.
-
-derivation:
-  type: owl.ObjectProperty
-  domain: DerivedIndicator
-  range: Derivation
-  label: Derivation
-  comment: Which Derivation this DerivedIndicator computes.
+    Simple moving average of the source Indicator over `period` units of
+    `periodUnit`. The runtime computes by averaging the trailing `period`
+    observations.
 
 of:
   type: owl.ObjectProperty
@@ -1248,7 +1277,7 @@ period:
   label: Period
   comment: >
     The lookback period for the derivation, expressed in TimeUnit-units of
-    the periodUnit. For moving-average, the number of bars in the average
+    the periodUnit. For MovingAverage, the number of bars in the average
     (50, 200, etc.).
 
 periodUnit:
@@ -1257,14 +1286,6 @@ periodUnit:
   range: TimeUnit
   label: Period Unit
   comment: TimeUnit scaling `period`. Most commonly `trading-days`.
-
-moving-average:
-  type: Derivation
-  label: Moving Average
-  comment: >
-    Simple moving average of the source Indicator over `period` units of
-    `periodUnit`. The runtime computes by averaging the trailing `period`
-    observations.
 
 
 # =============================================================================
