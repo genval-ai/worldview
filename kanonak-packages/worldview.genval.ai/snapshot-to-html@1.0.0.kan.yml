@@ -1,0 +1,1526 @@
+snapshot-to-html:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 2.0.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.0.0
+          alias: docast
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+        - package: finance
+          match: ^
+          version: 1.0.0
+          alias: fin
+
+# =============================================================================
+# WorldviewSnapshot -> single-page HTML report.
+#
+# Each wv.WorldviewSnapshot input emits one self-contained HTML artifact:
+#   - inline CSS (no external assets)
+#   - dynamically-sized SVG confidence bars (raw 0..1 value -> bar fill)
+#   - per-thesis cards with progressive disclosure (<details>) for
+#     invalidation conditions + supporting evidence
+#   - type-specific evidence facts via is-set checks (no type branching;
+#     each subclass field is rendered when present)
+#   - evidence type / status / strength humanized via CSS pseudo-element
+#     content keyed on uri-name segments (no arithmetic / no comparisons
+#     in the DSL, so categorical encoding via uri-name + CSS is the
+#     mechanism)
+#   - confidenceRationale (when authored) rendered below confidence
+#   - previousSnapshot (when set) rendered as a header navigation hint
+#
+# Because the new ontology models invalidationCondition as a structured
+# Condition tree (vs the old prose form), v1 of this transformation
+# renders only a "structured condition is set" disclosure - full
+# recursive rendering of the condition tree is deferred until either
+# the transformations DSL supports recursion or aggregate transformations
+# land that can stream the structure out as a derived markdown summary.
+#
+# The whole body is one text-html RawBlock built via a single
+# tx.join("",  tx.concat(...))  expression. The HTML backend passes
+# text/html RawBlocks through verbatim, which is how this transformation
+# attains pixel-level control over layout, type, and SVG geometry.
+# =============================================================================
+
+snapshot-to-html-transformation:
+  type: tx.Transformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.requires:
+      - "worldview.genval.ai/core/observedAt"
+      - "worldview.genval.ai/core/narrative"
+      - "worldview.genval.ai/core/hasThesis"
+
+  tx.artifactName:
+    tx.kind: tx.string-literal
+    tx.stringLiteral: snapshot
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    tx.kind: tx.build-ast-node
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          tx.kind: tx.concat
+          tx.parts:
+            - tx.kind: tx.build-ast-node
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    tx.kind: tx.uri-literal
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    tx.kind: tx.join
+                    tx.separator: ""
+                    tx.items:
+                      tx.kind: tx.concat
+                      tx.parts:
+
+                        # =====================================================
+                        # STYLE BLOCK
+                        # Self-contained dark-mode dashboard CSS. Tokens at the
+                        # top so a future fork can re-skin in one place.
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            <style>
+                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--bg-input:#0c1220;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--weak:#64748b;--danger:#f87171;--border:#1e293b;--border-soft:#162033;--radius:8px;--radius-sm:4px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
+                            *{box-sizing:border-box;margin:0;padding:0}
+                            html{background:var(--bg)}
+                            body{background:var(--bg);color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+                            a{color:var(--accent);text-decoration:none}
+                            a:hover{color:var(--accent-2)}
+                            article.snapshot{max-width:1180px;margin:0 auto;padding:64px 32px 96px;counter-reset:thesis-counter}
+                            @media (max-width:760px){article.snapshot{padding:32px 20px 64px}}
+                            /* HERO */
+                            .hero{padding:0 0 56px;border-bottom:1px solid var(--border);position:relative;margin-bottom:56px}
+                            .hero::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                            .hero-meta{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:24px;flex-wrap:wrap;gap:8px}
+                            .hero-meta .eyebrow{color:var(--accent)}
+                            .hero h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                            @media (max-width:760px){.hero h1{font-size:42px}}
+                            .hero-narrative{font-size:19px;max-width:840px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                            /* THESIS RAIL */
+                            .thesis-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;list-style:none;padding:0 0 40px;margin-bottom:48px;border-bottom:1px solid var(--border)}
+                            .thesis-rail li a{display:flex;flex-direction:column;gap:10px;padding:14px 14px 16px;background:var(--bg-card);border-radius:var(--radius-sm);color:var(--fg-dim);transition:background 120ms,color 120ms,transform 120ms;border:1px solid var(--border-soft);height:100%;font-size:11px;line-height:1.35;font-family:var(--font-mono);letter-spacing:0.02em;text-transform:uppercase}
+                            .thesis-rail li a:hover{background:var(--bg-elev);color:var(--fg);transform:translateY(-1px);border-color:var(--accent-3)}
+                            .rail-bar{height:3px;border-radius:2px;background:var(--bg-elev);overflow:hidden;display:block}
+                            .rail-bar svg{display:block;width:100%;height:100%}
+                            .rail-fill{fill:var(--accent)}
+                            /* SWARM */
+                            .evidence-swarm{margin:0 0 56px;padding:32px;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-soft)}
+                            .evidence-swarm h2{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:6px}
+                            .evidence-swarm .swarm-sub{font-size:13px;color:var(--fg-faint);margin-bottom:20px}
+                            .swarm-grid{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:20px;padding:8px 0;min-height:32px}
+                            .swarm-dot{width:14px;height:14px;border-radius:3px;display:inline-block;transition:transform 120ms}
+                            .swarm-dot:hover{transform:scale(1.3)}
+                            .swarm-dot.s-evidence-strong{background:var(--strong)}
+                            .swarm-dot.s-evidence-moderate{background:var(--moderate)}
+                            .swarm-dot.s-evidence-weak{background:var(--weak)}
+                            .swarm-legend{display:flex;gap:20px;list-style:none;padding:0;font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);text-transform:uppercase;letter-spacing:0.08em;flex-wrap:wrap}
+                            .swarm-legend li{display:flex;align-items:center;gap:8px}
+                            .swarm-legend .dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+                            /* SECTION */
+                            section.theses h2.section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                            section.theses h2.section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                            /* THESIS CARD */
+                            .thesis-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:32px;margin-bottom:16px;counter-increment:thesis-counter;transition:border-color 120ms,box-shadow 120ms;position:relative}
+                            .thesis-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15)}
+                            .thesis-card.status-active::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--accent);border-radius:0 2px 2px 0}
+                            .thesis-card.status-retired::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--weak);border-radius:0 2px 2px 0}
+                            .thesis-card.status-invalidated::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--danger);border-radius:0 2px 2px 0}
+                            @media (max-width:760px){.thesis-card{padding:24px 20px}}
+                            .thesis-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+                            .thesis-num::before{content:counter(thesis-counter,decimal-leading-zero);font-family:var(--font-mono);color:var(--fg-faint);font-size:13px;letter-spacing:0.05em}
+                            .thesis-label{flex:1;font-family:var(--font-display);font-size:26px;font-weight:400;letter-spacing:-0.015em;line-height:1.2;color:var(--fg);min-width:200px}
+                            .status-pill{font-family:var(--font-mono);font-size:10px;padding:4px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;height:fit-content;align-self:center;white-space:nowrap}
+                            .status-pill.status-active{background:rgba(52,211,153,0.12);color:var(--strong)}
+                            .status-pill.status-retired{background:rgba(100,116,139,0.18);color:var(--fg-dim)}
+                            .status-pill.status-invalidated{background:rgba(248,113,113,0.12);color:var(--danger)}
+                            /* CONFIDENCE */
+                            .confidence-strip{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px 0 12px;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)}
+                            .confidence-meter{flex:1;height:10px;background:var(--bg-elev);border-radius:5px;overflow:hidden}
+                            .confidence-meter svg{display:block;width:100%;height:100%}
+                            .conf-fill{fill:url(#conf-gradient)}
+                            .confidence-label{font-family:var(--font-mono);font-size:12px;color:var(--fg-dim);min-width:90px;text-align:right;letter-spacing:0.04em}
+                            .confidence-label .conf-value{color:var(--fg);font-weight:600}
+                            /* STATEMENT */
+                            .thesis-statement{font-size:16px;line-height:1.7;color:var(--fg);margin-bottom:8px;font-weight:300;max-width:78ch}
+                            .confidence-rationale{font-size:13px;line-height:1.55;color:var(--fg-dim);margin:4px 0 12px;max-width:78ch;border-left:2px solid var(--accent);padding-left:12px}
+                            .confidence-rationale .rationale-label{color:var(--fg-faint);font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;margin-right:6px}
+                            .condition-type{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--bg-elev);padding:1px 6px;border-radius:3px}
+                            .invalidation-note{padding:4px 0 8px;color:var(--fg-dim);font-size:13px}
+                            .hero-prev{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);margin-top:8px;letter-spacing:0.06em}
+                            .hero-prev a{color:var(--accent);text-decoration:none}
+                            .hero-prev a:hover{text-decoration:underline}
+                            /* DETAILS */
+                            details{border-top:1px solid var(--border-soft);margin-top:20px;padding-top:4px}
+                            details > summary{cursor:pointer;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:var(--fg-dim);list-style:none;padding:14px 0;user-select:none;display:flex;align-items:center;gap:10px;transition:color 120ms}
+                            details > summary:hover{color:var(--fg)}
+                            details > summary::before{content:"";width:0;height:0;border-style:solid;border-width:4px 0 4px 6px;border-color:transparent transparent transparent var(--fg-faint);transition:transform 150ms,border-color 150ms;display:inline-block}
+                            details[open] > summary::before{transform:rotate(90deg);border-left-color:var(--accent)}
+                            details > summary::-webkit-details-marker{display:none}
+                            details > summary::after{content:"";flex:1;height:1px;background:linear-gradient(to right,var(--border-soft),transparent)}
+                            .invalidation > p{padding:8px 0 16px;font-style:italic;color:var(--fg-dim);line-height:1.65;max-width:78ch;border-left:2px solid var(--danger);padding-left:16px;margin:8px 0 16px}
+                            /* EVIDENCE LIST */
+                            .evidence-items{list-style:none;padding:8px 0 16px;display:flex;flex-direction:column;gap:0}
+                            .evidence-item{padding:14px 0 14px 20px;border-left:2px solid var(--border);position:relative;margin-left:4px}
+                            .evidence-item + .evidence-item{border-top:1px solid var(--border-soft);margin-top:0}
+                            .evidence-item.strength-evidence-strong{border-left-color:var(--strong)}
+                            .evidence-item.strength-evidence-moderate{border-left-color:var(--moderate)}
+                            .evidence-item.strength-evidence-weak{border-left-color:var(--weak)}
+                            .ev-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+                            .ev-strength{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+                            .ev-strength.strength-evidence-strong{background:var(--strong);box-shadow:0 0 6px rgba(52,211,153,0.4)}
+                            .ev-strength.strength-evidence-moderate{background:var(--moderate);box-shadow:0 0 6px rgba(251,191,36,0.4)}
+                            .ev-strength.strength-evidence-weak{background:var(--weak)}
+                            .ev-type{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--fg-dim);font-weight:600}
+                            .ev-type::before{content:attr(data-type-label)}
+                            .ev-time{font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-left:auto;letter-spacing:0.04em}
+                            .ev-statement{font-size:14px;line-height:1.6;color:var(--fg);margin-bottom:6px;max-width:78ch}
+                            .ev-facts{display:flex;flex-wrap:wrap;gap:6px 0;list-style:none;padding:0;margin-top:6px}
+                            .ev-fact{font-size:11px;font-family:var(--font-mono);display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;margin-right:6px;background:var(--bg-elev);border-radius:3px;border:1px solid var(--border-soft)}
+                            .ev-fact-label{color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.06em;font-size:9px;font-weight:600}
+                            .ev-fact-value{color:var(--fg);font-weight:500}
+                            /* Type label CSS-driven (uri-name -> readable) */
+                            .ev-type[data-type="MarketDataEvidence"]::before{content:"Market data"}
+                            .ev-type[data-type="AnalystEvidence"]::before{content:"Analyst"}
+                            .ev-type[data-type="CorporateEvidence"]::before{content:"Corporate"}
+                            .ev-type[data-type="PolicyEvidence"]::before{content:"Policy"}
+                            .ev-type[data-type="CentralBankEvidence"]::before{content:"Central bank"}
+                            .ev-type[data-type="GeopoliticalEvidence"]::before{content:"Geopolitical"}
+                            .ev-type[data-type="OfficialStatementEvidence"]::before{content:"Statement"}
+                            .ev-type[data-type="InstitutionalFlowEvidence"]::before{content:"Capital flow"}
+                            .ev-type[data-type="EconomicDataEvidence"]::before{content:"Economic data"}
+                            .ev-type[data-type=""]::before{content:"Evidence"}
+                            /* FOOTER */
+                            footer.snapshot-footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:8px}
+                            footer.snapshot-footer .snapshot-uri{color:var(--accent)}
+                            /* SVG defs once (gradient referenced by all confidence bars) */
+                            .svg-defs{position:absolute;width:0;height:0;overflow:hidden}
+                            </style>
+                            <svg class="svg-defs" aria-hidden="true"><defs><linearGradient id="conf-gradient" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0ea5e9"/><stop offset="0.5" stop-color="#7dd3fc"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs></svg>
+
+                        # =====================================================
+                        # ARTICLE OPEN + HERO
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |-
+                            <article class="snapshot">
+                            <header class="hero">
+                            <div class="hero-meta">
+                            <span class="eyebrow">Portfolio Ops &middot; Worldview Snapshot</span>
+                            <time datetime="
+                        - tx.kind: tx.property-read
+                          tx.readSource:
+                            tx.kind: tx.var-ref
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |-
+                            ">
+                        - tx.kind: tx.property-read
+                          tx.readSource:
+                            tx.kind: tx.var-ref
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </time>
+                            </div>
+                            <h1>Macro worldview</h1>
+                            <p class="hero-narrative">
+                        - tx.kind: tx.normalize
+                          tx.normKind: tx.trim-end
+                          tx.normSource:
+                            tx.kind: tx.property-read
+                            tx.readSource:
+                              tx.kind: tx.var-ref
+                              tx.varName: input
+                            tx.readProp: wv.narrative
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </p>
+
+                        # --- previousSnapshot link (optional) ---
+                        - tx.kind: tx.when
+                          tx.condition:
+                            tx.kind: tx.is-set
+                            tx.checkExpr:
+                              tx.kind: tx.property-read
+                              tx.readSource:
+                                tx.kind: tx.var-ref
+                                tx.varName: input
+                              tx.readProp: wv.previousSnapshot
+                          tx.thenBuild:
+                            tx.kind: tx.concat
+                            tx.parts:
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '<p class="hero-prev">&larr; Previous snapshot: '
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.property-read
+                                  tx.readSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: input
+                                  tx.readProp: wv.previousSnapshot
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '</p>'
+
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </header>
+
+                        # =====================================================
+                        # THESIS RAIL Ã¢â‚¬â€ one chip per thesis with mini bar
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            <ol class="thesis-rail">
+                        - tx.kind: tx.for-each
+                          tx.iterate:
+                            tx.kind: tx.property-read
+                            tx.readSource:
+                              tx.kind: tx.var-ref
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            tx.kind: tx.concat
+                            tx.parts:
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '<li><a href="#thesis-'
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.var-ref
+                                  tx.varName: thesisRef
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '"><span class="rail-bar"><svg viewBox="0 0 1 1" preserveAspectRatio="none"><rect x="0" y="0" width="'
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '" height="1" class="rail-fill"/></svg></span><span class="rail-label">'
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRef
+                                tx.readProp: rdfs.label
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |-
+                                  </span></a></li>
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </ol>
+
+                        # =====================================================
+                        # EVIDENCE SWARM Ã¢â‚¬â€ one dot per (thesis, evidence)
+                        # Visualizes evidence-by-strength gestalt without
+                        # arithmetic; sheer count is the chart.
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            <section class="evidence-swarm">
+                            <h2>Evidence at a glance</h2>
+                            <p class="swarm-sub">One mark per supporting evidence item across all theses, colored by strength.</p>
+                            <div class="swarm-grid">
+                        - tx.kind: tx.for-each
+                          tx.iterate:
+                            tx.kind: tx.property-read
+                            tx.readSource:
+                              tx.kind: tx.var-ref
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRefSwarm
+                          tx.emit:
+                            tx.kind: tx.for-each
+                            tx.iterate:
+                              tx.kind: tx.property-read
+                              tx.readSource:
+                                tx.kind: tx.resolve-ref
+                                tx.resolveSource:
+                                  tx.kind: tx.var-ref
+                                  tx.varName: thesisRefSwarm
+                              tx.readProp: wv.supportingEvidence
+                            tx.loopVar: evRefSwarm
+                            tx.emit:
+                              tx.kind: tx.concat
+                              tx.parts:
+                                - tx.kind: tx.string-literal
+                                  tx.stringLiteral: '<span class="swarm-dot s-'
+                                - tx.kind: tx.uri-name
+                                  tx.uriNameOf:
+                                    tx.kind: tx.property-read
+                                    tx.readSource:
+                                      tx.kind: tx.resolve-ref
+                                      tx.resolveSource:
+                                        tx.kind: tx.var-ref
+                                        tx.varName: evRefSwarm
+                                    tx.readProp: wv.evidenceStrength
+                                - tx.kind: tx.string-literal
+                                  tx.stringLiteral: '" title="'
+                                - tx.kind: tx.property-read
+                                  tx.readSource:
+                                    tx.kind: tx.resolve-ref
+                                    tx.resolveSource:
+                                      tx.kind: tx.var-ref
+                                      tx.varName: evRefSwarm
+                                  tx.readProp: wv.evidenceStatement
+                                - tx.kind: tx.string-literal
+                                  tx.stringLiteral: '"></span>'
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </div>
+                            <ul class="swarm-legend">
+                            <li><span class="dot" style="background:var(--strong)"></span>Strong</li>
+                            <li><span class="dot" style="background:var(--moderate)"></span>Moderate</li>
+                            <li><span class="dot" style="background:var(--weak)"></span>Weak</li>
+                            </ul>
+                            </section>
+
+                        # =====================================================
+                        # THESES SECTION
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            <section class="theses">
+                            <h2 class="section-title">Theses</h2>
+
+                        - tx.kind: tx.for-each
+                          tx.iterate:
+                            tx.kind: tx.property-read
+                            tx.readSource:
+                              tx.kind: tx.var-ref
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRefMain
+                          tx.emit:
+                            tx.kind: tx.concat
+                            tx.parts:
+
+                              # --- CARD OPEN ---
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '<article class="thesis-card status-'
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.property-read
+                                  tx.readSource:
+                                    tx.kind: tx.resolve-ref
+                                    tx.resolveSource:
+                                      tx.kind: tx.var-ref
+                                      tx.varName: thesisRefMain
+                                  tx.readProp: wv.status
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '" id="thesis-'
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.var-ref
+                                  tx.varName: thesisRefMain
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |-
+                                  ">
+
+                              # --- HEADER (num + label + status pill) ---
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |
+                                  <header class="thesis-header">
+                                  <span class="thesis-num"></span>
+                                  <h3 class="thesis-label">
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRefMain
+                                tx.readProp: rdfs.label
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |-
+                                  </h3>
+                                  <span class="status-pill status-
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.property-read
+                                  tx.readSource:
+                                    tx.kind: tx.resolve-ref
+                                    tx.resolveSource:
+                                      tx.kind: tx.var-ref
+                                      tx.varName: thesisRefMain
+                                  tx.readProp: wv.status
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '">'
+                              - tx.kind: tx.uri-name
+                                tx.uriNameOf:
+                                  tx.kind: tx.property-read
+                                  tx.readSource:
+                                    tx.kind: tx.resolve-ref
+                                    tx.resolveSource:
+                                      tx.kind: tx.var-ref
+                                      tx.varName: thesisRefMain
+                                  tx.readProp: wv.status
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |
+                                  </span>
+                                  </header>
+
+                              # --- CONFIDENCE STRIP (SVG bar with gradient) ---
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |-
+                                  <div class="confidence-strip">
+                                  <div class="confidence-meter">
+                                  <svg viewBox="0 0 1 1" preserveAspectRatio="none"><rect x="0" y="0" width="
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRefMain
+                                tx.readProp: wv.confidence
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |-
+                                  " height="1" class="conf-fill"/></svg>
+                                  </div>
+                                  <span class="confidence-label">Conf <span class="conf-value">
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRefMain
+                                tx.readProp: wv.confidence
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |
+                                  </span></span>
+                                  </div>
+
+                              # --- CONFIDENCE RATIONALE (optional, new in this version) ---
+                              - tx.kind: tx.when
+                                tx.condition:
+                                  tx.kind: tx.is-set
+                                  tx.checkExpr:
+                                    tx.kind: tx.property-read
+                                    tx.readSource:
+                                      tx.kind: tx.resolve-ref
+                                      tx.resolveSource:
+                                        tx.kind: tx.var-ref
+                                        tx.varName: thesisRefMain
+                                    tx.readProp: wv.confidenceRationale
+                                tx.thenBuild:
+                                  tx.kind: tx.concat
+                                  tx.parts:
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: '<p class="confidence-rationale"><span class="rationale-label">Why this confidence:</span> '
+                                    - tx.kind: tx.property-read
+                                      tx.readSource:
+                                        tx.kind: tx.resolve-ref
+                                        tx.resolveSource:
+                                          tx.kind: tx.var-ref
+                                          tx.varName: thesisRefMain
+                                      tx.readProp: wv.confidenceRationale
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: '</p>'
+
+                              # --- STATEMENT ---
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: '<p class="thesis-statement">'
+                              - tx.kind: tx.property-read
+                                tx.readSource:
+                                  tx.kind: tx.resolve-ref
+                                  tx.resolveSource:
+                                    tx.kind: tx.var-ref
+                                    tx.varName: thesisRefMain
+                                tx.readProp: wv.thesisStatement
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |
+                                  </p>
+
+                              # --- INVALIDATION (structured; v1 disclosure only) ---
+                              # invalidationCondition is now a structured Condition
+                              # tree (vs the old prose form). We render only the
+                              # top-level type as a hint; full recursive rendering
+                              # of the condition tree is deferred until either the
+                              # transformations DSL supports recursion or aggregate
+                              # transformations land that can stream the structure
+                              # out as a derived markdown summary.
+                              - tx.kind: tx.when
+                                tx.condition:
+                                  tx.kind: tx.is-set
+                                  tx.checkExpr:
+                                    tx.kind: tx.property-read
+                                    tx.readSource:
+                                      tx.kind: tx.resolve-ref
+                                      tx.resolveSource:
+                                        tx.kind: tx.var-ref
+                                        tx.varName: thesisRefMain
+                                    tx.readProp: wv.invalidationCondition
+                                tx.thenBuild:
+                                  tx.kind: tx.concat
+                                  tx.parts:
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: |-
+                                        <details class="invalidation">
+                                        <summary>Invalidation condition (configured)</summary>
+                                        <p class="invalidation-note">Structured invalidation condition of type <code class="condition-type">
+                                    - tx.kind: tx.uri-name
+                                      tx.uriNameOf:
+                                        tx.kind: tx.property-read
+                                        tx.readSource:
+                                          tx.kind: tx.property-read
+                                          tx.readSource:
+                                            tx.kind: tx.resolve-ref
+                                            tx.resolveSource:
+                                              tx.kind: tx.var-ref
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: wv.invalidationCondition
+                                        tx.readProp: rdfs.type
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: |
+                                        </code> set on this thesis. See source YAML for the full condition tree.</p>
+                                        </details>
+
+                              # --- SUPPORTING EVIDENCE (collapsible, open default) ---
+                              - tx.kind: tx.when
+                                tx.condition:
+                                  tx.kind: tx.is-set
+                                  tx.checkExpr:
+                                    tx.kind: tx.property-read
+                                    tx.readSource:
+                                      tx.kind: tx.resolve-ref
+                                      tx.resolveSource:
+                                        tx.kind: tx.var-ref
+                                        tx.varName: thesisRefMain
+                                    tx.readProp: wv.supportingEvidence
+                                tx.thenBuild:
+                                  tx.kind: tx.concat
+                                  tx.parts:
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: |
+                                        <details class="evidence-list" open>
+                                        <summary>Supporting evidence</summary>
+                                        <ol class="evidence-items">
+
+                                    # --- per-evidence loop ---
+                                    - tx.kind: tx.for-each
+                                      tx.iterate:
+                                        tx.kind: tx.property-read
+                                        tx.readSource:
+                                          tx.kind: tx.resolve-ref
+                                          tx.resolveSource:
+                                            tx.kind: tx.var-ref
+                                            tx.varName: thesisRefMain
+                                        tx.readProp: wv.supportingEvidence
+                                      tx.loopVar: evRef
+                                      tx.emit:
+                                        tx.kind: tx.concat
+                                        tx.parts:
+
+                                          # ITEM OPEN with strength class
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '<li class="evidence-item strength-'
+                                          - tx.kind: tx.uri-name
+                                            tx.uriNameOf:
+                                              tx.kind: tx.property-read
+                                              tx.readSource:
+                                                tx.kind: tx.resolve-ref
+                                                tx.resolveSource:
+                                                  tx.kind: tx.var-ref
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: |-
+                                              ">
+
+                                          # HEAD: strength dot + type label + observedAt
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '<header class="ev-head"><span class="ev-strength strength-'
+                                          - tx.kind: tx.uri-name
+                                            tx.uriNameOf:
+                                              tx.kind: tx.property-read
+                                              tx.readSource:
+                                                tx.kind: tx.resolve-ref
+                                                tx.resolveSource:
+                                                  tx.kind: tx.var-ref
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '"></span><span class="ev-type" data-type="'
+                                          - tx.kind: tx.uri-name
+                                            tx.uriNameOf:
+                                              tx.kind: tx.property-read
+                                              tx.readSource:
+                                                tx.kind: tx.resolve-ref
+                                                tx.resolveSource:
+                                                  tx.kind: tx.var-ref
+                                                  tx.varName: evRef
+                                              tx.readProp: rdfs.type
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '"></span>'
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.evidenceObservedAt
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<time class="ev-time">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.evidenceObservedAt
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</time>'
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: |-
+                                              </header>
+
+                                          # STATEMENT
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '<p class="ev-statement">'
+                                          - tx.kind: tx.property-read
+                                            tx.readSource:
+                                              tx.kind: tx.resolve-ref
+                                              tx.resolveSource:
+                                                tx.kind: tx.var-ref
+                                                tx.varName: evRef
+                                            tx.readProp: wv.evidenceStatement
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: |
+                                              </p>
+
+                                          # FACTS LIST Ã¢â‚¬â€ every type-specific
+                                          # field is a `when is-set` chip.
+                                          # Order roughly: who/what/when/value
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: '<ul class="ev-facts">'
+
+                                          # --- Securities-bearing fields ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.aboutSecurity
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Security</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.uri-name
+                                                  tx.uriNameOf:
+                                                    tx.kind: tx.property-read
+                                                    tx.readSource:
+                                                      tx.kind: tx.resolve-ref
+                                                      tx.resolveSource:
+                                                        tx.kind: tx.var-ref
+                                                        tx.varName: evRef
+                                                    tx.readProp: fin.aboutSecurity
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- MarketDataEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.marketMetric
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.marketMetric
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.observedValue
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Value</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.observedValue
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- AnalystEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.analystInstitution
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Source</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.analystInstitution
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.forecastTarget
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Target</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.uri-name
+                                                  tx.uriNameOf:
+                                                    tx.kind: tx.property-read
+                                                    tx.readSource:
+                                                      tx.kind: tx.resolve-ref
+                                                      tx.resolveSource:
+                                                        tx.kind: tx.var-ref
+                                                        tx.varName: evRef
+                                                    tx.readProp: fin.forecastTarget
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.forecastValue
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Forecast</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.forecastValue
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.forecastHorizon
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Horizon</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.forecastHorizon
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- CorporateEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.corporateMetric
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.corporateMetric
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.reportingPeriod
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Period</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.reportingPeriod
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- PolicyEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.issuingBody
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Issued by</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.issuingBody
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.policy
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Policy</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.policy
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.effectiveDate
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Effective</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.effectiveDate
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- CentralBankEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.centralBank
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Bank</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.centralBank
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.meetingDate
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Meeting</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.meetingDate
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.voteCount
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Vote</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.voteCount
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- GeopoliticalEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.eventLocation
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Location</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.eventLocation
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.partiesInvolved
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Parties</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.partiesInvolved
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.geopoliticalEventDate
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Date</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.geopoliticalEventDate
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- OfficialStatementEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.speaker
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Speaker</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.speaker
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.speakerRole
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Role</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.speakerRole
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.statementVenue
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Venue</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.statementVenue
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.statementDate
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Date</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.statementDate
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- InstitutionalFlowEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.flowInstitution
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Institution</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.flowInstitution
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.flowDirection
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Direction</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.flowDirection
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: fin.flowMagnitudeValue
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Magnitude</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: fin.flowMagnitudeValue
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # --- EconomicDataEvidence ---
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.indicatorName
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Indicator</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.indicatorName
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.indicatorValue
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Reading</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.indicatorValue
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          - tx.kind: tx.when
+                                            tx.condition:
+                                              tx.kind: tx.is-set
+                                              tx.checkExpr:
+                                                tx.kind: tx.property-read
+                                                tx.readSource:
+                                                  tx.kind: tx.resolve-ref
+                                                  tx.resolveSource:
+                                                    tx.kind: tx.var-ref
+                                                    tx.varName: evRef
+                                                tx.readProp: wv.indicatorPeriod
+                                            tx.thenBuild:
+                                              tx.kind: tx.concat
+                                              tx.parts:
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '<li class="ev-fact"><span class="ev-fact-label">Period</span><span class="ev-fact-value">'
+                                                - tx.kind: tx.property-read
+                                                  tx.readSource:
+                                                    tx.kind: tx.resolve-ref
+                                                    tx.resolveSource:
+                                                      tx.kind: tx.var-ref
+                                                      tx.varName: evRef
+                                                  tx.readProp: wv.indicatorPeriod
+                                                - tx.kind: tx.string-literal
+                                                  tx.stringLiteral: '</span></li>'
+
+                                          # close facts and item
+                                          - tx.kind: tx.string-literal
+                                            tx.stringLiteral: |-
+                                              </ul>
+                                              </li>
+
+                                    # close evidence list
+                                    - tx.kind: tx.string-literal
+                                      tx.stringLiteral: |
+                                        </ol>
+                                        </details>
+
+                              # --- CARD CLOSE ---
+                              - tx.kind: tx.string-literal
+                                tx.stringLiteral: |
+                                  </article>
+
+                        # close theses section
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </section>
+
+                        # =====================================================
+                        # FOOTER
+                        # =====================================================
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |-
+                            <footer class="snapshot-footer">
+                            <span>Generated from <span class="snapshot-uri">portfolio-ops.kanonak.com/worldview</span></span>
+                            <time datetime="
+                        - tx.kind: tx.property-read
+                          tx.readSource:
+                            tx.kind: tx.var-ref
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: '">'
+                        - tx.kind: tx.property-read
+                          tx.readSource:
+                            tx.kind: tx.var-ref
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - tx.kind: tx.string-literal
+                          tx.stringLiteral: |
+                            </time>
+                            </footer>
+                            </article>
