@@ -342,12 +342,18 @@ snapshot-to-html-transformation:
                             .cond-sequenced .cond-key,.cond-before .cond-key{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-faint);margin-right:8px}
                             .cond-available .cond-type{background:rgba(34,197,94,0.10);color:var(--strong)}
                             /* EVIDENCE LIST */
-                            /* PER-THESIS MINI TIMELINE — always-visible thin temporal strip above
-                               the collapsed evidence list. Communicates "where in time does this
-                               thesis's evidence sit" before the reader expands the full list. */
+                            /* SUPPORTING EVIDENCE SECTION — explicit wrapper containing the heading,
+                               always-visible mini timeline, and the collapsible card list. Visually
+                               disambiguates the timeline as belonging to evidence (not invalidation). */
+                            .evidence-section{margin-top:24px}
+                            .ev-section-heading{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:14px;font-weight:500;display:flex;align-items:center;gap:12px}
+                            .ev-section-heading::after{content:"";flex:1;height:1px;background:var(--border)}
+                            /* PER-THESIS MINI TIMELINE — always-visible thin temporal strip below
+                               the heading. Communicates "where in time does this thesis's evidence
+                               sit" before the reader expands the full card list. */
                             .ev-timeline-mini{margin:0 0 14px 0;padding:10px 14px 8px;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;position:relative;overflow:hidden}
                             .ev-timeline-mini::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
-                            .ev-timeline-mini svg{display:block;width:100%;height:48px}
+                            .ev-timeline-mini svg{display:block;width:100%;height:auto}
                             .ev-timeline-mini .mini-axis{stroke:rgba(148,163,184,0.20);stroke-width:1}
                             .ev-timeline-mini .mini-tick{stroke:rgba(148,163,184,0.30);stroke-width:1}
                             .ev-timeline-mini .mini-tick-label{font-family:var(--font-mono);font-size:9px;fill:var(--fg-faint);letter-spacing:0.05em}
@@ -1684,9 +1690,15 @@ snapshot-to-html-transformation:
                                 tx.thenBuild:
                                   type: tx.Concat
                                   tx.parts:
-                                    # Empty placeholder for the always-visible per-thesis mini timeline.
-                                    # Populated by inline JS that walks the rendered evidence-item LIs
-                                    # for date + strength + thesis hue.
+                                    # Wrapper section opens here so the heading + timeline + collapsible
+                                    # card list all sit visually inside one Supporting evidence block.
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: |-
+                                        <section class="evidence-section">
+                                        <h4 class="ev-section-heading">Supporting evidence</h4>
+
+                                    # Always-visible per-thesis mini timeline. Populated by inline JS
+                                    # that walks the rendered evidence-item LIs for date + strength.
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: '<div class="ev-timeline-mini" data-thesis-name="'
                                     - type: tx.UriName
@@ -1715,12 +1727,18 @@ snapshot-to-html-transformation:
                                         tx.varName: input
                                       tx.readProp: wv.observedAt
                                     - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-snapshot-version="'
+                                    - type: tx.UriVersion
+                                      tx.uriVersionOf:
+                                        type: tx.VarRef
+                                        tx.varName: input
+                                    - type: tx.StringLiteral
                                       tx.stringLiteral: '"></div>'
 
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
                                         <details class="evidence-list">
-                                        <summary>Supporting evidence</summary>
+                                        <summary>Show evidence cards</summary>
                                         <ol class="evidence-items">
 
                                     # --- per-evidence loop ---
@@ -2910,11 +2928,12 @@ snapshot-to-html-transformation:
                                               </ul>
                                               </li>
 
-                                    # close evidence list
+                                    # close evidence list + wrapping evidence-section
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
                                         </ol>
                                         </details>
+                                        </section>
 
                               # --- CARD CLOSE ---
                               - type: tx.StringLiteral
@@ -3075,20 +3094,21 @@ snapshot-to-html-transformation:
                                   var span=tMax-tMin;
                                   var pad=span*0.04;
                                   var t0=tMin-pad, t1=tMax+pad;
-                                  // SVG geometry
-                                  var W=600, H=48, Mh={left:8, right:8, top:6, bottom:14};
+                                  // SVG geometry — viewBox sized to the actual rendered width so circles
+                                  // stay round, ticks stay vertical, no distortion. Fall back to 1100 if
+                                  // clientWidth is unavailable (display:none parents, etc.).
+                                  var measuredW=Math.max(360, host.clientWidth-28);
+                                  var W=measuredW, H=48, Mh={left:8, right:8, top:6, bottom:14};
                                   var iW=W-Mh.left-Mh.right;
                                   var axisY=H-Mh.bottom;
                                   function xS(t){return Mh.left+((t-t0)/(t1-t0))*iW;}
-                                  // Tint the left strip with the theme hue (the ::before pseudo-element)
-                                  host.style.setProperty('--theme-strip','hsla('+hue+', 60%, 60%, 0.5)');
-                                  // CSS pseudo-element pulls from this; use a small inline style override so
-                                  // the strip color is per-thesis without hardcoding.
-                                  // Use a direct style attribute to inline rather than rely on CSS var.
+                                  // Theme hue tint on the section's left edge so the strip visually
+                                  // belongs to its thesis without overpowering the strength colors of
+                                  // the markers themselves.
                                   host.style.borderLeft='3px solid hsla('+hue+', 50%, 50%, 0.55)';
                                   host.style.background='linear-gradient(to right, hsla('+hue+', 50%, 50%, 0.06), var(--bg-elev) 8%)';
                                   var p=[];
-                                  p.push('<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">');
+                                  p.push('<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">');
                                   // Axis baseline
                                   p.push('<line class="mini-axis" x1="'+Mh.left+'" x2="'+(W-Mh.right)+'" y1="'+axisY+'" y2="'+axisY+'"/>');
                                   // Tick scale: pick day/week/month based on span
@@ -3102,11 +3122,14 @@ snapshot-to-html-transformation:
                                     p.push('<line class="mini-tick" x1="'+x+'" x2="'+x+'" y1="'+(axisY-3)+'" y2="'+(axisY+3)+'"/>');
                                     p.push('<text class="mini-tick-label" x="'+x+'" y="'+(H-3)+'" text-anchor="middle">'+fmtFn(d)+'</text>');
                                   });
-                                  // Snapshot vertical line
+                                  // Snapshot vertical line + version label (e.g. "v1.0.4")
+                                  var snapVer=host.dataset.snapshotVersion||'';
                                   if(snapAt && snapAt.getTime()>=t0 && snapAt.getTime()<=t1){
                                     var sx=xS(snapAt.getTime());
                                     p.push('<line class="mini-snap" x1="'+sx+'" x2="'+sx+'" y1="2" y2="'+axisY+'"/>');
-                                    p.push('<text class="mini-snap-label" x="'+(sx+3)+'" y="9">SNAP</text>');
+                                    var labelX=sx+4, anchor='start';
+                                    if(sx>W*0.85){labelX=sx-4; anchor='end';}
+                                    p.push('<text class="mini-snap-label" x="'+labelX+'" y="9" text-anchor="'+anchor+'">v'+escapeAttr(snapVer)+'</text>');
                                   }
                                   // Markers — strength-colored, stems back to baseline
                                   // Same-day collisions get small Y jitter (alternating lanes, all above the line)
