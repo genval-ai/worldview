@@ -284,53 +284,45 @@ changes-transformation:
                                   # status values. UriName flattens both sides
                                   # to local-name strings so Equals does a
                                   # straight string compare.
-                                  #
-                                  # Inverted shape (statuses MATCH → empty;
-                                  # statuses DIFFER → emit) — works around the
-                                  # validator's mis-resolution of tx.Not.tx.operand
-                                  # to wv.NotCondition.operand. Same semantic
-                                  # result without using tx.Not at all.
                                   tx.condition:
-                                    type: tx.Equals
-                                    tx.compareLeft:
-                                      # prev's status URI name: lookup prev thesis
-                                      # ref by URI in prev.hasThesis, ResolveRef,
-                                      # read wv.status, take its UriName.
-                                      type: tx.UriName
-                                      tx.uriNameOf:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.ResolveRef
-                                          tx.resolveSource:
-                                            type: tx.ListItemAt
-                                            tx.source:
-                                              type: tx.Filter
+                                    type: tx.Not
+                                    tx.operand:
+                                      type: tx.Equals
+                                      tx.compareLeft:
+                                        # prev's status URI name: lookup prev thesis
+                                        # ref by URI in prev.hasThesis, ResolveRef,
+                                        # read wv.status, take its UriName.
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.ListItemAt
                                               tx.source:
-                                                type: tx.PropertyRead
-                                                tx.readSource: { type: tx.VarRef, tx.varName: prev }
-                                                tx.readProp: wv.hasThesis
-                                              tx.loopVar: prevRef
-                                              tx.predicate:
-                                                type: tx.Equals
-                                                tx.compareLeft: { type: tx.VarRef, tx.varName: prevRef }
-                                                tx.compareRight: { type: tx.VarRef, tx.varName: currThesisRef }
-                                            tx.itemIndex: { type: tx.IntegerLiteral, tx.integerLiteral: 0 }
-                                        tx.readProp: wv.status
-                                    tx.compareRight:
-                                      # curr's status URI name: ResolveRef directly
-                                      # on currThesisRef, read wv.status, take UriName.
-                                      type: tx.UriName
-                                      tx.uriNameOf:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.ResolveRef
-                                          tx.resolveSource: { type: tx.VarRef, tx.varName: currThesisRef }
-                                        tx.readProp: wv.status
+                                                type: tx.Filter
+                                                tx.source:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource: { type: tx.VarRef, tx.varName: prev }
+                                                  tx.readProp: wv.hasThesis
+                                                tx.loopVar: prevRef
+                                                tx.predicate:
+                                                  type: tx.Equals
+                                                  tx.compareLeft: { type: tx.VarRef, tx.varName: prevRef }
+                                                  tx.compareRight: { type: tx.VarRef, tx.varName: currThesisRef }
+                                              tx.itemIndex: { type: tx.IntegerLiteral, tx.integerLiteral: 0 }
+                                          tx.readProp: wv.status
+                                      tx.compareRight:
+                                        # curr's status URI name: ResolveRef directly
+                                        # on currThesisRef, read wv.status, take UriName.
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource: { type: tx.VarRef, tx.varName: currThesisRef }
+                                          tx.readProp: wv.status
                                   tx.thenBuild:
-                                    # Statuses match — no transition to render
-                                    type: tx.StringLiteral
-                                    tx.stringLiteral: ""
-                                  tx.elseBuild:
                                     # Statuses differ — emit the transition row
                                     type: tx.Concat
                                     tx.parts:
@@ -550,24 +542,14 @@ changes-transformation:
                                           tx.readProp: wv.hasThesis
                                         tx.loopVar: prevThesisRef
                                         tx.predicate:
-                                          # When-based "NOT Contains" — pass-through false
-                                          # if curr contains the ref, true otherwise.
-                                          # Avoids tx.Not which currently mis-resolves
-                                          # to wv.NotCondition.operand.
-                                          type: tx.When
-                                          tx.condition:
+                                          type: tx.Not
+                                          tx.operand:
                                             type: tx.Contains
                                             tx.haystack:
                                               type: tx.PropertyRead
                                               tx.readSource: { type: tx.VarRef, tx.varName: curr }
                                               tx.readProp: wv.hasThesis
                                             tx.needle: { type: tx.VarRef, tx.varName: prevThesisRef }
-                                          tx.thenBuild:
-                                            type: tx.BooleanLiteral
-                                            tx.booleanLiteral: false
-                                          tx.elseBuild:
-                                            type: tx.BooleanLiteral
-                                            tx.booleanLiteral: true
                                       tx.loopVar: prevThesisRef
                                       tx.emit:
                                         type: tx.Concat
