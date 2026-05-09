@@ -307,6 +307,11 @@ jobs:
           <span>Finance-domain extension &mdash; Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), the Security class with named instances, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, FiscalPeriod, ForecastHorizon, FlowDirection).</span>
           <a href="/finance/1.0.0.kan.yml">finance/1.0.0.kan.yml &rarr;</a>
           </li>
+          <li>
+          <code>worldview.genval.ai/visual</code>
+          <span>Visual extension &mdash; the <code>Theme</code> class and <code>thesisTheme</code> property that color-code each <code>WorldviewThesis</code> by domain (defense, energy, monetary, inflation, gold, ai, equity, geopolitical), each carrying an HSL hue. Drives the inline thesis icons on the snapshot view and (forthcoming) the regime portrait.</span>
+          <a href="/visual/1.0.0.kan.yml">visual/1.0.0.kan.yml &rarr;</a>
+          </li>
           </ul>
           </section>
 

@@ -13,6 +13,10 @@ snapshot:
           match: ^
           version: 1.0.0
           alias: fin
+        - package: visual
+          match: ^
+          version: 1.0.0
+          alias: vis
 
 # =============================================================================
 # Worldview snapshot - 2026-05-09 17:00 UTC (Saturday afternoon)
@@ -74,6 +78,7 @@ iran-war-rearmament:
   label: Iran war rearmament cycle
   thesisStatement: 'The US-Iran war that began Feb 28 2026 (Operation Epic Fury) triggered a multi-year defense spending cycle that benefits prime contractors with missile and missile-defense exposure regardless of whether the May 6 14-point MOU framework holds and whether the Pakistan-mediated 2-week ceasefire converts to a durable peace, because depleted munitions stockpiles must be replenished and Golden Dome ($185B) is now a multi-year program. The procurement cycle persists through diplomatic resolution unless DoD outlays meaningfully reverse.'
   confidence: 0.72
+  vis.thesisTheme: vis.theme-defense
   status: wv.active
   confidenceRationale: 'Down to 0.72 from 0.75. Iran-deal mechanics now have a concrete 48-hour response window on the 14-point MOU, and Hormuz first-vessel transit firing materially increases the political odds of the wider Iran-deal landing. Procurement-cycle thesis remains decoupled from peace by design (committed backlogs at LMT $194B and RTX $271B are multi-year), but the easier and faster the diplomatic resolution becomes, the more political risk to FY2027 Pentagon outlay growth as the post-war drawdown narrative gets ammunition.'
   supportingEvidence:
@@ -106,6 +111,7 @@ persistent-energy-shock:
   label: Persistent energy premium
   thesisStatement: Oil prices remain structurally elevated as long as the Strait of Hormuz reopening sequence is incomplete and Iranian retaliation risk is intact. The May 8 close (WTI $95.33) reflects a partial unwinding of the wartime premium following the Pakistan-mediated 2-week ceasefire and 14-point MOU framework, but the supply-side reset hasn't materialized and Goldman's $77.50 Brent target sits 25%+ below spot.
   confidence: 0.3
+  vis.thesisTheme: vis.theme-energy
   status: wv.active
   confidenceRationale: 'Stepped down from 0.40 to 0.30. The SequencedCondition first leg (durable Hormuz reopening) materially started firing this morning - the Qatar LNG tanker began transiting the strait, the first vessel movement since the conflict, with IRGC navy publicly committing to "safe and sustainable transit facilitated" under new procedures. This is not yet "durable" reopening (1,550+ vessels still trapped, full pre-war flow analysts say is months/years away), but the binary state of "is Hormuz open" flipped today. WTI prints Monday will be the first market reaction; if WTI drops below $80 and stays for 30 days, the OrCondition fires and this thesis invalidates.'
   supportingEvidence:
@@ -146,6 +152,7 @@ stagflation-risk:
   label: Stagflation risk and Fed independence stress
   thesisStatement: 'The Fed faces a hard mandate balance with energy-driven inflation moderating only on the May ceasefire and unemployment at 4.3-4.4%. Political pressure on Fed independence intensifies into the May 15 transition - 8-4 dissent on April 29 was the highest since 1992, the Senate Banking 13-11 party-line advance was historically partisan for a Fed Chair nominee, and Trump rate-cut pressure is sustained. Real assets and defensive positioning benefit; long duration is exposed.'
   confidence: 0.6
+  vis.thesisTheme: vis.theme-inflation
   status: wv.active
   confidenceRationale: 'Stepped down from 0.65 to 0.60 on the May 8 NFP print (115K vs 185K March, AHE +3.6% YoY vs +3.8% expected). Soft labor and easing wage pressure relax the stagflation case on the inflation side; 10y eased to 4.38%. Fed-independence side intact - Warsh full-Senate vote Monday May 11.'
   supportingEvidence:
@@ -201,6 +208,7 @@ gold-debasement-bid:
   label: Gold structural debasement bid
   thesisStatement: 'Gold sits in mid-cycle of a multi-year structural bull market driven by central-bank buying, sovereign de-dollarization, $39T US debt, stock-bond correlation breakdown, and Fed independence concerns. Q1 2026 set records on multiple dimensions - LBMA quarterly average $4,873/oz, central-bank net purchases 244 tonnes (highest Q1 ever, +17% QoQ), aggregate Q1 demand value $193B. Spot held above $4,700 May 8 even as oil retreated. Major bank targets all imply materially higher levels (JPM $5,055-$6,300, UBS $6,200, Citi $5,000-$7,000).'
   confidence: 0.82
+  vis.thesisTheme: vis.theme-gold
   status: wv.active
   confidenceRationale: 'Down to 0.82 from 0.85. The Hormuz first-vessel transit and 48-hour Iran-deal response window mean the durable-peace leg of the AndCondition invalidation has its first concrete near-term path. Still requires Fed-credibility-restored AND deficit-trajectory-reversal to fire (both far away), so the thesis is structurally robust - but the durable-peace leg getting closer reduces the joint probability of all three remaining far simultaneously. Mon WTI/gold prints will be informative.'
   supportingEvidence:
@@ -235,6 +243,7 @@ ai-capex-cycle-with-china-tail:
   label: AI capex sustained but with China decoupling tail risk
   thesisStatement: 'Hyperscaler AI capex continues at elevated pace into 2026 (NVDA $725B+, Gartner $1.3T+ semis with 30% AI share). AMD Q1 2026 (May 5 AH) materially confirmed the thesis - revenue $10.3B vs $9.88B consensus, Data Center +57% YoY at $5.8B vs $5.4B consensus, Q2 guide $11.2B vs $10.3B consensus. NVIDIA China revenue remains effectively zero structurally; the H20 / MI308 15% revenue-share deal partially monetizes the export-control impairment. Tail risk remains escalation of US-China export controls beyond H20.'
   confidence: 0.85
+  vis.thesisTheme: vis.theme-ai
   status: wv.active
   confidenceRationale: 'Up to 0.85 from 0.75. The AMD Q1 print and Q2 guide held through the next trading day; data-center momentum is corroborated and not a one-print event. Only surviving invalidation path is China export-control extension (the named tail). NVDA Q1 FY2027 prints May 20 - the next material datapoint.'
   supportingEvidence:
@@ -259,6 +268,7 @@ equity-melt-up-vs-recession-risk:
   label: Equity melt-up versus building recession risk
   thesisStatement: 'S&P 500 closed at a fresh ATH 7,389.24 on May 8 (+0.71%) with VIX 17.18 - sustained risk-on as the Iran ceasefire holds and oil retreats. Q1 2026 earnings season concluded at 84% beat rate (highest since Q2 2021), 27.1% blended EPS growth, blended net margin (May 7 FactSet refresh) 13.4%. The melt-up case dominates the misplaced-euphoria warning at this point; invalidation requires either a vol-expansion break (VIX > 25 with SPY breaking 50d MA) or unimpeded melt-up confirmation (SPX > 7,300 with VIX < 15).'
   confidence: 0.78
+  vis.thesisTheme: vis.theme-equity
   status: wv.active
   confidenceRationale: 'Up to 0.78 from 0.75. Six straight winning weeks for SPX (+2.3% week, +0.84% Friday closing 7,398.93) and Nasdaq (+4.5% week, +1.71% Friday closing 26,247.08) - both closing at fresh ATHs - extends the melt-up confirmation past a single-print read. VIX 17.08 keeps the vol-break leg of invalidation comfortably distant.'
   supportingEvidence:
@@ -322,6 +332,7 @@ powell-warsh-transition-risk:
   label: Fed leadership transition policy uncertainty
   thesisStatement: 'Senate cloture vote on Warsh scheduled Monday May 11 at 5:30 PM ET. Republicans hold a 53-seat majority and Sen. Fetterman (D-PA) signaled support, so confirmation is effectively locked in before Powell''s chair-term expiry May 15. The transition window through August FOMC is structurally higher-vol than normal because every Warsh comment will be priced as new information; the 13-11 party-line Banking Committee advance was the first fully partisan Fed-Chair vote in committee history. Warsh confirmation-hearing framing - "won''t be sock puppet" / "room to cut without inflation" - introduces a dovish-tilt risk to the dollar / long-duration cross.'
   confidence: 0.5
+  vis.thesisTheme: vis.theme-monetary
   status: wv.active
   confidenceRationale: 'Stepped down from 0.55 to 0.50. Cloture timing is now specific (Monday 5:30 PM ET) and Fetterman''s yes signal makes the vote outcome a near-certainty rather than a contested event - the binary "does Warsh get confirmed" risk collapses, leaving only the "what does Warsh do once confirmed" risk premium. That second part is what the next 30 days price.'
   supportingEvidence:

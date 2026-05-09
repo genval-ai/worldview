@@ -1,5 +1,6 @@
 core/1.0.0
 finance/1.0.0
+visual/1.0.0
 snapshot-to-html/1.0.0
 landing-page/1.0.0
 timeline/1.0.0

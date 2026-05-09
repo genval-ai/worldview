@@ -31,6 +31,10 @@ snapshot-to-html:
           match: ^
           version: 1.0.0
           alias: fin
+        - package: visual
+          match: ^
+          version: 1.0.0
+          alias: vis
 
 # =============================================================================
 # WorldviewSnapshot -> single-page HTML report.
@@ -230,7 +234,9 @@ snapshot-to-html-transformation:
                             .thesis-card.status-invalidated::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--danger);border-radius:0 2px 2px 0}
                             @media (max-width:760px){.thesis-card{padding:24px 20px}}
                             .thesis-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-                            .thesis-num::before{content:counter(thesis-counter,decimal-leading-zero);font-family:var(--font-mono);color:var(--fg-faint);font-size:13px;letter-spacing:0.05em}
+                            /* THESIS ICON — confidence-arc disc, hue=theme, stroke=status. Inline JS draws the SVG from data attributes. */
+                            .thesis-icon{display:inline-block;width:28px;height:28px;flex-shrink:0;margin-top:6px}
+                            .thesis-icon svg{display:block;width:100%;height:100%;overflow:visible}
                             .thesis-label{flex:1;font-family:var(--font-display);font-size:26px;font-weight:400;letter-spacing:-0.015em;line-height:1.2;color:var(--fg);min-width:200px}
                             .status-pill{font-family:var(--font-mono);font-size:10px;padding:4px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;height:fit-content;align-self:center;white-space:nowrap}
                             .status-pill.status-active{background:rgba(52,211,153,0.12);color:var(--strong)}
@@ -600,11 +606,46 @@ snapshot-to-html-transformation:
                                 tx.stringLiteral: |-
                                   ">
 
-                              # --- HEADER (num + label + status pill) ---
+                              # --- HEADER (icon + label + status pill) ---
                               - type: tx.StringLiteral
-                                tx.stringLiteral: |
+                                tx.stringLiteral: |-
                                   <header class="thesis-header">
-                                  <span class="thesis-num"></span>
+                                  <span class="thesis-icon" data-confidence="
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRefMain
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" data-theme-hue="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRefMain
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" data-status="'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRefMain
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  "></span>
                                   <h3 class="thesis-label">
                               - type: tx.PropertyRead
                                 tx.readSource:
@@ -2831,6 +2872,43 @@ snapshot-to-html-transformation:
                               }
                               walk(document.body);
                               if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                              // Render thesis-icon SVGs — arc disc whose fill = confidence,
+                              // hue = thesisTheme, stroke style = status. Same primitive at every
+                              // size; here we render compact (28px) inline next to each thesis label.
+                              (function(){
+                                function arcPath(cx,cy,r,startDeg,endDeg){
+                                  var s=(startDeg-90)*Math.PI/180, e=(endDeg-90)*Math.PI/180;
+                                  var x1=cx+r*Math.cos(s), y1=cy+r*Math.sin(s);
+                                  var x2=cx+r*Math.cos(e), y2=cy+r*Math.sin(e);
+                                  var large=(endDeg-startDeg)>180?1:0;
+                                  return 'M '+x1+' '+y1+' A '+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2;
+                                }
+                                document.querySelectorAll('.thesis-icon').forEach(function(el){
+                                  var conf=parseFloat(el.dataset.confidence);
+                                  var hue=parseInt(el.dataset.themeHue,10);
+                                  var status=el.dataset.status||'active';
+                                  if(isNaN(conf)) conf=0;
+                                  if(isNaN(hue)) hue=210;
+                                  var size=28, cx=size/2, cy=size/2, r=11, sw=2.5;
+                                  var ringStroke='hsl('+hue+', 28%, 26%)';
+                                  var arcStroke='hsl('+hue+', 60%, 62%)';
+                                  if(status==='invalidated') arcStroke='hsl(0, 60%, 60%)';
+                                  var dashAttr=(status==='retired'?' stroke-dasharray="2.5,2"':'');
+                                  var arc;
+                                  if(conf>=0.999){
+                                    arc='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+arcStroke+'" stroke-width="'+sw+'"'+dashAttr+'/>';
+                                  } else if(conf<=0.001){
+                                    arc='';
+                                  } else {
+                                    var p=arcPath(cx,cy,r,0,conf*359.999);
+                                    arc='<path d="'+p+'" fill="none" stroke="'+arcStroke+'" stroke-width="'+sw+'" stroke-linecap="round"'+dashAttr+'/>';
+                                  }
+                                  var center='<circle cx="'+cx+'" cy="'+cy+'" r="2" fill="'+arcStroke+'" opacity="0.6"/>';
+                                  var ring='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+ringStroke+'" stroke-width="1.2"/>';
+                                  el.innerHTML='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" aria-hidden="true">'+ring+arc+center+'</svg>';
+                                  el.setAttribute('title',(conf*100).toFixed(0)+'% · '+(status==='active'?'active':status));
+                                });
+                              })();
                               // Augment each thesis-card's evidence-count chip with a strength + cited
                               // breakdown — counted from the rendered evidence-item DOM. This signals
                               // 'there is real audit data here' without requiring the reader to expand

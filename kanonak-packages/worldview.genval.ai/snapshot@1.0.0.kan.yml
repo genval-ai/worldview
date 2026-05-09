@@ -13,6 +13,10 @@ snapshot:
           match: ^
           version: 1.0.0
           alias: fin
+        - package: visual
+          match: ^
+          version: 1.0.0
+          alias: vis
 
 # =============================================================================
 # Worldview snapshot - 2026-05-04
@@ -45,6 +49,7 @@ ai-capex-cycle-with-china-tail:
   label: AI capex sustained but with China decoupling tail risk
   thesisStatement: 'Hyperscaler AI capex continues at high pace into 2026, with AMD Data Center growth as the near-term tell. The China decoupling tail risk is real but partially monetized via the US-government 15% revenue-share deal on H20 / MI308 sales. AMD Q1 2026 (printing May 5 after-hours) is the immediate inflection - DC revenue above $5.4B confirms the strong-state thesis; below softens.'
   confidence: 0.5
+  vis.thesisTheme: vis.theme-ai
   status: wv.active
   supportingEvidence:
     - ev-amd-q4-data-center-record
