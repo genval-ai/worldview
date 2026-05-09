@@ -208,8 +208,20 @@ snapshot-to-html-transformation:
                             .swarm-legend li{display:flex;align-items:center;gap:8px}
                             .swarm-legend .dot{width:10px;height:10px;border-radius:2px;display:inline-block}
                             /* SECTION */
-                            section.theses h2.section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                            section.theses h2.section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:16px;display:flex;align-items:center;gap:12px}
                             section.theses h2.section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                            section.theses .section-lead{font-size:14px;color:var(--fg-dim);line-height:1.7;margin-bottom:32px;font-weight:300}
+                            section.theses .section-lead code{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:rgba(125,211,252,0.08);padding:1px 6px;border-radius:3px;border:1px solid rgba(125,211,252,0.2)}
+                            section.theses .section-lead em{color:var(--fg-dim);font-style:italic}
+                            /* EVIDENCE COUNT CHIP — visible on every thesis card header (always, even when supporting-evidence details are collapsed) */
+                            .ev-count-chip{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);background:var(--bg-elev);border:1px solid var(--border);padding:3px 10px;border-radius:4px;letter-spacing:0.05em;display:inline-flex;align-items:center;gap:8px;align-self:center;flex-shrink:0;white-space:nowrap}
+                            .ev-count-chip .ev-count-num{color:var(--fg);font-weight:600}
+                            .ev-count-chip .ev-count-label{text-transform:uppercase;font-size:10px;letter-spacing:0.08em;color:var(--fg-faint)}
+                            .ev-count-chip .ev-count-breakdown{font-size:10px;color:var(--fg-faint);letter-spacing:0.04em;display:inline-flex;gap:6px;align-items:center;border-left:1px solid var(--border);padding-left:8px;margin-left:2px}
+                            .ev-count-chip .ev-count-breakdown .ev-strong{color:var(--strong)}
+                            .ev-count-chip .ev-count-breakdown .ev-moderate{color:var(--moderate)}
+                            .ev-count-chip .ev-count-breakdown .ev-weak{color:var(--weak)}
+                            .ev-count-chip .ev-count-breakdown .ev-cited{color:var(--accent)}
                             /* THESIS CARD */
                             .thesis-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:32px;margin-bottom:16px;counter-increment:thesis-counter;transition:border-color 120ms,box-shadow 120ms;position:relative}
                             .thesis-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15)}
@@ -552,6 +564,7 @@ snapshot-to-html-transformation:
                           tx.stringLiteral: |
                             <section class="theses">
                             <h2 class="section-title">Theses</h2>
+                            <p class="section-lead">Each thesis below carries a machine-evaluable <code>invalidationCondition</code> — a typed condition tree (<code>AND</code> / <code>OR</code> / <code>Threshold</code> / <code>Event</code> / <code>Sequenced</code>) that defines exactly when the claim should be considered broken — plus typed, citation-backed Evidence. Click a thesis's <em>Supporting evidence</em> to see the audit trail behind the confidence.</p>
 
                         - type: tx.ForEach
                           tx.source:
@@ -625,8 +638,27 @@ snapshot-to-html-transformation:
                                       tx.varName: thesisRefMain
                                   tx.readProp: wv.status
                               - type: tx.StringLiteral
-                                tx.stringLiteral: |
+                                tx.stringLiteral: |-
                                   </span>
+                                  <span class="ev-count-chip" data-thesis-name="
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.VarRef
+                                  tx.varName: thesisRefMain
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '"><span class="ev-count-num">'
+                              - type: tx.Count
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRefMain
+                                  tx.readProp: wv.supportingEvidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </span><span class="ev-count-label">evidence</span></span>
                                   </header>
 
                               # --- CONFIDENCE STRIP (SVG bar with gradient) ---
@@ -726,7 +758,7 @@ snapshot-to-html-transformation:
                                   tx.parts:
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |-
-                                        <details class="invalidation">
+                                        <details class="invalidation" open>
                                         <summary>Invalidation condition</summary>
                                         <div class="cond-tree">
 
@@ -2799,6 +2831,34 @@ snapshot-to-html-transformation:
                               }
                               walk(document.body);
                               if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                              // Augment each thesis-card's evidence-count chip with a strength + cited
+                              // breakdown — counted from the rendered evidence-item DOM. This signals
+                              // 'there is real audit data here' without requiring the reader to expand
+                              // the supporting-evidence details first.
+                              document.querySelectorAll('.thesis-card').forEach(function(card){
+                                var chip=card.querySelector('.ev-count-chip');
+                                if(!chip) return;
+                                var items=card.querySelectorAll('.evidence-item');
+                                if(!items.length) return;
+                                var strong=0, moderate=0, weak=0, cited=0;
+                                items.forEach(function(it){
+                                  if(it.classList.contains('strength-evidence-strong')) strong++;
+                                  else if(it.classList.contains('strength-evidence-moderate')) moderate++;
+                                  else if(it.classList.contains('strength-evidence-weak')) weak++;
+                                  if(it.querySelector('.ev-citation, [href*="://"]')) cited++;
+                                });
+                                var bits=[];
+                                if(strong)bits.push('<span class="ev-strong" title="evidence-strong">'+strong+' strong</span>');
+                                if(moderate)bits.push('<span class="ev-moderate" title="evidence-moderate">'+moderate+' mod</span>');
+                                if(weak)bits.push('<span class="ev-weak" title="evidence-weak">'+weak+' weak</span>');
+                                if(cited)bits.push('<span class="ev-cited" title="cited evidence">'+cited+' cited</span>');
+                                if(bits.length){
+                                  var br=document.createElement('span');
+                                  br.className='ev-count-breakdown';
+                                  br.innerHTML=bits.join(' · ');
+                                  chip.appendChild(br);
+                                }
+                              });
                               // Display evidence newest-first. YAML stays in author-chronological order;
                               // reader sees the most recent observations at the top of each thesis.
                               document.querySelectorAll('ol.evidence-items').forEach(function(ol){
