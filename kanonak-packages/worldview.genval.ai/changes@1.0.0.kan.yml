@@ -127,6 +127,8 @@ changes-transformation:
                             a{color:var(--accent);text-decoration:none;transition:color 120ms}
                             a:hover{color:var(--accent-2)}
                             nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
+                            [id]{scroll-margin-top:80px}
+                            @media (max-width:600px){[id]{scroll-margin-top:120px}}
                             .site-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
                             a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
                             ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
