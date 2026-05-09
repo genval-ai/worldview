@@ -275,7 +275,23 @@ snapshot-to-html-transformation:
                             details > summary::-webkit-details-marker{display:none}
                             details > summary::after{content:"";flex:1;height:1px;background:linear-gradient(to right,var(--border-soft),transparent)}
                             .invalidation > p{padding:8px 0 16px;font-style:italic;color:var(--fg-dim);line-height:1.65;border-left:2px solid var(--danger);padding-left:16px;margin:8px 0 16px}
-                            .cond-tree{padding:12px 0 8px;font-size:13px;line-height:1.55}
+                            .invalidation-content{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+                            .cond-tree{flex:1 1 360px;min-width:0;padding:12px 0 8px;font-size:13px;line-height:1.55}
+                            .cond-graph{flex:0 0 320px;align-self:stretch;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;padding:14px 16px;display:flex;align-items:center;justify-content:center;min-height:96px}
+                            .cond-graph svg{display:block;width:100%;height:auto;max-width:100%;overflow:visible}
+                            @media (max-width:760px){.cond-graph{flex-basis:100%}}
+                            /* Graph node styling — types match the text-tree colors so the visual languages align */
+                            .cond-graph .gnode-bool{fill:rgba(125,211,252,0.12);stroke:var(--accent);stroke-width:1.5}
+                            .cond-graph .gnode-not{fill:rgba(248,113,113,0.12);stroke:var(--danger);stroke-width:1.5}
+                            .cond-graph .gnode-threshold{fill:rgba(52,211,153,0.10);stroke:var(--strong);stroke-width:1.2}
+                            .cond-graph .gnode-event{fill:rgba(251,191,36,0.10);stroke:var(--moderate);stroke-width:1.2}
+                            .cond-graph .gnode-sequenced{fill:rgba(167,139,250,0.10);stroke:#a78bfa;stroke-width:1.2}
+                            .cond-graph .gnode-comparison{fill:rgba(125,211,252,0.06);stroke:var(--accent-3);stroke-width:1.2}
+                            .cond-graph .gnode-available{fill:rgba(34,197,94,0.06);stroke:var(--strong);stroke-width:1.2}
+                            .cond-graph .gnode-text{font-family:var(--font-mono);font-size:10px;font-weight:600;fill:var(--fg);text-anchor:middle;dominant-baseline:middle;letter-spacing:0.04em}
+                            .cond-graph .gnode-text.op{font-size:11px;letter-spacing:0.06em}
+                            .cond-graph .gnode-text.subtle{fill:var(--fg-dim);font-weight:400;font-size:9px}
+                            .cond-graph .gedge{stroke:var(--border);stroke-width:1.2;fill:none}
                             .cond{display:block;padding:6px 0 6px 0}
                             .cond .cond-type{font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.12em;color:var(--accent);font-weight:600;padding:2px 8px;background:rgba(125,211,252,0.08);border-radius:3px;margin-right:8px}
                             .cond .cond-summary{color:var(--fg-faint);font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em}
@@ -809,6 +825,7 @@ snapshot-to-html-transformation:
                                       tx.stringLiteral: |-
                                         <details class="invalidation" open>
                                         <summary>Invalidation condition</summary>
+                                        <div class="invalidation-content">
                                         <div class="cond-tree">
 
                                     # ===== TOP-LEVEL DISPATCH =====
@@ -1607,6 +1624,8 @@ snapshot-to-html-transformation:
 
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
+                                        </div>
+                                        <div class="cond-graph" aria-hidden="true"></div>
                                         </div>
                                         </details>
 
@@ -2924,6 +2943,143 @@ snapshot-to-html-transformation:
                                   var ring='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+ringStroke+'" stroke-width="1.2"/>';
                                   el.innerHTML='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" aria-hidden="true">'+ring+arc+center+'</svg>';
                                   el.setAttribute('title',(conf*100).toFixed(0)+'% · '+(status==='active'?'active':status));
+                                });
+                              })();
+                              // Render invalidation-condition graph SVG per thesis. Walks the
+                              // existing rendered text-tree DOM (.cond-tree > .cond...) to derive
+                              // a node tree, computes a simple top-down hierarchical layout, draws
+                              // SVG into the .cond-graph placeholder. The graph complements the
+                              // text breakdown — text shows the LOGIC, graph shows the SHAPE.
+                              (function(){
+                                function pickType(el){
+                                  var classes=el.className.split(/\s+/);
+                                  for(var i=0;i<classes.length;i++){
+                                    var c=classes[i];
+                                    if(c.indexOf('cond-')===0 && c!=='cond' && c!=='cond-operands' && c!=='cond-summary' && c!=='cond-type' && c!=='cond-observable' && c!=='cond-comparator' && c!=='cond-threshold-val' && c!=='cond-event-id' && c!=='cond-durability' && c!=='cond-persistence' && c!=='cond-row' && c!=='cond-key' && c!=='cond-left' && c!=='cond-right'){
+                                      return c.substring(5);
+                                    }
+                                  }
+                                  return 'unknown';
+                                }
+                                function trim(s,n){s=(s||'').trim();return s.length>n?s.substring(0,n-1)+'…':s;}
+                                function parseCond(el){
+                                  if(!el) return null;
+                                  var type=pickType(el);
+                                  var node={type:type, children:[], full:''};
+                                  if(type==='bool'){
+                                    var ct=el.querySelector(':scope > .cond-type');
+                                    var raw=ct?ct.textContent:'BOOL';
+                                    node.label=raw.replace(/Condition$/,'').toUpperCase();
+                                    node.full=raw;
+                                    var ol=el.querySelector(':scope > .cond-operands');
+                                    if(ol){ol.querySelectorAll(':scope > li > .cond').forEach(function(c){var sub=parseCond(c); if(sub) node.children.push(sub);});}
+                                  } else if(type==='not'){
+                                    node.label='NOT';
+                                    node.full='NotCondition';
+                                    var sub=el.querySelector(':scope > .cond-operand > .cond');
+                                    if(sub){var s=parseCond(sub); if(s) node.children.push(s);}
+                                  } else if(type==='threshold'){
+                                    var obs=el.querySelector('.cond-observable')?(el.querySelector('.cond-observable').textContent||'').trim():'';
+                                    var cmp=el.querySelector('.cond-comparator')?(el.querySelector('.cond-comparator').textContent||'').trim():'';
+                                    var val=el.querySelector('.cond-threshold-val')?(el.querySelector('.cond-threshold-val').textContent||'').trim():'';
+                                    var per=el.querySelector('.cond-persistence')?(el.querySelector('.cond-persistence').textContent||'').trim():'';
+                                    node.label=trim(obs,16);
+                                    node.sub=cmp+' '+val;
+                                    node.full=(obs+' '+cmp+' '+val+' '+per).trim();
+                                  } else if(type==='event'){
+                                    var ev=el.querySelector('.cond-event-id')?(el.querySelector('.cond-event-id').textContent||'').trim():'';
+                                    var dur=el.querySelector('.cond-durability')?(el.querySelector('.cond-durability').textContent||'').trim():'';
+                                    node.label=trim(ev,16);
+                                    node.sub=dur;
+                                    node.full=(ev+' '+dur).trim();
+                                  } else if(type==='sequenced' || type==='before'){
+                                    node.label='SEQ';
+                                    var sm=el.querySelector('.cond-summary');
+                                    node.full=sm?sm.textContent.trim():'Sequenced';
+                                  } else if(type==='comparison'){
+                                    node.label='CMP';
+                                    var l=el.querySelector('.cond-left')?el.querySelector('.cond-left').textContent.trim():'';
+                                    var r=el.querySelector('.cond-right')?el.querySelector('.cond-right').textContent.trim():'';
+                                    var c=el.querySelector('.cond-comparator')?el.querySelector('.cond-comparator').textContent.trim():'';
+                                    node.label=trim(l,12);
+                                    node.sub=c+' '+trim(r,8);
+                                    node.full=(l+' '+c+' '+r).trim();
+                                  } else if(type==='available'){
+                                    node.label='AVAIL';
+                                    var ind=el.querySelector('code')?el.querySelector('code').textContent.trim():'';
+                                    node.full=('IndicatorAvailable '+ind).trim();
+                                  } else {
+                                    node.label=type.toUpperCase();
+                                    node.full=type;
+                                  }
+                                  return node;
+                                }
+                                // Compute leaf-span (horizontal extent in leaf-units) for layout
+                                function computeSpan(n){
+                                  if(!n.children.length){n.span=1;return 1;}
+                                  var s=0;n.children.forEach(function(c){s+=computeSpan(c);});
+                                  n.span=Math.max(s,1);return n.span;
+                                }
+                                // Top-down position assignment
+                                function position(n,x,y,uW,lH){
+                                  n.cx=x+(n.span*uW)/2; n.cy=y;
+                                  if(n.children.length){
+                                    var cx=x;
+                                    n.children.forEach(function(c){position(c,cx,y+lH,uW,lH);cx+=c.span*uW;});
+                                  }
+                                }
+                                // Compute max depth
+                                function depth(n){if(!n.children.length)return 1;var d=0;n.children.forEach(function(c){d=Math.max(d,depth(c));});return 1+d;}
+                                function renderGraph(host,tree){
+                                  var leafCount=tree.span;
+                                  var d=depth(tree);
+                                  var uW=Math.max(60,Math.min(110,Math.floor(280/Math.max(1,leafCount))));
+                                  var lH=64;
+                                  var pad=14;
+                                  var w=leafCount*uW+pad*2;
+                                  var h=d*lH+pad*2;
+                                  position(tree,pad,pad+24,uW,lH);
+                                  var parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'];
+                                  // Edges first so nodes draw over them
+                                  function emitEdges(n){
+                                    n.children.forEach(function(c){
+                                      parts.push('<path class="gedge" d="M '+n.cx+' '+(n.cy+18)+' C '+n.cx+' '+((n.cy+c.cy)/2)+' '+c.cx+' '+((n.cy+c.cy)/2)+' '+c.cx+' '+(c.cy-18)+'"/>');
+                                      emitEdges(c);
+                                    });
+                                  }
+                                  emitEdges(tree);
+                                  // Nodes
+                                  function emitNode(n){
+                                    var isOp=(n.type==='bool'||n.type==='not'||n.type==='sequenced'||n.type==='before');
+                                    var rectW=isOp?54:Math.min(110,Math.max(70,uW-12));
+                                    var rectH=36;
+                                    var x=n.cx-rectW/2, y=n.cy-rectH/2;
+                                    var rx=isOp?18:6;
+                                    parts.push('<g class="gnode"><title>'+escapeAttr(n.full)+'</title>');
+                                    parts.push('<rect class="gnode-'+n.type+'" x="'+x+'" y="'+y+'" width="'+rectW+'" height="'+rectH+'" rx="'+rx+'" ry="'+rx+'"/>');
+                                    if(n.sub){
+                                      parts.push('<text class="gnode-text'+(isOp?' op':'')+'" x="'+n.cx+'" y="'+(n.cy-5)+'">'+escapeText(n.label)+'</text>');
+                                      parts.push('<text class="gnode-text subtle" x="'+n.cx+'" y="'+(n.cy+9)+'">'+escapeText(n.sub)+'</text>');
+                                    } else {
+                                      parts.push('<text class="gnode-text'+(isOp?' op':'')+'" x="'+n.cx+'" y="'+n.cy+'">'+escapeText(n.label)+'</text>');
+                                    }
+                                    parts.push('</g>');
+                                    n.children.forEach(emitNode);
+                                  }
+                                  emitNode(tree);
+                                  parts.push('</svg>');
+                                  host.innerHTML=parts.join('');
+                                }
+                                function escapeText(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+                                function escapeAttr(s){return escapeText(s).replace(/"/g,'&quot;');}
+                                document.querySelectorAll('details.invalidation').forEach(function(det){
+                                  var rootCond=det.querySelector(':scope > .invalidation-content > .cond-tree > .cond');
+                                  var host=det.querySelector(':scope > .invalidation-content > .cond-graph');
+                                  if(!rootCond||!host) return;
+                                  var tree=parseCond(rootCond);
+                                  if(!tree) return;
+                                  computeSpan(tree);
+                                  renderGraph(host,tree);
                                 });
                               })();
                               // Augment each thesis-card's evidence-count chip with a strength + cited
