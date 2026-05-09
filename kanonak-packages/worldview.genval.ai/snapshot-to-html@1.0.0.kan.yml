@@ -278,21 +278,39 @@ snapshot-to-html-transformation:
                             /* Cap the paired-view row at ~880px and center inside the thesis card so the two columns read as a coherent pair on wide viewports rather than hugging opposite edges with empty middle. */
                             .invalidation-content{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;max-width:880px;margin:0 auto}
                             .cond-tree{flex:1 1 480px;min-width:0;padding:12px 0 8px;font-size:13px;line-height:1.55}
-                            .cond-graph{flex:0 0 320px;align-self:stretch;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;padding:14px 16px;display:flex;align-items:center;justify-content:center;min-height:96px}
+                            .cond-graph{flex:0 0 320px;align-self:stretch;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:96px}
                             .cond-graph svg{display:block;width:100%;height:auto;max-width:100%;overflow:visible}
+                            .cond-graph-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 14px;font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;padding-top:8px;border-top:1px solid var(--border-soft);width:100%}
+                            .cond-graph-legend span{display:inline-flex;align-items:center;gap:4px}
+                            .cond-graph-legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;border:1.5px solid currentColor}
+                            .cond-graph-legend .lg-t{color:var(--strong)}
+                            .cond-graph-legend .lg-e{color:var(--moderate)}
+                            .cond-graph-legend .lg-s{color:#a78bfa}
+                            .cond-graph-legend .lg-c{color:var(--accent)}
+                            .cond-graph-legend .lg-a{color:var(--strong);opacity:0.75}
                             @media (max-width:760px){.cond-graph{flex-basis:100%}}
-                            /* Graph node styling — types match the text-tree colors so the visual languages align */
-                            .cond-graph .gnode-bool{fill:rgba(125,211,252,0.12);stroke:var(--accent);stroke-width:1.5}
-                            .cond-graph .gnode-not{fill:rgba(248,113,113,0.12);stroke:var(--danger);stroke-width:1.5}
-                            .cond-graph .gnode-threshold{fill:rgba(52,211,153,0.10);stroke:var(--strong);stroke-width:1.2}
-                            .cond-graph .gnode-event{fill:rgba(251,191,36,0.10);stroke:var(--moderate);stroke-width:1.2}
-                            .cond-graph .gnode-sequenced{fill:rgba(167,139,250,0.10);stroke:#a78bfa;stroke-width:1.2}
-                            .cond-graph .gnode-comparison{fill:rgba(125,211,252,0.06);stroke:var(--accent-3);stroke-width:1.2}
-                            .cond-graph .gnode-available{fill:rgba(34,197,94,0.06);stroke:var(--strong);stroke-width:1.2}
-                            .cond-graph .gnode-text{font-family:var(--font-mono);font-size:10px;font-weight:600;fill:var(--fg);text-anchor:middle;dominant-baseline:middle;letter-spacing:0.04em}
-                            .cond-graph .gnode-text.op{font-size:11px;letter-spacing:0.06em}
-                            .cond-graph .gnode-text.subtle{fill:var(--fg-dim);font-weight:400;font-size:9px}
-                            .cond-graph .gedge{stroke:var(--border);stroke-width:1.2;fill:none}
+                            /* Graph nodes — operators as labeled pills, leaves as colored type-dots. Hover for full content (in <title>). The text tree on the left carries the data; the graph is pure topology. */
+                            .cond-graph .gnode-op-bool{fill:rgba(125,211,252,0.14);stroke:var(--accent);stroke-width:1.5}
+                            .cond-graph .gnode-op-not{fill:rgba(248,113,113,0.14);stroke:var(--danger);stroke-width:1.5}
+                            .cond-graph .gnode-op-sequenced{fill:rgba(167,139,250,0.14);stroke:#a78bfa;stroke-width:1.5}
+                            .cond-graph .gnode-op-before{fill:rgba(167,139,250,0.14);stroke:#a78bfa;stroke-width:1.5}
+                            .cond-graph .gleaf-threshold{fill:rgba(52,211,153,0.18);stroke:var(--strong);stroke-width:1.5}
+                            .cond-graph .gleaf-event{fill:rgba(251,191,36,0.18);stroke:var(--moderate);stroke-width:1.5}
+                            .cond-graph .gleaf-sequenced{fill:rgba(167,139,250,0.18);stroke:#a78bfa;stroke-width:1.5}
+                            .cond-graph .gleaf-before{fill:rgba(167,139,250,0.18);stroke:#a78bfa;stroke-width:1.5}
+                            .cond-graph .gleaf-comparison{fill:rgba(56,189,248,0.14);stroke:var(--accent-3);stroke-width:1.5}
+                            .cond-graph .gleaf-available{fill:rgba(34,197,94,0.14);stroke:var(--strong);stroke-width:1.5}
+                            .cond-graph .gleaf-unknown{fill:rgba(148,163,184,0.10);stroke:var(--weak);stroke-width:1.2}
+                            .cond-graph .gop-text{font-family:var(--font-mono);font-size:10px;font-weight:700;fill:var(--fg);text-anchor:middle;dominant-baseline:central;letter-spacing:0.06em}
+                            .cond-graph .gleaf-text{font-family:var(--font-mono);font-size:10px;font-weight:700;fill:var(--fg);text-anchor:middle;dominant-baseline:central;letter-spacing:0.04em}
+                            .cond-graph .gleaf-text.t{fill:var(--strong)}
+                            .cond-graph .gleaf-text.e{fill:var(--moderate)}
+                            .cond-graph .gleaf-text.s{fill:#a78bfa}
+                            .cond-graph .gleaf-text.c{fill:var(--accent)}
+                            .cond-graph .gleaf-text.a{fill:var(--strong)}
+                            .cond-graph .gnode g{cursor:default}
+                            .cond-graph .gnode g:hover .gleaf,.cond-graph .gnode g:hover .gop{filter:brightness(1.25)}
+                            .cond-graph .gedge{stroke:var(--border);stroke-width:1.4;fill:none;opacity:0.85}
                             .cond{display:block;padding:6px 0 6px 0}
                             .cond .cond-type{font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.12em;color:var(--accent);font-weight:600;padding:2px 8px;background:rgba(125,211,252,0.08);border-radius:3px;margin-right:8px}
                             .cond .cond-summary{color:var(--fg-faint);font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em}
@@ -3031,45 +3049,75 @@ snapshot-to-html-transformation:
                                 }
                                 // Compute max depth
                                 function depth(n){if(!n.children.length)return 1;var d=0;n.children.forEach(function(c){d=Math.max(d,depth(c));});return 1+d;}
+                                // Single-letter abbreviations for leaf type — picked so each is unique
+                                // and color-coded. T=Threshold, E=Event, S=Sequenced, C=Comparison,
+                                // A=IndicatorAvailable.
+                                var LEAF_LETTER={threshold:'T',event:'E',sequenced:'S',before:'S',comparison:'C',available:'A'};
+                                function isOperator(t){return t==='bool'||t==='not';}
                                 function renderGraph(host,tree){
                                   var leafCount=tree.span;
                                   var d=depth(tree);
-                                  var uW=Math.max(60,Math.min(110,Math.floor(280/Math.max(1,leafCount))));
-                                  var lH=64;
-                                  var pad=14;
-                                  var w=leafCount*uW+pad*2;
-                                  var h=d*lH+pad*2;
-                                  position(tree,pad,pad+24,uW,lH);
+                                  // Per-leaf horizontal unit. With type-dot leaves at r=12 we can pack
+                                  // tightly even at high leaf counts. Capped on the high side so single-
+                                  // leaf trees do not balloon.
+                                  var uW=Math.max(40,Math.min(64,Math.floor(280/Math.max(1,leafCount))));
+                                  var lH=58;
+                                  var padX=16, padY=16;
+                                  var w=leafCount*uW+padX*2;
+                                  var h=(d-1)*lH+padY*2+44;
+                                  position(tree,padX,padY+22,uW,lH);
                                   var parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet">'];
                                   // Edges first so nodes draw over them
+                                  function nodeBottomY(n){return isOperator(n.type)?(n.cy+12):(n.cy+12);}
+                                  function nodeTopY(n){return isOperator(n.type)?(n.cy-12):(n.cy-12);}
                                   function emitEdges(n){
                                     n.children.forEach(function(c){
-                                      parts.push('<path class="gedge" d="M '+n.cx+' '+(n.cy+18)+' C '+n.cx+' '+((n.cy+c.cy)/2)+' '+c.cx+' '+((n.cy+c.cy)/2)+' '+c.cx+' '+(c.cy-18)+'"/>');
+                                      var y1=nodeBottomY(n), y2=nodeTopY(c), midY=(y1+y2)/2;
+                                      parts.push('<path class="gedge" d="M '+n.cx+' '+y1+' C '+n.cx+' '+midY+' '+c.cx+' '+midY+' '+c.cx+' '+y2+'"/>');
                                       emitEdges(c);
                                     });
                                   }
                                   emitEdges(tree);
                                   // Nodes
                                   function emitNode(n){
-                                    var isOp=(n.type==='bool'||n.type==='not'||n.type==='sequenced'||n.type==='before');
-                                    var rectW=isOp?54:Math.min(110,Math.max(70,uW-12));
-                                    var rectH=36;
-                                    var x=n.cx-rectW/2, y=n.cy-rectH/2;
-                                    var rx=isOp?18:6;
                                     parts.push('<g class="gnode"><title>'+escapeAttr(n.full)+'</title>');
-                                    parts.push('<rect class="gnode-'+n.type+'" x="'+x+'" y="'+y+'" width="'+rectW+'" height="'+rectH+'" rx="'+rx+'" ry="'+rx+'"/>');
-                                    if(n.sub){
-                                      parts.push('<text class="gnode-text'+(isOp?' op':'')+'" x="'+n.cx+'" y="'+(n.cy-5)+'">'+escapeText(n.label)+'</text>');
-                                      parts.push('<text class="gnode-text subtle" x="'+n.cx+'" y="'+(n.cy+9)+'">'+escapeText(n.sub)+'</text>');
+                                    if(isOperator(n.type)){
+                                      // Operator pill — labeled rounded rect.
+                                      var opCls=(n.type==='not'?'gnode-op-not':'gnode-op-bool');
+                                      var pillW=44, pillH=24;
+                                      var x=n.cx-pillW/2, y=n.cy-pillH/2;
+                                      parts.push('<rect class="gop '+opCls+'" x="'+x+'" y="'+y+'" width="'+pillW+'" height="'+pillH+'" rx="12" ry="12"/>');
+                                      parts.push('<text class="gop-text" x="'+n.cx+'" y="'+n.cy+'">'+escapeText(n.label)+'</text>');
                                     } else {
-                                      parts.push('<text class="gnode-text'+(isOp?' op':'')+'" x="'+n.cx+'" y="'+n.cy+'">'+escapeText(n.label)+'</text>');
+                                      // Leaf — colored type-dot with single-letter indicator.
+                                      var letter=LEAF_LETTER[n.type]||'?';
+                                      var letterCls=letter.toLowerCase();
+                                      var leafCls='gleaf-'+(LEAF_LETTER[n.type]?n.type:'unknown');
+                                      var r=12;
+                                      parts.push('<circle class="gleaf '+leafCls+'" cx="'+n.cx+'" cy="'+n.cy+'" r="'+r+'"/>');
+                                      parts.push('<text class="gleaf-text '+letterCls+'" x="'+n.cx+'" y="'+(n.cy+0.5)+'">'+escapeText(letter)+'</text>');
                                     }
                                     parts.push('</g>');
                                     n.children.forEach(emitNode);
                                   }
                                   emitNode(tree);
                                   parts.push('</svg>');
-                                  host.innerHTML=parts.join('');
+                                  // Build a compact legend that reflects only the leaf types actually in this tree
+                                  var seen={};
+                                  function walkTypes(n){
+                                    if(!isOperator(n.type) && LEAF_LETTER[n.type]) seen[n.type]=true;
+                                    n.children.forEach(walkTypes);
+                                  }
+                                  walkTypes(tree);
+                                  var legendNames={threshold:'Threshold',event:'Event',sequenced:'Sequenced',before:'Sequenced',comparison:'Comparison',available:'Available'};
+                                  var legendBits=[];
+                                  Object.keys(seen).forEach(function(t){
+                                    var letter=LEAF_LETTER[t];
+                                    var cls='lg-'+letter.toLowerCase();
+                                    legendBits.push('<span class="'+cls+'">'+escapeText(letter)+' '+escapeText(legendNames[t])+'</span>');
+                                  });
+                                  var legendHtml=legendBits.length?'<div class="cond-graph-legend">'+legendBits.join('')+'</div>':'';
+                                  host.innerHTML=parts.join('')+legendHtml;
                                 }
                                 function escapeText(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
                                 function escapeAttr(s){return escapeText(s).replace(/"/g,'&quot;');}
