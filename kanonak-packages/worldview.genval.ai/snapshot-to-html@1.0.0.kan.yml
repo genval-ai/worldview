@@ -342,6 +342,23 @@ snapshot-to-html-transformation:
                             .cond-sequenced .cond-key,.cond-before .cond-key{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-faint);margin-right:8px}
                             .cond-available .cond-type{background:rgba(34,197,94,0.10);color:var(--strong)}
                             /* EVIDENCE LIST */
+                            /* PER-THESIS MINI TIMELINE — always-visible thin temporal strip above
+                               the collapsed evidence list. Communicates "where in time does this
+                               thesis's evidence sit" before the reader expands the full list. */
+                            .ev-timeline-mini{margin:0 0 14px 0;padding:10px 14px 8px;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;position:relative;overflow:hidden}
+                            .ev-timeline-mini::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+                            .ev-timeline-mini svg{display:block;width:100%;height:48px}
+                            .ev-timeline-mini .mini-axis{stroke:rgba(148,163,184,0.20);stroke-width:1}
+                            .ev-timeline-mini .mini-tick{stroke:rgba(148,163,184,0.30);stroke-width:1}
+                            .ev-timeline-mini .mini-tick-label{font-family:var(--font-mono);font-size:9px;fill:var(--fg-faint);letter-spacing:0.05em}
+                            .ev-timeline-mini .mini-snap{stroke:var(--accent);stroke-width:1.2;stroke-dasharray:2,2}
+                            .ev-timeline-mini .mini-snap-label{font-family:var(--font-mono);font-size:8px;fill:var(--accent);letter-spacing:0.06em}
+                            .ev-timeline-mini .mini-marker{cursor:pointer;transition:transform 120ms;transform-origin:center;transform-box:fill-box}
+                            .ev-timeline-mini .mini-marker:hover{transform:scale(1.4)}
+                            .ev-timeline-mini .mini-stem{stroke-width:1;opacity:0.4}
+                            .ev-timeline-mini .mini-empty{font-family:var(--font-mono);font-size:10px;fill:var(--fg-faint);letter-spacing:0.05em;text-anchor:middle}
+                            .evidence-item.evidence-flash{animation:ev-flash 1500ms ease-out}
+                            @keyframes ev-flash{0%{background:rgba(125,211,252,0.18)}100%{background:transparent}}
                             .evidence-items{list-style:none;padding:8px 0 16px;display:flex;flex-direction:column;gap:0}
                             .evidence-item{padding:14px 0 14px 20px;border-left:2px solid var(--border);position:relative;margin-left:4px}
                             .evidence-item + .evidence-item{border-top:1px solid var(--border-soft);margin-top:0}
@@ -1667,6 +1684,39 @@ snapshot-to-html-transformation:
                                 tx.thenBuild:
                                   type: tx.Concat
                                   tx.parts:
+                                    # Empty placeholder for the always-visible per-thesis mini timeline.
+                                    # Populated by inline JS that walks the rendered evidence-item LIs
+                                    # for date + strength + thesis hue.
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div class="ev-timeline-mini" data-thesis-name="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRefMain
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-theme-hue="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.ResolveRef
+                                        tx.resolveSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: vis.thesisTheme
+                                      tx.readProp: vis.themeHue
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-snapshot-observed-at="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.VarRef
+                                        tx.varName: input
+                                      tx.readProp: wv.observedAt
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '"></div>'
+
                                     - type: tx.StringLiteral
                                       tx.stringLiteral: |
                                         <details class="evidence-list">
@@ -1688,7 +1738,7 @@ snapshot-to-html-transformation:
                                         type: tx.Concat
                                         tx.parts:
 
-                                          # ITEM OPEN with strength class
+                                          # ITEM OPEN with strength class + name + observedAt for timeline lookup
                                           - type: tx.StringLiteral
                                             tx.stringLiteral: '<li class="evidence-item strength-'
                                           - type: tx.UriName
@@ -1700,6 +1750,21 @@ snapshot-to-html-transformation:
                                                   type: tx.VarRef
                                                   tx.varName: evRef
                                               tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-name="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.VarRef
+                                              tx.varName: evRef
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-observed-at="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.evidenceObservedAt
                                           - type: tx.StringLiteral
                                             tx.stringLiteral: |-
                                               ">
@@ -2967,6 +3032,140 @@ snapshot-to-html-transformation:
                                   el.innerHTML='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" aria-hidden="true">'+ring+arc+center+'</svg>';
                                   el.setAttribute('title',(conf*100).toFixed(0)+'% · '+(status==='active'?'active':status));
                                 });
+                              })();
+                              // Render per-thesis mini evidence timeline above each supporting-evidence
+                              // section. Visible always (the <details> below stays collapsed by default).
+                              // Reads dates + strength from the rendered evidence-item LIs; click a marker
+                              // to scroll/highlight the corresponding evidence card.
+                              (function(){
+                                var ROOT_S=getComputedStyle(document.documentElement);
+                                var ARC_S=(ROOT_S.getPropertyValue('--theme-arc-saturation')||'').trim()||'60%';
+                                var ARC_L=(ROOT_S.getPropertyValue('--theme-arc-lightness')||'').trim()||'62%';
+                                document.querySelectorAll('.ev-timeline-mini').forEach(function(host){
+                                  var hue=parseInt(host.dataset.themeHue,10);
+                                  if(isNaN(hue)) hue=200;
+                                  var snapAt=host.dataset.snapshotObservedAt?new Date(host.dataset.snapshotObservedAt):null;
+                                  // Find evidence items in the SAME thesis card (next sibling details)
+                                  var details=host.nextElementSibling;
+                                  while(details && !details.matches && details.matches('details.evidence-list')===false) details=details.nextElementSibling;
+                                  if(!details||!details.querySelectorAll) return;
+                                  var items=Array.prototype.slice.call(details.querySelectorAll('li.evidence-item'));
+                                  var dated=[];
+                                  items.forEach(function(li){
+                                    var iso=li.dataset.evidenceObservedAt;
+                                    if(!iso) return;
+                                    var d=new Date(iso);
+                                    if(isNaN(d.getTime())) return;
+                                    var strength='moderate';
+                                    if(li.classList.contains('strength-evidence-strong')) strength='strong';
+                                    else if(li.classList.contains('strength-evidence-weak')) strength='weak';
+                                    dated.push({li:li,date:d,strength:strength,name:li.dataset.evidenceName||''});
+                                  });
+                                  if(dated.length===0){
+                                    // Render an empty placeholder note instead of an empty SVG
+                                    host.innerHTML='<svg viewBox="0 0 600 48" preserveAspectRatio="none"><text class="mini-empty" x="300" y="28">No dated evidence on this thesis</text></svg>';
+                                    return;
+                                  }
+                                  dated.sort(function(a,b){return a.date-b.date;});
+                                  // Range: earliest evidence to latest of (latest evidence, snapshot date)
+                                  var tMin=dated[0].date.getTime();
+                                  var tMax=dated[dated.length-1].date.getTime();
+                                  if(snapAt && snapAt.getTime()>tMax) tMax=snapAt.getTime();
+                                  if(tMax-tMin<86400000) tMax=tMin+86400000; // ensure at least a day
+                                  var span=tMax-tMin;
+                                  var pad=span*0.04;
+                                  var t0=tMin-pad, t1=tMax+pad;
+                                  // SVG geometry
+                                  var W=600, H=48, Mh={left:8, right:8, top:6, bottom:14};
+                                  var iW=W-Mh.left-Mh.right;
+                                  var axisY=H-Mh.bottom;
+                                  function xS(t){return Mh.left+((t-t0)/(t1-t0))*iW;}
+                                  // Tint the left strip with the theme hue (the ::before pseudo-element)
+                                  host.style.setProperty('--theme-strip','hsla('+hue+', 60%, 60%, 0.5)');
+                                  // CSS pseudo-element pulls from this; use a small inline style override so
+                                  // the strip color is per-thesis without hardcoding.
+                                  // Use a direct style attribute to inline rather than rely on CSS var.
+                                  host.style.borderLeft='3px solid hsla('+hue+', 50%, 50%, 0.55)';
+                                  host.style.background='linear-gradient(to right, hsla('+hue+', 50%, 50%, 0.06), var(--bg-elev) 8%)';
+                                  var p=[];
+                                  p.push('<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">');
+                                  // Axis baseline
+                                  p.push('<line class="mini-axis" x1="'+Mh.left+'" x2="'+(W-Mh.right)+'" y1="'+axisY+'" y2="'+axisY+'"/>');
+                                  // Tick scale: pick day/week/month based on span
+                                  var dayMs=86400000, ticks, fmtFn;
+                                  if(span<10*dayMs){ticks=tickByDay(t0,t1,1); fmtFn=fmtMD;}
+                                  else if(span<45*dayMs){ticks=tickByDay(t0,t1,7); fmtFn=fmtMD;}
+                                  else if(span<120*dayMs){ticks=tickByDay(t0,t1,14); fmtFn=fmtMD;}
+                                  else {ticks=tickByMonth(t0,t1); fmtFn=fmtMonth;}
+                                  ticks.forEach(function(d){
+                                    var x=xS(d.getTime());
+                                    p.push('<line class="mini-tick" x1="'+x+'" x2="'+x+'" y1="'+(axisY-3)+'" y2="'+(axisY+3)+'"/>');
+                                    p.push('<text class="mini-tick-label" x="'+x+'" y="'+(H-3)+'" text-anchor="middle">'+fmtFn(d)+'</text>');
+                                  });
+                                  // Snapshot vertical line
+                                  if(snapAt && snapAt.getTime()>=t0 && snapAt.getTime()<=t1){
+                                    var sx=xS(snapAt.getTime());
+                                    p.push('<line class="mini-snap" x1="'+sx+'" x2="'+sx+'" y1="2" y2="'+axisY+'"/>');
+                                    p.push('<text class="mini-snap-label" x="'+(sx+3)+'" y="9">SNAP</text>');
+                                  }
+                                  // Markers — strength-colored, stems back to baseline
+                                  // Same-day collisions get small Y jitter (alternating lanes, all above the line)
+                                  var bucket={};
+                                  dated.forEach(function(it){
+                                    var x=xS(it.date.getTime());
+                                    var b=Math.round(x/4);
+                                    var lane=(bucket[b]||0)+1; bucket[b]=lane;
+                                    it._x=x; it._lane=lane;
+                                  });
+                                  var maxRank=Math.ceil(Object.keys(bucket).reduce(function(m,k){return Math.max(m,bucket[k]);},1)/2);
+                                  var laneSpacing=6;
+                                  var topReserve=axisY-8;
+                                  dated.forEach(function(it){
+                                    var rank=Math.ceil(it._lane/2)-1;
+                                    var dir=(it._lane%2===1)?-1:1;
+                                    var y=axisY-12-rank*laneSpacing*(dir>0?0:1)-(dir<0?rank*laneSpacing:0);
+                                    // Simplify: place all markers above baseline; same-day stack upward
+                                    y=axisY-10-rank*5;
+                                    if(y<6) y=6;
+                                    it._y=y;
+                                  });
+                                  dated.forEach(function(it){
+                                    p.push('<line class="mini-stem strength-'+it.strength+'" x1="'+it._x+'" x2="'+it._x+'" y1="'+axisY+'" y2="'+it._y+'" stroke="'+strengthColor(it.strength)+'"/>');
+                                  });
+                                  dated.forEach(function(it){
+                                    var fill=strengthColor(it.strength);
+                                    var stroke=strengthStroke(it.strength);
+                                    p.push('<circle class="mini-marker strength-'+it.strength+'" data-evidence-name="'+escapeAttr(it.name)+'" cx="'+it._x+'" cy="'+it._y+'" r="3.5" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1"><title>'+escapeAttr(it.li.querySelector('.ev-statement')?(it.li.querySelector('.ev-statement').textContent||'').slice(0,160):'(evidence)')+' · '+escapeAttr(fmtFull(it.date))+' · '+escapeAttr(it.strength)+'</title></circle>');
+                                  });
+                                  p.push('</svg>');
+                                  host.innerHTML=p.join('');
+                                  // Marker click -> scroll to evidence card + flash highlight
+                                  host.querySelectorAll('.mini-marker').forEach(function(m){
+                                    m.addEventListener('click',function(){
+                                      var name=m.dataset.evidenceName;
+                                      if(!name) return;
+                                      // Open the details if collapsed
+                                      var det=host.nextElementSibling;
+                                      while(det && (!det.matches || !det.matches('details.evidence-list'))) det=det.nextElementSibling;
+                                      if(det){det.open=true;}
+                                      var li=det?det.querySelector('li.evidence-item[data-evidence-name="'+CSS.escape(name)+'"]'):null;
+                                      if(li){
+                                        li.scrollIntoView({behavior:'smooth',block:'center'});
+                                        li.classList.remove('evidence-flash');
+                                        void li.offsetWidth; // force reflow so the animation re-runs
+                                        li.classList.add('evidence-flash');
+                                      }
+                                    });
+                                  });
+                                });
+                                function tickByDay(t0,t1,n){var out=[];var d=new Date(t0);d.setUTCHours(0,0,0,0);while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d));d.setUTCDate(d.getUTCDate()+n);}return out;}
+                                function tickByMonth(t0,t1){var out=[];var d=new Date(t0);d.setUTCDate(1);d.setUTCHours(0,0,0,0);while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d));d.setUTCMonth(d.getUTCMonth()+1);}return out;}
+                                function fmtMD(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});}
+                                function fmtMonth(d){return d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});}
+                                function fmtFull(d){return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});}
+                                function strengthColor(s){if(s==='strong')return 'hsl(160, 64%, 52%)';if(s==='weak')return 'hsl(215, 16%, 47%)';return 'hsl(38, 92%, 56%)';}
+                                function strengthStroke(s){if(s==='strong')return 'hsl(160, 60%, 40%)';if(s==='weak')return 'hsl(215, 18%, 35%)';return 'hsl(38, 70%, 40%)';}
+                                function escapeAttr(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
                               })();
                               // Render invalidation-condition graph SVG per thesis. Walks the
                               // existing rendered text-tree DOM (.cond-tree > .cond...) to derive
