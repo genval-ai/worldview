@@ -363,6 +363,9 @@ snapshot-to-html-transformation:
                             .ev-timeline-mini .mini-marker:hover{transform:scale(1.4)}
                             .ev-timeline-mini .mini-stem{stroke-width:1;opacity:0.4}
                             .ev-timeline-mini .mini-empty{font-family:var(--font-mono);font-size:10px;fill:var(--fg-faint);letter-spacing:0.05em;text-anchor:middle}
+                            .ev-timeline-mini-legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-family:var(--font-mono);font-size:9px;color:var(--fg-faint);letter-spacing:0.05em;text-transform:uppercase;margin:6px 0 0;padding-top:6px;border-top:1px solid var(--border-soft)}
+                            .ev-timeline-mini-legend span{display:inline-flex;align-items:center;gap:5px}
+                            .ev-timeline-mini-legend span::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
                             .evidence-item.evidence-flash{animation:ev-flash 1500ms ease-out}
                             @keyframes ev-flash{0%{background:rgba(125,211,252,0.18)}100%{background:transparent}}
                             .evidence-items{list-style:none;padding:8px 0 16px;display:flex;flex-direction:column;gap:0}
@@ -1784,6 +1787,17 @@ snapshot-to-html-transformation:
                                                 tx.varName: evRef
                                             tx.readProp: wv.evidenceObservedAt
                                           - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-type="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: rdfs.type
+                                          - type: tx.StringLiteral
                                             tx.stringLiteral: |-
                                               ">
 
@@ -3054,9 +3068,30 @@ snapshot-to-html-transformation:
                               })();
                               // Render per-thesis mini evidence timeline above each supporting-evidence
                               // section. Visible always (the <details> below stays collapsed by default).
-                              // Reads dates + strength from the rendered evidence-item LIs; click a marker
-                              // to scroll/highlight the corresponding evidence card.
+                              // Reads dates + strength + TYPE from the rendered evidence-item LIs;
+                              // type drives marker color (categorical: which kind of evidence landed
+                              // when), strength drives marker size (ordinal). Click a marker to
+                              // scroll/highlight the corresponding evidence card.
                               (function(){
+                                // Type -> hue + abbrev + label. Hues chosen to be distinguishable on
+                                // the dark theme and to read as "data" / "institutional" / "events"
+                                // family clusters when multiple types share a thesis.
+                                var TYPE_INFO={
+                                  'marketdataevidence':       {hue:195,abbrev:'MD',label:'Market data'},
+                                  'corporateevidence':        {hue:165,abbrev:'CO',label:'Corporate'},
+                                  'analystevidence':          {hue:280,abbrev:'AN',label:'Analyst'},
+                                  'centralbankevidence':      {hue:235,abbrev:'CB',label:'Central bank'},
+                                  'economicdataevidence':     {hue:178,abbrev:'ED',label:'Economic data'},
+                                  'geopoliticalevidence':     {hue:0,  abbrev:'GP',label:'Geopolitical'},
+                                  'policyevidence':           {hue:28, abbrev:'PO',label:'Policy'},
+                                  'officialstatementevidence':{hue:48, abbrev:'OS',label:'Statement'},
+                                  'institutionalflowevidence':{hue:325,abbrev:'IF',label:'Institutional flow'}
+                                };
+                                function typeInfoOf(typeName){
+                                  if(!typeName) return null;
+                                  var k=typeName.toLowerCase();
+                                  return TYPE_INFO[k]||null;
+                                }
                                 var ROOT_S=getComputedStyle(document.documentElement);
                                 var ARC_S=(ROOT_S.getPropertyValue('--theme-arc-saturation')||'').trim()||'60%';
                                 var ARC_L=(ROOT_S.getPropertyValue('--theme-arc-lightness')||'').trim()||'62%';
@@ -3078,7 +3113,9 @@ snapshot-to-html-transformation:
                                     var strength='moderate';
                                     if(li.classList.contains('strength-evidence-strong')) strength='strong';
                                     else if(li.classList.contains('strength-evidence-weak')) strength='weak';
-                                    dated.push({li:li,date:d,strength:strength,name:li.dataset.evidenceName||''});
+                                    var typeName=li.dataset.evidenceType||'';
+                                    var typeInfo=typeInfoOf(typeName);
+                                    dated.push({li:li,date:d,strength:strength,typeName:typeName,typeInfo:typeInfo,name:li.dataset.evidenceName||''});
                                   });
                                   if(dated.length===0){
                                     // Render an empty placeholder note instead of an empty SVG
@@ -3152,16 +3189,42 @@ snapshot-to-html-transformation:
                                     if(y<6) y=6;
                                     it._y=y;
                                   });
+                                  // Helpers — type drives color, strength drives marker size + opacity
+                                  function colorOf(it){
+                                    if(it.typeInfo) return 'hsl('+it.typeInfo.hue+', '+ARC_S+', '+ARC_L+')';
+                                    return 'hsl(215, 12%, 50%)'; // unknown type — neutral grey
+                                  }
+                                  function strokeOf(it){
+                                    if(it.typeInfo) return 'hsl('+it.typeInfo.hue+', 60%, 36%)';
+                                    return 'hsl(215, 16%, 32%)';
+                                  }
+                                  function radiusOf(s){if(s==='strong') return 4.5; if(s==='weak') return 2.8; return 3.6;}
+                                  function opacityOf(s){if(s==='weak') return 0.55; return 0.92;}
                                   dated.forEach(function(it){
-                                    p.push('<line class="mini-stem strength-'+it.strength+'" x1="'+it._x+'" x2="'+it._x+'" y1="'+axisY+'" y2="'+it._y+'" stroke="'+strengthColor(it.strength)+'"/>');
+                                    p.push('<line class="mini-stem" x1="'+it._x+'" x2="'+it._x+'" y1="'+axisY+'" y2="'+it._y+'" stroke="'+colorOf(it)+'" opacity="0.45"/>');
                                   });
                                   dated.forEach(function(it){
-                                    var fill=strengthColor(it.strength);
-                                    var stroke=strengthStroke(it.strength);
-                                    p.push('<circle class="mini-marker strength-'+it.strength+'" data-evidence-name="'+escapeAttr(it.name)+'" cx="'+it._x+'" cy="'+it._y+'" r="3.5" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1"><title>'+escapeAttr(it.li.querySelector('.ev-statement')?(it.li.querySelector('.ev-statement').textContent||'').slice(0,160):'(evidence)')+' · '+escapeAttr(fmtFull(it.date))+' · '+escapeAttr(it.strength)+'</title></circle>');
+                                    var typeName=it.typeName||'unknown';
+                                    var typeAbbr=it.typeInfo?it.typeInfo.abbrev:'?';
+                                    var typeLabel=it.typeInfo?it.typeInfo.label:typeName;
+                                    p.push('<circle class="mini-marker" data-evidence-name="'+escapeAttr(it.name)+'" data-evidence-type="'+escapeAttr(typeName)+'" cx="'+it._x+'" cy="'+it._y+'" r="'+radiusOf(it.strength)+'" fill="'+colorOf(it)+'" stroke="'+strokeOf(it)+'" stroke-width="1" opacity="'+opacityOf(it.strength)+'"><title>'+escapeAttr((it.li.querySelector('.ev-statement')?(it.li.querySelector('.ev-statement').textContent||'').slice(0,160):'(evidence)'))+' · '+escapeAttr(typeLabel)+' · '+escapeAttr(fmtFull(it.date))+' · '+escapeAttr(it.strength)+'</title></circle>');
                                   });
                                   p.push('</svg>');
-                                  host.innerHTML=p.join('');
+                                  // Legend — only types that appear in this thesis
+                                  var typesSeen={};
+                                  dated.forEach(function(it){if(it.typeInfo) typesSeen[it.typeName.toLowerCase()]=it.typeInfo;});
+                                  var legendKeys=Object.keys(typesSeen);
+                                  var legendHtml='';
+                                  if(legendKeys.length>0){
+                                    legendHtml='<div class="ev-timeline-mini-legend">';
+                                    legendKeys.forEach(function(k){
+                                      var info=typesSeen[k];
+                                      var color='hsl('+info.hue+', '+ARC_S+', '+ARC_L+')';
+                                      legendHtml+='<span style="color:'+color+'">'+escapeAttr(info.label)+'</span>';
+                                    });
+                                    legendHtml+='</div>';
+                                  }
+                                  host.innerHTML=p.join('')+legendHtml;
                                   // Marker click -> scroll to evidence card + flash highlight
                                   host.querySelectorAll('.mini-marker').forEach(function(m){
                                     m.addEventListener('click',function(){
@@ -3186,8 +3249,6 @@ snapshot-to-html-transformation:
                                 function fmtMD(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});}
                                 function fmtMonth(d){return d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});}
                                 function fmtFull(d){return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});}
-                                function strengthColor(s){if(s==='strong')return 'hsl(160, 64%, 52%)';if(s==='weak')return 'hsl(215, 16%, 47%)';return 'hsl(38, 92%, 56%)';}
-                                function strengthStroke(s){if(s==='strong')return 'hsl(160, 60%, 40%)';if(s==='weak')return 'hsl(215, 18%, 35%)';return 'hsl(38, 70%, 40%)';}
                                 function escapeAttr(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
                               })();
                               // Render invalidation-condition graph SVG per thesis. Walks the
