@@ -205,6 +205,7 @@ landing-page-transformation:
                             <li><a href="/">Latest</a></li>
                             <li><a href="/snapshots/" class="active">Snapshots</a></li>
                             <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
                             <li><a href="/about/">About</a></li>
                             </ul>
                             </div>

@@ -176,6 +176,7 @@ timeline-transformation:
                             <li><a href="/">Latest</a></li>
                             <li><a href="/snapshots/">Snapshots</a></li>
                             <li><a href="/timeline/" class="active">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
                             <li><a href="/about/">About</a></li>
                             </ul>
                             </div>
