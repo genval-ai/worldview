@@ -275,8 +275,9 @@ snapshot-to-html-transformation:
                             details > summary::-webkit-details-marker{display:none}
                             details > summary::after{content:"";flex:1;height:1px;background:linear-gradient(to right,var(--border-soft),transparent)}
                             .invalidation > p{padding:8px 0 16px;font-style:italic;color:var(--fg-dim);line-height:1.65;border-left:2px solid var(--danger);padding-left:16px;margin:8px 0 16px}
-                            .invalidation-content{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
-                            .cond-tree{flex:1 1 360px;min-width:0;padding:12px 0 8px;font-size:13px;line-height:1.55}
+                            /* Cap the paired-view row at ~880px and center inside the thesis card so the two columns read as a coherent pair on wide viewports rather than hugging opposite edges with empty middle. */
+                            .invalidation-content{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;max-width:880px;margin:0 auto}
+                            .cond-tree{flex:1 1 480px;min-width:0;padding:12px 0 8px;font-size:13px;line-height:1.55}
                             .cond-graph{flex:0 0 320px;align-self:stretch;background:var(--bg-elev);border:1px solid var(--border-soft);border-radius:6px;padding:14px 16px;display:flex;align-items:center;justify-content:center;min-height:96px}
                             .cond-graph svg{display:block;width:100%;height:auto;max-width:100%;overflow:visible}
                             @media (max-width:760px){.cond-graph{flex-basis:100%}}
