@@ -28,6 +28,7 @@ snapshot:
 
 view:
   type: wv.WorldviewSnapshot
+  label: AI capex pre-print
   observedAt: 2026-05-04T20:00:00Z
   narrative: |
     AI capex thesis pre-Q1 earnings. AMD Q1 2026 prints May 5 after-hours.

@@ -180,8 +180,10 @@ snapshot-to-html-transformation:
                             /* HERO */
                             .hero{padding:0 0 56px;border-bottom:1px solid var(--border);position:relative;margin-bottom:56px}
                             .hero::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
-                            .hero-meta{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:24px;flex-wrap:wrap;gap:8px}
+                            .hero-meta{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:24px;flex-wrap:wrap;gap:14px}
                             .hero-meta .eyebrow{color:var(--accent)}
+                            .hero-meta .hero-version{font-family:var(--font-mono);color:var(--accent);font-size:11px;letter-spacing:0.05em;background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);padding:2px 8px;border-radius:4px;text-transform:none}
+                            .hero-meta time{margin-left:auto}
                             .hero h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
                             @media (max-width:760px){.hero h1{font-size:42px}}
                             .hero-narrative{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
@@ -348,6 +350,14 @@ snapshot-to-html-transformation:
                             <header class="hero">
                             <div class="hero-meta">
                             <span class="eyebrow">Worldview Snapshot</span>
+                            <span class="snapshot-version hero-version">v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </span>
                             <time datetime="
                         - type: tx.PropertyRead
                           tx.readSource:
@@ -363,10 +373,23 @@ snapshot-to-html-transformation:
                             tx.varName: input
                           tx.readProp: wv.observedAt
                         - type: tx.StringLiteral
-                          tx.stringLiteral: |
+                          tx.stringLiteral: |-
                             </time>
                             </div>
-                            <h1>Macro worldview</h1>
+                            <h1>
+                        - type: tx.Fallback
+                          tx.primary:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: rdfs.label
+                          tx.alternate:
+                            type: tx.StringLiteral
+                            tx.stringLiteral: Worldview
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </h1>
                             <p class="hero-narrative">
                         - type: tx.Normalize
                           tx.normKind: tx.trim-end
@@ -2741,6 +2764,16 @@ snapshot-to-html-transformation:
                             </footer>
                             </article>
                             <script>
+                            // Set active nav state — snapshot-to-html serves both / (latest) and
+                            // /<pkg>/view.html (per-version), so the active link is path-derived
+                            // rather than hardcoded.
+                            (function(){
+                              var path=location.pathname;
+                              var pick;
+                              if(path==='/'||path==='/index.html') pick='/';
+                              else if(/^\/snapshot@/.test(path)) pick='/snapshots/';
+                              if(pick){document.querySelectorAll('ul.site-nav-links a').forEach(function(a){if(a.getAttribute('href')===pick) a.classList.add('active');});}
+                            })();
                             // Reformat ISO datetimes to readable form. Pure presentation —
                             // raw timestamps stay in the source YAML for tools that want them.
                             (function(){

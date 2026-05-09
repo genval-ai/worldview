@@ -30,6 +30,7 @@ snapshot:
 
 view:
   type: wv.WorldviewSnapshot
+  label: Macro worldview
   observedAt: 2026-05-09T03:00:00Z
   narrative: |
     Saturday-morning weekend take into the May 11 Warsh Senate cloture vote.

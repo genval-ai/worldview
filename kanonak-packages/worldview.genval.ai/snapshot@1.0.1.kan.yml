@@ -32,6 +32,7 @@ snapshot:
 
 view:
   type: wv.WorldviewSnapshot
+  label: Macro worldview
   observedAt: 2026-05-08T20:30:00Z
   narrative: |
     Macro state as of May 8 2026. Seven theses dominate allocation:

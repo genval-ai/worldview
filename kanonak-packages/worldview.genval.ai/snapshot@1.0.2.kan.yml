@@ -32,6 +32,7 @@ snapshot:
 
 view:
   type: wv.WorldviewSnapshot
+  label: Macro worldview
   observedAt: 2026-05-08T22:00:00Z
   narrative: |
     End-of-day refresh after the April jobs print and a week of incremental

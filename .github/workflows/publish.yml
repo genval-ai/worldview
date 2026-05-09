@@ -234,7 +234,7 @@ jobs:
           <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>About &mdash; worldview.genval.ai</title>
+          <title>About &middot; worldview.genval.ai</title>
           <style>
           :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--border:#1e293b;--border-soft:#162033;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
           *{box-sizing:border-box;margin:0;padding:0}
@@ -288,7 +288,7 @@ jobs:
           <article class="about">
           <header class="intro">
           <span class="eyebrow">About</span>
-          <h1>worldview.genval.ai</h1>
+          <h1>About the publisher</h1>
           <p class="lead">A record of what we believe is going on in the world, and why &mdash; published as immutable, falsifiable snapshots over time. Each thesis carries an explicit machine-evaluable condition that says when it should be considered broken, plus the typed evidence behind the claim.</p>
           <p class="lead">Built on the <a href="https://kanonak.org">Kanonak Protocol</a>; every package is fetchable from this origin and importable into any Kanonak-compatible tool. <a href="/">Read the latest worldview &rarr;</a></p>
           </header>
