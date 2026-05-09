@@ -165,6 +165,34 @@ jobs:
             --out "_site/snapshots/"
 
       # ---------------------------------------------------------------
+      # 5b. Render the timeline view at /timeline/. The timeline
+      # SetTransformation iterates every snapshot in scope and emits
+      # per-thesis (snapshot, confidence) data points; inline JS draws
+      # an SVG line chart of confidence trajectories. Same multi-scope
+      # invocation pattern as /snapshots/.
+      # ---------------------------------------------------------------
+      - name: Render timeline view to /timeline/
+        run: |
+          set -e
+          mkdir -p _site/timeline
+          scope_args=()
+          for f in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f" .kan.yml)
+            scope_args+=(--scope "worldview.genval.ai/${base}")
+          done
+          if [ "${#scope_args[@]}" -eq 0 ]; then
+            echo "<h1>Timeline</h1><p>No snapshots published yet.</p>" > _site/timeline/index.html
+            exit 0
+          fi
+          echo "Rendering timeline across ${#scope_args[@]} snapshot version(s)"
+          kanonak transform run \
+            worldview.genval.ai/timeline/timeline-transformation \
+            "${scope_args[@]}" \
+            --format html \
+            --out "_site/timeline/"
+
+      # ---------------------------------------------------------------
       # 6. Write the About page. Static HTML; same visual language as
       # the transformation outputs. Describes the ontology, the
       # tooling packages, and how to consume the publisher.
@@ -224,6 +252,7 @@ jobs:
           <ul class="site-nav-links">
           <li><a href="/">Latest</a></li>
           <li><a href="/snapshots/">Snapshots</a></li>
+          <li><a href="/timeline/">Timeline</a></li>
           <li><a href="/about/" class="active">About</a></li>
           </ul>
           </div>
@@ -278,6 +307,11 @@ jobs:
           <code>worldview.genval.ai/landing-page</code>
           <span>A SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending.</span>
           <a href="/landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/timeline</code>
+          <span>A SetTransformation that walks every published snapshot and emits one data point per (snapshot, thesis) pair; inline JS draws an SVG line chart of confidence trajectories. The first non-list aggregate transformation in the publisher.</span>
+          <a href="/timeline/1.0.0.kan.yml">timeline/1.0.0.kan.yml &rarr;</a>
           </li>
           </ul>
           </section>
