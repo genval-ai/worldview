@@ -15,12 +15,16 @@ snapshot-to-html:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.2.0
+          version: 3.6.0
           alias: tx
         - package: document-ast
           match: ^
           version: 1.0.0
           alias: docast
+        - package: site
+          match: ^
+          version: 1.0.0
+          alias: site
     - publisher: worldview.genval.ai
       packages:
         - package: core
@@ -35,6 +39,10 @@ snapshot-to-html:
           match: ^
           version: 1.0.0
           alias: vis
+        - package: pages
+          match: ^
+          version: 1.0.0
+          alias: pages
 
 # =============================================================================
 # WorldviewSnapshot -> single-page HTML report.
@@ -158,38 +166,32 @@ snapshot-to-html-transformation:
                         # STYLE BLOCK
                         # Self-contained dark-mode dashboard CSS. Tokens at the
                         # top so a future fork can re-skin in one place.
+                        #
+                        # Three parts:
+                        #   1. <style> opener
+                        #   2. Shared chrome CSS pulled from the
+                        #      `worldview.genval.ai/pages` package's
+                        #      `worldview-chrome-css` Asset — design tokens,
+                        #      body resets, site-nav layout, anchor-scroll
+                        #      offset. Same bytes serve every layout
+                        #      transformation across this publisher; authored
+                        #      once, consumed via PropertyRead.
+                        #   3. Page-specific CSS for the snapshot view —
+                        #      hero, thesis cards, condition graph, evidence
+                        #      timeline, etc. + </style> closer.
                         # =====================================================
                         - type: tx.StringLiteral
-                          tx.stringLiteral: |
+                          tx.stringLiteral: |-
                             <style>
-                            /* Suppress the CLI's default metadata frontmatter render — the title is consumed via <title>, we don't want it duplicated as visible body content */
-                            dl.metadata{display:none!important}
-                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--bg-input:#0c1220;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--weak:#64748b;--danger:#f87171;--border:#1e293b;--border-soft:#162033;--radius:8px;--radius-sm:4px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif;
-                              /* Visual-token color tuning. Hue comes from each theme via the ontology (vis.themeHue); saturation and lightness are renderer choices that adapt to the surface (dark theme today, could shift for a light theme later). All inline-SVG icon renderers read these to stay visually consistent across pages. */
-                              --theme-arc-saturation:60%;
-                              --theme-arc-lightness:62%;
-                              --theme-ring-saturation:28%;
-                              --theme-ring-lightness:26%;
-                              --theme-fill-saturation:55%;
-                              --theme-fill-lightness:18%
-                            }
-                            *{box-sizing:border-box;margin:0;padding:0}
-                            html{background:var(--bg)}
-                            /* Override the CLI's default light-theme body wrapper (max-width:860px;margin:2rem auto;padding:0 1rem) so our sticky nav can span the full viewport. The article inside has its own max-width centering. */
-                            body{background:var(--bg)!important;color:var(--fg)!important;font-family:var(--font-sans)!important;line-height:1.55!important;font-size:15px!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;max-width:none!important;margin:0!important;padding:0!important}
-                            a{color:var(--accent);text-decoration:none}
-                            a:hover{color:var(--accent-2)}
-                            /* SITE NAV */
-                            nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
-                            /* Anchor-link scroll offset — accounts for the sticky nav so #thesis-X / #any-id lands below the nav with breathing room. Doubles on mobile where the nav wraps to two rows. */
-                            [id]{scroll-margin-top:80px}
-                            @media (max-width:600px){[id]{scroll-margin-top:120px}}
-                            .site-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
-                            a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
-                            ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
-                            ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;transition:color 120ms;font-weight:500}
-                            ul.site-nav-links a:hover{color:var(--fg)}
-                            @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
+
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.UriLiteral
+                            tx.refTo: pages.worldview-chrome-css
+                          tx.readProp: site.content
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
                             article.snapshot{max-width:1400px;margin:0 auto;padding:48px 32px 96px;counter-reset:thesis-counter}
                             @media (max-width:760px){article.snapshot{padding:32px 20px 64px}}
                             /* HERO */
