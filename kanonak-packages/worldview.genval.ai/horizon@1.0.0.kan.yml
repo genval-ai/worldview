@@ -150,11 +150,19 @@ horizon-transformation:
                             header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
                             @media (max-width:760px){header.intro h1{font-size:42px}}
                             header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                            header.intro .lead code{font-family:var(--font-mono);font-size:14px;color:var(--accent);background:rgba(125,211,252,0.08);border:1px solid rgba(125,211,252,0.2);padding:1px 7px;border-radius:3px;letter-spacing:0.02em;font-weight:400;vertical-align:1px}
                             section.chart-section{margin-top:64px}
                             .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
                             .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
-                            .horizon-host{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:24px;overflow-x:auto}
-                            .horizon-host svg{display:block;width:100%;height:auto;min-width:880px}
+                            .horizon-host{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:18px 20px 22px}
+                            .horizon-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-family:var(--font-mono);font-size:11px}
+                            .horizon-toolbar button{background:var(--bg-elev);border:1px solid var(--border);color:var(--fg-dim);padding:4px 10px;border-radius:4px;font-family:var(--font-mono);font-size:13px;cursor:pointer;transition:color 120ms,border-color 120ms;line-height:1;font-weight:600;min-width:30px}
+                            .horizon-toolbar button:hover{color:var(--accent);border-color:var(--accent)}
+                            .horizon-toolbar button:active{background:var(--bg-input)}
+                            .horizon-toolbar .horizon-hint{margin-left:auto;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;font-size:10px}
+                            .horizon-svg-wrap{cursor:grab;user-select:none;-webkit-user-select:none}
+                            .horizon-svg-wrap.dragging{cursor:grabbing}
+                            .horizon-svg-wrap svg{display:block;width:100%;height:auto}
                             .horizon-summary{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
                             .summary-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;font-size:13px;cursor:default;transition:border-color 120ms,opacity 120ms}
                             .summary-row.dimmed{opacity:0.35}
@@ -201,7 +209,15 @@ horizon-transformation:
                             </header>
                             <section class="chart-section">
                             <h2 class="section-title">Evidence over time</h2>
-                            <div class="horizon-host" id="horizon-host"><svg id="horizon-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 380" preserveAspectRatio="xMidYMid meet"></svg></div>
+                            <div class="horizon-host" id="horizon-host">
+                            <div class="horizon-toolbar">
+                            <button data-action="zoom-out" title="Zoom out (or scroll down on chart)" aria-label="Zoom out">&minus;</button>
+                            <button data-action="reset" title="Fit all data" aria-label="Fit all">&#8634;</button>
+                            <button data-action="zoom-in" title="Zoom in (or scroll up on chart)" aria-label="Zoom in">+</button>
+                            <span class="horizon-hint">drag &middot; scroll to zoom</span>
+                            </div>
+                            <div class="horizon-svg-wrap" id="horizon-svg-wrap"></div>
+                            </div>
                             <div class="horizon-summary" id="horizon-summary"></div>
                             </section>
                             <section class="data" aria-hidden="true">
@@ -392,83 +408,170 @@ horizon-transformation:
                                 return;
                               }
                               evList.sort(function(a,b){return a.observedAt-b.observedAt;});
-                              // === Compute time range ===
+                              // === Initial time range — earliest evidence to latest snapshot, with padding ===
                               var tMin=evList[0].observedAt.getTime();
                               var tMax=evList[evList.length-1].observedAt.getTime();
                               snaps.forEach(function(s){if(s.observedAt.getTime()>tMax) tMax=s.observedAt.getTime();});
-                              // Extend right side by ~20% so latest snapshot doesn't hug the edge
-                              var span=tMax-tMin||(7*86400000);
-                              var rightPad=span*0.08;
-                              var leftPad=span*0.04;
-                              var t0=tMin-leftPad, t1=tMax+rightPad;
+                              var span0=tMax-tMin||(7*86400000);
+                              var initialT0=tMin-span0*0.04, initialT1=tMax+span0*0.08;
+                              // === Mutable range state (zoom + pan) ===
+                              var stateT0=initialT0, stateT1=initialT1;
                               // === SVG geometry ===
                               var W=1280, H=380, M={top:34,right:30,bottom:60,left:30};
                               var iW=W-M.left-M.right, iH=H-M.top-M.bottom;
-                              function xS(t){return M.left+((t-t0)/(t1-t0))*iW;}
                               function rootStyle(name,fb){var x=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return x||fb;}
                               var ARC_S=rootStyle('--theme-arc-saturation','60%');
                               var ARC_L=rootStyle('--theme-arc-lightness','62%');
-                              // === Build SVG ===
-                              var p=[];
-                              p.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">');
-                              // Snapshot vertical lines + version labels
-                              snaps.forEach(function(s){
-                                var x=xS(s.observedAt.getTime());
-                                p.push('<line x1="'+x+'" x2="'+x+'" y1="'+M.top+'" y2="'+(H-M.bottom+6)+'" stroke="rgba(125,211,252,0.30)" stroke-width="1" stroke-dasharray="3,3"/>');
-                                p.push('<text x="'+x+'" y="'+(M.top-12)+'" fill="var(--accent)" font-size="10" font-family="ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">v'+s.version+'</text>');
-                              });
-                              // Time axis baseline
-                              var baselineY=M.top+iH*0.5;
-                              p.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+baselineY+'" y2="'+baselineY+'" stroke="rgba(148,163,184,0.18)" stroke-width="1"/>');
-                              // X-axis date ticks — month boundaries within range
-                              function* monthTicks(){
-                                var d=new Date(t0); d.setUTCDate(1); d.setUTCHours(0,0,0,0);
-                                while(d.getTime()<=t1){
-                                  if(d.getTime()>=t0) yield new Date(d);
-                                  d.setUTCMonth(d.getUTCMonth()+1);
-                                }
-                              }
-                              var ticks=[]; for(var t of monthTicks()) ticks.push(t);
-                              ticks.forEach(function(d){
-                                var x=xS(d.getTime());
-                                p.push('<line x1="'+x+'" x2="'+x+'" y1="'+(baselineY-4)+'" y2="'+(baselineY+4)+'" stroke="rgba(148,163,184,0.35)" stroke-width="1"/>');
-                                var lbl=d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});
-                                p.push('<text x="'+x+'" y="'+(H-M.bottom+22)+'" fill="#9aa5b8" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">'+lbl+'</text>');
-                                if(d.getUTCMonth()===0||d.getTime()===ticks[0].getTime()){
-                                  p.push('<text x="'+x+'" y="'+(H-M.bottom+38)+'" fill="#6b7689" font-size="9" font-family="ui-monospace, monospace" text-anchor="middle">'+d.getUTCFullYear()+'</text>');
-                                }
-                              });
-                              // Evidence markers — stacked vertically when overlapping at same x
-                              // Use theme hue for color; size by strength.
                               function strengthRadius(s){if(s==='evidence-strong') return 5; if(s==='evidence-weak') return 3; return 4;}
-                              // Compute marker positions with simple force-resolution for overlap
-                              var laneSpacing=14, maxLanesUp=Math.floor((iH/2-12)/laneSpacing), maxLanesDown=Math.floor((iH/2-12)/laneSpacing);
-                              var occupiedAtX={}; // map of x-bucket -> max lane used
-                              evList.forEach(function(ev){
-                                var x=xS(ev.observedAt.getTime());
-                                var bucket=Math.round(x/8);
-                                var lane=(occupiedAtX[bucket]||0)+1;
-                                occupiedAtX[bucket]=lane;
-                                // alternate up/down by lane parity
-                                var dir=(lane%2===1)?-1:1;
-                                var rank=Math.ceil(lane/2);
-                                ev._x=x;
-                                ev._y=baselineY+dir*rank*laneSpacing;
+                              function monthTicks(t0,t1){
+                                var out=[]; var d=new Date(t0); d.setUTCDate(1); d.setUTCHours(0,0,0,0);
+                                while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d)); d.setUTCMonth(d.getUTCMonth()+1);}
+                                return out;
+                              }
+                              function dayTicks(t0,t1,everyN){
+                                var out=[]; var d=new Date(t0); d.setUTCHours(0,0,0,0);
+                                while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d)); d.setUTCDate(d.getUTCDate()+everyN);}
+                                return out;
+                              }
+                              // === Render — reads stateT0/stateT1, rebuilds SVG markup ===
+                              function render(){
+                                var t0=stateT0, t1=stateT1, span=t1-t0;
+                                function xS(t){return M.left+((t-t0)/span)*iW;}
+                                var p=[];
+                                p.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">');
+                                // Snapshot vertical lines + version labels (only those within range)
+                                snaps.forEach(function(s){
+                                  var st=s.observedAt.getTime();
+                                  if(st<t0||st>t1) return;
+                                  var x=xS(st);
+                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+M.top+'" y2="'+(H-M.bottom+6)+'" stroke="rgba(125,211,252,0.32)" stroke-width="1" stroke-dasharray="3,3"/>');
+                                  p.push('<text x="'+x+'" y="'+(M.top-12)+'" fill="var(--accent)" font-size="10" font-family="ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">v'+s.version+'</text>');
+                                });
+                                // Baseline
+                                var baselineY=M.top+iH*0.5;
+                                p.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+baselineY+'" y2="'+baselineY+'" stroke="rgba(148,163,184,0.18)" stroke-width="1"/>');
+                                // Tick scale picker — span < 8 days: every 1 day; < 35 days: every week; < 95 days: every fortnight; else month boundaries
+                                var dayMs=86400000, ticks, fmtFn;
+                                if(span<8*dayMs){
+                                  ticks=dayTicks(t0,t1,1);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else if(span<35*dayMs){
+                                  ticks=dayTicks(t0,t1,7);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else if(span<95*dayMs){
+                                  ticks=dayTicks(t0,t1,14);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else {
+                                  ticks=monthTicks(t0,t1);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});};
+                                }
+                                ticks.forEach(function(d,i){
+                                  var x=xS(d.getTime());
+                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+(baselineY-4)+'" y2="'+(baselineY+4)+'" stroke="rgba(148,163,184,0.35)" stroke-width="1"/>');
+                                  p.push('<text x="'+x+'" y="'+(H-M.bottom+22)+'" fill="#9aa5b8" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">'+fmtFn(d)+'</text>');
+                                  if(i===0||d.getUTCMonth()===0&&d.getUTCDate()===1){
+                                    p.push('<text x="'+x+'" y="'+(H-M.bottom+38)+'" fill="#6b7689" font-size="9" font-family="ui-monospace, monospace" text-anchor="middle">'+d.getUTCFullYear()+'</text>');
+                                  }
+                                });
+                                // Evidence markers — only those within current range
+                                var visibleEv=evList.filter(function(ev){var t=ev.observedAt.getTime();return t>=t0&&t<=t1;});
+                                var laneSpacing=14;
+                                var occupiedAtX={};
+                                visibleEv.forEach(function(ev){
+                                  var x=xS(ev.observedAt.getTime());
+                                  var bucket=Math.round(x/8);
+                                  var lane=(occupiedAtX[bucket]||0)+1;
+                                  occupiedAtX[bucket]=lane;
+                                  var dir=(lane%2===1)?-1:1;
+                                  var rank=Math.ceil(lane/2);
+                                  ev._x=x;
+                                  ev._y=baselineY+dir*rank*laneSpacing;
+                                });
+                                visibleEv.forEach(function(ev){
+                                  p.push('<line class="stem" data-thesis="'+(ev.theses[0]||'')+'" x1="'+ev._x+'" x2="'+ev._x+'" y1="'+baselineY+'" y2="'+ev._y+'" stroke="hsl('+ev.primaryHue+', 30%, 30%)" stroke-width="1" opacity="0.6"/>');
+                                });
+                                visibleEv.forEach(function(ev){
+                                  var r=strengthRadius(ev.strength);
+                                  var fill='hsl('+ev.primaryHue+', '+ARC_S+', '+ARC_L+')';
+                                  var stroke='hsl('+ev.primaryHue+', 60%, 35%)';
+                                  p.push('<circle class="ev-marker" data-thesis="'+(ev.theses[0]||'')+'" data-all-theses="'+escapeAttr(ev.theses.join(','))+'" cx="'+ev._x+'" cy="'+ev._y+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2" opacity="0.9"><title>'+escapeAttr(ev.statement+' (observed '+fmtFull(ev.observedAt)+')')+'</title></circle>');
+                                });
+                                p.push('</svg>');
+                                document.getElementById('horizon-svg-wrap').innerHTML=p.join('');
+                              }
+                              function setRange(t0,t1){
+                                var span=t1-t0;
+                                var minSpan=4*60*60*1000; // 4h floor
+                                var maxSpan=(initialT1-initialT0)*8;
+                                if(span<minSpan||span>maxSpan) return;
+                                stateT0=t0; stateT1=t1;
+                                render();
+                              }
+                              function zoomAt(factor,anchorT){
+                                setRange(
+                                  anchorT-(anchorT-stateT0)*factor,
+                                  anchorT+(stateT1-anchorT)*factor
+                                );
+                              }
+                              function clientToData(clientX){
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return (stateT0+stateT1)/2;
+                                var rect=svgEl.getBoundingClientRect();
+                                var ratio=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+                                // Map screen ratio to data, accounting for SVG viewBox left margin
+                                var innerLeft=M.left/W, innerRight=(W-M.right)/W;
+                                var dataRatio=(ratio-innerLeft)/(innerRight-innerLeft);
+                                return stateT0+dataRatio*(stateT1-stateT0);
+                              }
+                              // === Initial render ===
+                              render();
+                              // === Interactive handlers ===
+                              var wrapEl=document.getElementById('horizon-svg-wrap');
+                              wrapEl.addEventListener('wheel',function(e){
+                                e.preventDefault();
+                                var anchor=clientToData(e.clientX);
+                                zoomAt(e.deltaY>0?1.18:0.85,anchor);
+                              },{passive:false});
+                              var dragX=null, dragT0, dragT1;
+                              wrapEl.addEventListener('mousedown',function(e){
+                                if(e.button!==0) return;
+                                dragX=e.clientX; dragT0=stateT0; dragT1=stateT1;
+                                wrapEl.classList.add('dragging');
+                                e.preventDefault();
                               });
-                              // Draw "stem" lines from baseline to each marker
-                              evList.forEach(function(ev){
-                                p.push('<line class="stem" data-thesis="'+(ev.theses[0]||'')+'" x1="'+ev._x+'" x2="'+ev._x+'" y1="'+baselineY+'" y2="'+ev._y+'" stroke="hsl('+ev.primaryHue+', 30%, 30%)" stroke-width="1" opacity="0.6"/>');
+                              window.addEventListener('mousemove',function(e){
+                                if(dragX===null) return;
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return;
+                                var rect=svgEl.getBoundingClientRect();
+                                var dx=e.clientX-dragX;
+                                var dt=-dx/rect.width*(dragT1-dragT0);
+                                setRange(dragT0+dt, dragT1+dt);
                               });
-                              // Draw markers
-                              evList.forEach(function(ev){
-                                var r=strengthRadius(ev.strength);
-                                var fill='hsl('+ev.primaryHue+', '+ARC_S+', '+ARC_L+')';
-                                var stroke='hsl('+ev.primaryHue+', 60%, 35%)';
-                                var thesisAttr=ev.theses.map(function(n){return ' '+n;}).join('').trim();
-                                p.push('<circle class="ev-marker" data-thesis="'+(ev.theses[0]||'')+'" data-all-theses="'+escapeAttr(ev.theses.join(','))+'" cx="'+ev._x+'" cy="'+ev._y+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2" opacity="0.9"><title>'+escapeAttr(ev.statement+' (observed '+fmtFull(ev.observedAt)+')')+'</title></circle>');
+                              window.addEventListener('mouseup',function(){
+                                if(dragX!==null){dragX=null; wrapEl.classList.remove('dragging');}
                               });
-                              p.push('</svg>');
-                              document.getElementById('horizon-chart').outerHTML=p.join('');
+                              // Touch — pan only (single finger). Pinch-to-zoom would need more handlers.
+                              var touchX=null, touchT0, touchT1;
+                              wrapEl.addEventListener('touchstart',function(e){
+                                if(e.touches.length!==1) return;
+                                touchX=e.touches[0].clientX; touchT0=stateT0; touchT1=stateT1;
+                              },{passive:true});
+                              wrapEl.addEventListener('touchmove',function(e){
+                                if(touchX===null||e.touches.length!==1) return;
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return;
+                                var rect=svgEl.getBoundingClientRect();
+                                var dx=e.touches[0].clientX-touchX;
+                                var dt=-dx/rect.width*(touchT1-touchT0);
+                                setRange(touchT0+dt, touchT1+dt);
+                                e.preventDefault();
+                              },{passive:false});
+                              wrapEl.addEventListener('touchend',function(){touchX=null;});
+                              // Toolbar buttons
+                              document.querySelector('.horizon-toolbar [data-action="zoom-in"]').addEventListener('click',function(){zoomAt(0.7,(stateT0+stateT1)/2);});
+                              document.querySelector('.horizon-toolbar [data-action="zoom-out"]').addEventListener('click',function(){zoomAt(1.43,(stateT0+stateT1)/2);});
+                              document.querySelector('.horizon-toolbar [data-action="reset"]').addEventListener('click',function(){stateT0=initialT0; stateT1=initialT1; render();});
                               // === Build per-thesis summary rows (legend with stats) ===
                               var summaryEl=document.getElementById('horizon-summary');
                               var thesisList=Object.keys(theses).map(function(k){return theses[k];});
