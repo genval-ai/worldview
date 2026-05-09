@@ -177,11 +177,25 @@ changes-transformation:
                             .change-evidence[open] summary::before{content:"-"}
                             .change-evidence summary:hover{color:var(--fg-dim)}
                             .change-evidence ul{list-style:none;padding:8px 0 0 22px;margin:0}
-                            .change-evidence li{padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:13px;color:var(--fg-dim);line-height:1.6}
+                            .change-evidence li{padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:13px;color:var(--fg-dim);line-height:1.6;display:flex;align-items:flex-start;gap:10px;position:relative}
                             .change-evidence li:last-child{border-bottom:none}
-                            .change-evidence li code{font-family:var(--font-mono);font-size:11px;color:var(--accent);background:rgba(125,211,252,0.08);padding:2px 6px;border-radius:3px;margin-right:8px;letter-spacing:0.02em}
+                            .ev-strength-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:7px}
+                            .ev-strength-dot.evidence-strong{background:var(--strong);box-shadow:0 0 6px rgba(52,211,153,0.4)}
+                            .ev-strength-dot.evidence-moderate{background:var(--moderate);box-shadow:0 0 6px rgba(251,191,36,0.4)}
+                            .ev-strength-dot.evidence-weak{background:var(--weak)}
+                            .ev-statement{flex:1;color:var(--fg-dim);min-width:0}
+                            .ev-citation-link{flex-shrink:0;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);padding:2px 8px;border:1px solid var(--border);border-radius:3px;text-decoration:none;letter-spacing:0.04em;transition:color 120ms,border-color 120ms;align-self:flex-start;margin-top:2px}
+                            .ev-citation-link:hover{color:var(--accent);border-color:var(--accent)}
+                            /* Tooltip on hover — strength label + observed date. Citation already visible as a link. */
+                            .change-evidence li:hover .ev-tip{opacity:1;transform:translateY(0)}
+                            .ev-tip{position:absolute;bottom:calc(100% - 4px);left:18px;background:var(--bg-elev);border:1px solid var(--border);padding:8px 12px;border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--fg);letter-spacing:0.04em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 120ms,transform 120ms;z-index:50;box-shadow:0 4px 16px -4px rgba(0,0,0,0.5);transform:translateY(4px);display:flex;gap:14px;align-items:center}
+                            .ev-tip .ev-tip-strength{padding:1px 6px;border-radius:3px;text-transform:uppercase;font-size:10px;letter-spacing:0.08em}
+                            .ev-tip .ev-tip-strength.evidence-strong{background:rgba(52,211,153,0.15);color:var(--strong);border:1px solid rgba(52,211,153,0.3)}
+                            .ev-tip .ev-tip-strength.evidence-moderate{background:rgba(251,191,36,0.15);color:var(--moderate);border:1px solid rgba(251,191,36,0.3)}
+                            .ev-tip .ev-tip-strength.evidence-weak{background:rgba(100,116,139,0.15);color:var(--weak);border:1px solid var(--border)}
+                            .ev-tip .ev-tip-date{color:var(--fg-dim)}
                             .change-evidence.removed summary{color:var(--danger)}
-                            .change-evidence.removed li code{color:var(--danger);background:rgba(248,113,113,0.08)}
+                            .change-evidence.removed li .ev-strength-dot{filter:grayscale(0.7) opacity(0.5)}
                             .new-thesis-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:rgba(52,211,153,0.12);color:var(--strong);border:1px solid rgba(52,211,153,0.3);margin-left:8px}
                             .stable-summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;padding:14px 28px;border-top:1px solid var(--border-soft);background:var(--bg-card)}
                             .data{display:none}
@@ -345,6 +359,35 @@ changes-transformation:
                                                 tx.varName: evRef
                                             tx.readProp: wv.evidenceStatement
                                           - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-observed-at="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.evidenceObservedAt
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-strength="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-citation="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.citation
+                                          - type: tx.StringLiteral
                                             tx.stringLiteral: '"></div>'
 
                                     - type: tx.StringLiteral
@@ -374,7 +417,12 @@ changes-transformation:
                                 s.querySelectorAll('.thesis-data').forEach(function(t){
                                   var evidence={};
                                   t.querySelectorAll('.evidence-ref').forEach(function(e){
-                                    evidence[e.dataset.evidenceName]=e.dataset.evidenceStatement||'';
+                                    evidence[e.dataset.evidenceName]={
+                                      statement:e.dataset.evidenceStatement||'',
+                                      observedAt:e.dataset.evidenceObservedAt||'',
+                                      strength:e.dataset.evidenceStrength||'',
+                                      citation:e.dataset.evidenceCitation||''
+                                    };
                                   });
                                   theses[t.dataset.thesisName]={
                                     label:t.dataset.thesisLabel||t.dataset.thesisName,
@@ -407,6 +455,31 @@ changes-transformation:
                               function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
                               function deltaClass(d){if(Math.abs(d)<0.005)return 'flat';return d>0?'up':'down';}
                               function deltaText(d){if(Math.abs(d)<0.005)return '0pt';return (d>0?'+':'')+(d*100).toFixed(0)+'pt';}
+                              function strengthLabel(s){var m={'evidence-strong':'Strong','evidence-moderate':'Moderate','evidence-weak':'Weak'};return m[s]||s;}
+                              function fmtEvDate(iso){
+                                if(!iso) return '';
+                                var d=new Date(iso); if(isNaN(d.getTime())) return '';
+                                return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});
+                              }
+                              function shortHost(url){try{var u=new URL(url);return u.hostname.replace(/^www\./,'');}catch(_){return 'cite';}}
+                              function renderEvidenceLi(ev){
+                                var strengthCls=ev.strength||'evidence-moderate';
+                                var html='<li>';
+                                html+='<span class="ev-strength-dot '+escapeHtml(strengthCls)+'" aria-hidden="true"></span>';
+                                html+='<span class="ev-statement">'+escapeHtml(ev.statement||'(no statement)')+'</span>';
+                                if(ev.citation){
+                                  html+='<a class="ev-citation-link" href="'+escapeHtml(ev.citation)+'" target="_blank" rel="noopener" title="'+escapeHtml(ev.citation)+'">'+escapeHtml(shortHost(ev.citation))+' &#8599;</a>';
+                                }
+                                // Hover tooltip with strength badge + observed date
+                                if(ev.strength||ev.observedAt){
+                                  html+='<span class="ev-tip" aria-hidden="true">';
+                                  if(ev.strength)html+='<span class="ev-tip-strength '+escapeHtml(strengthCls)+'">'+escapeHtml(strengthLabel(ev.strength))+'</span>';
+                                  if(ev.observedAt)html+='<span class="ev-tip-date">Observed '+escapeHtml(fmtEvDate(ev.observedAt))+'</span>';
+                                  html+='</span>';
+                                }
+                                html+='</li>';
+                                return html;
+                              }
                               // Build status-transitions section
                               var statusEvents=[];
                               pairs.slice().reverse().forEach(function(pair){
@@ -436,14 +509,14 @@ changes-transformation:
                                   var fromT=pair.from.theses[name];
                                   var toT=pair.to.theses[name];
                                   if(!fromT){
-                                    entries.push({type:'new',name:name,label:toT.label,confidence:toT.confidence,status:toT.status,rationale:toT.rationale,delta:null,newEvidence:Object.keys(toT.evidence).map(function(en){return{name:en,statement:toT.evidence[en]};})});
+                                    entries.push({type:'new',name:name,label:toT.label,confidence:toT.confidence,status:toT.status,rationale:toT.rationale,delta:null,newEvidence:Object.keys(toT.evidence).map(function(en){var ev=toT.evidence[en];return{name:en,statement:ev.statement,observedAt:ev.observedAt,strength:ev.strength,citation:ev.citation};})});
                                     newEvCount+=Object.keys(toT.evidence).length;
                                   }else{
                                     var delta=toT.confidence-fromT.confidence;
                                     var newEv=[];
-                                    Object.keys(toT.evidence).forEach(function(en){if(!(en in fromT.evidence))newEv.push({name:en,statement:toT.evidence[en]});});
+                                    Object.keys(toT.evidence).forEach(function(en){if(!(en in fromT.evidence)){var ev=toT.evidence[en];newEv.push({name:en,statement:ev.statement,observedAt:ev.observedAt,strength:ev.strength,citation:ev.citation});}});
                                     var removedEv=[];
-                                    Object.keys(fromT.evidence).forEach(function(en){if(!(en in toT.evidence))removedEv.push({name:en,statement:fromT.evidence[en]});});
+                                    Object.keys(fromT.evidence).forEach(function(en){if(!(en in toT.evidence)){var ev=fromT.evidence[en];removedEv.push({name:en,statement:ev.statement,observedAt:ev.observedAt,strength:ev.strength,citation:ev.citation});}});
                                     var statusChanged=fromT.status!==toT.status;
                                     if(Math.abs(delta)>=0.005||newEv.length>0||removedEv.length>0||statusChanged){
                                       entries.push({type:'change',name:name,label:toT.label,fromConf:fromT.confidence,toConf:toT.confidence,delta:delta,rationale:toT.rationale,fromStatus:fromT.status,toStatus:toT.status,statusChanged:statusChanged,newEvidence:newEv,removedEvidence:removedEv});
@@ -507,12 +580,12 @@ changes-transformation:
                                   if(e.rationale){html+='<p class="change-rationale">'+escapeHtml(e.rationale)+'</p>';}
                                   if(e.newEvidence&&e.newEvidence.length>0){
                                     html+='<details class="change-evidence" open><summary>'+e.newEvidence.length+' new evidence item'+(e.newEvidence.length===1?'':'s')+'</summary><ul>';
-                                    e.newEvidence.forEach(function(ev){html+='<li><code>'+escapeHtml(ev.name)+'</code> '+escapeHtml(ev.statement)+'</li>';});
+                                    e.newEvidence.forEach(function(ev){html+=renderEvidenceLi(ev);});
                                     html+='</ul></details>';
                                   }
                                   if(e.removedEvidence&&e.removedEvidence.length>0){
                                     html+='<details class="change-evidence removed"><summary>'+e.removedEvidence.length+' removed evidence item'+(e.removedEvidence.length===1?'':'s')+'</summary><ul>';
-                                    e.removedEvidence.forEach(function(ev){html+='<li><code>'+escapeHtml(ev.name)+'</code> '+escapeHtml(ev.statement)+'</li>';});
+                                    e.removedEvidence.forEach(function(ev){html+=renderEvidenceLi(ev);});
                                     html+='</ul></details>';
                                   }
                                   html+='</li>';
