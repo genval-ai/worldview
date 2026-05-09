@@ -135,8 +135,10 @@ changes-transformation:
 
                         - type: tx.PropertyRead
                           tx.readSource:
-                            type: tx.UriLiteral
-                            tx.refTo: pages.worldview-chrome-css
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.UriLiteral
+                              tx.refTo: pages.worldview-chrome-css
                           tx.readProp: site.content
 
                         - type: tx.StringLiteral
