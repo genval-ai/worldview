@@ -164,7 +164,15 @@ snapshot-to-html-transformation:
                             <style>
                             /* Suppress the CLI's default metadata frontmatter render — the title is consumed via <title>, we don't want it duplicated as visible body content */
                             dl.metadata{display:none!important}
-                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--bg-input:#0c1220;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--weak:#64748b;--danger:#f87171;--border:#1e293b;--border-soft:#162033;--radius:8px;--radius-sm:4px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
+                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--bg-input:#0c1220;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--accent-3:#0ea5e9;--strong:#34d399;--moderate:#fbbf24;--weak:#64748b;--danger:#f87171;--border:#1e293b;--border-soft:#162033;--radius:8px;--radius-sm:4px;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif;
+                              /* Visual-token color tuning. Hue comes from each theme via the ontology (vis.themeHue); saturation and lightness are renderer choices that adapt to the surface (dark theme today, could shift for a light theme later). All inline-SVG icon renderers read these to stay visually consistent across pages. */
+                              --theme-arc-saturation:60%;
+                              --theme-arc-lightness:62%;
+                              --theme-ring-saturation:28%;
+                              --theme-ring-lightness:26%;
+                              --theme-fill-saturation:55%;
+                              --theme-fill-lightness:18%
+                            }
                             *{box-sizing:border-box;margin:0;padding:0}
                             html{background:var(--bg)}
                             /* Override the CLI's default light-theme body wrapper (max-width:860px;margin:2rem auto;padding:0 1rem) so our sticky nav can span the full viewport. The article inside has its own max-width centering. */
@@ -2875,7 +2883,16 @@ snapshot-to-html-transformation:
                               // Render thesis-icon SVGs — arc disc whose fill = confidence,
                               // hue = thesisTheme, stroke style = status. Same primitive at every
                               // size; here we render compact (28px) inline next to each thesis label.
+                              // Saturation / lightness pulled from CSS vars on :root so every page
+                              // and every renderer stays visually identical, and a future light-mode
+                              // override flips all icons across the site at once.
                               (function(){
+                                var rootStyle=getComputedStyle(document.documentElement);
+                                function v(name,fallback){var x=rootStyle.getPropertyValue(name).trim();return x||fallback;}
+                                var ARC_S=v('--theme-arc-saturation','60%');
+                                var ARC_L=v('--theme-arc-lightness','62%');
+                                var RING_S=v('--theme-ring-saturation','28%');
+                                var RING_L=v('--theme-ring-lightness','26%');
                                 function arcPath(cx,cy,r,startDeg,endDeg){
                                   var s=(startDeg-90)*Math.PI/180, e=(endDeg-90)*Math.PI/180;
                                   var x1=cx+r*Math.cos(s), y1=cy+r*Math.sin(s);
@@ -2890,9 +2907,9 @@ snapshot-to-html-transformation:
                                   if(isNaN(conf)) conf=0;
                                   if(isNaN(hue)) hue=210;
                                   var size=28, cx=size/2, cy=size/2, r=11, sw=2.5;
-                                  var ringStroke='hsl('+hue+', 28%, 26%)';
-                                  var arcStroke='hsl('+hue+', 60%, 62%)';
-                                  if(status==='invalidated') arcStroke='hsl(0, 60%, 60%)';
+                                  var ringStroke='hsl('+hue+', '+RING_S+', '+RING_L+')';
+                                  var arcStroke='hsl('+hue+', '+ARC_S+', '+ARC_L+')';
+                                  if(status==='invalidated') arcStroke='hsl(0, '+ARC_S+', '+ARC_L+')';
                                   var dashAttr=(status==='retired'?' stroke-dasharray="2.5,2"':'');
                                   var arc;
                                   if(conf>=0.999){
