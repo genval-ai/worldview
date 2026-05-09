@@ -218,6 +218,7 @@ changes-transformation:
                             <li><a href="/snapshots/">Snapshots</a></li>
                             <li><a href="/timeline/">Timeline</a></li>
                             <li><a href="/changes/" class="active">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
                             <li><a href="/about/">About</a></li>
                             </ul>
                             </div>

@@ -220,6 +220,33 @@ jobs:
             --out "_site/changes/"
 
       # ---------------------------------------------------------------
+      # 5d. Render the horizon (temporal axis) view at /horizon/. Same
+      # multi-scope pattern. Walks every snapshot's evidence and plots
+      # observedAt dates as a single horizontal time axis with snapshot
+      # vertical lines and per-thesis color coding.
+      # ---------------------------------------------------------------
+      - name: Render horizon view to /horizon/
+        run: |
+          set -e
+          mkdir -p _site/horizon
+          scope_args=()
+          for f in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f" .kan.yml)
+            scope_args+=(--scope "worldview.genval.ai/${base}")
+          done
+          if [ "${#scope_args[@]}" -eq 0 ]; then
+            echo "<h1>Horizon</h1><p>No snapshots published yet.</p>" > _site/horizon/index.html
+            exit 0
+          fi
+          echo "Rendering horizon view across ${#scope_args[@]} snapshot version(s)"
+          kanonak transform run \
+            worldview.genval.ai/horizon/horizon-transformation \
+            "${scope_args[@]}" \
+            --format html \
+            --out "_site/horizon/"
+
+      # ---------------------------------------------------------------
       # 6. Write the About page. Static HTML; same visual language as
       # the transformation outputs. Describes the ontology, the
       # tooling packages, and how to consume the publisher.
@@ -283,6 +310,7 @@ jobs:
           <li><a href="/snapshots/">Snapshots</a></li>
           <li><a href="/timeline/">Timeline</a></li>
           <li><a href="/changes/">Changes</a></li>
+          <li><a href="/horizon/">Horizon</a></li>
           <li><a href="/about/" class="active">About</a></li>
           </ul>
           </div>
@@ -352,6 +380,11 @@ jobs:
           <code>worldview.genval.ai/changes</code>
           <span>A diff-centric SetTransformation that triple-walks each snapshot's theses and supportingEvidence; inline JS computes consecutive-pair set-differences and renders the change log newest-first &mdash; per-thesis confidence shifts, the author's rationale, and exactly which Evidence items landed alongside the change.</span>
           <a href="/changes/1.0.0.kan.yml">changes/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/horizon</code>
+          <span>A temporal-axis SetTransformation that aggregates every snapshot's evidence into a single horizontal time axis. Each marker is a typed Evidence dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports via <code>vis.thesisTheme</code>. Snapshot publication dates land as vertical lines.</span>
+          <a href="/horizon/1.0.0.kan.yml">horizon/1.0.0.kan.yml &rarr;</a>
           </li>
           </ul>
           </section>
