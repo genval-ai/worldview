@@ -365,12 +365,12 @@ jobs:
           </section>
 
           <section class="about-section">
-          <h2 class="section-title">Roadmap</h2>
-          <p>What's on the bench for the next few snapshots:</p>
+          <h2 class="section-title">What's next</h2>
+          <p>Cross-version aggregation, the confidence-trajectory chart at <a href="/timeline/">/timeline/</a>, and the diff-centric audit log at <a href="/changes/">/changes/</a> are all live. What's still on the bench:</p>
           <ul>
           <li>
-          <code>Time-series visualization</code>
-          <span>A chart layer across <code>snapshot</code> versions showing how each thesis's confidence evolves, when theses appear / retire / invalidate, and how the regime narrative shifts. Cross-version aggregation already works; the chart layer is the next piece.</span>
+          <code>Live invalidation distance</code>
+          <span>The killer-feature pass on the structured <code>invalidationCondition</code> trees: a rules engine that reads each thesis's typed conditions (<code>Threshold WTI &lt; 80 over 30 calendar-days</code>, etc.), binds the observables to live evidence streams, and computes how far each thesis is from invalidation at every snapshot. Charts that distance over time. Closes the audit loop &mdash; this is the publisher's claim to being meaningfully different from a Substack.</span>
           </li>
           <li>
           <code>More evidence sources</code>
@@ -378,7 +378,7 @@ jobs:
           </li>
           <li>
           <code>Programmatic consumers</code>
-          <span>Worked examples for downstream tools that read the published packages directly: rules-engine evaluation of invalidation conditions against live data, comparative-confidence dashboards, regime-change detectors.</span>
+          <span>Worked examples for downstream tools that read the published packages directly: comparative-confidence dashboards, regime-change detectors, agents that consume the snapshot stream as input to other reasoning.</span>
           </li>
           </ul>
           </section>
