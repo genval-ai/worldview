@@ -416,8 +416,8 @@ horizon-transformation:
                               var initialT0=tMin-span0*0.04, initialT1=tMax+span0*0.08;
                               // === Mutable range state (zoom + pan) ===
                               var stateT0=initialT0, stateT1=initialT1;
-                              // === SVG geometry ===
-                              var W=1280, H=380, M={top:34,right:30,bottom:60,left:30};
+                              // === SVG geometry — left gutter widens to fit per-thesis lane labels ===
+                              var W=1280, H=400, M={top:34,right:30,bottom:60,left:160};
                               var iW=W-M.left-M.right, iH=H-M.top-M.bottom;
                               function rootStyle(name,fb){var x=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return x||fb;}
                               var ARC_S=rootStyle('--theme-arc-saturation','60%');
@@ -433,12 +433,39 @@ horizon-transformation:
                                 while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d)); d.setUTCDate(d.getUTCDate()+everyN);}
                                 return out;
                               }
+                              // === Lane assignment — Y is now meaningful: one row per thesis,
+                              // sorted by theme hue. Evidence supporting multiple theses renders
+                              // a marker in each lane it belongs to, so cross-thesis evidence
+                              // becomes a visually aligned vertical column. ===
+                              var lanesOrdered=Object.keys(theses).map(function(k){return theses[k];});
+                              lanesOrdered.sort(function(a,b){return a.hue-b.hue;});
+                              var laneIndex={};
+                              lanesOrdered.forEach(function(t,i){laneIndex[t.name]=i;});
+                              // Truncate long thesis labels so they fit the left gutter
+                              function truncLabel(s,n){return (s||'').length>n?(s.substring(0,n-1)+'…'):(s||'');}
                               // === Render — reads stateT0/stateT1, rebuilds SVG markup ===
                               function render(){
                                 var t0=stateT0, t1=stateT1, span=t1-t0;
                                 function xS(t){return M.left+((t-t0)/span)*iW;}
+                                var nLanes=lanesOrdered.length||1;
+                                var laneH=iH/nLanes;
+                                function laneCenterY(i){return M.top+laneH*(i+0.5);}
                                 var p=[];
                                 p.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">');
+                                // Lane backgrounds — alternating zebra tint at the theme hue, very faint
+                                lanesOrdered.forEach(function(t,i){
+                                  var y=M.top+laneH*i;
+                                  var fill='hsla('+t.hue+', 40%, 50%, 0.04)';
+                                  if(i%2===1) fill='hsla('+t.hue+', 40%, 50%, 0.07)';
+                                  p.push('<rect class="lane-bg" data-thesis="'+t.name+'" x="'+M.left+'" y="'+y+'" width="'+iW+'" height="'+laneH+'" fill="'+fill+'"/>');
+                                });
+                                // Lane centerlines + left labels
+                                lanesOrdered.forEach(function(t,i){
+                                  var cy=laneCenterY(i);
+                                  p.push('<line class="lane-line" data-thesis="'+t.name+'" x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+cy+'" y2="'+cy+'" stroke="hsla('+t.hue+', 30%, 50%, 0.18)" stroke-width="1"/>');
+                                  // Lane label on left (right-aligned to the chart edge)
+                                  p.push('<text class="lane-label" data-thesis="'+t.name+'" x="'+(M.left-10)+'" y="'+(cy+0.5)+'" fill="hsl('+t.hue+', '+ARC_S+', '+ARC_L+')" font-size="10" font-family="ui-monospace, monospace" text-anchor="end" dominant-baseline="middle" letter-spacing="0.04em">'+escapeText(truncLabel(t.label,22))+'</text>');
+                                });
                                 // Snapshot vertical lines + version labels (only those within range)
                                 snaps.forEach(function(s){
                                   var st=s.observedAt.getTime();
@@ -447,10 +474,7 @@ horizon-transformation:
                                   p.push('<line x1="'+x+'" x2="'+x+'" y1="'+M.top+'" y2="'+(H-M.bottom+6)+'" stroke="rgba(125,211,252,0.32)" stroke-width="1" stroke-dasharray="3,3"/>');
                                   p.push('<text x="'+x+'" y="'+(M.top-12)+'" fill="var(--accent)" font-size="10" font-family="ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">v'+s.version+'</text>');
                                 });
-                                // Baseline
-                                var baselineY=M.top+iH*0.5;
-                                p.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+baselineY+'" y2="'+baselineY+'" stroke="rgba(148,163,184,0.18)" stroke-width="1"/>');
-                                // Tick scale picker — span < 8 days: every 1 day; < 35 days: every week; < 95 days: every fortnight; else month boundaries
+                                // Tick scale picker — adapts with zoom
                                 var dayMs=86400000, ticks, fmtFn;
                                 if(span<8*dayMs){
                                   ticks=dayTicks(t0,t1,1);
@@ -465,36 +489,54 @@ horizon-transformation:
                                   ticks=monthTicks(t0,t1);
                                   fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});};
                                 }
+                                var axisY=H-M.bottom;
+                                p.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+axisY+'" y2="'+axisY+'" stroke="rgba(148,163,184,0.25)" stroke-width="1"/>');
                                 ticks.forEach(function(d,i){
                                   var x=xS(d.getTime());
-                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+(baselineY-4)+'" y2="'+(baselineY+4)+'" stroke="rgba(148,163,184,0.35)" stroke-width="1"/>');
-                                  p.push('<text x="'+x+'" y="'+(H-M.bottom+22)+'" fill="#9aa5b8" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">'+fmtFn(d)+'</text>');
-                                  if(i===0||d.getUTCMonth()===0&&d.getUTCDate()===1){
-                                    p.push('<text x="'+x+'" y="'+(H-M.bottom+38)+'" fill="#6b7689" font-size="9" font-family="ui-monospace, monospace" text-anchor="middle">'+d.getUTCFullYear()+'</text>');
+                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+(axisY-4)+'" y2="'+(axisY+4)+'" stroke="rgba(148,163,184,0.35)" stroke-width="1"/>');
+                                  p.push('<text x="'+x+'" y="'+(axisY+18)+'" fill="#9aa5b8" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">'+fmtFn(d)+'</text>');
+                                  if(i===0||(d.getUTCMonth()===0&&d.getUTCDate()===1)){
+                                    p.push('<text x="'+x+'" y="'+(axisY+34)+'" fill="#6b7689" font-size="9" font-family="ui-monospace, monospace" text-anchor="middle">'+d.getUTCFullYear()+'</text>');
                                   }
                                 });
-                                // Evidence markers — only those within current range
+                                // Evidence markers — one per (evidence, thesis) pair, placed in
+                                // the corresponding thesis lane. Same-day collisions inside a lane
+                                // get a small Y jitter (+/- 4px alternating).
                                 var visibleEv=evList.filter(function(ev){var t=ev.observedAt.getTime();return t>=t0&&t<=t1;});
-                                var laneSpacing=14;
-                                var occupiedAtX={};
+                                var laneCollisions={}; // key: thesisName + ":" + xBucket  -> count
+                                var instances=[]; // { ev, thesis, x, y, r }
                                 visibleEv.forEach(function(ev){
                                   var x=xS(ev.observedAt.getTime());
-                                  var bucket=Math.round(x/8);
-                                  var lane=(occupiedAtX[bucket]||0)+1;
-                                  occupiedAtX[bucket]=lane;
-                                  var dir=(lane%2===1)?-1:1;
-                                  var rank=Math.ceil(lane/2);
-                                  ev._x=x;
-                                  ev._y=baselineY+dir*rank*laneSpacing;
+                                  var bucket=Math.round(x/6);
+                                  ev.theses.forEach(function(thesisName){
+                                    var li=laneIndex[thesisName];
+                                    if(li===undefined) return;
+                                    var t=lanesOrdered[li];
+                                    var key=thesisName+':'+bucket;
+                                    var n=(laneCollisions[key]||0)+1;
+                                    laneCollisions[key]=n;
+                                    var dir=(n%2===1)?-1:1;
+                                    var rank=Math.ceil(n/2)-1;
+                                    var jitter=rank*5;
+                                    var y=laneCenterY(li)+(n===1?0:dir*jitter);
+                                    instances.push({ev:ev,thesisName:thesisName,thesis:t,x:x,y:y});
+                                  });
                                 });
-                                visibleEv.forEach(function(ev){
-                                  p.push('<line class="stem" data-thesis="'+(ev.theses[0]||'')+'" x1="'+ev._x+'" x2="'+ev._x+'" y1="'+baselineY+'" y2="'+ev._y+'" stroke="hsl('+ev.primaryHue+', 30%, 30%)" stroke-width="1" opacity="0.6"/>');
+                                // Stems (a small vertical tick from the lane line to each marker
+                                // when jittered, otherwise just the marker on the line).
+                                instances.forEach(function(it){
+                                  var lineY=laneCenterY(laneIndex[it.thesisName]);
+                                  if(Math.abs(it.y-lineY)>0.5){
+                                    p.push('<line class="stem" data-thesis="'+it.thesisName+'" x1="'+it.x+'" x2="'+it.x+'" y1="'+lineY+'" y2="'+it.y+'" stroke="hsl('+it.thesis.hue+', 30%, 35%)" stroke-width="1" opacity="0.5"/>');
+                                  }
                                 });
-                                visibleEv.forEach(function(ev){
-                                  var r=strengthRadius(ev.strength);
-                                  var fill='hsl('+ev.primaryHue+', '+ARC_S+', '+ARC_L+')';
-                                  var stroke='hsl('+ev.primaryHue+', 60%, 35%)';
-                                  p.push('<circle class="ev-marker" data-thesis="'+(ev.theses[0]||'')+'" data-all-theses="'+escapeAttr(ev.theses.join(','))+'" cx="'+ev._x+'" cy="'+ev._y+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2" opacity="0.9"><title>'+escapeAttr(ev.statement+' (observed '+fmtFull(ev.observedAt)+')')+'</title></circle>');
+                                // Markers — color = host lane's theme hue (not the evidence's "primary"
+                                // hue), so each lane reads as a single color column visually.
+                                instances.forEach(function(it){
+                                  var r=strengthRadius(it.ev.strength);
+                                  var fill='hsl('+it.thesis.hue+', '+ARC_S+', '+ARC_L+')';
+                                  var stroke='hsl('+it.thesis.hue+', 60%, 35%)';
+                                  p.push('<circle class="ev-marker" data-thesis="'+it.thesisName+'" data-all-theses="'+escapeAttr(it.ev.theses.join(','))+'" cx="'+it.x+'" cy="'+it.y+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2" opacity="0.9"><title>'+escapeAttr(it.ev.statement+' (observed '+fmtFull(it.ev.observedAt)+', '+escapeText(it.thesis.label)+')')+'</title></circle>');
                                 });
                                 p.push('</svg>');
                                 document.getElementById('horizon-svg-wrap').innerHTML=p.join('');
@@ -583,20 +625,23 @@ horizon-transformation:
                                 return '<div class="summary-row" data-thesis="'+t.name+'"><span class="summary-swatch" style="color:'+color+';background:'+color+'"></span><span class="summary-label">'+escapeText(t.label)+'</span><span class="summary-stats"><span class="count">'+t.evidenceCount+'</span><span>obs</span><span class="recency">latest '+escapeText(recency)+'</span></span></div>';
                               });
                               summaryEl.innerHTML=rows.join('');
-                              // Hover: isolate one thesis
+                              // Hover: isolate one thesis (markers + stems + the lane row itself)
                               summaryEl.querySelectorAll('.summary-row').forEach(function(row){
                                 row.addEventListener('mouseenter',function(){
                                   var t=row.dataset.thesis;
                                   summaryEl.querySelectorAll('.summary-row').forEach(function(o){if(o.dataset.thesis!==t) o.classList.add('dimmed');});
                                   document.querySelectorAll('.ev-marker, .stem').forEach(function(el){
-                                    var thesisList=(el.dataset.allTheses||el.dataset.thesis||'').split(',');
-                                    if(thesisList.indexOf(t)<0) el.style.opacity='0.1';
+                                    if(el.dataset.thesis!==t) el.style.opacity='0.08';
+                                  });
+                                  document.querySelectorAll('.lane-bg, .lane-line, .lane-label').forEach(function(el){
+                                    if(el.dataset.thesis!==t) el.style.opacity='0.25';
                                   });
                                 });
                                 row.addEventListener('mouseleave',function(){
                                   summaryEl.querySelectorAll('.summary-row').forEach(function(o){o.classList.remove('dimmed');});
                                   document.querySelectorAll('.ev-marker').forEach(function(el){el.style.opacity='0.9';});
-                                  document.querySelectorAll('.stem').forEach(function(el){el.style.opacity='0.6';});
+                                  document.querySelectorAll('.stem').forEach(function(el){el.style.opacity='0.5';});
+                                  document.querySelectorAll('.lane-bg, .lane-line, .lane-label').forEach(function(el){el.style.opacity='';});
                                 });
                               });
                               // === Helpers ===
