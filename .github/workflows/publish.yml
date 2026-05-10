@@ -42,12 +42,19 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 2. For every WorldviewSnapshot-bearing package, render the
-      # paired HTML + CSS artifacts via the snapshot-to-html /
-      # snapshot-stylesheet transformations (the 1.1.0 formats.stylesheet
-      # derivation pattern — see pages@1.1.0). Each output pair lives
-      # at its canonical path _site/<package>@<version>/{view.html,
-      # snapshot.css} so it is permanently linkable. The HTML carries
+      # 2. For every snapshot@<version> package, render the paired
+      # HTML + CSS artifacts via `kanonak derive` on the `view` resource.
+      # `derive` walks the polymorphic derivation discovery (instance
+      # overrides → class hierarchy → universal defaults) and dispatches
+      # to snapshot-to-html-transformation / snapshot-stylesheet through
+      # the wv.WorldviewSnapshot bindings declared in pages@1.1.0. Using
+      # `derive` (not `transform run`) is what lets cross-package
+      # `tx.CallFragment(pages.worldview-chrome-fragment)` references
+      # resolve.
+      #
+      # Each output pair lands at its canonical path
+      # _site/snapshot@<version>/{view.html, snapshot.css} so it is
+      # permanently linkable. The HTML carries
       # `<link rel="stylesheet" href="snapshot.css">` so the relative
       # href resolves to the sibling .css.
       # ---------------------------------------------------------------
@@ -55,32 +62,15 @@ jobs:
         run: |
           set -e
           mkdir -p _site
-          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
+          for pkg_file in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
-            # Skip ontology / transformation / non-snapshot packages
-            case "$base" in
-              core@*|finance@*|visual@*|pages@*|snapshot-to-html@*|landing-page@*|timeline@*|horizon@*|changes@*|regimes@*|securities@*|events@*|indicators@*) continue ;;
-            esac
-            # Only render packages that contain a WorldviewSnapshot.
-            if ! grep -q "type: wv\.WorldviewSnapshot\|type: worldview\.genval\.ai/core/WorldviewSnapshot" "$pkg_file"; then
-              echo "Skipping $base (no WorldviewSnapshot)"
-              continue
-            fi
-            pkg_uri="worldview.genval.ai/${base}"
+            view_uri="worldview.genval.ai/${base}/view"
             out_dir="_site/${base}"
-            echo "Rendering $pkg_uri -> $out_dir"
-            kanonak transform run \
-              worldview.genval.ai/snapshot-to-html/snapshot-to-html-transformation \
-              --scope "$pkg_uri" \
-              --format html \
-              --out "$out_dir/"
-            kanonak transform run \
-              worldview.genval.ai/snapshot-to-html/snapshot-stylesheet \
-              --scope "$pkg_uri" \
-              --format stylesheet \
-              --out "$out_dir/"
-            # snapshot-to-html emits snapshot.html (artifactName); rename to
-            # view.html so the file matches the instance URI used by
+            echo "Rendering $view_uri -> $out_dir"
+            kanonak derive "$view_uri" --format html --out "$out_dir/"
+            kanonak derive "$view_uri" --format stylesheet --out "$out_dir/"
+            # snapshot-to-html emits snapshot.html (artifactName); rename
+            # to view.html so the file matches the instance URI used by
             # landing-page deep links (SubjectUri ends in /view). The CSS
             # artifact name is `snapshot.css` (pinned in tx.artifactName)
             # to match the <link href="snapshot.css"> reference in the HTML.
@@ -114,19 +104,11 @@ jobs:
             exit 0
           fi
           base=$(basename "$latest_file" .kan.yml)
-          pkg_uri="worldview.genval.ai/${base}"
-          echo "Latest worldview package: $pkg_uri"
+          view_uri="worldview.genval.ai/${base}/view"
+          echo "Latest worldview view: $view_uri"
           tmpdir=$(mktemp -d)
-          kanonak transform run \
-            worldview.genval.ai/snapshot-to-html/snapshot-to-html-transformation \
-            --scope "$pkg_uri" \
-            --format html \
-            --out "$tmpdir/"
-          kanonak transform run \
-            worldview.genval.ai/snapshot-to-html/snapshot-stylesheet \
-            --scope "$pkg_uri" \
-            --format stylesheet \
-            --out "$tmpdir/"
+          kanonak derive "$view_uri" --format html --out "$tmpdir/"
+          kanonak derive "$view_uri" --format stylesheet --out "$tmpdir/"
           # Install the HTML as the root index.html, and the paired CSS
           # at /snapshot.css to satisfy the in-HTML <link href="snapshot.css">.
           mv "$tmpdir/snapshot.html" _site/index.html
