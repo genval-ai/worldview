@@ -34,7 +34,7 @@ view:
   type: wv.WorldviewSnapshot
   label: AI capex pre-print
   observedAt: 2026-05-04T20:00:00Z
-  narrative: |
+  narrative: >
     AI capex thesis pre-Q1 earnings. AMD Q1 2026 prints May 5 after-hours.
     The thesis itself names AMD's Data Center segment revenue as the
     near-term tell - whether it beats or misses consensus $5.4B is the

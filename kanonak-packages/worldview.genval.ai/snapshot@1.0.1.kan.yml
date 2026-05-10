@@ -38,7 +38,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-08T20:30:00Z
-  narrative: |
+  narrative: >
     Macro state as of May 8 2026. Seven theses dominate allocation:
     Iran rearmament cycle still in motion despite peace progress; energy
     premium has eased materially as the 2-week ceasefire holds (WTI $95.33,

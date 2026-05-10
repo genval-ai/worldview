@@ -36,7 +36,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-09T03:00:00Z
-  narrative: |
+  narrative: >
     Saturday-morning weekend take into the May 11 Warsh Senate cloture vote.
     The dominant Friday move was the equity-melt-up confirmation: SPX
     closed at 7,398.93 (+0.84% Friday, +2.3% week) and Nasdaq at 26,247.08

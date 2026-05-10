@@ -60,7 +60,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-10T02:30:00Z
-  narrative: |
+  narrative: >
     Late-Saturday-Eastern reset (Saturday-night re-read of the
     Saturday-afternoon view). The Qatar LNG transit narrative that
     anchored 1.0.4's view collides with the May 7-8 record once that

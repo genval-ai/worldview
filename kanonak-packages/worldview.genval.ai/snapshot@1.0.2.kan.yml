@@ -38,7 +38,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-08T22:00:00Z
-  narrative: |
+  narrative: >
     End-of-day refresh after the April jobs print and a week of incremental
     Iran-peace progress. NFP at 115K (vs 185K March, 55K consensus) with
     unemployment held at 4.3% and average hourly earnings up only 3.6% YoY

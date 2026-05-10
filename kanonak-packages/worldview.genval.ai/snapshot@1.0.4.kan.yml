@@ -41,7 +41,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-09T17:00:00Z
-  narrative: |
+  narrative: >
     Saturday-afternoon refresh. The week began with the Sequenced first
     leg of the persistent-energy-shock thesis materially firing: a Qatar
     LNG tanker started transiting the Strait of Hormuz this morning -
