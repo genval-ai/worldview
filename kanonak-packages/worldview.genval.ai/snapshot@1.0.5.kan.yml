@@ -19,7 +19,7 @@ snapshot:
           alias: vis
 
 # =============================================================================
-# Worldview snapshot - 2026-05-10 18:00 UTC (Sunday evening)
+# Worldview snapshot - 2026-05-10 02:30 UTC (late Saturday EDT)
 #
 # Walk-back. Saturday afternoon (1.0.4) leaned hard on the Qatar LNG transit
 # and the IRGC's "safe and sustainable transit facilitated" framing as the
@@ -59,11 +59,12 @@ snapshot:
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
-  observedAt: 2026-05-10T18:00:00Z
+  observedAt: 2026-05-10T02:30:00Z
   narrative: |
-    Sunday evening reset. The Qatar LNG transit narrative that anchored
-    Saturday's view collides with the May 7-8 record once that record is
-    weighted properly: Iran fired on three US destroyers in the Strait of
+    Late-Saturday-Eastern reset (Saturday-night re-read of the
+    Saturday-afternoon view). The Qatar LNG transit narrative that
+    anchored 1.0.4's view collides with the May 7-8 record once that
+    record is weighted properly: Iran fired on three US destroyers in the Strait of
     Hormuz Thursday night, the UAE absorbed two ballistic missiles and
     three drones from Iran on Friday (the biggest escalation since the
     ceasefire began on Apr 12), and the US disabled two Iranian tankers
@@ -98,9 +99,10 @@ view:
     Markets: SPX closed at a fresh ATH 7,398.93 Friday on a six-week
     winning streak (longest since 2024); Nasdaq ATH 26,247.08; Brent
     $101.29 (+1% on UAE attack); WTI $95.42; gold $4,720-4,740 (highest
-    since April 22, weekly +2%); VIX 17.08; SPX futures Sunday 7,419
-    (above Friday). UMich sentiment 48.2 (record low). The risk-on /
-    consumer-sentiment divergence keeps widening.
+    since April 22, weekly +2%); VIX 17.08. CME e-mini SPX futures
+    Sunday session opens 18:00 ET (22:00 UTC) - first market read on
+    the May 7-8 escalation re-weighting. UMich sentiment 48.2 (record
+    low). The risk-on / consumer-sentiment divergence keeps widening.
   hasThesis:
     - iran-war-rearmament
     - persistent-energy-shock
@@ -325,11 +327,11 @@ ai-capex-cycle-with-china-tail:
 equity-melt-up-vs-recession-risk:
   type: wv.WorldviewThesis
   label: Equity melt-up versus building recession risk
-  thesisStatement: 'S&P 500 closed at a fresh ATH 7,398.93 on May 8 with VIX 17.08 - six-week winning streak (longest since 2024). Q1 2026 earnings season concluded at 84% beat rate (highest since Q2 2021), 27.1% blended EPS growth, blended net margin 13.4%. SPX futures Sunday 7,419 (above Friday close) on weekend opening. The melt-up dominates near-term price action, but the divergence with consumer sentiment (UMich preliminary May 48.2, fresh record low) is widening. Invalidation requires either a vol-expansion break (VIX > 25 with SPY breaking 50d MA) or unimpeded melt-up confirmation (SPX > 7,300 with VIX < 15).'
+  thesisStatement: 'S&P 500 closed at a fresh ATH 7,398.93 on May 8 with VIX 17.08 - six-week winning streak (longest since 2024). Q1 2026 earnings season concluded at 84% beat rate (highest since Q2 2021), 27.1% blended EPS growth, blended net margin 13.4%. CME e-mini SPX futures Sunday session opens 18:00 ET (22:00 UTC) - first price read on the May 7-8 escalation re-weighting. The melt-up dominates near-term price action, but the divergence with consumer sentiment (UMich preliminary May 48.2, fresh record low) is widening. Invalidation requires either a vol-expansion break (VIX > 25 with SPY breaking 50d MA) or unimpeded melt-up confirmation (SPX > 7,300 with VIX < 15).'
   confidence: 0.75
   vis.thesisTheme: vis.theme-equity
   status: wv.active
-  confidenceRationale: 'Down to 0.75 from 0.78. The price action is unambiguously melt-up (SPX ATH on a six-week run, futures up Sunday despite weekend escalation news). But the sentiment-vs-price divergence widened sharply this week - UMich record low 48.2 with one-third of consumers spontaneously citing gas prices means the consumer side of the economy is running visibly hot inflation perceptions while equity markets price a clean ceasefire and AI-led earnings tailwind. That gap is the recession-risk leg. Stepping confidence down slightly to register the divergence; not flipping toward the vol-expansion invalidation since neither leg is even close to firing.'
+  confidenceRationale: 'Down to 0.75 from 0.78. The price action is unambiguously melt-up (SPX ATH on a six-week run). Sunday futures session opens 22:00 UTC and will be the first read on whether the May 7-8 escalation has any market impact at all. But the sentiment-vs-price divergence widened sharply this week - UMich record low 48.2 with one-third of consumers spontaneously citing gas prices means the consumer side of the economy is running visibly hot inflation perceptions while equity markets price a clean ceasefire and AI-led earnings tailwind. That gap is the recession-risk leg. Stepping confidence down slightly to register the divergence; not flipping toward the vol-expansion invalidation since neither leg is even close to firing.'
   supportingEvidence:
     - ev-sp500-ath-7389-may8
     - ev-sp500-friday-close-7399-may8
@@ -346,7 +348,7 @@ equity-melt-up-vs-recession-risk:
     - ev-fortune-stopped-caring-iran-quote
     - ev-sen-misplaced-euphoria-quote
     - ev-pe-multidecade-norm-above-avg
-    - ev-spx-futures-7419-sunday-may10
+    - ev-cme-sunday-futures-open-22z
     - ev-umich-sentiment-record-low-48-may
   invalidationCondition:
     type: wv.OrCondition
@@ -652,14 +654,13 @@ ev-vix-1718-may8:
   fin.marketMetric: fin.volatility-level
   fin.observedValue: 17.08
 
-ev-spx-futures-7419-sunday-may10:
+ev-cme-sunday-futures-open-22z:
   type: fin.MarketDataEvidence
-  evidenceStatement: 'SPX futures trading at 7,419 on Sunday 2026-05-10 - above Friday cash close (7,398.93) despite the May 7-8 escalation news (UAE attack, US-Iran fire exchange in Strait of Hormuz). Markets pricing the diplomatic track as dominant signal over the kinetic activity.'
-  evidenceObservedAt: 2026-05-10T18:00:00Z
+  evidenceStatement: 'CME e-mini SPX futures Sunday session opens 18:00 ET / 22:00 UTC on 2026-05-10 - the first market window for repricing after the Friday cash close (SPX 7,398.93) given the May 7-8 escalation (UAE attack, US-Iran fire exchange in Strait of Hormuz, US disabling Iranian tankers). At snapshot time (02:30 UTC Sunday) markets are closed and there is no live quote.'
+  evidenceObservedAt: 2026-05-10T02:30:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: fin.spx
-  fin.marketMetric: fin.futures-level
-  fin.observedValue: 7419.0
+  fin.marketMetric: fin.market-session-schedule
 
 ev-30y-yield-5pct-may5:
   type: fin.MarketDataEvidence
