@@ -60,7 +60,6 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-10T18:00:00Z
-  previousSnapshot: snapshot.view
   narrative: |
     Sunday evening reset. The Qatar LNG transit narrative that anchored
     Saturday's view collides with the May 7-8 record once that record is
