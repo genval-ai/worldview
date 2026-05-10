@@ -1,7 +1,7 @@
 changes:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.0.0
+  version: 1.1.0
   imports:
     - publisher: kanonak.org
       packages:
@@ -15,16 +15,20 @@ changes:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.7.0
+          version: 3.10.0
           alias: tx
         - package: document-ast
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: docast
         - package: site
           match: ^
           version: 1.0.0
           alias: site
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
     - publisher: worldview.genval.ai
       packages:
         - package: core
@@ -33,7 +37,7 @@ changes:
           alias: wv
         - package: pages
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: pages
 
 # =============================================================================
@@ -122,95 +126,14 @@ changes-transformation:
                       tx.parts:
 
                         # =====================================================
-                        # STYLE BLOCK — three parts:
-                        #   1. <style> opener
-                        #   2. Shared chrome CSS pulled from the
-                        #      worldview-chrome-css Asset (design tokens,
-                        #      body resets, site-nav, anchor-scroll offset).
-                        #   3. Page-specific CSS for the diff log + </style>.
+                        # STYLESHEET LINK
+                        # External CSS materialized by `changes-stylesheet`
+                        # at sibling path `index.css` under the changes/
+                        # output directory.
                         # =====================================================
                         - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            <style>
-
-                        - type: tx.PropertyRead
-                          tx.readSource:
-                            type: tx.ResolveRef
-                            tx.resolveSource:
-                              type: tx.UriLiteral
-                              tx.refTo: pages.worldview-chrome-css
-                          tx.readProp: site.content
-
-                        - type: tx.StringLiteral
                           tx.stringLiteral: |
-                            article.changes{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
-                            @media (max-width:760px){article.changes{padding:32px 20px 64px}}
-                            header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
-                            header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
-                            header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
-                            header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
-                            @media (max-width:760px){header.intro h1{font-size:42px}}
-                            header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
-                            section.transitions,section.diff-log{margin-top:56px}
-                            .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
-                            .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
-                            .empty-state{padding:24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:8px;color:var(--fg-faint);font-size:13px;line-height:1.6;font-style:italic}
-                            /* DIFF PAIR — one section per consecutive snapshot pair */
-                            .diff-pair{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;margin-bottom:24px;overflow:hidden;position:relative}
-                            .diff-pair-header{padding:20px 28px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--bg-elev)}
-                            .diff-pair-versions{font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;gap:10px}
-                            .diff-pair-versions .v{background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);color:var(--accent);padding:2px 8px;border-radius:4px;letter-spacing:0.05em}
-                            .diff-pair-versions .arrow{color:var(--fg-faint);font-size:14px}
-                            .diff-pair-time{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);letter-spacing:0.06em}
-                            .diff-pair-stats{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;margin-left:auto}
-                            .diff-changes{list-style:none;padding:0;margin:0}
-                            .diff-change{padding:18px 28px;border-bottom:1px solid var(--border-soft)}
-                            .diff-change:last-child{border-bottom:none}
-                            .diff-change.major{background:rgba(125,211,252,0.03)}
-                            .diff-change-header{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:10px}
-                            .change-thesis-label{font-size:15px;color:var(--fg);font-weight:500}
-                            .change-shift{font-family:var(--font-mono);font-size:13px;color:var(--fg-dim);display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
-                            .change-shift .from-conf{color:var(--fg-faint)}
-                            .change-shift .to-conf{color:var(--fg)}
-                            .change-shift .arrow{color:var(--fg-faint)}
-                            .change-shift .delta{padding:2px 8px;border-radius:4px;font-size:11px;letter-spacing:0.05em;font-weight:600}
-                            .change-shift .delta.up{background:rgba(52,211,153,0.12);color:var(--strong);border:1px solid rgba(52,211,153,0.3)}
-                            .change-shift .delta.down{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.3)}
-                            .change-shift .delta.flat{color:var(--fg-faint)}
-                            .change-status{padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:var(--bg-elev);border:1px solid var(--border);color:var(--fg-dim)}
-                            .change-rationale{font-size:13px;color:var(--fg-dim);line-height:1.65;border-left:2px solid var(--accent);padding:6px 0 6px 14px;margin:8px 0;font-style:italic}
-                            .change-evidence{margin-top:12px}
-                            .change-evidence summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;padding:6px 0;list-style:none;display:inline-flex;align-items:center;gap:8px}
-                            .change-evidence summary::-webkit-details-marker{display:none}
-                            .change-evidence summary::before{content:"+";font-family:var(--font-mono);width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:3px;color:var(--accent);transition:transform 120ms}
-                            .change-evidence[open] summary::before{content:"-"}
-                            .change-evidence summary:hover{color:var(--fg-dim)}
-                            .change-evidence ul{list-style:none;padding:8px 0 0 22px;margin:0}
-                            .change-evidence li{padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:13px;color:var(--fg-dim);line-height:1.6;display:flex;align-items:flex-start;gap:10px;position:relative}
-                            .change-evidence li:last-child{border-bottom:none}
-                            .ev-strength-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:7px}
-                            .ev-strength-dot.evidence-strong{background:var(--strong);box-shadow:0 0 6px rgba(52,211,153,0.4)}
-                            .ev-strength-dot.evidence-moderate{background:var(--moderate);box-shadow:0 0 6px rgba(251,191,36,0.4)}
-                            .ev-strength-dot.evidence-weak{background:var(--weak)}
-                            .ev-statement{flex:1;color:var(--fg-dim);min-width:0}
-                            .ev-citation-link{flex-shrink:0;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);padding:2px 8px;border:1px solid var(--border);border-radius:3px;text-decoration:none;letter-spacing:0.04em;transition:color 120ms,border-color 120ms;align-self:flex-start;margin-top:2px}
-                            .ev-citation-link:hover{color:var(--accent);border-color:var(--accent)}
-                            /* Tooltip on hover — strength label + observed date. Citation already visible as a link. */
-                            .change-evidence li:hover .ev-tip{opacity:1;transform:translateY(0)}
-                            .ev-tip{position:absolute;bottom:calc(100% - 4px);left:18px;background:var(--bg-elev);border:1px solid var(--border);padding:8px 12px;border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--fg);letter-spacing:0.04em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 120ms,transform 120ms;z-index:50;box-shadow:0 4px 16px -4px rgba(0,0,0,0.5);transform:translateY(4px);display:flex;gap:14px;align-items:center}
-                            .ev-tip .ev-tip-strength{padding:1px 6px;border-radius:3px;text-transform:uppercase;font-size:10px;letter-spacing:0.08em}
-                            .ev-tip .ev-tip-strength.evidence-strong{background:rgba(52,211,153,0.15);color:var(--strong);border:1px solid rgba(52,211,153,0.3)}
-                            .ev-tip .ev-tip-strength.evidence-moderate{background:rgba(251,191,36,0.15);color:var(--moderate);border:1px solid rgba(251,191,36,0.3)}
-                            .ev-tip .ev-tip-strength.evidence-weak{background:rgba(100,116,139,0.15);color:var(--weak);border:1px solid var(--border)}
-                            .ev-tip .ev-tip-date{color:var(--fg-dim)}
-                            .change-evidence.removed summary{color:var(--danger)}
-                            .change-evidence.removed li .ev-strength-dot{filter:grayscale(0.7) opacity(0.5)}
-                            .new-thesis-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:rgba(52,211,153,0.12);color:var(--strong);border:1px solid rgba(52,211,153,0.3);margin-left:8px}
-                            .stable-summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;padding:14px 28px;border-top:1px solid var(--border-soft);background:var(--bg-card)}
-                            .data{display:none}
-                            footer.changes-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
-                            footer.changes-footer a{color:var(--accent)}
-                            </style>
+                            <link rel="stylesheet" href="index.css">
 
                         # =====================================================
                         # SITE NAV
@@ -590,3 +513,113 @@ changes-transformation:
                             <span>Apache 2.0</span>
                             </footer>
                             </article>
+
+
+# =============================================================================
+# Changes-aggregate -> index.css
+#
+# Paired stylesheet SetTransformation. `pages@1.1.0/changes-aggregate`
+# binds (formats.stylesheet, default) → this transformation.
+# =============================================================================
+
+changes-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index.css
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.changes{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+                      @media (max-width:760px){article.changes{padding:32px 20px 64px}}
+                      header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
+                      header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+                      header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                      @media (max-width:760px){header.intro h1{font-size:42px}}
+                      header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                      section.transitions,section.diff-log{margin-top:56px}
+                      .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                      .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      .empty-state{padding:24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:8px;color:var(--fg-faint);font-size:13px;line-height:1.6;font-style:italic}
+                      .diff-pair{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;margin-bottom:24px;overflow:hidden;position:relative}
+                      .diff-pair-header{padding:20px 28px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--bg-elev)}
+                      .diff-pair-versions{font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;gap:10px}
+                      .diff-pair-versions .v{background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);color:var(--accent);padding:2px 8px;border-radius:4px;letter-spacing:0.05em}
+                      .diff-pair-versions .arrow{color:var(--fg-faint);font-size:14px}
+                      .diff-pair-time{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);letter-spacing:0.06em}
+                      .diff-pair-stats{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;margin-left:auto}
+                      .diff-changes{list-style:none;padding:0;margin:0}
+                      .diff-change{padding:18px 28px;border-bottom:1px solid var(--border-soft)}
+                      .diff-change:last-child{border-bottom:none}
+                      .diff-change.major{background:rgba(125,211,252,0.03)}
+                      .diff-change-header{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:10px}
+                      .change-thesis-label{font-size:15px;color:var(--fg);font-weight:500}
+                      .change-shift{font-family:var(--font-mono);font-size:13px;color:var(--fg-dim);display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+                      .change-shift .from-conf{color:var(--fg-faint)}
+                      .change-shift .to-conf{color:var(--fg)}
+                      .change-shift .arrow{color:var(--fg-faint)}
+                      .change-shift .delta{padding:2px 8px;border-radius:4px;font-size:11px;letter-spacing:0.05em;font-weight:600}
+                      .change-shift .delta.up{background:rgba(52,211,153,0.12);color:var(--strong);border:1px solid rgba(52,211,153,0.3)}
+                      .change-shift .delta.down{background:rgba(248,113,113,0.12);color:var(--danger);border:1px solid rgba(248,113,113,0.3)}
+                      .change-shift .delta.flat{color:var(--fg-faint)}
+                      .change-status{padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:var(--bg-elev);border:1px solid var(--border);color:var(--fg-dim)}
+                      .change-rationale{font-size:13px;color:var(--fg-dim);line-height:1.65;border-left:2px solid var(--accent);padding:6px 0 6px 14px;margin:8px 0;font-style:italic}
+                      .change-evidence{margin-top:12px}
+                      .change-evidence summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;padding:6px 0;list-style:none;display:inline-flex;align-items:center;gap:8px}
+                      .change-evidence summary::-webkit-details-marker{display:none}
+                      .change-evidence summary::before{content:"+";font-family:var(--font-mono);width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:3px;color:var(--accent);transition:transform 120ms}
+                      .change-evidence[open] summary::before{content:"-"}
+                      .change-evidence summary:hover{color:var(--fg-dim)}
+                      .change-evidence ul{list-style:none;padding:8px 0 0 22px;margin:0}
+                      .change-evidence li{padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:13px;color:var(--fg-dim);line-height:1.6;display:flex;align-items:flex-start;gap:10px;position:relative}
+                      .change-evidence li:last-child{border-bottom:none}
+                      .ev-strength-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:7px}
+                      .ev-strength-dot.evidence-strong{background:var(--strong);box-shadow:0 0 6px rgba(52,211,153,0.4)}
+                      .ev-strength-dot.evidence-moderate{background:var(--moderate);box-shadow:0 0 6px rgba(251,191,36,0.4)}
+                      .ev-strength-dot.evidence-weak{background:var(--weak)}
+                      .ev-statement{flex:1;color:var(--fg-dim);min-width:0}
+                      .ev-citation-link{flex-shrink:0;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);padding:2px 8px;border:1px solid var(--border);border-radius:3px;text-decoration:none;letter-spacing:0.04em;transition:color 120ms,border-color 120ms;align-self:flex-start;margin-top:2px}
+                      .ev-citation-link:hover{color:var(--accent);border-color:var(--accent)}
+                      .change-evidence li:hover .ev-tip{opacity:1;transform:translateY(0)}
+                      .ev-tip{position:absolute;bottom:calc(100% - 4px);left:18px;background:var(--bg-elev);border:1px solid var(--border);padding:8px 12px;border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--fg);letter-spacing:0.04em;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 120ms,transform 120ms;z-index:50;box-shadow:0 4px 16px -4px rgba(0,0,0,0.5);transform:translateY(4px);display:flex;gap:14px;align-items:center}
+                      .ev-tip .ev-tip-strength{padding:1px 6px;border-radius:3px;text-transform:uppercase;font-size:10px;letter-spacing:0.08em}
+                      .ev-tip .ev-tip-strength.evidence-strong{background:rgba(52,211,153,0.15);color:var(--strong);border:1px solid rgba(52,211,153,0.3)}
+                      .ev-tip .ev-tip-strength.evidence-moderate{background:rgba(251,191,36,0.15);color:var(--moderate);border:1px solid rgba(251,191,36,0.3)}
+                      .ev-tip .ev-tip-strength.evidence-weak{background:rgba(100,116,139,0.15);color:var(--weak);border:1px solid var(--border)}
+                      .ev-tip .ev-tip-date{color:var(--fg-dim)}
+                      .change-evidence.removed summary{color:var(--danger)}
+                      .change-evidence.removed li .ev-strength-dot{filter:grayscale(0.7) opacity(0.5)}
+                      .new-thesis-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:rgba(52,211,153,0.12);color:var(--strong);border:1px solid rgba(52,211,153,0.3);margin-left:8px}
+                      .stable-summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;padding:14px 28px;border-top:1px solid var(--border-soft);background:var(--bg-card)}
+                      .data{display:none}
+                      footer.changes-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                      footer.changes-footer a{color:var(--accent)}
