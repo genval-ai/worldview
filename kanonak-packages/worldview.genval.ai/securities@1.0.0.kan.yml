@@ -1,0 +1,283 @@
+securities:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.0.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+    - publisher: worldview.genval.ai
+      packages:
+        - package: finance
+          match: ^
+          version: 1.0.0
+          alias: fin
+
+# =============================================================================
+# Public security reference set + typed AssetClass / Sector taxonomy.
+#
+# Supplements `worldview.genval.ai/finance`, which already declares the
+# Security class plus a small set of common-ticker Security instances using
+# string-valued assetClass. This package adds:
+#
+#   - The typed `AssetClass` and `Sector` enumerations (closed taxonomies),
+#     so downstream consumers can dispatch on instance identity rather than
+#     string match.
+#   - Seven additional Security instances not in fin.* (vti, uvix, iau, dis,
+#     ief, kmlm, dbmf) using the typed taxonomy plus reference price + date.
+#
+# Other publishers running their own worldview can cite these AssetClass /
+# Sector / Security instances directly (`sec.equity`, `sec.precious-metals`,
+# `sec.uvix`, etc.). The set is intentionally US-centric for now; a future
+# global-equities companion package can layer on without touching this one.
+# =============================================================================
+
+# =============================================================================
+# 1. ASSET CLASS taxonomy
+# =============================================================================
+
+AssetClass:
+  type: rdfs.Class
+  label: Asset Class
+  comment: >-
+    Closed taxonomy of broad instrument classifications. Industry term
+    retained as-is. Drives strategy applicability filters and execution
+    routing in downstream portfolio systems.
+
+equity:
+  type: AssetClass
+  label: Equity
+  comment: Common stock or share. Direct ownership claim on a company.
+
+etf:
+  type: AssetClass
+  label: ETF
+  comment: Exchange-traded fund. Basket security with intraday liquidity.
+
+etn:
+  type: AssetClass
+  label: ETN
+  comment: >-
+    Exchange-traded note. Unsecured debt instrument tracking an underlying
+    index. Carries issuer credit risk.
+
+index:
+  type: AssetClass
+  label: Index
+  comment: >-
+    An index value (e.g., SPX, VIX). Directly observable but not directly
+    tradable.
+
+futures:
+  type: AssetClass
+  label: Futures
+  comment: Standardized exchange-traded forward contract.
+
+option:
+  type: AssetClass
+  label: Option
+  comment: >-
+    Options contract granting the right to buy or sell an underlying at
+    a strike.
+
+bond:
+  type: AssetClass
+  label: Bond
+  comment: Fixed-income debt instrument.
+
+commodity:
+  type: AssetClass
+  label: Commodity
+  comment: Physical commodity exposure.
+
+# =============================================================================
+# 2. SECTOR taxonomy
+# =============================================================================
+
+Sector:
+  type: rdfs.Class
+  label: Sector
+  comment: >-
+    Industry or asset-category sector classification. Open-ended -
+    downstream packages may define additional sector instances beyond
+    the starter set provided here. Used for thesis-to-security matching
+    and exposure aggregation.
+
+defense:
+  type: Sector
+  label: Defense
+  comment: Aerospace and defense industry.
+
+energy:
+  type: Sector
+  label: Energy
+  comment: Oil, gas, refining, pipelines, integrated majors, energy services.
+
+semiconductors:
+  type: Sector
+  label: Semiconductors
+  comment: Chip designers, foundries, equipment makers, and adjacent IP companies.
+
+precious-metals:
+  type: Sector
+  label: Precious Metals
+  comment: Gold, silver, platinum, and the miners or streamers producing them.
+
+broad-market:
+  type: Sector
+  label: Broad Market
+  comment: Diversified market exposure (SPY, VTI, SPX). Equity beta without sector tilt.
+
+volatility:
+  type: Sector
+  label: Volatility
+  comment: VIX-linked instruments and volatility products.
+
+media-entertainment:
+  type: Sector
+  label: Media and Entertainment
+  comment: Studios, streaming services, theme parks, sports rights.
+
+long-treasury:
+  type: Sector
+  label: Long Treasury
+  comment: Long-duration US Treasury exposure (20+ years).
+
+medium-treasury:
+  type: Sector
+  label: Medium Treasury
+  comment: Intermediate-duration US Treasury exposure (7-10 years).
+
+managed-futures:
+  type: Sector
+  label: Managed Futures
+  comment: Trend-following exposure across rates, commodities, and currencies via futures.
+
+# =============================================================================
+# 3. EXTENSION PROPERTIES on fin.Security
+#
+# These properties extend the Security class declared in
+# worldview.genval.ai/finance with optional richer typing. Authoring is
+# additive: an instance can have a string `fin.assetClass` AND a typed
+# `sec.typedAssetClass` simultaneously; consumers pick whichever they
+# prefer. New Security instances declared in this package use the typed
+# form exclusively.
+# =============================================================================
+
+typedAssetClass:
+  type: owl.ObjectProperty
+  domain: fin.Security
+  range: AssetClass
+  label: Typed Asset Class
+  comment: >-
+    Typed AssetClass reference. Closed-taxonomy alternative to
+    fin.assetClass (which is a string). Use whichever fits your
+    consumer needs.
+
+typedSector:
+  type: owl.ObjectProperty
+  domain: fin.Security
+  range: Sector
+  label: Typed Sector
+  comment: >-
+    Sector classification of the security. Used for thesis-to-security
+    matching and exposure aggregation.
+
+referencePrice:
+  type: owl.DatatypeProperty
+  domain: fin.Security
+  range: xsd.decimal
+  label: Reference Price
+  comment: >-
+    Approximate reference price at the security record's authoring time.
+    Live execution should query the actual quote; this field is a
+    sanity-check anchor for the definition.
+
+priceAsOf:
+  type: owl.DatatypeProperty
+  domain: fin.Security
+  range: xsd.date
+  label: Price As Of
+  comment: Date the referencePrice was observed.
+
+# =============================================================================
+# 4. ADDITIONAL Security instances
+#
+# fin.* already declares: amd, nvda, spy, spx, vix, gld, gdx, xle, xom,
+# cvx, lmt, rtx, noc, tlt. These seven extend the public set without
+# duplicating any of those.
+# =============================================================================
+
+vti:
+  type: fin.Security
+  fin.ticker: VTI
+  label: Vanguard Total Stock Market ETF
+  typedAssetClass: etf
+  typedSector: broad-market
+  referencePrice: 365.0
+  priceAsOf: 2026-05-04
+
+uvix:
+  type: fin.Security
+  fin.ticker: UVIX
+  label: 2x Long VIX Futures ETF
+  typedAssetClass: etf
+  typedSector: volatility
+  referencePrice: 5.36
+  priceAsOf: 2026-05-04
+
+iau:
+  type: fin.Security
+  fin.ticker: IAU
+  label: iShares Gold Trust
+  typedAssetClass: etf
+  typedSector: precious-metals
+  referencePrice: 86.0
+  priceAsOf: 2026-05-04
+
+dis:
+  type: fin.Security
+  fin.ticker: DIS
+  label: The Walt Disney Company
+  typedAssetClass: equity
+  typedSector: media-entertainment
+  referencePrice: 105.0
+  priceAsOf: 2026-05-04
+
+ief:
+  type: fin.Security
+  fin.ticker: IEF
+  label: iShares 7-10 Year Treasury Bond ETF
+  typedAssetClass: etf
+  typedSector: medium-treasury
+  referencePrice: 96.0
+  priceAsOf: 2026-05-04
+
+kmlm:
+  type: fin.Security
+  fin.ticker: KMLM
+  label: KFA Mount Lucas Managed Futures ETF
+  typedAssetClass: etf
+  typedSector: managed-futures
+  referencePrice: 27.0
+  priceAsOf: 2026-05-04
+
+dbmf:
+  type: fin.Security
+  fin.ticker: DBMF
+  label: iMGP DBi Managed Futures Strategy ETF
+  typedAssetClass: etf
+  typedSector: managed-futures
+  referencePrice: 30.0
+  priceAsOf: 2026-05-04

@@ -1,0 +1,88 @@
+regimes:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.0.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+
+# =============================================================================
+# Public regime taxonomy.
+#
+# A regime is a persistent market state characterized by observable indicator
+# readings. Classifiers (publisher-specific, typically private) output a
+# probability distribution over regimes; the highest-probability regime drives
+# strategy fitness lookup, position sizing, and risk-gate behavior in any
+# downstream portfolio system that consumes a worldview.
+#
+# Public on the theory that the regime taxonomy is cross-publisher useful -
+# different publishers will classify into the same regime set even when their
+# classifier methodologies diverge. The regime instances themselves are the
+# shared vocabulary; each publisher can supply their own classifier (the
+# private piece) while everyone references `worldview.genval.ai/regimes/quiet-contango`
+# the same way.
+# =============================================================================
+
+Regime:
+  type: rdfs.Class
+  label: Regime
+  comment: >-
+    A persistent market state characterized by observable indicator readings.
+    Classifiers output a probability distribution over regimes rather than a
+    single label; the highest-probability regime drives downstream strategy
+    fitness lookup, and the confidence affects sizing.
+
+# =============================================================================
+# CANONICAL REGIME INSTANCES
+# =============================================================================
+
+quiet-contango:
+  type: Regime
+  label: Quiet / contango
+  comment: >-
+    Low VIX, contango term structure (front below back), low realized vol.
+    The classic short-premium regime where vol risk premium is reliably
+    harvestable.
+
+bull-trending:
+  type: Regime
+  label: Bull trending
+  comment: >-
+    SPY above 50-day and 200-day moving averages with positive momentum.
+    Directional bullish strategies thrive; range-bound strategies underperform.
+
+choppy-range:
+  type: Regime
+  label: Choppy / range
+  comment: >-
+    Mid-VIX with no clear directional bias and elevated realized vol.
+    Mean-reversion environment - iron condors and other neutral premium
+    strategies excel.
+
+vol-expansion:
+  type: Regime
+  label: Vol expansion
+  comment: >-
+    Rising VIX into the low 20s, term structure flattening or briefly
+    inverting. Early stress signal - short premium becomes hostile,
+    defensive positioning preferred.
+
+crisis:
+  type: Regime
+  label: Crisis
+  comment: >-
+    VIX above 30, severe SPY drawdown, term structure inverted. Tail-risk
+    regime where short premium loses badly and long volatility thrives.
+    Most short-vol strategies should be flat.
