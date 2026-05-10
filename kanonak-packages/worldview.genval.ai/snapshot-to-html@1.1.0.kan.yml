@@ -68,13 +68,31 @@ snapshot-to-html:
 #     `<span class="resource"><code>label</code><span class="resource-tip">
 #     comment</span></span>` chain at every typed-reference render site)
 #     is already committed in this file, so deleting the script is
-#     functionally a no-op. Future reference renders should follow the
-#     same pattern, or — once the structural rewrite happens — switch
-#     to `docast.ResourceLink` with `docast.linkTooltip` (now available
-#     in document-ast@1.2.0) so the HTML backend renders tooltips
-#     natively. The page-specific `.resource` / `.resource-tip` CSS
-#     stays in `snapshot-stylesheet` so existing call sites keep their
-#     visual treatment until that follow-up.
+#     functionally a no-op. New reference renders should follow the
+#     same pattern.
+#
+#   - **Phase 4b (native `docast.ResourceLink` + `docast.linkTooltip`)
+#     was evaluated and declined.** Two reasons:
+#       1. Architecture mismatch. This transformation builds the entire
+#          body as one `RawBlock(text/html)` (giant `tx.join("",
+#          tx.concat(...))`). `ResourceLink` is an inline AST node;
+#          using it natively would require breaking the RawBlock into
+#          a structural docast tree (Document → Paragraph → ResourceLink
+#          → ...), which loses the pixel-level control over SVG
+#          confidence bars, condition-graph topology, mini-timeline
+#          geometry, and other inline visualizations this transformation
+#          relies on.
+#       2. Visual regression. `docast.linkTooltip` renders as a native
+#          HTML `title=""` attribute — a small, unstyled, browser-
+#          default popup. The current `.resource > .resource-tip` is a
+#          dark-themed card with soft shadow, 320px width, multi-line
+#          text, and arrow pointer. Switching would be a visible
+#          downgrade for readers.
+#     Net: the hand-rolled tooltip pattern stays. The `--kan-*` chrome-
+#     fragment variable bridge means a future Kanonak Browser viewing
+#     these pages still gets reasonable defaults if its host stylesheet
+#     binds `--kan-link-color` etc., but the resource cards are
+#     publisher-specific and worth keeping.
 #
 # Each wv.WorldviewSnapshot input emits:
 #   - HTML artifact (snapshot.html) — the page itself
