@@ -58,12 +58,8 @@ changes-transformation:
   tx.inputPattern:
     tx.matchesClass: wv.WorldviewSnapshot
     tx.sortBy:
-      # Descending so PairwiseMap walks newest -> 2nd-newest -> ...
-      # Each pair binds firstVar=curr (newer) + secondVar=prev (older).
-      # Diff log shows newest pair first; transitions section is a
-      # chronological log either way.
       - tx.byProperty: wv.observedAt
-        tx.order: tx.descending
+        tx.order: tx.ascending
 
   tx.artifactName:
     type: tx.StringLiteral
@@ -263,8 +259,8 @@ changes-transformation:
                           tx.source:
                             type: tx.PairwiseMap
                             tx.source: { type: tx.VarRef, tx.varName: inputs }
-                            tx.firstVar: curr
-                            tx.secondVar: prev
+                            tx.firstVar: prev
+                            tx.secondVar: curr
                             tx.pairBody:
                               type: tx.ForEach
                               tx.source:
@@ -405,10 +401,12 @@ changes-transformation:
                             type: tx.Join
                             tx.separator: ""
                             tx.source:
+                              type: tx.Reverse
+                              tx.source:
                                 type: tx.PairwiseMap
                                 tx.source: { type: tx.VarRef, tx.varName: inputs }
-                                tx.firstVar: curr
-                                tx.secondVar: prev
+                                tx.firstVar: prev
+                                tx.secondVar: curr
                                 tx.pairBody:
                                   type: tx.Concat
                                   tx.parts:
