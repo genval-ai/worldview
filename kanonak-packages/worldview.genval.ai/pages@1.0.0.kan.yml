@@ -98,6 +98,8 @@ worldview-chrome-css:
     ul.site-nav-links a:hover{color:var(--fg)}
     ul.site-nav-links a.active{color:var(--fg)}
     @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
+    /* Prose paragraph preservation — temporary stand-in for the protocol-level prose property type tracked in kanonak-protocol/typescript#20. Authors put `\n\n` between paragraphs in YAML literal-block scalars; HTML collapses whitespace runs into single spaces by default, so without this rule multi-paragraph prose renders as one wall of text. `pre-line` preserves authored newlines while still letting words wrap. Selectors enumerate every prose class used across this publisher's transformations; new prose-bearing classes should be added here so paragraph rendering stays consistent. */
+    .hero-narrative,.thesis-statement,.confidence-rationale,.change-rationale,.lead,.invalidation > p,.prose{white-space:pre-line}
 
 # =============================================================================
 # DERIVATION BINDING ON wv.WorldviewSnapshot
