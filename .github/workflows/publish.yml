@@ -42,10 +42,14 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 2. For every WorldviewSnapshot-bearing package, render an HTML
-      # snapshot via the snapshot-to-html transformation. Each output
-      # lives at its canonical path _site/<package>@<version>/snapshot.html
-      # so it is permanently linkable. The /snapshots/ index links here.
+      # 2. For every WorldviewSnapshot-bearing package, render the
+      # paired HTML + CSS artifacts via the snapshot-to-html /
+      # snapshot-stylesheet transformations (the 1.1.0 formats.stylesheet
+      # derivation pattern — see pages@1.1.0). Each output pair lives
+      # at its canonical path _site/<package>@<version>/{view.html,
+      # snapshot.css} so it is permanently linkable. The HTML carries
+      # `<link rel="stylesheet" href="snapshot.css">` so the relative
+      # href resolves to the sibling .css.
       # ---------------------------------------------------------------
       - name: Render WorldviewSnapshots (canonical per-package paths)
         run: |
@@ -55,7 +59,7 @@ jobs:
             base=$(basename "$pkg_file" .kan.yml)
             # Skip ontology / transformation / non-snapshot packages
             case "$base" in
-              core@*|finance@*|snapshot-to-html@*|landing-page@*) continue ;;
+              core@*|finance@*|visual@*|pages@*|snapshot-to-html@*|landing-page@*|timeline@*|horizon@*|changes@*|regimes@*|securities@*|events@*|indicators@*) continue ;;
             esac
             # Only render packages that contain a WorldviewSnapshot.
             if ! grep -q "type: wv\.WorldviewSnapshot\|type: worldview\.genval\.ai/core/WorldviewSnapshot" "$pkg_file"; then
@@ -70,9 +74,16 @@ jobs:
               --scope "$pkg_uri" \
               --format html \
               --out "$out_dir/"
+            kanonak transform run \
+              worldview.genval.ai/snapshot-to-html/snapshot-stylesheet \
+              --scope "$pkg_uri" \
+              --format stylesheet \
+              --out "$out_dir/"
             # snapshot-to-html emits snapshot.html (artifactName); rename to
             # view.html so the file matches the instance URI used by
-            # landing-page deep links (SubjectUri ends in /view).
+            # landing-page deep links (SubjectUri ends in /view). The CSS
+            # artifact name is `snapshot.css` (pinned in tx.artifactName)
+            # to match the <link href="snapshot.css"> reference in the HTML.
             if [ -f "$out_dir/snapshot.html" ]; then
               mv "$out_dir/snapshot.html" "$out_dir/view.html"
             fi
@@ -84,6 +95,11 @@ jobs:
       # (rather than a list of links). "Latest" is the highest-versioned
       # snapshot@*.kan.yml — each version is the worldview as published
       # on a specific date, so version order tracks chronological order.
+      #
+      # Render both the HTML (installed as /index.html) and the paired
+      # CSS (installed as /snapshot.css since the HTML's
+      # `<link rel="stylesheet" href="snapshot.css">` resolves relative
+      # to /index.html, which sits at the site root).
       # ---------------------------------------------------------------
       - name: Render latest snapshot to /index.html
         run: |
@@ -106,8 +122,15 @@ jobs:
             --scope "$pkg_uri" \
             --format html \
             --out "$tmpdir/"
-          # Transformation emits snapshot.html — install it as the root index.html
+          kanonak transform run \
+            worldview.genval.ai/snapshot-to-html/snapshot-stylesheet \
+            --scope "$pkg_uri" \
+            --format stylesheet \
+            --out "$tmpdir/"
+          # Install the HTML as the root index.html, and the paired CSS
+          # at /snapshot.css to satisfy the in-HTML <link href="snapshot.css">.
           mv "$tmpdir/snapshot.html" _site/index.html
+          mv "$tmpdir/snapshot.css" _site/snapshot.css
 
       # ---------------------------------------------------------------
       # 4. Stage the publisher manifest + index.txt + CNAME + a mirror
@@ -143,16 +166,34 @@ jobs:
       # the workspace, finds every declaration, and writes the
       # materialized HTML to its declared path under --out.
       #
-      # Replaces the four hand-rolled `kanonak transform run --scope ...`
-      # steps for /snapshots/, /timeline/, /changes/, and /horizon/ —
-      # the per-page workflow steps are now a single declarative call.
-      # New AggregateViews land at their declared paths automatically
-      # without touching this workflow.
+      # `kanonak site build` only materializes the HTML output for each
+      # AggregateView. Each aggregate also carries a per-instance
+      # (formats.stylesheet, default) `derivation.derivations` binding
+      # in pages@1.1.0, so we follow up with one `kanonak derive` per
+      # aggregate to produce the sibling .css file referenced by the
+      # HTML's `<link rel="stylesheet" href="index.css">`.
       # ---------------------------------------------------------------
       - name: Render AggregateViews via kanonak site build
         run: |
           set -e
           kanonak site build --out _site
+
+          # Paired stylesheets. Each aggregate's HTML lives at
+          # `_site/<dir>/index.html` and links to a sibling `index.css`;
+          # derive each one from its AggregateView resource (per-instance
+          # binding fires).
+          kanonak derive worldview.genval.ai/pages@1.1.0/snapshots-aggregate \
+            --format stylesheet \
+            --out _site/snapshots/
+          kanonak derive worldview.genval.ai/pages@1.1.0/timeline-aggregate \
+            --format stylesheet \
+            --out _site/timeline/
+          kanonak derive worldview.genval.ai/pages@1.1.0/horizon-aggregate \
+            --format stylesheet \
+            --out _site/horizon/
+          kanonak derive worldview.genval.ai/pages@1.1.0/changes-aggregate \
+            --format stylesheet \
+            --out _site/changes/
 
       # ---------------------------------------------------------------
       # 6. Write the About page. Static HTML; same visual language as
@@ -272,27 +313,27 @@ jobs:
           <li>
           <code>worldview.genval.ai/snapshot-to-html</code>
           <span>An InstanceTransformation that emits a self-contained HTML report from any <code>WorldviewSnapshot</code>: inline CSS, dynamic SVG confidence bars, structured rendering of invalidation-condition trees down to three levels of nesting, evidence cards with hover tooltips for typed-instance references.</span>
-          <a href="/snapshot-to-html/1.0.0.kan.yml">snapshot-to-html/1.0.0.kan.yml &rarr;</a>
+          <a href="/snapshot-to-html/1.1.0.kan.yml">snapshot-to-html/1.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/landing-page</code>
           <span>A SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending.</span>
-          <a href="/landing-page/1.0.0.kan.yml">landing-page/1.0.0.kan.yml &rarr;</a>
+          <a href="/landing-page/1.1.0.kan.yml">landing-page/1.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/timeline</code>
           <span>A SetTransformation that walks every published snapshot and emits one data point per (snapshot, thesis) pair; inline JS draws an SVG line chart of confidence trajectories. The first non-list aggregate transformation in the publisher.</span>
-          <a href="/timeline/1.0.0.kan.yml">timeline/1.0.0.kan.yml &rarr;</a>
+          <a href="/timeline/1.1.0.kan.yml">timeline/1.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/changes</code>
           <span>A diff-centric SetTransformation that triple-walks each snapshot's theses and supportingEvidence; inline JS computes consecutive-pair set-differences and renders the change log newest-first &mdash; per-thesis confidence shifts, the author's rationale, and exactly which Evidence items landed alongside the change.</span>
-          <a href="/changes/1.0.0.kan.yml">changes/1.0.0.kan.yml &rarr;</a>
+          <a href="/changes/1.1.0.kan.yml">changes/1.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/horizon</code>
           <span>A temporal-axis SetTransformation that aggregates every snapshot's evidence into a single horizontal time axis. Each marker is a typed Evidence dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports via <code>vis.thesisTheme</code>. Snapshot publication dates land as vertical lines.</span>
-          <a href="/horizon/1.0.0.kan.yml">horizon/1.0.0.kan.yml &rarr;</a>
+          <a href="/horizon/1.1.0.kan.yml">horizon/1.1.0.kan.yml &rarr;</a>
           </li>
           </ul>
           </section>
