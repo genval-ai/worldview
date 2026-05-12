@@ -115,30 +115,37 @@ jobs:
           mv "$tmpdir/snapshot.css" _site/snapshot.css
 
       # ---------------------------------------------------------------
-      # 4. Stage the publisher manifest + index.txt + CNAME + a mirror
-      # of every package file at its canonical Kanonak path so the static
-      # site doubles as the protocol publisher origin (consumers can
+      # 4. Stage the publisher manifest + CNAME + a mirror of every
+      # package file at its canonical Kanonak path so the static site
+      # doubles as the protocol publisher origin (consumers can
       # `import worldview.genval.ai/core@^1.0.0` and have it resolve
-      # over HTTPS).
+      # over HTTPS). Generates index.txt from the same loop so the
+      # protocol-required catalogue at /index.txt cannot drift from
+      # what is actually mirrored.
       # ---------------------------------------------------------------
       - name: Stage publisher manifest + package mirror
         run: |
           set -e
           mkdir -p _site/.well-known
           cp .well-known/kanonak.json _site/.well-known/kanonak.json
-          cp index.txt _site/index.txt
           # GitHub Pages custom-domain binding requires a CNAME file in
           # the deployed artifact root. Without it, each deploy invalidates
           # the custom-domain validation.
           echo "worldview.genval.ai" > _site/CNAME
-          # Mirror each package file at its canonical path.
+          # Mirror each package file at its canonical path and accumulate
+          # an unsorted catalogue; sort -V at the end yields version-aware
+          # order (1.0.10 > 1.0.9), matching how step 3 picks "latest".
+          : > _site/index.txt.unsorted
           for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
             name="${base%@*}"
             version="${base#*@}"
             mkdir -p "_site/${name}"
             cp "$pkg_file" "_site/${name}/${version}.kan.yml"
+            echo "${name}/${version}" >> _site/index.txt.unsorted
           done
+          sort -V _site/index.txt.unsorted > _site/index.txt
+          rm _site/index.txt.unsorted
 
       # ---------------------------------------------------------------
       # 5. Render every site.AggregateView in the workspace via
