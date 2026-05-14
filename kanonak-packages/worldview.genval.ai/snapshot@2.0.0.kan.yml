@@ -1,0 +1,885 @@
+snapshot:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.0.0
+  imports:
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+        - package: finance
+          match: ^
+          version: 1.0.0
+          alias: fin
+
+loc-strait-of-hormuz:
+  type: wv.Location
+  label: "Strait of Hormuz"
+
+loc-iran:
+  type: wv.Location
+  label: "Iran"
+
+party-united-states:
+  type: wv.Party
+  label: "United States"
+
+party-israel:
+  type: wv.Party
+  label: "Israel"
+
+party-iran:
+  type: wv.Party
+  label: "Iran"
+
+party-lisa-su:
+  type: wv.Party
+  label: "Lisa Su"
+
+inst-yardeni-research:
+  type: fin.AnalystInstitution
+  label: "Yardeni Research"
+
+inst-global-central-banks:
+  type: wv.Institution
+  label: "Global central banks (aggregate)"
+
+ind-hyperscaler-ai-capex-2026:
+  type: wv.Indicator
+  label: "Big Four Hyperscaler AI Capex 2026"
+
+worldview-snapshot:
+  type: wv.WorldviewSnapshot
+  observedAt: "2026-05-14T03:42:31Z"
+  narrative: >-
+    This snapshot opens a new major version of the worldview. It is authored
+    as a fresh, self-contained reading of the macro regime as of mid-May 2026
+    and deliberately does not carry forward the evidence chain or thesis
+    lineage of any prior snapshot. The dominant regime is a stagflationary
+    collision: United States equities are at all-time highs, carried by the
+    strongest corporate earnings cycle since 2021 and a hyperscaler AI
+    capital-expenditure boom, while an energy-driven inflation re-acceleration,
+    the direct consequence of the 2026 Iran war and the de facto closure of
+    the Strait of Hormuz, is forcing wholesale and consumer prices higher and
+    freezing the Federal Reserve in place. The market is pricing the earnings
+    boom and discounting the supply shock; this worldview holds both as live,
+    simultaneously true, and in tension.
+
+
+    The pivotal events behind the regime: a United States and Israeli air war
+    against Iran that began on 2026-02-28, Iran's de facto closure of the
+    Strait of Hormuz on 2026-03-04, and a United States naval blockade of
+    Iranian ports from 2026-04-13, together producing what the International
+    Energy Agency has characterized as the largest supply disruption in the
+    history of the global oil market. April headline CPI printed 3.8 percent
+    year over year, the highest since May 2023, and April producer prices rose
+    1.4 percent month over month, the sharpest monthly gain since 2022. The
+    FOMC held its policy rate at 3.5 to 3.75 percent on 2026-04-29 in an 8-4
+    vote, the first four-dissent decision since October 1992. Kevin Warsh was
+    confirmed as Federal Reserve Chair on 2026-05-13 in a 54-45 Senate vote,
+    the most divisive Fed chair confirmation in modern history, succeeding
+    Jerome Powell whose term expires 2026-05-15. Despite all of this, the
+    S&P 500 closed at a record 7444.25 on 2026-05-13 with the VIX near 18.
+
+
+    This is a major version because the worldview is being framed from first
+    principles around the stagflation regime rather than revised at the
+    margin. Confidence calibration: the energy-shock and defense-rerating
+    theses carry the highest conviction (0.85 and 0.83) because their
+    structural supports, a closed strait, a one-trillion-dollar defense
+    budget, and record contractor backlogs, are slow-moving and well-sourced.
+    The AI-capex supercycle and Fed-credibility theses are high-conviction
+    working hypotheses (0.80 and 0.78). The equity melt-up, bond bear, and
+    gold consolidation theses are sized more modestly (0.70, 0.72, 0.68)
+    because each has invalidation conditions partially in motion or depends on
+    a market path rather than a structural fact. No prior snapshot was
+    consulted in authoring this version; every confidence is an initial
+    calibration, not a delta. Two research limitations are recorded in the
+    evidence below: the Massive index-aggregate endpoints returned
+    NOT_AUTHORIZED under the current plan tier, and the Massive treasury-yields
+    endpoint returned no data for the requested date, so the S&P 500 index
+    level, the VIX level, and the 10-year Treasury yield were sourced via web
+    research and annotated as such.
+  hasThesis:
+    - stagflation-shock-from-hormuz
+    - equity-melt-up-despite-shock
+    - ai-capex-supercycle
+    - fed-credibility-under-transition-strain
+    - bond-bear-resumes-on-inflation
+    - defense-structural-rerating
+    - gold-consolidation-after-parabola
+
+stagflation-shock-from-hormuz:
+  type: wv.WorldviewThesis
+  label: "Stagflation shock from the Hormuz closure"
+  thesisStatement: >-
+    The 2026 Iran war and the de facto closure of the Strait of Hormuz have
+    produced an energy-driven inflation re-acceleration that is the dominant
+    macro force of the regime. With roughly 20 percent of global seaborne oil
+    normally transiting Hormuz and transit volumes now near 5 percent of
+    pre-conflict levels, the supply shock pushed April headline CPI to 3.8
+    percent year over year and April producer prices up 1.4 percent month over
+    month. The shock remains in force until the strait reopens durably, oil
+    prices normalize, and consumer inflation decelerates back toward target.
+  confidence: 0.85
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.85: the supply shock is a structural, well-documented fact
+    with a closed strait and a standing United States blockade. The only path
+    to invalidation requires a durable reopening that is not in evidence as of
+    the observation date.
+  supportingEvidence:
+    - ev-iran-war-outbreak-2026-02-28
+    - ev-hormuz-de-facto-closure-2026-03-04
+    - ev-us-iran-port-blockade-2026-04-13
+    - ev-wti-front-month-2026-05-13
+    - ev-brent-front-month-2026-05-13
+    - ev-cpi-april-2026
+    - ev-tariff-regime-2026
+    - ev-xle-close-2026-05-13
+    - ev-xom-close-2026-05-13
+  invalidationCondition:
+    type: wv.AndCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-strait-of-hormuz-reopened
+        durability: wv.durable
+      - type: wv.ThresholdCondition
+        observable: fin.ind-wti-close
+        comparator: wv.lt
+        threshold: 80.0
+        unit: "usd-per-bbl"
+        persistence:
+          wv.duration: 30
+          windowUnit: wv.calendar-days
+      - type: wv.ThresholdCondition
+        observable: fin.ind-headline-cpi-yoy
+        comparator: wv.lt
+        threshold: 3.0
+        unit: "pct"
+
+equity-melt-up-despite-shock:
+  type: wv.WorldviewThesis
+  label: "Equity melt-up despite the supply shock"
+  thesisStatement: >-
+    United States equities are in a melt-up that is shrugging off the energy
+    and inflation shock. The S&P 500 closed at a record 7444.25 on 2026-05-13
+    with the VIX near 18, supported by a Q1 2026 earnings season in which 84
+    percent of companies beat estimates, blended earnings grew about 13 percent
+    year over year, and net margins held at 13.4 percent. The melt-up thesis
+    breaks if the index gives back its gains in a sustained drawdown or if
+    volatility regime-shifts higher.
+  confidence: 0.70
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.70: the earnings support is real and current, but a melt-up
+    driven by positioning and narrative is path-dependent and vulnerable to the
+    very inflation shock that the stagflation thesis describes. This is a
+    working hypothesis to size modestly, not a high-conviction call.
+  supportingEvidence:
+    - ev-spy-close-2026-05-13
+    - ev-sp500-record-high-2026-05-13
+    - ev-vix-close-2026-05-13
+    - ev-sp500-q1-2026-beat-rate
+    - ev-sp500-q1-2026-eps-growth
+    - ev-sp500-q1-2026-net-margin
+    - ev-yardeni-sp500-target
+  invalidationCondition:
+    type: wv.OrCondition
+    operands:
+      - type: wv.ThresholdCondition
+        observable: fin.ind-spy-close
+        comparator: wv.lt
+        threshold: 660.0
+        unit: "usd"
+        persistence:
+          wv.duration: 20
+          windowUnit: wv.trading-days
+      - type: wv.ThresholdCondition
+        observable: fin.ind-vix-close
+        comparator: wv.gt
+        threshold: 35.0
+        unit: "vix-points"
+        persistence:
+          wv.duration: 10
+          windowUnit: wv.trading-days
+
+ai-capex-supercycle:
+  type: wv.WorldviewThesis
+  label: "AI capital-expenditure supercycle"
+  thesisStatement: >-
+    Hyperscaler AI capital expenditure is a structural earnings engine that is
+    concentrated in semiconductors and still accelerating. The big four United
+    States hyperscalers plan roughly 630 billion dollars of 2026 capital
+    expenditure, up about 62 percent from 2025, and that spend is showing up
+    directly in chip-maker results: NVIDIA data-center revenue reached 197.3
+    billion dollars in fiscal 2026 and AMD data-center revenue grew 57 percent
+    year over year in Q1 2026. The supercycle thesis breaks if planned
+    hyperscaler capex is cut materially below the 2025 spending level.
+  confidence: 0.80
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.80: the capex commitments and the chip-maker prints that
+    corroborate them are concrete and recent, but a single demand-cycle or
+    financing-cost shift could compress the spend, so this sits just below the
+    structural theses.
+  supportingEvidence:
+    - ev-hyperscaler-capex-2026
+    - ev-nvda-datacenter-fy2026
+    - ev-amd-q1-2026-datacenter
+    - ev-amd-q1-2026-eps
+    - ev-lisa-su-datacenter-statement
+    - ev-nvda-close-2026-05-13
+    - ev-amd-close-2026-05-13
+  invalidationCondition:
+    type: wv.ThresholdCondition
+    observable: ind-hyperscaler-ai-capex-2026
+    comparator: wv.lt
+    threshold: 500.0
+    unit: "usd-billions"
+
+fed-credibility-under-transition-strain:
+  type: wv.WorldviewThesis
+  label: "Fed credibility under transition strain"
+  thesisStatement: >-
+    The Federal Reserve enters its most contested leadership transition in
+    modern history with a fracturing committee and no room to ease. The FOMC
+    held at 3.5 to 3.75 percent on 2026-04-29 in an 8-4 vote, the first
+    four-dissent decision since 1992, and Kevin Warsh was confirmed Chair on
+    2026-05-13 in a 54-45 Senate vote, succeeding Powell. With April CPI at 3.8
+    percent and a still-resilient labor market at 4.3 percent unemployment,
+    policy is paralyzed between political pressure to cut and an inflation
+    print that forbids it. The thesis resolves if Warsh restores a credible,
+    near-consensus policy footing.
+  confidence: 0.78
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.78: the dissent count, the partisan confirmation, and the
+    inflation print are all on the record, but the thesis is about an
+    institution under strain rather than a measured quantity, and Warsh's first
+    FOMC on 2026-06-16 is a near-term test that could move it either way.
+  supportingEvidence:
+    - ev-fomc-april-2026-hold
+    - ev-warsh-confirmation-2026-05-13
+    - ev-10y-yield-2026-05-13
+    - ev-unemployment-april-2026
+  invalidationCondition:
+    type: wv.OrCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-fed-credibility-restored
+        durability: wv.durable
+      - type: wv.AndCondition
+        operands:
+          - type: wv.EventCondition
+            event: fin.evt-fed-chair-continuity-signal
+          - type: wv.ThresholdCondition
+            observable: fin.ind-fomc-dissent-count
+            comparator: wv.lte
+            threshold: 1.0
+            unit: "dissent-count"
+
+bond-bear-resumes-on-inflation:
+  type: wv.WorldviewThesis
+  label: "Bond bear resumes on inflation"
+  thesisStatement: >-
+    Long-duration United States Treasuries are repricing lower as the inflation
+    shock reopens the term-premium story. The 10-year yield reached 4.49
+    percent on 2026-05-13, its highest since July 2025, driven by a 3.8 percent
+    CPI print and a producer-price shock, with TLT trading near 84.80. The bond
+    bear remains in force until the 10-year yield falls durably back below 4.0
+    percent.
+  confidence: 0.72
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.72: the yield breakout and its inflation catalyst are clearly
+    observed, but rates are a market path and a growth scare or a
+    flight-to-quality bid could reverse the move quickly, so conviction is
+    moderate.
+  supportingEvidence:
+    - ev-10y-yield-2026-05-13
+    - ev-tlt-close-2026-05-13
+    - ev-cpi-april-2026
+  invalidationCondition:
+    type: wv.ThresholdCondition
+    observable: fin.ind-10y-treasury-yield
+    comparator: wv.lt
+    threshold: 4.0
+    unit: "pct"
+    persistence:
+      wv.duration: 30
+      windowUnit: wv.calendar-days
+
+defense-structural-rerating:
+  type: wv.WorldviewThesis
+  label: "Defense structural rerating"
+  thesisStatement: >-
+    The Iran war has triggered a structural rerating of United States defense.
+    The fiscal 2026 defense budget is near one trillion dollars with a fiscal
+    2027 request approaching 1.5 trillion, contractor backlogs are at records,
+    Lockheed Martin near 194 billion dollars and RTX near 268 billion, and
+    roughly half of the United States most expensive missile stocks were
+    depleted in the first seven weeks of the conflict, guaranteeing a
+    multi-year restocking cycle. The rerating thesis breaks only on a durable
+    United States and Iran peace agreement combined with a flat or declining
+    defense outlay trajectory.
+  confidence: 0.83
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.83: backlogs, appropriations, and depletion data are
+    slow-moving structural facts, and the invalidation requires both a durable
+    peace and a budget reversal, neither of which is in evidence.
+  supportingEvidence:
+    - ev-defense-budget-fy2027-proposal
+    - ev-us-iran-port-blockade-2026-04-13
+    - ev-lmt-backlog-q4-2025
+    - ev-rtx-backlog-q4-2025
+    - ev-lmt-close-2026-05-13
+    - ev-rtx-close-2026-05-13
+    - ev-noc-close-2026-05-13
+  invalidationCondition:
+    type: wv.AndCondition
+    operands:
+      - type: wv.EventCondition
+        event: fin.evt-us-iran-peace-agreement-implemented
+        durability: wv.durable
+      - type: wv.ThresholdCondition
+        observable: fin.ind-dod-outlays-yoy-change
+        comparator: wv.lt
+        threshold: 0.0
+        unit: "pct"
+
+gold-consolidation-after-parabola:
+  type: wv.WorldviewThesis
+  label: "Gold consolidation after the parabola"
+  thesisStatement: >-
+    Gold is consolidating a sharp drawdown rather than reversing a structural
+    bull market. Spot gold has pulled back roughly 16 percent from its January
+    2026 all-time high near 5589 dollars, but central banks bought a net 244
+    tonnes in Q1 2026 and institutional forecasters including Goldman Sachs
+    still target 5400 dollars by year end. GLD traded near 430.50 and the
+    miners proxy GDX near 96.23. The consolidation thesis breaks if spot gold
+    falls durably below 4000 dollars.
+  confidence: 0.68
+  status: wv.active
+  confidenceRationale: >-
+    Confidence 0.68: the central-bank bid and the forecaster targets support a
+    consolidation read, but gold has already given back a large move and the
+    thesis depends on a price level holding, so it is the most modestly sized
+    thesis in the snapshot.
+  supportingEvidence:
+    - ev-gld-close-2026-05-13
+    - ev-gdx-close-2026-05-13
+    - ev-cb-gold-buying-q1-2026
+    - ev-goldman-gold-target
+  invalidationCondition:
+    type: wv.ThresholdCondition
+    observable: fin.ind-gold-spot
+    comparator: wv.lt
+    threshold: 4000.0
+    unit: "usd-per-oz"
+    persistence:
+      wv.duration: 30
+      windowUnit: wv.calendar-days
+
+ev-iran-war-outbreak-2026-02-28:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    A United States and Israeli air war against Iran began on 2026-02-28,
+    including a strike that killed Iran's supreme leader. The conflict opened
+    the chain of events that led to the disruption of the Strait of Hormuz.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-02-28T00:00:00Z"
+  citation: "https://www.cnn.com/2026/04/29/world/iran-war-gulf-hormuz-shipping-maps-intl-vis"
+  eventLocation: loc-iran
+  partiesInvolved:
+    - party-united-states
+    - party-israel
+    - party-iran
+  geopoliticalEventDate: 2026-02-28
+
+ev-hormuz-de-facto-closure-2026-03-04:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Iran declared the Strait of Hormuz closed on 2026-03-04 and threatened any
+    transiting vessel. Monthly transit volume has since fallen to roughly 5
+    percent of the pre-conflict norm of about 3000 vessels, with open transits
+    near zero since 2026-05-06. The International Energy Agency has called it
+    the largest supply disruption in the history of the global oil market.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-03-04T00:00:00Z"
+  citation: "https://commonslibrary.parliament.uk/research-briefings/cbp-10636/"
+  eventLocation: loc-strait-of-hormuz
+  partiesInvolved:
+    - party-iran
+    - party-united-states
+  geopoliticalEventDate: 2026-03-04
+
+ev-us-iran-port-blockade-2026-04-13:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    The United States announced a naval blockade of ships entering or exiting
+    Iranian ports effective 2026-04-13, and has since directed at least 38
+    vessels to turn back. The blockade hardened the de facto Hormuz closure
+    into a sustained supply disruption.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-04-13T00:00:00Z"
+  citation: "https://www.nbcnews.com/data-graphics/strait-of-hormuz-ports-traffic-trump-us-iran-war-rcna331507"
+  issuingBody: fin.us-white-house
+  policy: wv.executive-order
+  effectiveDate: 2026-04-13
+
+ev-tariff-regime-2026:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    United States tariff rates stand at their highest since 1943, with a
+    Section 122 ten-percent universal surcharge set to expire 2026-07-24 and a
+    China effective rate near 31.6 percent. The Court of International Trade
+    struck down the latest round on 2026-05-07, but the duties continue to be
+    collected during the administration's appeal, leaving the tariff regime an
+    active contributor to goods-price pressure.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-07T00:00:00Z"
+  citation: "https://www.washingtonpost.com/business/2026/05/07/tariffs-trade-court-ruling-trump/"
+  issuingBody: fin.us-white-house
+  policy: wv.executive-order
+
+ev-wti-front-month-2026-05-13:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    WTI crude front-month futures traded near 102 dollars per barrel on
+    2026-05-13. Brent averaged about 117 dollars in April and peaked near 138
+    dollars on 2026-04-07 as the de facto Hormuz closure tightened global
+    supply.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://fortune.com/article/price-of-oil-05-12-2026/"
+  indicatorName: fin.ind-wti-close
+  indicatorValue: 102.0
+  indicatorPeriod: "2026-05-13"
+
+ev-brent-front-month-2026-05-13:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    Brent crude front-month futures traded near 107 dollars per barrel around
+    2026-05-13. The US Energy Information Administration projects Brent near
+    106 dollars for May and June 2026.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://www.eia.gov/outlooks/steo/"
+  indicatorName: fin.ind-brent-close
+  indicatorValue: 107.0
+  indicatorPeriod: "2026-05-13"
+
+ev-cpi-april-2026:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    United States headline CPI rose 3.8 percent year over year in April 2026,
+    the highest reading since May 2023, and 0.6 percent month over month. The
+    energy index rose 3.8 percent on the month and accounted for over 40
+    percent of the all-items increase; core CPI was 2.8 percent year over year.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-12T12:30:00Z"
+  citation: "https://www.bls.gov/news.release/cpi.nr0.htm"
+  indicatorName: fin.ind-headline-cpi-yoy
+  indicatorValue: 3.8
+  indicatorPeriod: "April 2026"
+
+ev-xle-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The Energy Select Sector SPDR Fund (XLE) closed at 57.63 on 2026-05-13,
+    reflecting sustained energy-sector strength under the oil supply shock.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/XLE/prev"
+  aboutSecurity: fin.xle
+  marketMetric: fin.close-price
+  observedValue: 57.63
+
+ev-xom-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Exxon Mobil (XOM) closed at 151.57 on 2026-05-13, consistent with elevated
+    crude prices supporting integrated-major earnings.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/XOM/prev"
+  aboutSecurity: fin.xom
+  marketMetric: fin.close-price
+  observedValue: 151.57
+
+ev-spy-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The SPDR S&P 500 ETF (SPY) closed at 742.31 on 2026-05-13, at record
+    territory.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/SPY/prev"
+  aboutSecurity: fin.spy
+  marketMetric: fin.close-price
+  observedValue: 742.31
+
+ev-sp500-record-high-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The S&P 500 index closed at a record 7444.25 on 2026-05-13, having first
+    crossed 7000 in January 2026. Sourced via web research because the Massive
+    index-aggregate endpoint returned NOT_AUTHORIZED under the current plan
+    tier.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://www.thestreet.com/latest-news/stock-market-today-may-13-2026-updates"
+  aboutSecurity: fin.spx
+  marketMetric: fin.close-price
+  observedValue: 7444.25
+
+ev-vix-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The CBOE Volatility Index closed near 17.99 on 2026-05-13, well within the
+    normal 15 to 25 range and far below the March 2026 peak near 31. Sourced
+    via web research because the Massive index-aggregate endpoint returned
+    NOT_AUTHORIZED under the current plan tier.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://tradingeconomics.com/united-states/cboe-volatility-index-vix-fed-data.html"
+  aboutSecurity: fin.vix
+  marketMetric: fin.volatility-level
+  observedValue: 17.99
+
+ev-sp500-q1-2026-beat-rate:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    With 89 percent of S&P 500 companies reported for Q1 2026, 84 percent beat
+    consensus EPS, above the five-year average of 78 percent, with aggregate
+    results 18.2 percent above estimates.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-08T00:00:00Z"
+  citation: "https://insight.factset.com/sp-500-earnings-season-update-may-8-2026"
+  marketMetric: fin.earnings-beat-rate
+  observedValue: 0.84
+
+ev-sp500-q1-2026-eps-growth:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The S&P 500 is reporting blended year-over-year earnings growth of about
+    13.2 percent for Q1 2026, the sixth consecutive quarter of double-digit
+    growth and the highest rate since Q4 2021.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-08T00:00:00Z"
+  citation: "https://insight.factset.com/sp-500-earnings-season-update-may-8-2026"
+  marketMetric: fin.eps-growth
+  observedValue: 0.132
+
+ev-sp500-q1-2026-net-margin:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The blended net profit margin for the S&P 500 in Q1 2026 is 13.4 percent,
+    above the trailing five-year average.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-08T00:00:00Z"
+  citation: "https://insight.factset.com/sp-500-earnings-season-update-may-8-2026"
+  marketMetric: fin.net-profit-margin
+  observedValue: 0.134
+
+ev-yardeni-sp500-target:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    Yardeni Research raised its year-end 2026 S&P 500 target to 8250 from 7700,
+    the most bullish among major Wall Street forecasters, citing the earnings
+    cycle and a Roaring 2020s framing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-10T00:00:00Z"
+  citation: "https://fortune.com/2026/05/10/stock-market-outlook-yardeni-sp500-price-target-hike-8250-earnings-roaring-2020s/"
+  analystInstitution: inst-yardeni-research
+  forecastTarget: fin.spx
+  forecastValue: 8250.0
+  forecastHorizon: fin.horizon-full-year
+
+ev-hyperscaler-capex-2026:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    The big four United States hyperscalers plan up to roughly 630 billion
+    dollars of infrastructure capital expenditure in 2026, about a 62 percent
+    increase over 2025, with the majority directed at AI infrastructure.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-13T00:00:00Z"
+  citation: "https://datacenterrichness.substack.com/p/hyperscalers-plan-630-billion-in"
+  indicatorName: ind-hyperscaler-ai-capex-2026
+  indicatorValue: 630.0
+  indicatorPeriod: "calendar year 2026 (planned)"
+
+ev-nvda-datacenter-fy2026:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    NVIDIA data-center segment revenue reached 197.3 billion dollars in fiscal
+    2026, up from 115.2 billion dollars in fiscal 2025, capturing the bulk of
+    AI-accelerator spending.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-12T00:00:00Z"
+  citation: "https://www.fxleaders.com/news/2026/05/12/nvidia-nvda-stock-forecast-2026-ai-capex-boom-hyperscaler-spending-strategic-partnerships-drive-nvda-price-surge/"
+  aboutSecurity: fin.nvda
+  corporateMetric: fin.segment-revenue
+  reportingPeriod: fin.fy-2026
+
+ev-amd-q1-2026-datacenter:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    AMD reported Q1 2026 data-center segment revenue of 5.8 billion dollars, up
+    57 percent year over year, on strong EPYC processor demand and the ramp of
+    Instinct GPU shipments.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-05T20:00:00Z"
+  citation: "https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results"
+  aboutSecurity: fin.amd
+  corporateMetric: fin.segment-revenue
+  reportingPeriod: fin.q1-2026
+
+ev-amd-q1-2026-eps:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    AMD reported Q1 2026 revenue of 10.3 billion dollars and GAAP diluted EPS
+    of 0.84 dollars, with non-GAAP diluted EPS of 1.37 dollars, beating
+    estimates and lifting forward guidance.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-05T20:00:00Z"
+  citation: "https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results"
+  aboutSecurity: fin.amd
+  corporateMetric: fin.eps
+  reportingPeriod: fin.q1-2026
+
+ev-lisa-su-datacenter-statement:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    AMD chair and CEO Lisa Su stated on the Q1 2026 earnings call that the data
+    center is now the primary driver of the company's revenue and earnings
+    growth, driven by accelerating demand for AI infrastructure.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-05T20:00:00Z"
+  citation: "https://ir.amd.com/news-events/press-releases/detail/1284/amd-reports-first-quarter-2026-financial-results"
+  speaker: party-lisa-su
+  speakerRole: fin.ceo
+  statementVenue: "AMD Q1 2026 earnings call"
+  statementDate: 2026-05-05
+
+ev-nvda-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVIDIA (NVDA) closed at 225.83 on 2026-05-13.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/NVDA/prev"
+  aboutSecurity: fin.nvda
+  marketMetric: fin.close-price
+  observedValue: 225.83
+
+ev-amd-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Advanced Micro Devices (AMD) closed at 445.50 on 2026-05-13, holding the
+    gains that followed its Q1 2026 data-center beat.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/AMD/prev"
+  aboutSecurity: fin.amd
+  marketMetric: fin.close-price
+  observedValue: 445.50
+
+ev-fomc-april-2026-hold:
+  type: fin.CentralBankEvidence
+  evidenceStatement: >-
+    The FOMC held the federal funds target at 3.5 to 3.75 percent on
+    2026-04-29 in an 8-4 vote, the first decision with four dissents since
+    October 1992. Governor Miran dissented in favor of a 25 basis point cut
+    while three others objected to the statement language.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-04-29T18:00:00Z"
+  citation: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm"
+  centralBank: fin.fomc
+  meetingDate: 2026-04-29
+  voteCount:
+    yeaCount: 8
+    nayCount: 4
+    abstainCount: 0
+
+ev-warsh-confirmation-2026-05-13:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    The United States Senate confirmed Kevin Warsh as Federal Reserve Chair on
+    2026-05-13 in a 54-45 vote, the most divisive Fed chair confirmation in
+    modern history. Warsh succeeds Jerome Powell, whose term expires
+    2026-05-15, and chairs his first FOMC meeting on 2026-06-16.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T00:00:00Z"
+  citation: "https://www.cnbc.com/2026/05/13/kevin-warsh-wins-senate-confirmation-as-the-next-federal-reserve-chair.html"
+  issuingBody: fin.us-congress
+  policy: wv.appointment
+  effectiveDate: 2026-05-13
+
+ev-10y-yield-2026-05-13:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    The 10-year United States Treasury yield reached 4.49 percent on
+    2026-05-13, its highest level since July 2025, after a 3.8 percent April
+    CPI print and an April producer-price reading of 1.4 percent month over
+    month. Sourced via web research because the Massive treasury-yields
+    endpoint returned no data for the requested date.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://www.cnbc.com/2026/05/13/treasury-yields-fall-as-investors-digest-hotter-than-expected-cpi-data.html"
+  indicatorName: fin.ind-10y-treasury-yield
+  indicatorValue: 4.49
+  indicatorPeriod: "2026-05-13 close"
+
+ev-unemployment-april-2026:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    The United States unemployment rate was unchanged at 4.3 percent in April
+    2026, with nonfarm payrolls up 115000 on the month, above the 55000
+    consensus. The labor market remains resilient enough to remove any urgency
+    for the Fed to ease into the inflation print.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-08T12:30:00Z"
+  citation: "https://www.bls.gov/news.release/empsit.nr0.htm"
+  indicatorName: fin.ind-unemployment-rate
+  indicatorValue: 4.3
+  indicatorPeriod: "April 2026"
+
+ev-tlt-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The iShares 20+ Year Treasury Bond ETF (TLT) closed at 84.80 on
+    2026-05-13, near the low end of its recent range as long-duration yields
+    broke higher.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/TLT/prev"
+  aboutSecurity: fin.tlt
+  marketMetric: fin.close-price
+  observedValue: 84.80
+
+ev-defense-budget-fy2027-proposal:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    The administration is pushing a fiscal 2027 United States military budget
+    that could approach 1.5 trillion dollars, up from a fiscal 2026 budget near
+    one trillion dollars, framed around the Iran war and missile restocking.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-04-25T00:00:00Z"
+  citation: "https://fortune.com/2026/04/25/us-defense-contractors-iran-war-missile-restocking/"
+  issuingBody: fin.us-white-house
+  policy: wv.budget
+
+ev-lmt-backlog-q4-2025:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Lockheed Martin reported a record all-defense backlog near 194 billion
+    dollars with its Q4 2025 results, and has since secured a 4.7 billion
+    dollar preliminary contract to expand Patriot interceptor production.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-01-27T00:00:00Z"
+  citation: "https://247wallst.com/investing/2026/04/23/lockheed-martin-vs-rtx-defense-spending-is-surging-heres-who-wins/"
+  aboutSecurity: fin.lmt
+  corporateMetric: fin.backlog
+  reportingPeriod: fin.q4-2025
+
+ev-rtx-backlog-q4-2025:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    RTX Corporation reported a backlog near 268 billion dollars with its Q4
+    2025 results, split roughly 161 billion dollars commercial and 107 billion
+    dollars defense.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-01-27T00:00:00Z"
+  citation: "https://247wallst.com/investing/2026/04/23/lockheed-martin-vs-rtx-defense-spending-is-surging-heres-who-wins/"
+  aboutSecurity: fin.rtx
+  corporateMetric: fin.backlog
+  reportingPeriod: fin.q4-2025
+
+ev-lmt-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Lockheed Martin (LMT) closed at 519.94 on 2026-05-13.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/LMT/prev"
+  aboutSecurity: fin.lmt
+  marketMetric: fin.close-price
+  observedValue: 519.94
+
+ev-rtx-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    RTX Corporation (RTX) closed at 178.11 on 2026-05-13.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/RTX/prev"
+  aboutSecurity: fin.rtx
+  marketMetric: fin.close-price
+  observedValue: 178.11
+
+ev-noc-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Northrop Grumman (NOC) closed at 551.80 on 2026-05-13.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/NOC/prev"
+  aboutSecurity: fin.noc
+  marketMetric: fin.close-price
+  observedValue: 551.80
+
+ev-gld-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The SPDR Gold Shares ETF (GLD) closed at 430.50 on 2026-05-13, roughly 16
+    percent below the January 2026 all-time high in spot gold.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/GLD/prev"
+  aboutSecurity: fin.gld
+  marketMetric: fin.close-price
+  observedValue: 430.50
+
+ev-gdx-close-2026-05-13:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The VanEck Gold Miners ETF (GDX) closed at 96.23 on 2026-05-13.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-05-13T20:00:00Z"
+  citation: "https://api.polygon.io/v2/aggs/ticker/GDX/prev"
+  aboutSecurity: fin.gdx
+  marketMetric: fin.close-price
+  observedValue: 96.23
+
+ev-cb-gold-buying-q1-2026:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: >-
+    Central banks bought a net 244 tonnes of gold in Q1 2026 despite a visible
+    uptick in selling activity, following net purchases of 863 tonnes in 2025.
+    Full-year 2026 official-sector buying is projected near 755 tonnes, still
+    well above pre-2022 norms.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: "2026-04-30T00:00:00Z"
+  citation: "https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026"
+  flowInstitution: inst-global-central-banks
+  flowDirection: fin.flow-buying
+  flowMagnitudeValue: 244.0
+  flowMagnitudeUnit: "tonnes"
+
+ev-goldman-gold-target:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    Goldman Sachs raised its end-of-2026 gold forecast to 5400 dollars per
+    ounce, with other institutional forecasters maintaining 5000 dollar and
+    higher targets for the year.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: "2026-05-08T00:00:00Z"
+  citation: "https://goldsilver.com/industry-news/article/gold-price-outlook-may-2026-why-institutional-forecasters-still-see-5000/"
+  analystInstitution: fin.goldman-sachs-research
+  forecastValue: 5400.0
+  forecastHorizon: fin.horizon-full-year
