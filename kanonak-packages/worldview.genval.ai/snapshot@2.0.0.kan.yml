@@ -50,8 +50,9 @@ ind-hyperscaler-ai-capex-2026:
   type: wv.Indicator
   label: "Big Four Hyperscaler AI Capex 2026"
 
-worldview-snapshot:
+view:
   type: wv.WorldviewSnapshot
+  label: Macro worldview
   observedAt: "2026-05-14T03:42:31Z"
   narrative: >-
     This snapshot opens a new major version of the worldview. It is authored
