@@ -106,6 +106,12 @@ jobs:
       # `transform run`) because snapshot-stylesheet uses
       # `tx.CallFragment(pages.worldview-chrome-fragment)` which only
       # the derive code path resolves cleanly.
+      #
+      # Also: WorldviewThesis instances get a rich custom standalone
+      # page via worldview-chrome's thesis-html-renderer (status pill,
+      # confidence meter, theme chip, statement, rationale, supporting
+      # evidence list). Overwrites the generic any-resource-renderer
+      # output for each thesis.
       # ---------------------------------------------------------------
       - name: Render WorldviewSnapshots (rich custom view)
         run: |
@@ -124,6 +130,12 @@ jobs:
             if [ -f "$out_dir/snapshot.html" ]; then
               mv "$out_dir/snapshot.html" "$out_dir/view.html"
             fi
+            # Rich per-thesis pages — one transform-run renders every
+            # WorldviewThesis in this snapshot package.
+            kanonak transform run worldview.genval.ai/worldview-chrome/thesis-html-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format html \
+              --out "$out_dir/" 2>&1 | tail -3 || true
           done
 
       # ---------------------------------------------------------------

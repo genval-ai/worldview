@@ -33,6 +33,16 @@ worldview-chrome:
           match: ^
           version: 1.0.0
           alias: derivation
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 1.0.0
+          alias: wv
+        - package: visual
+          match: ^
+          version: 1.0.0
+          alias: vis
 
 any-resource-renderer:
   type: tx.InstanceTransformation
@@ -187,6 +197,408 @@ any-resource-renderer:
                             <footer class="resource-footer">Kanonak Protocol resource</footer>
                             </article>
 
+thesis-html-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewThesis
+    tx.requires:
+      - wv.thesisStatement
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.Join
+                                tx.separator: ""
+                                tx.source:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.VarRef
+                                          tx.varName: input
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.VarRef
+                                          tx.varName: input
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: " · worldview.genval.ai"
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <style>
+                            dl.metadata{display:none!important}
+                            :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--border:#1e293b;--border-soft:#162033;--strong:#34d399;--moderate:#fbbf24;--weak:#64748b;--danger:#f87171;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
+                            *{box-sizing:border-box;margin:0;padding:0}
+                            html,body{background:var(--bg)}
+                            body{color:var(--fg)!important;font-family:var(--font-sans)!important;line-height:1.55!important;font-size:15px!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh;max-width:none!important;margin:0!important;padding:0!important}
+                            a{color:var(--accent);text-decoration:none;transition:color 120ms}
+                            a:hover{color:var(--accent-2)}
+                            nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
+                            .site-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+                            a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+                            ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
+                            ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
+                            ul.site-nav-links a:hover{color:var(--fg)}
+                            article.thesis{max-width:880px;margin:0 auto;padding:48px 32px 96px}
+                            @media (max-width:760px){article.thesis{padding:32px 20px 64px}}
+                            .hero{padding:0 0 32px;border-bottom:1px solid var(--border);position:relative;margin-bottom:32px}
+                            .hero::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                            .hero-meta{display:flex;align-items:baseline;font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:24px;gap:16px;flex-wrap:wrap}
+                            .eyebrow{color:var(--accent)}
+                            .thesis-version{font-family:var(--font-mono);color:var(--accent);font-size:11px;letter-spacing:0.05em;background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);padding:2px 8px;border-radius:4px;text-transform:none}
+                            .thesis-label{font-family:var(--font-display);font-size:36px;font-weight:400;letter-spacing:-0.02em;line-height:1.15;color:var(--fg);margin-bottom:20px}
+                            @media (max-width:760px){.thesis-label{font-size:28px}}
+                            .status-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:20px}
+                            .status-pill{font-family:var(--font-mono);font-size:10px;padding:4px 10px;border-radius:12px;text-transform:uppercase;letter-spacing:0.12em;font-weight:600}
+                            .status-pill.status-active{background:rgba(52,211,153,0.12);color:var(--strong)}
+                            .status-pill.status-retired{background:rgba(100,116,139,0.18);color:var(--fg-dim)}
+                            .status-pill.status-invalidated{background:rgba(248,113,113,0.12);color:var(--danger)}
+                            .theme-chip{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:var(--bg-card);color:var(--fg-dim)}
+                            .confidence-strip{display:flex;align-items:center;gap:16px;margin-top:8px}
+                            .confidence-meter{flex:1;height:10px;background:var(--bg-elev);border-radius:5px;overflow:hidden}
+                            .confidence-meter svg{display:block;width:100%;height:100%}
+                            .conf-fill{fill:var(--accent)}
+                            .confidence-label{font-family:var(--font-mono);font-size:12px;color:var(--fg-dim);min-width:90px;text-align:right;letter-spacing:0.04em}
+                            .confidence-label .conf-value{color:var(--fg);font-weight:600}
+                            .thesis-statement{font-size:17px;color:var(--fg);line-height:1.7;font-weight:300;margin-bottom:20px}
+                            .confidence-rationale{font-size:13px;line-height:1.55;color:var(--fg-dim);margin:8px 0 24px;border-left:2px solid var(--accent);padding-left:14px;font-style:italic}
+                            .confidence-rationale .rationale-label{color:var(--fg-faint);font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;margin-right:6px;font-style:normal}
+                            .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin:32px 0 12px;display:flex;align-items:center;gap:12px}
+                            .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                            .invalidation{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;padding:14px 18px;font-family:var(--font-mono);font-size:12px;color:var(--fg-dim)}
+                            .invalidation code{color:var(--accent);background:var(--bg-elev);padding:1px 6px;border-radius:3px}
+                            .evidence-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
+                            .evidence-list li{font-family:var(--font-mono);font-size:11px}
+                            .evidence-list a{color:var(--fg-dim);background:var(--bg-card);border:1px solid var(--border-soft);padding:6px 10px;border-radius:4px;display:block;letter-spacing:0.02em;word-break:break-all}
+                            .evidence-list a:hover{color:var(--accent);border-color:var(--accent-3,var(--accent))}
+                            .thesis-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em}
+                            .thesis-footer p{margin-bottom:6px}
+                            .thesis-footer code{color:var(--accent);background:var(--bg-card);padding:1px 6px;border-radius:3px;border:1px solid var(--border-soft)}
+                            .thesis-footer a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+                            .thesis-footer a:hover{color:var(--accent-2);border-bottom-color:var(--accent-2)}
+                            </style>
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+                            <article class="thesis">
+                            <header class="hero">
+                            <div class="hero-meta">
+                            <span class="eyebrow">Thesis</span>
+                            <span class="thesis-version">snapshot v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </span>
+                            </div>
+                            <h1 class="thesis-label">
+                        - type: tx.Fallback
+                          tx.primary:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: rdfs.label
+                          tx.alternate:
+                            type: tx.UriName
+                            tx.uriNameOf:
+                              type: tx.VarRef
+                              tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </h1>
+                            <div class="status-row">
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<span class="status-pill status-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: input
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.VarRef
+                                      tx.varName: input
+                                    tx.readProp: wv.status
+                                tx.readProp: rdfs.label
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</span>'
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<span class="theme-chip">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.VarRef
+                                      tx.varName: input
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: rdfs.label
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</span>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </div>
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.confidence
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<div class="confidence-strip"><div class="confidence-meter"><svg viewBox="0 0 1 1" preserveAspectRatio="none"><rect x="0" y="0" width="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: input
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" height="1" class="conf-fill"/></svg></div><span class="confidence-label">confidence <span class="conf-value">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: input
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</span></span></div>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </header>
+
+                            <p class="thesis-statement">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.thesisStatement
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '</p>'
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.confidenceRationale
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<p class="confidence-rationale"><span class="rationale-label">Rationale</span>'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: input
+                                tx.readProp: wv.confidenceRationale
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</p>'
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.invalidationCondition
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<h2 class="section-title">Invalidation</h2><div class="invalidation">Structured machine-evaluable condition declared. See the <a href="view">snapshot view</a> for the full condition tree.</div>'
+
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.supportingEvidence
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<h2 class="section-title">Supporting evidence</h2><ul class="evidence-list">'
+                              - type: tx.ForEach
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: input
+                                  tx.readProp: wv.supportingEvidence
+                                tx.loopVar: ev
+                                tx.emit:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<li><a href="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: ev
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '">'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: ev
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</a></li>'
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</ul>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <footer class="thesis-footer">
+                            <p>Part of <a href="view">snapshot v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '</a></p><p>Canonical URI: <code>'
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '</code></p><p>Also: <a href="'
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '.md">Markdown</a> &middot; <a href="/snapshot/'
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            .kan.yml">Source</a></p>
+                            </footer>
+                            </article>
+
 rdfs.Resource:
   derivation.derivations:
     - type: derivation.Derivation
@@ -198,3 +610,15 @@ rdfs.Resource:
         tx.package: worldview-chrome
         tx.version: 1.0.0
         tx.name: any-resource-renderer
+
+wv.WorldviewThesis:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.html
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 1.0.0
+        tx.name: thesis-html-renderer

@@ -175,8 +175,12 @@ security-to-html-transformation:
                             .price-label{color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.1em;font-size:10px}
                             .price{color:var(--fg);font-weight:600;font-size:18px}
                             .price-asof{color:var(--fg-dim);font-size:11px}
+                            .security-description{font-size:15px;color:var(--fg-dim);line-height:1.7;margin:24px 0 0;font-weight:300}
                             .security-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em}
+                            .security-footer p{margin-bottom:6px}
                             .security-footer code{color:var(--accent);background:var(--bg-card);padding:1px 6px;border-radius:3px;border:1px solid var(--border-soft);font-size:11px}
+                            .footer-siblings a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+                            .footer-siblings a:hover{color:var(--accent-2);border-bottom-color:var(--accent-2)}
                             </style>
                             <nav class="site-nav">
                             <div class="site-nav-inner">
@@ -332,15 +336,51 @@ security-to-html-transformation:
                           tx.stringLiteral: |-
                             </header>
 
+                        - type: tx.When
+                          tx.condition:
+                            type: tx.IsSet
+                            tx.checkExpr:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: rdfs.comment
+                          tx.thenBuild:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<p class="security-description">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: input
+                                tx.readProp: rdfs.comment
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</p>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
                             <footer class="security-footer">
-                            <p>Canonical URI: <code>
+                            <p class="footer-uri">Canonical URI: <code>
                         - type: tx.SubjectUri
                           tx.subjectOf:
                             type: tx.VarRef
                             tx.varName: input
                         - type: tx.StringLiteral
-                          tx.stringLiteral: |
-                            </code></p>
+                          tx.stringLiteral: '</code></p><p class="footer-siblings">Also: <a href="'
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '.md">Markdown</a> &middot; <a href="/securities/'
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            .kan.yml">Source</a></p>
                             </footer>
                             </article>
 
