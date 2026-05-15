@@ -68,6 +68,12 @@ jobs:
       - name: Render every resource (canonical URL form)
         run: |
           set -e
+          # universal-derivations isn't imported by any workspace
+          # package (it augments rdfs.Resource via load-order
+          # precedence, not via explicit import), so the validate
+          # step doesn't pull it into the local cache. Install
+          # explicitly so the transform-run calls below resolve.
+          kanonak install kanonak.org/universal-derivations
           # ONE `transform run` per package renders every rdfs.Resource
           # instance via universal-derivations — orders of magnitude
           # faster than N derive calls (the renderer matches
