@@ -42,44 +42,81 @@ jobs:
           done
 
       # ---------------------------------------------------------------
-      # 2. For every snapshot@<version> package, render the paired
-      # HTML + CSS artifacts via `kanonak derive` on the `view` resource.
-      # `derive` walks the polymorphic derivation discovery (instance
-      # overrides → class hierarchy → universal defaults) and dispatches
-      # to snapshot-to-html-transformation / snapshot-stylesheet through
-      # the wv.WorldviewSnapshot bindings declared in pages@1.2.0. Using
-      # `derive` (not `transform run`) is what lets cross-package
-      # `tx.CallFragment(pages.worldview-chrome-fragment)` references
-      # resolve.
+      # 1b. GENERIC RESOURCE RENDER.
+      # Walk every package; for every top-level typed resource (any
+      # subject whose `type:` is not Package), run `kanonak derive
+      # --format html` and write to the canonical filesystem path
+      # `_site/<package>/<version>/<resource>.html`.
       #
-      # Each output pair lands at its canonical path
-      # _site/snapshot@<version>/{view.html, snapshot.css} so it is
-      # permanently linkable. The HTML carries
-      # `<link rel="stylesheet" href="snapshot.css">` so the relative
-      # href resolves to the sibling .css.
+      # Discovery cascade (instance override → class hierarchy →
+      # universal default at rdfs.Resource) picks the most specific
+      # transformation for each resource. Resources without a class-
+      # specific binding fall through to
+      # `kanonak.org/universal-derivations/any-resource-renderer`, so
+      # EVERY canonical URI gets a renderable page out of the box.
+      #
+      # Runs BEFORE the class-specific steps below so they overwrite
+      # where the publisher has richer custom renderers (snapshot view,
+      # security pages). Per-resource failures are logged and skipped
+      # so one broken resource never blocks the rest of the deploy.
+      #
+      # This step is publisher-agnostic apart from the hardcoded
+      # publisher directory — extracting that into a workflow input
+      # would make this the basis of a reusable GH Action that any
+      # Kanonak publisher could drop into their repo.
       # ---------------------------------------------------------------
-      - name: Render WorldviewSnapshots (canonical per-package paths)
+      - name: Render every resource (canonical URL form)
         run: |
           set -e
-          mkdir -p _site
-          for pkg_file in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
+          pip install --quiet pyyaml
+          enum_resources='
+          import yaml, sys
+          doc = yaml.safe_load(open(sys.argv[1])) or {}
+          for k, v in doc.items():
+              if not isinstance(v, dict): continue
+              t = v.get("type")
+              if not t or t == "Package": continue
+              print(k)
+          '
+          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
             name="${base%@*}"
             version="${base#*@}"
-            view_uri="worldview.genval.ai/${base}/view"
-            # Canonical URL form per kanonak-protocol@2.1.0#canonical-url-form
-            # is `/<package>/<version>/<name>` — note the slash between package
-            # and version, NOT the `@` of the URI form. The output path mirrors
-            # the URL so GH Pages serves it natively without per-publisher
-            # routing rules.
             out_dir="_site/${name}/${version}"
-            echo "Rendering $view_uri -> $out_dir"
-            kanonak derive "$view_uri" --format html --out "$out_dir/"
-            kanonak derive "$view_uri" --format stylesheet --out "$out_dir/"
-            if [ -f "$out_dir/snapshot.html" ]; then
-              mv "$out_dir/snapshot.html" "$out_dir/view.html"
-            fi
+            mkdir -p "$out_dir"
+            python3 -c "$enum_resources" "$pkg_file" | while IFS= read -r resource; do
+              [ -z "$resource" ] && continue
+              uri="worldview.genval.ai/${base}/${resource}"
+              tmp=$(mktemp -d)
+              if kanonak derive "$uri" --format html --out "$tmp/" >/dev/null 2>&1; then
+                produced=$(ls "$tmp"/*.html 2>/dev/null | head -1)
+                if [ -n "$produced" ]; then
+                  mv "$produced" "$out_dir/${resource}.html"
+                fi
+              else
+                echo "  skip-html: $uri"
+              fi
+              # Stylesheet — universal-derivations is the rdfs.Resource fallback
+              # so this succeeds for every resource. Files keep their artifact
+              # name (snapshot's HTML links to literal "snapshot.css"; universal
+              # uses "<resource>.css" — neither conflicts within the per-version
+              # output directory).
+              if kanonak derive "$uri" --format stylesheet --out "$tmp/" >/dev/null 2>&1; then
+                for css in "$tmp"/*.css; do
+                  [ -f "$css" ] || continue
+                  mv "$css" "$out_dir/$(basename "$css")"
+                done
+              fi
+              rm -rf "$tmp"
+            done
           done
+
+      # (Snapshot per-version rendering is now handled by the generic
+      # resource step above. Discovery picks up the wv.WorldviewSnapshot
+      # binding via pages@1.2.0 and dispatches to
+      # snapshot-to-html-transformation, with the paired stylesheet
+      # derived alongside. The dedicated step was removed in favor of
+      # the generic loop.)
 
       # ---------------------------------------------------------------
       # 3. Render the LATEST WorldviewSnapshot to _site/index.html so
