@@ -64,16 +64,18 @@ jobs:
           mkdir -p _site
           for pkg_file in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
+            name="${base%@*}"
+            version="${base#*@}"
             view_uri="worldview.genval.ai/${base}/view"
-            out_dir="_site/${base}"
+            # Canonical URL form per kanonak-protocol@2.1.0#canonical-url-form
+            # is `/<package>/<version>/<name>` — note the slash between package
+            # and version, NOT the `@` of the URI form. The output path mirrors
+            # the URL so GH Pages serves it natively without per-publisher
+            # routing rules.
+            out_dir="_site/${name}/${version}"
             echo "Rendering $view_uri -> $out_dir"
             kanonak derive "$view_uri" --format html --out "$out_dir/"
             kanonak derive "$view_uri" --format stylesheet --out "$out_dir/"
-            # snapshot-to-html emits snapshot.html (artifactName); rename
-            # to view.html so the file matches the instance URI used by
-            # landing-page deep links (SubjectUri ends in /view). The CSS
-            # artifact name is `snapshot.css` (pinned in tx.artifactName)
-            # to match the <link href="snapshot.css"> reference in the HTML.
             if [ -f "$out_dir/snapshot.html" ]; then
               mv "$out_dir/snapshot.html" "$out_dir/view.html"
             fi
@@ -150,10 +152,10 @@ jobs:
       # ---------------------------------------------------------------
       # 4b. Render a Security HTML page for every fin.Security instance
       # across every published securities@<version> package. Each page
-      # lands at _site/securities/<version>/<name>/index.html so the
-      # canonical URL `/securities/<version>/<name>` resolves via the
-      # static host. The HTML is self-contained (inline <style>) — no
-      # paired stylesheet is needed for security pages.
+      # lands at _site/securities/<version>/<name>.html so the canonical
+      # URL `/securities/<version>/<name>` resolves WITHOUT the trailing-
+      # slash 301 that a directory/index.html layout would force on
+      # GH Pages. The HTML is self-contained (inline <style>).
       # ---------------------------------------------------------------
       - name: Render Security pages
         run: |
@@ -163,17 +165,10 @@ jobs:
             version="${base#*@}"
             out_dir="_site/securities/${version}"
             mkdir -p "$out_dir"
-            tmp=$(mktemp -d)
             kanonak transform run worldview.genval.ai/securities-to-html/security-to-html-transformation \
               --scope "worldview.genval.ai/${base}" \
               --format html \
-              --out "$tmp/"
-            for f in "$tmp"/*.html; do
-              name=$(basename "$f" .html)
-              mkdir -p "$out_dir/$name"
-              mv "$f" "$out_dir/$name/index.html"
-            done
-            rm -rf "$tmp"
+              --out "$out_dir/"
           done
 
       # ---------------------------------------------------------------
