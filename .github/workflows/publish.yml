@@ -68,16 +68,13 @@ jobs:
       - name: Render every resource (canonical URL form)
         run: |
           set -e
-          # universal-derivations isn't imported by any workspace
-          # package (it augments rdfs.Resource via load-order
-          # precedence, not via explicit import), so the validate
-          # step doesn't pull it into the local cache. Install
-          # explicitly so the transform-run calls below resolve.
-          kanonak install kanonak.org/universal-derivations
           # ONE `transform run` per package renders every rdfs.Resource
-          # instance via universal-derivations — orders of magnitude
-          # faster than N derive calls (the renderer matches
-          # rdfs.Resource which every typed resource subclasses).
+          # instance via the publisher's worldview-chrome renderer —
+          # which produces themed, self-contained HTML with the
+          # publisher's nav and dark theme. The transformation matches
+          # rdfs.Resource which every typed resource subclasses, so
+          # one invocation batches all instances per package.
+          #
           # Class-specific overrides for snapshot / security run in
           # the steps below and overwrite where they have richer
           # custom transformations.
@@ -88,13 +85,9 @@ jobs:
             out_dir="_site/${name}/${version}"
             mkdir -p "$out_dir"
             echo "-> $base"
-            kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
+            kanonak transform run worldview.genval.ai/worldview-chrome/any-resource-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format html \
-              --out "$out_dir/" 2>&1 | tail -3 || true
-            kanonak transform run kanonak.org/universal-derivations/any-resource-stylesheet \
-              --scope "worldview.genval.ai/${base}" \
-              --format stylesheet \
               --out "$out_dir/" 2>&1 | tail -3 || true
           done
 
