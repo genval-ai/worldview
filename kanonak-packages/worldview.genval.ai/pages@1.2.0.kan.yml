@@ -1,7 +1,7 @@
 pages:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.1.0
+  version: 1.2.0
   imports:
     - publisher: kanonak.org
       packages:
@@ -171,7 +171,7 @@ wv.WorldviewSnapshot:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
-        tx.version: 1.1.0
+        tx.version: 1.2.0
         tx.name: snapshot-to-html-transformation
     - type: derivation.Derivation
       derivation.format: formats.stylesheet
@@ -180,7 +180,7 @@ wv.WorldviewSnapshot:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
-        tx.version: 1.1.0
+        tx.version: 1.2.0
         tx.name: snapshot-stylesheet
 
 # =============================================================================

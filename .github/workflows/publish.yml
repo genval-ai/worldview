@@ -47,7 +47,7 @@ jobs:
       # `derive` walks the polymorphic derivation discovery (instance
       # overrides → class hierarchy → universal defaults) and dispatches
       # to snapshot-to-html-transformation / snapshot-stylesheet through
-      # the wv.WorldviewSnapshot bindings declared in pages@1.1.0. Using
+      # the wv.WorldviewSnapshot bindings declared in pages@1.2.0. Using
       # `derive` (not `transform run`) is what lets cross-package
       # `tx.CallFragment(pages.worldview-chrome-fragment)` references
       # resolve.
@@ -158,7 +158,7 @@ jobs:
       # `kanonak site build` only materializes the HTML output for each
       # AggregateView. Each aggregate also carries a per-instance
       # (formats.stylesheet, default) `derivation.derivations` binding
-      # in pages@1.1.0, so we follow up with one `kanonak derive` per
+      # in pages@1.2.0, so we follow up with one `kanonak derive` per
       # aggregate to produce the sibling .css file referenced by the
       # HTML's `<link rel="stylesheet" href="index.css">`.
       # ---------------------------------------------------------------
@@ -171,16 +171,16 @@ jobs:
           # `_site/<dir>/index.html` and links to a sibling `index.css`;
           # derive each one from its AggregateView resource (per-instance
           # binding fires).
-          kanonak derive worldview.genval.ai/pages@1.1.0/snapshots-aggregate \
+          kanonak derive worldview.genval.ai/pages@1.2.0/snapshots-aggregate \
             --format stylesheet \
             --out _site/snapshots/
-          kanonak derive worldview.genval.ai/pages@1.1.0/timeline-aggregate \
+          kanonak derive worldview.genval.ai/pages@1.2.0/timeline-aggregate \
             --format stylesheet \
             --out _site/timeline/
-          kanonak derive worldview.genval.ai/pages@1.1.0/horizon-aggregate \
+          kanonak derive worldview.genval.ai/pages@1.2.0/horizon-aggregate \
             --format stylesheet \
             --out _site/horizon/
-          kanonak derive worldview.genval.ai/pages@1.1.0/changes-aggregate \
+          kanonak derive worldview.genval.ai/pages@1.2.0/changes-aggregate \
             --format stylesheet \
             --out _site/changes/
 

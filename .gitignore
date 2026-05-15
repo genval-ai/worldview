@@ -4,6 +4,7 @@ dist/
 
 # Local kanonak CLI cache
 .kanonak/
+kanonak.lock
 
 # Local working notes / scratch (issues, drafts, fetched specs)
 research/
