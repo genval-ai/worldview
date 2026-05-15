@@ -148,6 +148,35 @@ jobs:
           rm _site/index.txt.unsorted
 
       # ---------------------------------------------------------------
+      # 4b. Render a Security HTML page for every fin.Security instance
+      # across every published securities@<version> package. Each page
+      # lands at _site/securities/<version>/<name>/index.html so the
+      # canonical URL `/securities/<version>/<name>` resolves via the
+      # static host. The HTML is self-contained (inline <style>) — no
+      # paired stylesheet is needed for security pages.
+      # ---------------------------------------------------------------
+      - name: Render Security pages
+        run: |
+          set -e
+          for pkg_file in kanonak-packages/worldview.genval.ai/securities@*.kan.yml; do
+            base=$(basename "$pkg_file" .kan.yml)
+            version="${base#*@}"
+            out_dir="_site/securities/${version}"
+            mkdir -p "$out_dir"
+            tmp=$(mktemp -d)
+            kanonak transform run worldview.genval.ai/securities-to-html/security-to-html-transformation \
+              --scope "worldview.genval.ai/${base}" \
+              --format html \
+              --out "$tmp/"
+            for f in "$tmp"/*.html; do
+              name=$(basename "$f" .html)
+              mkdir -p "$out_dir/$name"
+              mv "$f" "$out_dir/$name/index.html"
+            done
+            rm -rf "$tmp"
+          done
+
+      # ---------------------------------------------------------------
       # 5. Render every site.AggregateView in the workspace via
       # `kanonak site build`. Each AggregateView in
       # `worldview.genval.ai/pages` declares its scopeClass +
