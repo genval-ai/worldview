@@ -1064,9 +1064,10 @@ snapshot-svg-renderer:
 
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
                             <style>
                             text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
                             .bg{fill:#0a0e1a}
                             .frame{stroke:#1e293b;fill:none}
                             .t-active{opacity:1}
@@ -1074,11 +1075,14 @@ snapshot-svg-renderer:
                             .t-invalidated{opacity:0.45;filter:saturate(0.4) brightness(0.7)}
                             .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
                             .meta-value{fill:#9aa5b8;font-size:11px}
-                            .version-chip{fill:#7dd3fc;font-size:11px;letter-spacing:0.5px}
+                            .big-version{fill:#e6eaf2;font-size:24px;font-weight:700;letter-spacing:1px}
+                            .big-version .v-prefix{fill:#6b7689;font-weight:500;letter-spacing:2.5px}
+                            .card-date{fill:#9aa5b8;font-size:12px;letter-spacing:0.5px}
                             .stat{fill:#9aa5b8;font-size:10px;letter-spacing:2px}
                             .stat-num{fill:#e6eaf2;font-weight:700;font-size:13px}
-                            .full-label{fill:#9aa5b8;font-size:11px}
-                            .full-conf{fill:#e6eaf2;font-weight:600;font-size:11px}
+                            .full-label{fill:#9aa5b8;font-size:9px}
+                            .full-conf{fill:#e6eaf2;font-weight:600;font-size:9px}
+                            .conf-row{font-size:11px;font-weight:600;letter-spacing:0.5px}
                             /* Semantic zoom — see worldview-chrome convention block. */
                             .tier-icon,.tier-card{display:none}
                             .tier-full{display:block}
@@ -1153,12 +1157,13 @@ snapshot-svg-renderer:
                             </g>
 
                         # =====================================================
-                        # tier-card — version + date header, dot row, count
+                        # tier-card — prominent version + formatted date,
+                        # dot row, per-theme confidence row, count footer
                         # =====================================================
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             <g class="tier-card">
-                            <text x="24" y="36" class="version-chip">SNAPSHOT v
+                            <text x="200" y="48" text-anchor="middle" class="big-version"><tspan class="v-prefix">SNAPSHOT </tspan>v
                         - type: tx.UriVersion
                           tx.uriVersionOf:
                             type: tx.VarRef
@@ -1166,16 +1171,19 @@ snapshot-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
-                            <text x="376" y="36" text-anchor="end" class="meta-value">
-                        - type: tx.PropertyRead
-                          tx.readSource:
-                            type: tx.VarRef
-                            tx.varName: input
-                          tx.readProp: wv.observedAt
+                            <text x="200" y="70" text-anchor="middle" class="card-date">
+                        - type: tx.DateFormat
+                          tx.dateSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.observedAt
+                          tx.dateFormat: long-date
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
-                            <text x="200" y="150" text-anchor="middle" font-size="70" letter-spacing="-2">
+                            <text x="200" y="135" text-anchor="middle" font-size="60" letter-spacing="-2">
                         - type: tx.ForEach
                           tx.source:
                             type: tx.PropertyRead
@@ -1226,7 +1234,58 @@ snapshot-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
-                            <text x="200" y="205" text-anchor="middle" class="stat"><tspan class="stat-num">
+                            <text x="200" y="172" text-anchor="middle" class="conf-row">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)"> '
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ' </tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="212" text-anchor="middle" class="stat"><tspan class="stat-num">
                         - type: tx.Count
                           tx.source:
                             type: tx.PropertyRead
@@ -1240,13 +1299,13 @@ snapshot-svg-renderer:
                             </g>
 
                         # =====================================================
-                        # tier-full — version + date header, dot row, thesis list
+                        # tier-full — prominent version + formatted date,
+                        # dot row, thesis list (labels left, conf right-aligned)
                         # =====================================================
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             <g class="tier-full">
-                            <text x="24" y="32" class="meta-label">SNAPSHOT</text>
-                            <text x="24" y="50" class="version-chip">v
+                            <text x="24" y="46" class="big-version"><tspan class="v-prefix">SNAPSHOT </tspan>v
                         - type: tx.UriVersion
                           tx.uriVersionOf:
                             type: tx.VarRef
@@ -1255,16 +1314,19 @@ snapshot-svg-renderer:
                           tx.stringLiteral: |-
                             </text>
                             <text x="376" y="32" text-anchor="end" class="meta-label">OBSERVED</text>
-                            <text x="376" y="50" text-anchor="end" class="meta-value">
-                        - type: tx.PropertyRead
-                          tx.readSource:
-                            type: tx.VarRef
-                            tx.varName: input
-                          tx.readProp: wv.observedAt
+                            <text x="376" y="48" text-anchor="end" class="card-date">
+                        - type: tx.DateFormat
+                          tx.dateSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.observedAt
+                          tx.dateFormat: long-date
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
-                            <text x="200" y="110" text-anchor="middle" font-size="56" letter-spacing="-1">
+                            <text x="200" y="108" text-anchor="middle" font-size="50" letter-spacing="-1">
                         - type: tx.ForEach
                           tx.source:
                             type: tx.PropertyRead
@@ -1315,7 +1377,7 @@ snapshot-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
-                            <text x="24" y="148" font-size="11">
+                            <text x="24" y="148" font-size="9">
                         - type: tx.ForEach
                           tx.source:
                             type: tx.PropertyRead
@@ -1328,7 +1390,7 @@ snapshot-svg-renderer:
                             type: tx.Concat
                             tx.parts:
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '<tspan x="24" dy="14" class="t-'
+                                tx.stringLiteral: '<tspan x="24" dy="13" class="t-'
                               - type: tx.UriName
                                 tx.uriNameOf:
                                   type: tx.PropertyRead
@@ -1353,7 +1415,7 @@ snapshot-svg-renderer:
                                     tx.readProp: vis.thesisTheme
                                 tx.readProp: vis.themeHue
                               - type: tx.StringLiteral
-                                tx.stringLiteral: ',65%,55%)" font-size="14">●</tspan> <tspan class="full-label">'
+                                tx.stringLiteral: ',65%,55%)" font-size="12">●</tspan> <tspan class="full-label">'
                               - type: tx.PropertyRead
                                 tx.readSource:
                                   type: tx.ResolveRef
@@ -1362,7 +1424,7 @@ snapshot-svg-renderer:
                                     tx.varName: thesisRef
                                 tx.readProp: rdfs.label
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '</tspan> <tspan class="full-conf">'
+                                tx.stringLiteral: '</tspan><tspan x="376" text-anchor="end" class="full-conf">'
                               - type: tx.PropertyRead
                                 tx.readSource:
                                   type: tx.ResolveRef
