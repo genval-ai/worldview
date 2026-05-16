@@ -250,7 +250,15 @@ changes-transformation:
                                     type: tx.Concat
                                     tx.parts:
                                       - type: tx.StringLiteral
-                                        tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label">'
+                                        tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label"><img class="thesis-icon-inline" src="/snapshot/'
+                                      - type: tx.UriVersion
+                                        tx.uriVersionOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                      - type: tx.StringLiteral
+                                        tx.stringLiteral: '/'
+                                      - type: tx.UriName
+                                        tx.uriNameOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                      - type: tx.StringLiteral
+                                        tx.stringLiteral: '.svg" alt="" loading="lazy"/>'
                                       - type: tx.PropertyRead
                                         tx.readSource:
                                           type: tx.ResolveRef
@@ -392,7 +400,15 @@ changes-transformation:
                                           type: tx.Concat
                                           tx.parts:
                                             - type: tx.StringLiteral
-                                              tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label">'
+                                              tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label"><img class="thesis-icon-inline" src="/snapshot/'
+                                            - type: tx.UriVersion
+                                              tx.uriVersionOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                            - type: tx.StringLiteral
+                                              tx.stringLiteral: '/'
+                                            - type: tx.UriName
+                                              tx.uriNameOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                            - type: tx.StringLiteral
+                                              tx.stringLiteral: '.svg" alt="" loading="lazy"/>'
                                             - type: tx.PropertyRead
                                               tx.readSource:
                                                 type: tx.ResolveRef
@@ -457,7 +473,15 @@ changes-transformation:
                                           type: tx.Concat
                                           tx.parts:
                                             - type: tx.StringLiteral
-                                              tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label">'
+                                              tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label"><img class="thesis-icon-inline" src="/snapshot/'
+                                            - type: tx.UriVersion
+                                              tx.uriVersionOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                            - type: tx.StringLiteral
+                                              tx.stringLiteral: '/'
+                                            - type: tx.UriName
+                                              tx.uriNameOf: { type: tx.VarRef, tx.varName: currThesisRef }
+                                            - type: tx.StringLiteral
+                                              tx.stringLiteral: '.svg" alt="" loading="lazy"/>'
                                             - type: tx.PropertyRead
                                               tx.readSource:
                                                 type: tx.ResolveRef
@@ -496,7 +520,15 @@ changes-transformation:
                                         type: tx.Concat
                                         tx.parts:
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label">'
+                                            tx.stringLiteral: '<li class="diff-change"><div class="diff-change-header"><span class="change-thesis-label"><img class="thesis-icon-inline" src="/snapshot/'
+                                          - type: tx.UriVersion
+                                            tx.uriVersionOf: { type: tx.VarRef, tx.varName: prevThesisRef }
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '/'
+                                          - type: tx.UriName
+                                            tx.uriNameOf: { type: tx.VarRef, tx.varName: prevThesisRef }
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '.svg" alt="" loading="lazy"/>'
                                           - type: tx.PropertyRead
                                             tx.readSource:
                                               type: tx.ResolveRef
@@ -606,7 +638,8 @@ changes-stylesheet:
                       .diff-change:last-child{border-bottom:none}
                       .diff-change.major{background:rgba(125,211,252,0.03)}
                       .diff-change-header{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:10px}
-                      .change-thesis-label{font-size:15px;color:var(--fg);font-weight:500}
+                      .change-thesis-label{font-size:15px;color:var(--fg);font-weight:500;display:inline-flex;align-items:center;gap:10px}
+                      .thesis-icon-inline{display:inline-block;width:44px;height:auto;border-radius:5px;vertical-align:middle;flex-shrink:0}
                       .change-shift{font-family:var(--font-mono);font-size:13px;color:var(--fg-dim);display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
                       .change-shift .from-conf{color:var(--fg-faint)}
                       .change-shift .to-conf{color:var(--fg)}
