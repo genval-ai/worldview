@@ -26,7 +26,7 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview
   observedAt: 2026-05-16T03:37:02Z
-  narrative: >
+  narrative: |
     Post-Friday-close refresh covering the May 15 cash session - the
     [[view]] window from the 1.0.13 22:52-ET wrap (May 15 02:52 UTC)
     to the May 16 03:37 UTC capture. Friday delivered a regime test

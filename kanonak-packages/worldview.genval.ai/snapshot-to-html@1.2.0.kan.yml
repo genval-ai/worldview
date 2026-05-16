@@ -3302,6 +3302,30 @@ snapshot-to-html-transformation:
                                 }
                               }
                             })();
+                            // Inject chip-tier SVG before each [[ref]] link in the narrative.
+                            // tx.RenderMarkdown emits plain <a> links; we wrap each one whose
+                            // href resolves to a known resource type (Security or Thesis) with
+                            // its canonical .svg sibling rendered at inline-text size. The SVG
+                            // sees a <60px-wide viewport, so it auto-renders its tier-chip
+                            // representation per the worldview-chrome semantic-zoom convention.
+                            (function(){
+                              var RE = /^(?:https?:\/\/[^/]+)?\/(securities|snapshot)\/([^/]+)\/([^/?#]+)$/;
+                              document.querySelectorAll('.hero-narrative a').forEach(function(link){
+                                var href = link.getAttribute('href') || '';
+                                var m = href.match(RE);
+                                if (!m) return;
+                                var klass = m[1], version = m[2], name = m[3];
+                                // Skip self-link to this snapshot's view and evidence refs
+                                // (we don't ship evidence SVGs).
+                                if (klass === 'snapshot' && (name === 'view' || name.indexOf('ev-') === 0)) return;
+                                var img = document.createElement('img');
+                                img.src = '/' + klass + '/' + version + '/' + name + '.svg';
+                                img.className = 'narrative-chip';
+                                img.alt = '';
+                                img.loading = 'lazy';
+                                link.insertBefore(img, link.firstChild);
+                              });
+                            })();
                             </script>
 
 
@@ -3389,6 +3413,9 @@ snapshot-stylesheet:
                       .hero h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
                       @media (max-width:760px){.hero h1{font-size:42px}}
                       .hero-narrative{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                      .hero-narrative p{margin-bottom:14px}
+                      .hero-narrative p:last-child{margin-bottom:0}
+                      .narrative-chip{display:inline-block;height:0.95em;width:1.58em;vertical-align:-0.18em;margin-right:0.3em;border-radius:2px;background:#0a0e1a}
                       /* THESIS RAIL */
                       .thesis-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;list-style:none;padding:0 0 40px;margin-bottom:48px;border-bottom:1px solid var(--border)}
                       .thesis-rail li a{display:flex;flex-direction:column;gap:10px;padding:14px 14px 16px;background:var(--bg-card);border-radius:var(--radius-sm);color:var(--fg-dim);transition:background 120ms,color 120ms,transform 120ms;border:1px solid var(--border-soft);height:100%;font-size:11px;line-height:1.35;font-family:var(--font-mono);letter-spacing:0.02em;text-transform:uppercase}
