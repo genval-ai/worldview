@@ -299,11 +299,11 @@ thesis-html-renderer:
                             ul.site-nav-links a:hover{color:var(--fg)}
                             article.thesis{max-width:880px;margin:0 auto;padding:48px 32px 96px}
                             @media (max-width:760px){article.thesis{padding:32px 20px 64px}}
-                            .hero{padding:0 0 32px;border-bottom:1px solid var(--border);position:relative;margin-bottom:32px;padding-right:200px;min-height:180px}
+                            .hero{padding:0 0 32px;border-bottom:1px solid var(--border);position:relative;margin-bottom:32px;padding-right:280px;min-height:170px}
                             .hero::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
-                            .hero-visual{position:absolute;top:8px;right:0;width:170px;height:170px}
-                            .hero-visual img{width:100%;height:100%;display:block;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.35)}
-                            @media (max-width:720px){.hero{padding-right:0;min-height:0}.hero-visual{position:static;margin:0 auto 24px;width:180px;height:180px}}
+                            .hero-visual{position:absolute;top:8px;right:0;width:260px;height:156px}
+                            .hero-visual img{width:100%;height:100%;display:block;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.35)}
+                            @media (max-width:780px){.hero{padding-right:0;min-height:0}.hero-visual{position:static;margin:0 auto 24px;width:100%;max-width:400px;height:auto;aspect-ratio:5/3}}
                             .hero-meta{display:flex;align-items:baseline;font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:24px;gap:16px;flex-wrap:wrap}
                             .eyebrow{color:var(--accent)}
                             .thesis-version{font-family:var(--font-mono);color:var(--accent);font-size:11px;letter-spacing:0.05em;background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);padding:2px 8px;border-radius:4px;text-transform:none}
@@ -666,16 +666,33 @@ thesis-svg-renderer:
 
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="400" height="240">
                             <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
                             .frame.s-active{stroke:#34d399}
                             .frame.s-retired{stroke:#64748b;stroke-dasharray:4 3}
                             .frame.s-invalidated{stroke:#f87171}
                             .status-text.s-active{fill:#34d399}
                             .status-text.s-retired{fill:#9aa5b8}
                             .status-text.s-invalidated{fill:#f87171}
+                            .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .meta-value{fill:#9aa5b8;font-size:11px}
+                            .conf-value{fill:#e6eaf2;font-size:50px;font-weight:600}
+                            .conf-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .ev-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .ev-count{fill:#e6eaf2;font-weight:600}
+                            .ev-row{font-size:11px;letter-spacing:1px}
+                            .ev-row tspan{fill:#6b7689}
+                            .ev-row tspan.evidence-strong{fill:#34d399}
+                            .ev-row tspan.evidence-moderate{fill:#fbbf24}
+                            .ev-row tspan.evidence-weak{fill:#64748b}
+                            .ev-row tspan.evidence-unknown{fill:#6b7689;opacity:0.4}
+                            .ev-legend{fill:#6b7689;font-size:8px;letter-spacing:1.5px}
+                            .lg-strong{fill:#34d399}
+                            .lg-moderate{fill:#fbbf24}
+                            .lg-weak{fill:#64748b}
                             </style>
-                            <rect x="4" y="4" width="192" height="192" rx="14" fill="#0a0e1a" stroke-width="3" class="frame s-
+                            <rect x="4" y="4" width="392" height="232" rx="14" fill="#0a0e1a" stroke-width="2.5" class="frame s-
                         - type: tx.UriName
                           tx.uriNameOf:
                             type: tx.PropertyRead
@@ -686,18 +703,64 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             "/>
-                            <g transform="translate(28, 24)">
-                            <rect width="144" height="120" rx="8" fill="#0f1524"/>
-                            <svg width="144" height="120" viewBox="0 0 1 1" preserveAspectRatio="none">
-                            <g transform="rotate(180 0.5 0.5)">
-                            <rect width="1" height="
+                            <text x="24" y="32" class="meta-label">THEME</text>
+                            <text x="24" y="50" class="meta-value">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="376" y="32" text-anchor="end" class="meta-label">STATUS</text>
+                            <text x="376" y="50" text-anchor="end" font-weight="600" style="text-transform:uppercase" class="status-text s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" font-size="11">'
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="125" text-anchor="middle" class="conf-value">
                         - type: tx.PropertyRead
                           tx.readSource:
                             type: tx.VarRef
                             tx.varName: input
                           tx.readProp: wv.confidence
                         - type: tx.StringLiteral
-                          tx.stringLiteral: '" fill="hsl('
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="142" text-anchor="middle" class="conf-label">CONFIDENCE</text>
+                            <rect x="24" y="156" width="352" height="6" rx="3" fill="#1a2233"/>
+                            <svg x="24" y="156" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" height="1" fill="hsl('
                         - type: tx.PropertyRead
                           tx.readSource:
                             type: tx.ResolveRef
@@ -710,41 +773,49 @@ thesis-svg-renderer:
                           tx.readProp: vis.themeHue
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            ,60%,50%)" opacity="0.55"/>
-                            </g>
-                            </svg>
-                            <rect x="0.5" y="0.5" width="143" height="119" rx="8" fill="none" stroke="rgba(255,255,255,0.04)"/>
-                            </g>
-                            <text x="100" y="92" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="38" font-weight="600" fill="#e6eaf2">
-                        - type: tx.PropertyRead
-                          tx.readSource:
-                            type: tx.VarRef
-                            tx.varName: input
-                          tx.readProp: wv.confidence
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            </text>
-                            <text x="100" y="114" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="8" letter-spacing="3" fill="#6b7689">CONFIDENCE</text>
-                            <text x="100" y="180" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="11" font-weight="600" letter-spacing="4" class="status-text s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
+                            ,65%,55%)"/></svg>
+                            <text x="24" y="188" class="ev-label">EVIDENCE (<tspan class="ev-count">
+                        - type: tx.Count
+                          tx.source:
                             type: tx.PropertyRead
                             tx.readSource:
                               type: tx.VarRef
                               tx.varName: input
-                            tx.readProp: wv.status
+                            tx.readProp: wv.supportingEvidence
                         - type: tx.StringLiteral
-                          tx.stringLiteral: '" style="text-transform:uppercase">'
-                        - type: tx.PropertyRead
-                          tx.readSource:
-                            type: tx.ResolveRef
-                            tx.resolveSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.status
-                          tx.readProp: rdfs.label
+                          tx.stringLiteral: |-
+                            </tspan> ITEMS)</text>
+                            <text x="376" y="188" text-anchor="end" class="ev-legend"><tspan class="lg-strong">● STRONG</tspan>  <tspan class="lg-moderate">● MOD</tspan>  <tspan class="lg-weak">● WEAK</tspan></text>
+                            <text x="24" y="212" class="ev-row">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.supportingEvidence
+                          tx.loopVar: ev
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="'
+                              - type: tx.Fallback
+                                tx.primary:
+                                  type: tx.UriName
+                                  tx.uriNameOf:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: ev
+                                    tx.readProp: wv.evidenceStrength
+                                tx.alternate:
+                                  type: tx.StringLiteral
+                                  tx.stringLiteral: 'evidence-unknown'
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">●</tspan>'
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
