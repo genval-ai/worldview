@@ -15,7 +15,7 @@ horizon:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.10.0
+          version: 3.11.0
           alias: tx
         - package: document-ast
           match: ^
@@ -29,7 +29,7 @@ horizon:
       packages:
         - package: core
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: wv
         - package: visual
           match: ^
@@ -37,7 +37,7 @@ horizon:
           alias: vis
         - package: pages
           match: ^
-          version: 1.1.0
+          version: 1.2.0
           alias: pages
 
 # =============================================================================

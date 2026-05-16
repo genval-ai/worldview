@@ -7,12 +7,16 @@ snapshot:
       packages:
         - package: core
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: wv
         - package: finance
           match: ^
-          version: 1.0.0
+          version: 2.1.0
           alias: fin
+        - package: securities
+          match: ^
+          version: 1.2.0
+          alias: sec
         - package: visual
           match: ^
           version: 1.0.0
@@ -79,7 +83,7 @@ ev-amd-q4-data-center-record:
   type: fin.CorporateEvidence
   evidenceStatement: AMD Q4 2025 data center segment revenue hit a record $5.38B, up 39% year-over-year.
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
+  fin.aboutSecurity: sec.amd
   fin.corporateMetric: fin.segment-revenue
   fin.reportingPeriod: fin.q4-2025
 
@@ -87,7 +91,7 @@ ev-nvda-china-revenue-zero:
   type: fin.CorporateEvidence
   evidenceStatement: NVIDIA China AI accelerator market share is now 0% per CEO Jensen Huang. Revenue collapsed from $19.67B (FY2025) to effectively zero following expanded US export controls.
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.nvda
+  fin.aboutSecurity: sec.nvda
   fin.corporateMetric: fin.geographic-revenue
   fin.reportingPeriod: fin.fy-2026
 
@@ -96,6 +100,6 @@ ev-amd-q1-consensus:
   evidenceStatement: AMD Q1 2026 consensus pre-print - revenue $9.88B, EPS $1.29. Data Center segment consensus $5.4B is the bar that determines whether the AI-capex thesis confirms or softens.
   evidenceStrength: wv.evidence-strong
   fin.analystInstitution: fin.bloomberg-consensus
-  fin.forecastTarget: fin.amd
+  fin.forecastTarget: sec.amd
   fin.forecastValue: 9.88
   fin.forecastHorizon: fin.horizon-q1-print

@@ -7,11 +7,11 @@ securities-to-html:
       packages:
         - package: core-rdf
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: rdfs
         - package: core-owl
           match: ^
-          version: 2.0.0
+          version: 2.1.0
           alias: owl
         - package: core-xsd
           match: ^
@@ -19,7 +19,7 @@ securities-to-html:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.10.0
+          version: 3.11.0
           alias: tx
         - package: document-ast
           match: ^
@@ -37,11 +37,11 @@ securities-to-html:
       packages:
         - package: finance
           match: ^
-          version: 2.0.0
+          version: 2.1.0
           alias: fin
         - package: securities
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: sec
         - package: pages
           match: ^

@@ -1,17 +1,17 @@
 worldview-chrome:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.0.0
+  version: 1.1.0
   imports:
     - publisher: kanonak.org
       packages:
         - package: core-rdf
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: rdfs
         - package: core-owl
           match: ^
-          version: 2.0.0
+          version: 2.1.0
           alias: owl
         - package: core-xsd
           match: ^
@@ -19,7 +19,7 @@ worldview-chrome:
           alias: xsd
         - package: transformations
           match: ^
-          version: 3.10.0
+          version: 3.11.0
           alias: tx
         - package: document-ast
           match: ^
@@ -37,8 +37,12 @@ worldview-chrome:
       packages:
         - package: core
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: wv
+        - package: finance
+          match: ^
+          version: 2.1.0
+          alias: fin
         - package: visual
           match: ^
           version: 1.0.0
@@ -394,12 +398,41 @@ thesis-html-renderer:
                             .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
                             .invalidation{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;padding:14px 18px;font-family:var(--font-mono);font-size:12px;color:var(--fg-dim)}
                             .invalidation code{color:var(--accent);background:var(--bg-elev);padding:1px 6px;border-radius:3px}
-                            .evidence-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px}
-                            .evidence-list li{font-family:var(--font-mono);font-size:11px}
-                            .evidence-list a{color:var(--fg-dim);background:var(--bg-card);border:1px solid var(--border-soft);padding:6px 10px;border-radius:4px;display:flex;align-items:center;gap:8px;letter-spacing:0.02em;word-break:break-all}
-                            .evidence-list a:hover{color:var(--accent);border-color:var(--accent-3,var(--accent))}
-                            .evidence-list .ev-type-icon,.evidence-list .ev-strength-icon{width:20px;height:20px;flex-shrink:0;display:inline-block}
-                            .evidence-list .ev-name{flex:1;min-width:0}
+                            .ev-timeline{position:relative;height:62px;margin:8px 0 22px}
+                            .ev-timeline-caption{position:absolute;top:0;left:0;right:0;text-align:center;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);letter-spacing:0.14em;text-transform:uppercase}
+                            .ev-timeline-axis{position:absolute;left:0;right:0;top:38px;height:1px;background:var(--border)}
+                            .ev-timeline-dot{position:absolute;top:38px;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid var(--bg);cursor:pointer;transition:transform 120ms,box-shadow 120ms;z-index:1;text-decoration:none}
+                            .ev-timeline-dot:hover,.ev-timeline-dot:focus{transform:translate(-50%,-50%) scale(1.6);z-index:3;outline:none;box-shadow:0 0 0 3px rgba(125,211,252,0.25)}
+                            .ev-timeline-dot.strength-evidence-strong{background:var(--strong)}
+                            .ev-timeline-dot.strength-evidence-moderate{background:var(--moderate)}
+                            .ev-timeline-dot.strength-evidence-weak{background:var(--weak)}
+                            .ev-timeline-label{position:absolute;top:50px;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);letter-spacing:0.1em;text-transform:uppercase}
+                            .ev-timeline-label.start{left:0}
+                            .ev-timeline-label.end{right:0}
+                            .ev-cards{list-style:none;padding:0;margin:0;counter-reset:ev-counter;display:flex;flex-direction:column;gap:10px}
+                            .ev-card{counter-increment:ev-counter;background:var(--bg-card);border:1px solid var(--border-soft);border-left-width:3px;border-radius:6px;padding:14px 38px 14px 16px;transition:border-color 120ms,box-shadow 120ms;scroll-margin-top:80px;position:relative}
+                            .ev-card::before{content:counter(ev-counter);position:absolute;top:14px;right:14px;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);letter-spacing:0.04em}
+                            .ev-card.strength-evidence-strong{border-left-color:var(--strong)}
+                            .ev-card.strength-evidence-moderate{border-left-color:var(--moderate)}
+                            .ev-card.strength-evidence-weak{border-left-color:var(--weak)}
+                            .ev-card.ev-highlight{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 6px 20px rgba(125,211,252,0.18)}
+                            .ev-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);letter-spacing:0.04em;flex-wrap:wrap}
+                            .ev-head .ev-type-icon{width:14px;height:14px;flex-shrink:0;color:var(--fg-dim);opacity:0.9}
+                            .ev-head .ev-type-label{color:var(--fg);font-weight:500;text-transform:none;letter-spacing:0}
+                            .ev-head .ev-strength-label{text-transform:uppercase;letter-spacing:0.12em;font-size:10px;font-weight:600}
+                            .ev-card.strength-evidence-strong .ev-strength-label{color:var(--strong)}
+                            .ev-card.strength-evidence-moderate .ev-strength-label{color:var(--moderate)}
+                            .ev-card.strength-evidence-weak .ev-strength-label{color:var(--weak)}
+                            .ev-head .ev-time{margin-left:auto;font-family:var(--font-mono);color:var(--fg-faint);font-size:11px;letter-spacing:0.04em}
+                            .ev-head .ev-sep{color:var(--fg-faint);opacity:0.4}
+                            .ev-statement{font-size:14px;line-height:1.55;color:var(--fg);margin:0}
+                            .ev-facts{list-style:none;padding:0;margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--font-mono);font-size:10px;color:var(--fg-dim);letter-spacing:0.04em}
+                            .ev-facts li{display:flex;gap:6px;align-items:baseline}
+                            .ev-facts .ev-fact-label{color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.1em}
+                            .ev-facts .ev-fact-value{color:var(--fg)}
+                            .ev-citation{display:inline-block;margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:0.12em;border-bottom:1px dotted var(--accent)}
+                            .ev-citation:hover{color:var(--accent-2);border-bottom-color:var(--accent-2)}
+                            .section-count{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);font-weight:400;letter-spacing:0.04em;text-transform:none}
                             .thesis-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em}
                             .thesis-footer p{margin-bottom:6px}
                             .thesis-footer code{color:var(--accent);background:var(--bg-card);padding:1px 6px;border-radius:3px;border:1px solid var(--border-soft)}
@@ -608,6 +641,16 @@ thesis-html-renderer:
                               - type: tx.StringLiteral
                                 tx.stringLiteral: '<h2 class="section-title">Invalidation</h2><div class="invalidation">Structured machine-evaluable condition declared. See the <a href="view">snapshot view</a> for the full condition tree.</div>'
 
+                        # --- SUPPORTING EVIDENCE: timeline + chronological cards ---
+                        # The thesis page renders evidence INLINE rather than as links to
+                        # per-evidence pages (which are deliberately not derived; the prose
+                        # statement IS the user-facing artifact). Each card carries the
+                        # type icon + type label + strength label + observedAt + statement
+                        # + domain-specific facts + citation. Above the cards, a horizontal
+                        # timeline plots one dot per dated evidence; clicking a dot scrolls
+                        # to and highlights the corresponding card. The timeline DOM is
+                        # built at runtime by the script at the bottom of this rule, which
+                        # walks the cards' data-evidence-observed-at attributes.
                         - type: tx.When
                           tx.condition:
                             type: tx.IsSet
@@ -621,7 +664,19 @@ thesis-html-renderer:
                             type: tx.Concat
                             tx.parts:
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '<h2 class="section-title">Supporting evidence</h2><ul class="evidence-list">'
+                                tx.stringLiteral: '<h2 class="section-title">Supporting evidence <span class="section-count">'
+                              - type: tx.Count
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: input
+                                  tx.readProp: wv.supportingEvidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </span></h2>
+                                  <div class="ev-timeline" aria-hidden="true"></div>
+                                  <ol class="ev-cards">
                               - type: tx.ForEach
                                 tx.source:
                                   type: tx.PropertyRead
@@ -633,14 +688,81 @@ thesis-html-renderer:
                                 tx.emit:
                                   type: tx.Concat
                                   tx.parts:
+                                    # CARD OPEN — strength class + data attrs feed the timeline script
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '<li><a href="'
+                                      tx.stringLiteral: '<li class="ev-card strength-'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: ev
+                                        tx.readProp: wv.evidenceStrength
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" id="ev-'
                                     - type: tx.UriName
                                       tx.uriNameOf:
                                         type: tx.VarRef
                                         tx.varName: ev
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '"><img class="ev-type-icon" src="/'
+                                      tx.stringLiteral: '" data-evidence-name="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: ev
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-evidence-strength="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: ev
+                                        tx.readProp: wv.evidenceStrength
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-evidence-type="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: ev
+                                        tx.readProp: rdfs.type
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: wv.evidenceObservedAt
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-observed-at="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: wv.evidenceObservedAt
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '">'
+
+                                    # HEAD — type icon + type label + strength label + observedAt
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<header class="ev-head"><img class="ev-type-icon" src="/'
                                     - type: tx.UriPackage
                                       tx.uriPackageOf:
                                         type: tx.PropertyRead
@@ -673,48 +795,451 @@ thesis-html-renderer:
                                             tx.varName: ev
                                         tx.readProp: rdfs.type
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '.svg" alt="" loading="lazy" onerror="this.style.display=&apos;none&apos;"/><img class="ev-strength-icon" src="/'
-                                    - type: tx.UriPackage
-                                      tx.uriPackageOf:
+                                      tx.stringLiteral: '.svg" alt="" loading="lazy" onerror="this.style.display=&apos;none&apos;"/><span class="ev-type-label">'
+                                    - type: tx.Fallback
+                                      tx.primary:
                                         type: tx.PropertyRead
                                         tx.readSource:
                                           type: tx.ResolveRef
                                           tx.resolveSource:
-                                            type: tx.VarRef
-                                            tx.varName: ev
-                                        tx.readProp: wv.evidenceStrength
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: rdfs.type
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: rdfs.type
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '/'
-                                    - type: tx.UriVersion
-                                      tx.uriVersionOf:
+                                      tx.stringLiteral: '</span><span class="ev-sep">·</span><span class="ev-strength-label">'
+                                    - type: tx.Fallback
+                                      tx.primary:
                                         type: tx.PropertyRead
                                         tx.readSource:
                                           type: tx.ResolveRef
                                           tx.resolveSource:
-                                            type: tx.VarRef
-                                            tx.varName: ev
-                                        tx.readProp: wv.evidenceStrength
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: wv.evidenceStrength
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: wv.evidenceStrength
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '/'
-                                    - type: tx.UriName
-                                      tx.uriNameOf:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.ResolveRef
-                                          tx.resolveSource:
-                                            type: tx.VarRef
-                                            tx.varName: ev
-                                        tx.readProp: wv.evidenceStrength
+                                      tx.stringLiteral: '</span>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: wv.evidenceObservedAt
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<time class="ev-time" datetime="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: wv.evidenceObservedAt
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '">'
+                                          - type: tx.DateFormat
+                                            tx.dateSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: ev
+                                              tx.readProp: wv.evidenceObservedAt
+                                            tx.dateFormat: short-date
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</time>'
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '.svg" alt="" loading="lazy"/><span class="ev-name">'
-                                    - type: tx.UriName
-                                      tx.uriNameOf:
-                                        type: tx.VarRef
-                                        tx.varName: ev
+                                      tx.stringLiteral: '</header>'
+
+                                    # STATEMENT
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '</span></a></li>'
+                                      tx.stringLiteral: '<p class="ev-statement">'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.ResolveRef
+                                        tx.resolveSource:
+                                          type: tx.VarRef
+                                          tx.varName: ev
+                                      tx.readProp: wv.evidenceStatement
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</p>'
+
+                                    # FACTS — typed domain-specific fields, each wrapped
+                                    # in tx.When so absent fields produce no markup.
+                                    # The list itself unconditionally opens/closes; that
+                                    # is acceptable because evidence with no facts still
+                                    # gets a (possibly-empty) ul that CSS leaves invisible
+                                    # via :empty handling.
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<ul class="ev-facts">'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: fin.aboutSecurity
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Security</span><span class="ev-fact-value">'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: ev
+                                                  tx.readProp: fin.aboutSecurity
+                                              tx.readProp: rdfs.label
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: ev
+                                                tx.readProp: fin.aboutSecurity
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: fin.marketMetric
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: ev
+                                                  tx.readProp: fin.marketMetric
+                                              tx.readProp: rdfs.label
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: ev
+                                                tx.readProp: fin.marketMetric
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: fin.observedValue
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Value</span><span class="ev-fact-value">'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: fin.observedValue
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: fin.corporateMetric
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Metric</span><span class="ev-fact-value">'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: ev
+                                                  tx.readProp: fin.corporateMetric
+                                              tx.readProp: rdfs.label
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: ev
+                                                tx.readProp: fin.corporateMetric
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: fin.reportingPeriod
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Period</span><span class="ev-fact-value">'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: ev
+                                                  tx.readProp: fin.reportingPeriod
+                                              tx.readProp: rdfs.label
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: ev
+                                                tx.readProp: fin.reportingPeriod
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: wv.speakerRole
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<li><span class="ev-fact-label">Speaker</span><span class="ev-fact-value">'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: ev
+                                                  tx.readProp: wv.speakerRole
+                                              tx.readProp: rdfs.label
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: ev
+                                                tx.readProp: wv.speakerRole
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '</span></li>'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</ul>'
+
+                                    # CITATION — outbound link, opens in new tab
+                                    - type: tx.When
+                                      tx.condition:
+                                        type: tx.IsSet
+                                        tx.checkExpr:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: ev
+                                          tx.readProp: wv.citation
+                                      tx.thenBuild:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<a class="ev-citation" href="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: ev
+                                            tx.readProp: wv.citation
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" target="_blank" rel="noopener">View source &rarr;</a>'
+
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</li>'
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '</ul>'
+                                tx.stringLiteral: |-
+                                  </ol>
+                                  <script>
+                                  // Build the evidence timeline DOM from the rendered cards.
+                                  // Reads data-evidence-observed-at + data-evidence-strength
+                                  // off each .ev-card; plots one dot per dated card; clicking
+                                  // a dot scrolls + highlights the target card. Cards without
+                                  // a parseable date simply do not appear on the timeline.
+                                  (function(){
+                                    var cards = Array.from(document.querySelectorAll('.ev-cards .ev-card'));
+                                    var timeline = document.querySelector('.ev-timeline');
+                                    if (!cards.length || !timeline) return;
+                                    var dated = cards.map(function(card){
+                                      var iso = card.getAttribute('data-evidence-observed-at');
+                                      var t = iso ? Date.parse(iso) : NaN;
+                                      return {card: card, t: t, iso: iso, strength: card.getAttribute('data-evidence-strength') || ''};
+                                    }).filter(function(p){ return !isNaN(p.t); });
+                                    if (!dated.length) { timeline.style.display = 'none'; return; }
+                                    var min = dated[0].t, max = dated[0].t;
+                                    dated.forEach(function(p){ if(p.t<min)min=p.t; if(p.t>max)max=p.t; });
+                                    var span = Math.max(1, max - min);
+                                    var fmt = function(t){
+                                      var d = new Date(t);
+                                      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    };
+                                    var caption = document.createElement('span');
+                                    caption.className = 'ev-timeline-caption';
+                                    caption.textContent = dated.length + ' dated · click any dot to jump';
+                                    timeline.appendChild(caption);
+                                    var axis = document.createElement('div');
+                                    axis.className = 'ev-timeline-axis';
+                                    timeline.appendChild(axis);
+                                    var lblStart = document.createElement('span');
+                                    lblStart.className = 'ev-timeline-label start';
+                                    lblStart.textContent = fmt(min);
+                                    timeline.appendChild(lblStart);
+                                    if (max !== min) {
+                                      var lblEnd = document.createElement('span');
+                                      lblEnd.className = 'ev-timeline-label end';
+                                      lblEnd.textContent = fmt(max);
+                                      timeline.appendChild(lblEnd);
+                                    }
+                                    timeline.removeAttribute('aria-hidden');
+                                    dated.forEach(function(p){
+                                      var dot = document.createElement('a');
+                                      dot.className = 'ev-timeline-dot strength-' + p.strength;
+                                      dot.href = '#' + p.card.id;
+                                      dot.style.left = (((p.t - min) / span) * 100).toFixed(2) + '%';
+                                      var typeLabel = p.card.querySelector('.ev-type-label');
+                                      dot.title = fmt(p.t) + (typeLabel ? ' · ' + typeLabel.textContent.trim() : '');
+                                      dot.setAttribute('aria-label', dot.title);
+                                      dot.addEventListener('click', function(e){
+                                        e.preventDefault();
+                                        p.card.scrollIntoView({behavior:'smooth', block:'start'});
+                                        document.querySelectorAll('.ev-card.ev-highlight').forEach(function(c){ c.classList.remove('ev-highlight'); });
+                                        p.card.classList.add('ev-highlight');
+                                        setTimeout(function(){ p.card.classList.remove('ev-highlight'); }, 2400);
+                                        if (history.replaceState) history.replaceState(null, '', '#' + p.card.id);
+                                      });
+                                      timeline.appendChild(dot);
+                                    });
+                                  })();
+                                  </script>
 
                         - type: tx.StringLiteral
                           tx.stringLiteral: |
@@ -778,7 +1303,7 @@ rdfs.Resource:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
-        tx.version: 1.0.0
+        tx.version: 1.1.0
         tx.name: any-resource-renderer
 
 thesis-svg-renderer:
@@ -2041,7 +2566,7 @@ wv.WorldviewSnapshot:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
-        tx.version: 1.0.0
+        tx.version: 1.1.0
         tx.name: snapshot-svg-renderer
 
 wv.WorldviewThesis:
@@ -2053,7 +2578,7 @@ wv.WorldviewThesis:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
-        tx.version: 1.0.0
+        tx.version: 1.1.0
         tx.name: thesis-html-renderer
     - type: derivation.Derivation
       derivation.format: formats.svg
@@ -2062,7 +2587,7 @@ wv.WorldviewThesis:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
-        tx.version: 1.0.0
+        tx.version: 1.1.0
         tx.name: thesis-svg-renderer
 
 # =============================================================================
@@ -2078,5 +2603,5 @@ wv.EvidenceStrength:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
-        tx.version: 1.0.0
+        tx.version: 1.1.0
         tx.name: evidence-strength-svg-renderer

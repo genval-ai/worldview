@@ -7,12 +7,16 @@ snapshot:
       packages:
         - package: core
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: wv
         - package: finance
           match: ^
-          version: 1.0.0
+          version: 2.1.0
           alias: fin
+        - package: securities
+          match: ^
+          version: 1.2.0
+          alias: sec
         - package: visual
           match: ^
           version: 1.0.0
@@ -679,7 +683,6 @@ ev-iran-realistic-positive-may10:
   evidenceStatement: 'Senior Iranian official on 2026-05-10 described Tehran''s formal response to the US MOU as "realistic and positive," adding that "Washington''s positive response to our response will move the negotiations forward quickly." The framing positions Iran as constructive while preserving maximalist substantive demands (see ev-iran-hormuz-sovereignty-demand-may10).'
   evidenceObservedAt: 2026-05-10T18:00:00Z
   evidenceStrength: wv.evidence-moderate
-  speakerRole: wv.government-official
   statementDate: 2026-05-10
 
 ev-trump-totally-unacceptable-may10:
@@ -772,7 +775,6 @@ ev-iran-demands-legitimate-may11:
   evidenceStatement: 'Iranian official on 2026-05-11 said Iran''s response to the US peace proposal contained "legitimate demands" - "reasonable and responsible" and "beneficial not only for Iran but also for the wider region and the world." The defensive framing positions Iran as constructive after Trump''s rejection without walking back any substantive demand, including the Hormuz sovereignty demand that the durable-reopening invalidation leg sits against.'
   evidenceObservedAt: 2026-05-11T12:00:00Z
   evidenceStrength: wv.evidence-moderate
-  speakerRole: wv.government-official
   statementDate: 2026-05-11
 
 ev-hormuz-17-vessels-may10:
@@ -807,7 +809,7 @@ ev-sp500-ath-7389-may8:
   evidenceStatement: S&P 500 closed at a fresh all-time high of 7,398.93 on May 8 2026, +0.84% on the day. Closed above the 7,300 melt-up threshold for several consecutive sessions.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
+  fin.aboutSecurity: sec.spx
   fin.marketMetric: fin.close-price
   fin.observedValue: 7398.93
 
@@ -816,7 +818,7 @@ ev-sp500-friday-close-7399-may8:
   evidenceStatement: S&P 500 Friday May 8 closing print confirmed at 7,398.93, +0.84% on the day. Sixth consecutive winning week (longest since 2024); week +2.3%.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
+  fin.aboutSecurity: sec.spx
   fin.marketMetric: fin.close-price
   fin.observedValue: 7398.93
 
@@ -825,7 +827,7 @@ ev-spy-friday-close-73762-may8:
   evidenceStatement: 'SPY ETF Friday May 8 close $737.62 - verified via Massive /v2/aggs/ticker/SPY/prev API call on 2026-05-11. Friday session OHLC: open $734.93, high $738.08, low $734.57, close $737.62, volume 47.2M, VWAP $736.54. Tracks the SPX cash 7,398.93 close at the standard ~10x divisor.'
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spy
+  fin.aboutSecurity: sec.spy
   fin.marketMetric: fin.close-price
   fin.observedValue: 737.62
 
@@ -834,7 +836,6 @@ ev-nasdaq-ath-26247-may8:
   evidenceStatement: Nasdaq closed at a fresh all-time high of 26,247.08 on May 8 2026, +1.71%. Week +4.5% led by AI/semis follow-through from the AMD Q1 print.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.ndx
   fin.marketMetric: fin.close-price
   fin.observedValue: 26247.08
 
@@ -843,14 +844,13 @@ ev-six-week-winning-streak-may8:
   evidenceStatement: SPX and Nasdaq both posted six consecutive winning weeks through May 8 2026 - the longest winning streak since 2024.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.weekly-streak
 
 ev-sp500-ath-7230-may1:
   type: fin.MarketDataEvidence
   evidenceStatement: S&P 500 hit an all-time high of 7,230 on May 1 2026.
   evidenceObservedAt: 2026-05-01T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
+  fin.aboutSecurity: sec.spx
   fin.marketMetric: fin.close-price
   fin.observedValue: 7230.0
 
@@ -859,7 +859,7 @@ ev-spx-may6-record-7365:
   evidenceStatement: SPX closed at a record 7,365.12 on May 6 2026 (+1.46%) on Iran ceasefire euphoria and AMD Q1 follow-through.
   evidenceObservedAt: 2026-05-06T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
+  fin.aboutSecurity: sec.spx
   fin.marketMetric: fin.close-price
   fin.observedValue: 7365.12
 
@@ -868,7 +868,7 @@ ev-vix-1718-may8:
   evidenceStatement: VIX at 17.08 on 2026-05-08. Sits in the 15-20 normal-business-conditions range despite the active Iran negotiations and the imminent Fed transition.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.vix
+  fin.aboutSecurity: sec.vix
   fin.marketMetric: fin.volatility-level
   fin.observedValue: 17.08
 
@@ -877,15 +877,13 @@ ev-cme-sunday-futures-open-22z:
   evidenceStatement: 'CME e-mini SPX futures Sunday session opens 18:00 ET / 22:00 UTC on 2026-05-10 - the first market window for repricing after the Friday cash close (SPX 7,398.93) given the May 7-8 escalation and the May 10 Trump rejection of Iran''s formal response. At snapshot time (00:30 UTC Monday) the Sunday session has been live ~2.5 hours; intraday price data not captured in this evidence pass.'
   evidenceObservedAt: 2026-05-11T00:30:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
-  fin.marketMetric: fin.market-session-schedule
+  fin.aboutSecurity: sec.spx
 
 ev-30y-yield-5pct-may5:
   type: fin.MarketDataEvidence
   evidenceStatement: 30-year US Treasury yield at approximately 5% on May 5 2026.
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 5.0
 
 ev-treasury-10y-441-may7:
@@ -893,7 +891,6 @@ ev-treasury-10y-441-may7:
   evidenceStatement: '10-year US Treasury yield at 4.41% on 2026-05-07 - verified via Massive /fed/v1/treasury-yields endpoint on 2026-05-11. May 8 and May 11 not yet posted in the upstream Fed dataset (typical 1-day lag). Earlier in the week: 4.43% (May 5), 4.36% (May 6).'
   evidenceObservedAt: 2026-05-07T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.41
 
 ev-treasury-30y-497-may7:
@@ -901,21 +898,18 @@ ev-treasury-30y-497-may7:
   evidenceStatement: '30-year US Treasury yield at 4.97% on 2026-05-07 - verified via Massive /fed/v1/treasury-yields endpoint on 2026-05-11. Sustained near 5% across the week (4.98% May 5, 4.94% May 6, 4.97% May 7). Term-premium signal of fiscal stress, supportive of gold and stagflation theses. May 8 and May 11 not yet posted upstream at snapshot time.'
   evidenceObservedAt: 2026-05-07T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.97
 
 ev-pe-multidecade-norm-above-avg:
   type: fin.MarketDataEvidence
   evidenceStatement: Forward P/E sits multi-decade above norm, leaving SPX with little fundamental cushion against an earnings disappointment or vol shock.
   evidenceStrength: wv.evidence-moderate
-  fin.marketMetric: fin.forward-pe-multiple
 
 ev-q1-2026-84pct-beat-rate:
   type: fin.CorporateEvidence
   evidenceStatement: Q1 2026 S&P 500 beat rate ran at 84% (highest since Q2 2021).
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.beat-rate
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-eps-growth-271pct:
@@ -923,7 +917,6 @@ ev-q1-2026-eps-growth-271pct:
   evidenceStatement: Q1 2026 S&P 500 blended EPS growth 27.1% YoY (FactSet refresh).
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.eps-growth-yoy
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-magnitude-of-beats-207:
@@ -931,7 +924,6 @@ ev-q1-2026-magnitude-of-beats-207:
   evidenceStatement: Q1 2026 magnitude of EPS beats running 20.7% above expectations.
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.beat-magnitude
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-net-margin-revised-134pct:
@@ -939,7 +931,6 @@ ev-q1-2026-net-margin-revised-134pct:
   evidenceStatement: Q1 2026 S&P 500 blended net margin revised to 13.4% (May 7 FactSet refresh).
   evidenceObservedAt: 2026-05-07T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.net-margin
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-forward-guide-21-23:
@@ -947,7 +938,6 @@ ev-q1-2026-forward-guide-21-23:
   evidenceStatement: Q1 2026 forward EPS guidance running in the 21-23% YoY range, supporting the melt-up case into the next reporting cycle.
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.forward-eps-growth
   fin.reportingPeriod: fin.q1-2026
 
 ev-fortune-stopped-caring-iran-quote:
@@ -975,7 +965,7 @@ ev-spx-monday-close-7413-may11:
   evidenceStatement: 'S&P 500 closed at 7,412.84 on Monday 2026-05-11, +13.91 (+0.19%) - the first close above 7,400. Both SPX and Nasdaq set fresh all-time intraday highs during the session; the cash market absorbed the Sunday Trump rejection of Iran''s MOU response and the Monday "massive life support" escalation. Source: Yahoo Finance.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.spx
+  fin.aboutSecurity: sec.spx
   fin.marketMetric: fin.close-price
   fin.observedValue: 7412.84
 
@@ -984,7 +974,6 @@ ev-nasdaq-monday-close-26274-may11:
   evidenceStatement: 'Nasdaq Composite closed at 26,274.13 on Monday 2026-05-11, +27.05 (+0.10%) - a fresh all-time high. Chip-stock rotation continued with Micron printing a fresh record and AMD / NVDA extending the Friday post-Q1 rally. Source: Yahoo Finance.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.ndx
   fin.marketMetric: fin.close-price
   fin.observedValue: 26274.13
 
@@ -1009,7 +998,7 @@ ev-vix-1836-monday-may11:
   evidenceStatement: 'VIX closed at 18.36 on Monday 2026-05-11, +1.17 (+6.80%) on the Iran-rejection vol expansion. Still well below the 25 vol-expansion invalidation threshold; sentiment-vs-price divergence widens further. Source: Yahoo Finance.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.vix
+  fin.aboutSecurity: sec.vix
   fin.marketMetric: fin.volatility-level
   fin.observedValue: 18.36
 
@@ -1034,8 +1023,7 @@ ev-gold-spot-mid-band-may11:
   evidenceStatement: 'Gold spot pulled back to roughly $4,677-4,730 on Monday 2026-05-11 from Friday''s $4,720-4,740 range - inside the normal daily band rather than a structural break. The structural-bull supports (central-bank Q1 record 244t buying, 30Y at 4.97%, major bank targets implying materially higher levels) remain unaffected by the one-day move.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.gld
-  fin.marketMetric: fin.spot-price
+  fin.aboutSecurity: sec.gld
   fin.observedValue: 4700.0
 
 # =============================================================================
@@ -1047,7 +1035,7 @@ ev-amd-q1-2026-blowout:
   evidenceStatement: AMD Q1 2026 (May 5 AH) reported revenue $10.3B vs $9.88B consensus, EPS $0.97 vs $0.93 consensus.
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
+  fin.aboutSecurity: sec.amd
   fin.corporateMetric: fin.revenue
   fin.reportingPeriod: fin.q1-2026
 
@@ -1056,7 +1044,7 @@ ev-amd-q1-data-center-58b:
   evidenceStatement: AMD Data Center segment revenue $5.8B in Q1 2026, +57% YoY vs $5.4B consensus.
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
+  fin.aboutSecurity: sec.amd
   fin.corporateMetric: fin.segment-revenue
   fin.reportingPeriod: fin.q1-2026
 
@@ -1065,8 +1053,7 @@ ev-amd-q2-guide-112b:
   evidenceStatement: AMD Q2 2026 revenue guidance $11.2B vs $10.3B consensus, signaling sustained data-center demand momentum.
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
-  fin.corporateMetric: fin.forward-revenue-guide
+  fin.aboutSecurity: sec.amd
   fin.reportingPeriod: fin.q2-2026
 
 ev-amd-stock-plus18-ah:
@@ -1074,15 +1061,14 @@ ev-amd-stock-plus18-ah:
   evidenceStatement: AMD stock +18% in after-hours trading on the May 5 Q1 print.
   evidenceObservedAt: 2026-05-05T20:30:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
-  fin.marketMetric: fin.after-hours-change
+  fin.aboutSecurity: sec.amd
 
 ev-amd-friday-close-45519-may8:
   type: fin.MarketDataEvidence
   evidenceStatement: 'AMD Friday May 8 close $455.19 - verified via Massive /v2/aggs/ticker/AMD/prev API call on 2026-05-11. Friday session OHLC: open $418.59, high $456.29, low $418.29, close $455.19, volume 58.1M, VWAP $441.70. The +8.7% intraday move on Friday extends the May 5 AH print follow-through and confirms the post-Q1 reset of the AMD narrative.'
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.amd
+  fin.aboutSecurity: sec.amd
   fin.marketMetric: fin.close-price
   fin.observedValue: 455.19
 
@@ -1098,15 +1084,13 @@ ev-nvda-china-revenue-zero:
   type: fin.CorporateEvidence
   evidenceStatement: NVIDIA China data-center revenue effectively zero post-Trump export controls, with no clear timeline for return.
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.nvda
-  fin.corporateMetric: fin.geographic-segment-revenue
+  fin.aboutSecurity: sec.nvda
 
 ev-nvda-h20-charge-45b:
   type: fin.CorporateEvidence
   evidenceStatement: NVDA $4.5B H20-related charge taken in the prior quarter against the China export-control impairment.
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.nvda
-  fin.corporateMetric: fin.impairment-charge
+  fin.aboutSecurity: sec.nvda
 
 ev-nvda-amd-15pct-china-revshare:
   type: wv.PolicyEvidence
@@ -1117,29 +1101,24 @@ ev-gartner-semi-revenue-1t-plus-2026:
   type: fin.AnalystEvidence
   evidenceStatement: Gartner projects 2026 semiconductor revenue exceeds $1.3 trillion with AI capturing roughly 30% share.
   evidenceStrength: wv.evidence-moderate
-  fin.analystInstitution: fin.gartner
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-anthropic-meta-ai-partnerships:
   type: fin.CorporateEvidence
   evidenceStatement: Anthropic-Meta and other large AI partnerships continue to extend training compute commitments, supporting the hyperscaler capex demand side of the AI thesis.
   evidenceStrength: wv.evidence-moderate
-  fin.corporateMetric: fin.commercial-agreement
 
 ev-openai-6gw-supply-agreement:
   type: fin.CorporateEvidence
   evidenceStatement: OpenAI 6 GW supply agreement signed; multi-year compute pipeline.
   evidenceStrength: wv.evidence-moderate
-  fin.corporateMetric: fin.commercial-agreement
 
 ev-nvda-q1-fy27-78b-guide-may20:
   type: fin.CorporateEvidence
   evidenceStatement: 'NVIDIA Q1 FY2027 earnings call set for 2026-05-20 5 PM ET. Management revenue guide $78B (+77% YoY) explicitly excludes all China data-center compute revenue. Consensus revenue $78.8B and EPS $1.78. The print is the next material datapoint for the AI-capex thesis.'
   evidenceObservedAt: 2026-05-09T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.nvda
-  fin.corporateMetric: fin.forward-revenue-guide
-  fin.reportingPeriod: fin.q1-fy2027
+  fin.aboutSecurity: sec.nvda
 
 ev-huang-china-50b-effectively-gone:
   type: wv.OfficialStatementEvidence
@@ -1154,7 +1133,7 @@ ev-nvda-monday-close-21944-may11:
   evidenceStatement: 'NVDA closed at $219.44 on Monday 2026-05-11, +$4.22 (+1.96%) - extending the post-AMD Q1 chip-stock rally into the May 20 NVDA print. Friday close was $215.20 (Massive verified). Source: Yahoo Finance.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.nvda
+  fin.aboutSecurity: sec.nvda
   fin.marketMetric: fin.close-price
   fin.observedValue: 219.44
 
@@ -1163,7 +1142,7 @@ ev-amd-monday-up-24pct-may11:
   evidenceStatement: 'AMD closed up approximately 2.4% on Monday 2026-05-11, extending Friday''s +8.7% to $455.19. The post-Q1 follow-through has now spanned three sessions (May 5 AH +18%, May 8 +8.7%, May 11 +2.4%) on sustained chip-stock rotation toward data-center exposure.'
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-moderate
-  fin.aboutSecurity: fin.amd
+  fin.aboutSecurity: sec.amd
   fin.marketMetric: fin.close-price
 
 ev-micron-fresh-ath-may11:
@@ -1193,7 +1172,7 @@ ev-lmt-backlog-194b-q1-2026:
   evidenceStatement: Lockheed Martin (LMT) backlog grew to $194B as of Q1 2026.
   evidenceObservedAt: 2026-04-30T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.lmt
+  fin.aboutSecurity: sec.lmt
   fin.corporateMetric: fin.backlog
   fin.reportingPeriod: fin.q1-2026
 
@@ -1202,7 +1181,7 @@ ev-rtx-backlog-271b-q1-2026:
   evidenceStatement: RTX (Raytheon Technologies) backlog grew to a record $271B as of Q1 2026. Double-digit organic sales growth; full-year EPS guidance raised to $6.70-$6.90, sales to $92.5-$93.5B.
   evidenceObservedAt: 2026-04-30T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.rtx
+  fin.aboutSecurity: sec.rtx
   fin.corporateMetric: fin.backlog
   fin.reportingPeriod: fin.q1-2026
 
@@ -1292,7 +1271,6 @@ ev-april-cpi-consensus-headline-37:
   evidenceStrength: wv.evidence-strong
   fin.analystInstitution: fin.market-consensus
   fin.forecastValue: 3.75
-  fin.forecastHorizon: fin.horizon-1-month
 
 ev-april-cpi-consensus-core-27:
   type: fin.AnalystEvidence
@@ -1301,7 +1279,6 @@ ev-april-cpi-consensus-core-27:
   evidenceStrength: wv.evidence-strong
   fin.analystInstitution: fin.market-consensus
   fin.forecastValue: 2.7
-  fin.forecastHorizon: fin.horizon-1-month
 
 # =============================================================================
 # EVIDENCE - consumer / inflation expectations
@@ -1436,8 +1413,7 @@ ev-gold-spot-4740-may8:
   evidenceStatement: Gold spot $4,720-4,740 on 2026-05-08 - highest since April 22 with weekly gain over 2%. Held the bid even as Brent retreated week-on-week, supporting the structural-bull case independent of energy.
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.gld
-  fin.marketMetric: fin.spot-price
+  fin.aboutSecurity: sec.gld
   fin.observedValue: 4740.0
 
 ev-gld-friday-close-43377-may8:
@@ -1445,7 +1421,7 @@ ev-gld-friday-close-43377-may8:
   evidenceStatement: 'GLD ETF Friday May 8 close $433.77 - verified via Massive /v2/aggs/ticker/GLD/prev API call on 2026-05-11. Friday session OHLC: open $434.05, high $436.20, low $431.70, close $433.77, volume 5.38M, VWAP $433.89. Tracks gold spot $4,720-4,740 at the standard ~10.9x divisor and confirms the cash-market bid held through the week.'
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.gld
+  fin.aboutSecurity: sec.gld
   fin.marketMetric: fin.close-price
   fin.observedValue: 433.77
 
@@ -1454,7 +1430,7 @@ ev-lbma-q1-record-4873:
   evidenceStatement: LBMA (PM) gold price set a new quarterly average record of $4,873/oz in Q1 2026.
   evidenceObservedAt: 2026-04-15T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.aboutSecurity: fin.gld
+  fin.aboutSecurity: sec.gld
   fin.marketMetric: fin.quarterly-average-price
   fin.observedValue: 4873.0
 
@@ -1472,7 +1448,6 @@ ev-cb-survey-95pct-reserves-up:
   evidenceStatement: World Gold Council central bank survey - 95% of respondents expect official gold reserves to increase over the next 12 months.
   evidenceObservedAt: 2026-04-15T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.world-gold-council
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-gold-q1-2026-record-demand-193b:
@@ -1497,21 +1472,17 @@ ev-stock-bond-correlation-30y-high:
   type: fin.MarketDataEvidence
   evidenceStatement: Stock-bond correlation at 30-year high - traditional 60/40 hedge weakening, supporting gold as a portfolio diversifier.
   evidenceStrength: wv.evidence-moderate
-  fin.marketMetric: fin.correlation-coefficient
 
 ev-jpm-gold-target-5055-6300:
   type: fin.AnalystEvidence
   evidenceStatement: JPMorgan gold price target range $5,055-$6,300 for the next 12-18 months.
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.jpm
   fin.forecastValue: 5677.5
-  fin.forecastHorizon: fin.horizon-12-18-month
 
 ev-ubs-gold-target-6200:
   type: fin.AnalystEvidence
   evidenceStatement: UBS gold price target $6,200 for 2026.
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.ubs
   fin.forecastValue: 6200.0
   fin.forecastHorizon: fin.horizon-12-month
 
@@ -1519,16 +1490,13 @@ ev-citi-gold-target-5000-7000:
   type: fin.AnalystEvidence
   evidenceStatement: Citi gold price target range $5,000-$7,000 for the medium term.
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.citi
   fin.forecastValue: 6000.0
-  fin.forecastHorizon: fin.horizon-12-18-month
 
 ev-cb-2026-projection-755-tonnes:
   type: fin.AnalystEvidence
   evidenceStatement: '2026 central bank gold purchases projected at ~755 tonnes - a step lower than the 1,000+ tonne peak of the last three years but materially elevated against pre-2022 averages of 400-500 tonnes.'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.world-gold-council
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-goldman-brent-target-raise:
@@ -1536,5 +1504,4 @@ ev-goldman-brent-target-raise:
   evidenceStatement: Goldman Sachs maintains a $77.50 Brent target - approximately 25% below the May 8 spot of $101.29, framing the wartime premium as transient.
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-moderate
-  fin.analystInstitution: fin.goldman-sachs
   fin.forecastValue: 77.50

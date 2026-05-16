@@ -7,11 +7,11 @@ snapshot:
       packages:
         - package: core
           match: ^
-          version: 1.1.0
+          version: 1.2.0
           alias: wv
         - package: finance
           match: ^
-          version: 2.0.0
+          version: 2.1.0
           alias: fin
         - package: securities
           match: ^
@@ -187,11 +187,6 @@ iran-war-rearmament:
     - ev-trump-nsc-military-may12
     - ev-iran-heavy-assault-warning-may12
     - ev-lebanon-talks-may14-15-may9
-    - ev-trump-decimated-may12
-    - ev-trump-finish-job-may12
-    - ev-iran-nuclear-research-sanctions-may12
-    - ev-lmt-tuesday-close-521-may12
-    - ev-rtx-tuesday-close-17889-may12
     - ev-lmt-wednesday-close-51994-may13
     - ev-rtx-wednesday-close-17811-may13
     - ev-noc-wednesday-close-55180-may13
@@ -276,12 +271,6 @@ persistent-energy-shock:
     - ev-trump-nsc-military-may12
     - ev-iran-heavy-assault-warning-may12
     - ev-aramco-ceo-100m-bbl-may12
-    - ev-wti-tuesday-settle-10218-may12
-    - ev-brent-tuesday-settle-10777-may12
-    - ev-xle-tuesday-close-5757-may12
-    - ev-xom-tuesday-up-35pct-may12
-    - ev-trump-decimated-may12
-    - ev-trump-finish-job-may12
     - ev-wti-wednesday-may13
     - ev-brent-wednesday-may13
     - ev-xle-wednesday-close-5763-may13
@@ -369,10 +358,6 @@ stagflation-risk:
     - ev-april-cpi-print-core-28-may12
     - ev-cpi-energy-component-may12
     - ev-warsh-cloture-passed-49-44-may11
-    - ev-10y-yield-446-tuesday-may12
-    - ev-30y-yield-502-tuesday-may12
-    - ev-warsh-governor-confirmed-51-45-may12
-    - ev-rate-path-2027-hike-pricing-may12
     - ev-ppi-april-print-headline-14-may13
     - ev-ppi-april-core-52-may13
     - ev-10y-yield-449-wednesday-may13
@@ -457,10 +442,6 @@ gold-debasement-bid:
     - ev-april-cpi-print-headline-38-may12
     - ev-wti-tuesday-10137-may12
     - ev-trump-nsc-military-may12
-    - ev-gold-spot-4695-tuesday-may12
-    - ev-gld-tuesday-close-43293-may12
-    - ev-gdx-tuesday-close-9714-may12
-    - ev-30y-yield-502-tuesday-may12
     - ev-gld-wednesday-close-43050-may13
     - ev-gdx-wednesday-close-9623-may13
     - ev-10y-yield-449-wednesday-may13
@@ -521,11 +502,6 @@ ai-capex-cycle-with-china-tail:
     - ev-amd-monday-up-24pct-may11
     - ev-micron-fresh-ath-may11
     - ev-nasdaq-tuesday-pullback-may12
-    - ev-nvda-tuesday-close-22078-may12
-    - ev-amd-tuesday-close-44829-may12
-    - ev-mu-tuesday-close-76658-may12
-    - ev-qqq-tuesday-close-70724-may12
-    - ev-trump-beijing-xi-meeting-may13
     - ev-nvda-wednesday-close-22583-may13
     - ev-amd-wednesday-close-44550-may13
     - ev-trump-xi-summit-underway-may14
@@ -595,14 +571,6 @@ equity-melt-up-vs-recession-risk:
     - ev-nasdaq-tuesday-pullback-may12
     - ev-russell-tuesday-may12
     - ev-wti-tuesday-10137-may12
-    - ev-spx-tuesday-close-7401-may12
-    - ev-ndx-tuesday-close-26088-may12
-    - ev-dji-tuesday-close-49761-may12
-    - ev-iwm-tuesday-close-28257-may12
-    - ev-vix-tuesday-close-1838-may12
-    - ev-spy-tuesday-close-73818-may12
-    - ev-30y-yield-502-tuesday-may12
-    - ev-asia-futures-mixed-may13
     - ev-spx-wednesday-close-7444-may13
     - ev-spy-wednesday-close-74231-may13
     - ev-vix-wednesday-close-1799-may13
@@ -707,11 +675,6 @@ powell-warsh-transition-risk:
     - ev-warsh-coons-cross-may11
     - ev-april-cpi-print-headline-38-may12
     - ev-april-cpi-print-core-28-may12
-    - ev-warsh-governor-confirmed-51-45-may12
-    - ev-coons-no-on-confirmation-may12
-    - ev-warsh-chair-vote-wed-30hr-may12
-    - ev-rate-path-2027-hike-pricing-may12
-    - ev-30y-yield-502-tuesday-may12
     - ev-warsh-chair-confirmed-54-45-may13
     - ev-10y-yield-449-wednesday-may13
     - ev-10y-yield-445-may14
@@ -891,7 +854,6 @@ ev-iran-realistic-positive-may10:
   evidenceStatement: 'Senior Iranian official on 2026-05-10 described Tehran''s formal response to the US MOU as "realistic and positive," adding that "Washington''s positive response to our response will move the negotiations forward quickly." The framing positions Iran as constructive while preserving maximalist substantive demands.'
   evidenceObservedAt: 2026-05-10T18:00:00Z
   evidenceStrength: wv.evidence-moderate
-  speakerRole: wv.government-official
   statementDate: 2026-05-10
 
 ev-trump-totally-unacceptable-may10:
@@ -980,7 +942,6 @@ ev-iran-demands-legitimate-may11:
   evidenceStatement: 'Iranian official on 2026-05-11 said Iran''s response to the US peace proposal contained "legitimate demands" - "reasonable and responsible" and "beneficial not only for Iran but also for the wider region and the world." The defensive framing positions Iran as constructive after Trump''s rejection without walking back any substantive demand, including the Hormuz sovereignty demand.'
   evidenceObservedAt: 2026-05-11T12:00:00Z
   evidenceStrength: wv.evidence-moderate
-  speakerRole: wv.government-official
   statementDate: 2026-05-11
 
 ev-hormuz-17-vessels-may10:
@@ -1022,7 +983,6 @@ ev-iran-heavy-assault-warning-may12:
   evidenceObservedAt: 2026-05-12T13:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnn.com/2026/05/11/world/live-news/iran-war-proposal-trump'
-  speakerRole: wv.military-official
   statementDate: 2026-05-12
 
 ev-aramco-ceo-100m-bbl-may12:
@@ -1091,7 +1051,6 @@ ev-six-week-winning-streak-may8:
   evidenceStatement: 'SPX and Nasdaq both posted six consecutive winning weeks through May 8 2026 - the longest winning streak since 2024.'
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.weekly-streak
 
 ev-sp500-ath-7230-may1:
   type: fin.MarketDataEvidence
@@ -1126,14 +1085,12 @@ ev-cme-sunday-futures-open-22z:
   evidenceObservedAt: 2026-05-11T00:30:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.spx
-  fin.marketMetric: fin.market-session-schedule
 
 ev-30y-yield-5pct-may5:
   type: fin.MarketDataEvidence
   evidenceStatement: '30-year US Treasury yield at approximately 5% on May 5 2026.'
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 5.0
 
 ev-treasury-10y-441-may7:
@@ -1141,7 +1098,6 @@ ev-treasury-10y-441-may7:
   evidenceStatement: '10-year US Treasury yield at 4.41% on 2026-05-07 - verified via Massive /fed/v1/treasury-yields endpoint on 2026-05-11. May 8 through May 12 not yet posted in the upstream Fed dataset (typical 1-day lag). Earlier in the week: 4.43% (May 5), 4.36% (May 6).'
   evidenceObservedAt: 2026-05-07T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.41
 
 ev-treasury-30y-497-may7:
@@ -1149,21 +1105,18 @@ ev-treasury-30y-497-may7:
   evidenceStatement: '30-year US Treasury yield at 4.97% on 2026-05-07 - verified via Massive /fed/v1/treasury-yields endpoint on 2026-05-11. Sustained near 5% across the week (4.98% May 5, 4.94% May 6, 4.97% May 7). Term-premium signal of fiscal stress, supportive of gold and stagflation theses. May 8 through May 12 not yet posted upstream at snapshot time.'
   evidenceObservedAt: 2026-05-07T20:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.97
 
 ev-pe-multidecade-norm-above-avg:
   type: fin.MarketDataEvidence
   evidenceStatement: 'Forward P/E sits multi-decade above norm, leaving SPX with little fundamental cushion against an earnings disappointment or vol shock.'
   evidenceStrength: wv.evidence-moderate
-  fin.marketMetric: fin.forward-pe-multiple
 
 ev-q1-2026-84pct-beat-rate:
   type: fin.CorporateEvidence
   evidenceStatement: 'Q1 2026 S&P 500 beat rate ran at 84% (highest since Q2 2021).'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.beat-rate
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-eps-growth-271pct:
@@ -1171,7 +1124,6 @@ ev-q1-2026-eps-growth-271pct:
   evidenceStatement: 'Q1 2026 S&P 500 blended EPS growth 27.1% YoY (FactSet refresh).'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.eps-growth-yoy
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-magnitude-of-beats-207:
@@ -1179,7 +1131,6 @@ ev-q1-2026-magnitude-of-beats-207:
   evidenceStatement: 'Q1 2026 magnitude of EPS beats running 20.7% above expectations.'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.beat-magnitude
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-net-margin-revised-134pct:
@@ -1187,7 +1138,6 @@ ev-q1-2026-net-margin-revised-134pct:
   evidenceStatement: 'Q1 2026 S&P 500 blended net margin revised to 13.4% (May 7 FactSet refresh).'
   evidenceObservedAt: 2026-05-07T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.net-margin
   fin.reportingPeriod: fin.q1-2026
 
 ev-q1-2026-forward-guide-21-23:
@@ -1195,7 +1145,6 @@ ev-q1-2026-forward-guide-21-23:
   evidenceStatement: 'Q1 2026 forward EPS guidance running in the 21-23% YoY range, supporting the melt-up case into the next reporting cycle.'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.corporateMetric: fin.forward-eps-growth
   fin.reportingPeriod: fin.q1-2026
 
 ev-fortune-stopped-caring-iran-quote:
@@ -1279,7 +1228,6 @@ ev-gold-spot-mid-band-may11:
   evidenceObservedAt: 2026-05-11T20:00:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.gld
-  fin.marketMetric: fin.spot-price
   fin.observedValue: 4700.0
 
 ev-wti-tuesday-10137-may12:
@@ -1288,7 +1236,6 @@ ev-wti-tuesday-10137-may12:
   evidenceObservedAt: 2026-05-12T14:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/12/oil-prices-today-brent-wti-trump-iran-war-hormuz.html'
-  fin.marketMetric: fin.intraday-price
   fin.observedValue: 101.37
 
 ev-brent-tuesday-10758-may12:
@@ -1297,7 +1244,6 @@ ev-brent-tuesday-10758-may12:
   evidenceObservedAt: 2026-05-12T14:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/12/oil-prices-today-brent-wti-trump-iran-war-hormuz.html'
-  fin.marketMetric: fin.intraday-price
   fin.observedValue: 107.58
 
 ev-spx-tuesday-pullback-may12:
@@ -1307,7 +1253,6 @@ ev-spx-tuesday-pullback-may12:
   evidenceStrength: wv.evidence-strong
   citation: 'https://247wallst.com/investing/2026/05/12/stock-market-live-may-12-2026-sp-500-spy-sinks-on-higher-inflation/'
   fin.aboutSecurity: sec.spx
-  fin.marketMetric: fin.intraday-percent-change
   fin.observedValue: -0.0037
 
 ev-nasdaq-tuesday-pullback-may12:
@@ -1317,7 +1262,6 @@ ev-nasdaq-tuesday-pullback-may12:
   evidenceStrength: wv.evidence-strong
   citation: 'https://247wallst.com/investing/2026/05/12/stock-market-live-may-12-2026-sp-500-spy-sinks-on-higher-inflation/'
   fin.aboutSecurity: sec.ixic
-  fin.marketMetric: fin.intraday-percent-change
   fin.observedValue: -0.0065
 
 ev-russell-tuesday-may12:
@@ -1326,7 +1270,6 @@ ev-russell-tuesday-may12:
   evidenceObservedAt: 2026-05-12T14:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://247wallst.com/investing/2026/05/12/stock-market-live-may-12-2026-sp-500-spy-sinks-on-higher-inflation/'
-  fin.marketMetric: fin.intraday-percent-change
   fin.observedValue: 0.0033
 
 ev-amd-q1-2026-blowout:
@@ -1353,7 +1296,6 @@ ev-amd-q2-guide-112b:
   evidenceObservedAt: 2026-05-05T20:00:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.amd
-  fin.corporateMetric: fin.forward-revenue-guide
   fin.reportingPeriod: fin.q2-2026
 
 ev-amd-stock-plus18-ah:
@@ -1362,7 +1304,6 @@ ev-amd-stock-plus18-ah:
   evidenceObservedAt: 2026-05-05T20:30:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.amd
-  fin.marketMetric: fin.after-hours-change
 
 ev-amd-friday-close-45519-may8:
   type: fin.MarketDataEvidence
@@ -1386,14 +1327,12 @@ ev-nvda-china-revenue-zero:
   evidenceStatement: 'NVIDIA China data-center revenue effectively zero post-Trump export controls, with no clear timeline for return.'
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.nvda
-  fin.corporateMetric: fin.geographic-segment-revenue
 
 ev-nvda-h20-charge-45b:
   type: fin.CorporateEvidence
   evidenceStatement: 'NVDA $4.5B H20-related charge taken in the prior quarter against the China export-control impairment.'
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.nvda
-  fin.corporateMetric: fin.impairment-charge
 
 ev-nvda-amd-15pct-china-revshare:
   type: wv.PolicyEvidence
@@ -1404,20 +1343,17 @@ ev-gartner-semi-revenue-1t-plus-2026:
   type: fin.AnalystEvidence
   evidenceStatement: 'Gartner projects 2026 semiconductor revenue exceeds $1.3 trillion with AI capturing roughly 30% share.'
   evidenceStrength: wv.evidence-moderate
-  fin.analystInstitution: fin.gartner
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-anthropic-meta-ai-partnerships:
   type: fin.CorporateEvidence
   evidenceStatement: 'Anthropic-Meta and other large AI partnerships continue to extend training compute commitments, supporting the hyperscaler capex demand side of the AI thesis.'
   evidenceStrength: wv.evidence-moderate
-  fin.corporateMetric: fin.commercial-agreement
 
 ev-openai-6gw-supply-agreement:
   type: fin.CorporateEvidence
   evidenceStatement: 'OpenAI 6 GW supply agreement signed; multi-year compute pipeline.'
   evidenceStrength: wv.evidence-moderate
-  fin.corporateMetric: fin.commercial-agreement
 
 ev-nvda-q1-fy27-78b-guide-may20:
   type: fin.CorporateEvidence
@@ -1425,8 +1361,6 @@ ev-nvda-q1-fy27-78b-guide-may20:
   evidenceObservedAt: 2026-05-09T00:00:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.nvda
-  fin.corporateMetric: fin.forward-revenue-guide
-  fin.reportingPeriod: fin.q1-fy2027
 
 ev-huang-china-50b-effectively-gone:
   type: wv.OfficialStatementEvidence
@@ -1571,7 +1505,6 @@ ev-april-cpi-consensus-headline-37:
   evidenceStrength: wv.evidence-strong
   fin.analystInstitution: fin.market-consensus
   fin.forecastValue: 3.75
-  fin.forecastHorizon: fin.horizon-1-month
 
 ev-april-cpi-consensus-core-27:
   type: fin.AnalystEvidence
@@ -1580,7 +1513,6 @@ ev-april-cpi-consensus-core-27:
   evidenceStrength: wv.evidence-strong
   fin.analystInstitution: fin.market-consensus
   fin.forecastValue: 2.7
-  fin.forecastHorizon: fin.horizon-1-month
 
 ev-april-cpi-print-headline-38-may12:
   type: wv.EconomicDataEvidence
@@ -1748,7 +1680,6 @@ ev-gold-spot-4740-may8:
   evidenceObservedAt: 2026-05-08T20:00:00Z
   evidenceStrength: wv.evidence-strong
   fin.aboutSecurity: sec.gld
-  fin.marketMetric: fin.spot-price
   fin.observedValue: 4740.0
 
 ev-gld-friday-close-43377-may8:
@@ -1783,7 +1714,6 @@ ev-cb-survey-95pct-reserves-up:
   evidenceStatement: 'World Gold Council central bank survey - 95% of respondents expect official gold reserves to increase over the next 12 months.'
   evidenceObservedAt: 2026-04-15T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.world-gold-council
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-gold-q1-2026-record-demand-193b:
@@ -1808,21 +1738,17 @@ ev-stock-bond-correlation-30y-high:
   type: fin.MarketDataEvidence
   evidenceStatement: 'Stock-bond correlation at 30-year high - traditional 60/40 hedge weakening, supporting gold as a portfolio diversifier.'
   evidenceStrength: wv.evidence-moderate
-  fin.marketMetric: fin.correlation-coefficient
 
 ev-jpm-gold-target-5055-6300:
   type: fin.AnalystEvidence
   evidenceStatement: 'JPMorgan gold price target range $5,055-$6,300 for the next 12-18 months.'
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.jpm
   fin.forecastValue: 5677.5
-  fin.forecastHorizon: fin.horizon-12-18-month
 
 ev-ubs-gold-target-6200:
   type: fin.AnalystEvidence
   evidenceStatement: 'UBS gold price target $6,200 for 2026.'
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.ubs
   fin.forecastValue: 6200.0
   fin.forecastHorizon: fin.horizon-12-month
 
@@ -1830,16 +1756,13 @@ ev-citi-gold-target-5000-7000:
   type: fin.AnalystEvidence
   evidenceStatement: 'Citi gold price target range $5,000-$7,000 for the medium term.'
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.citi
   fin.forecastValue: 6000.0
-  fin.forecastHorizon: fin.horizon-12-18-month
 
 ev-cb-2026-projection-755-tonnes:
   type: fin.AnalystEvidence
   evidenceStatement: '2026 central bank gold purchases projected at ~755 tonnes - a step lower than the 1,000+ tonne peak of the last three years but materially elevated against pre-2022 averages of 400-500 tonnes.'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-strong
-  fin.analystInstitution: fin.world-gold-council
   fin.forecastHorizon: fin.horizon-12-month
 
 ev-goldman-brent-target-raise:
@@ -1847,7 +1770,6 @@ ev-goldman-brent-target-raise:
   evidenceStatement: 'Goldman Sachs maintains a $77.50 Brent target - approximately 25% below the May 8 spot of $101.29, framing the wartime premium as transient.'
   evidenceObservedAt: 2026-05-08T00:00:00Z
   evidenceStrength: wv.evidence-moderate
-  fin.analystInstitution: fin.goldman-sachs
   fin.forecastValue: 77.50
   fin.forecastHorizon: fin.horizon-12-month
 
@@ -1913,7 +1835,6 @@ ev-10y-yield-449-wednesday-may13:
   evidenceObservedAt: 2026-05-13T20:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/13/treasury-yields-fall-as-investors-digest-hotter-than-expected-cpi-data.html'
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.49
 
 ev-tlt-wednesday-close-8480-may13:
@@ -2041,7 +1962,6 @@ ev-spx-intraday-7446-may14:
   evidenceStrength: wv.evidence-moderate
   citation: 'https://tradingeconomics.com/united-states/stock-market'
   fin.aboutSecurity: sec.spx
-  fin.marketMetric: fin.intraday-price
   fin.observedValue: 7446.17
 
 ev-vix-intraday-1798-may14:
@@ -2060,7 +1980,6 @@ ev-10y-yield-445-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://tradingeconomics.com/united-states/government-bond-yield'
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.45
 
 ev-rate-hike-odds-40pct-may14:
@@ -2103,7 +2022,6 @@ ev-wti-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://fortune.com/article/price-of-oil-05-14-2026/'
-  fin.marketMetric: fin.intraday-price
   fin.observedValue: 101.5
 
 ev-brent-may14:
@@ -2112,7 +2030,6 @@ ev-brent-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://tradingeconomics.com/commodity/brent-crude-oil'
-  fin.marketMetric: fin.intraday-price
   fin.observedValue: 106.0
 
 ev-gold-spot-4705-may14:
@@ -2122,7 +2039,6 @@ ev-gold-spot-4705-may14:
   evidenceStrength: wv.evidence-moderate
   citation: 'https://www.fxleaders.com/news/2026/05/14/gold-price-at-4705-holds-steady-retail-sales-trump-xi-summit-key-this-week/'
   fin.aboutSecurity: sec.gld
-  fin.marketMetric: fin.spot-price
   fin.observedValue: 4705.0
 
 ev-spx-thursday-close-7501-may14:
@@ -2201,7 +2117,6 @@ ev-h200-export-approval-may14:
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/14/us-clears-h200-chip-sales-to-10-china-firms-as-nvidia-ceo-looks-for-breakthrough.html'
   effectiveDate: 2026-05-14
-  issuingBody: US Department of Commerce
 
 ev-h200-deals-stalled-may14:
   type: wv.PolicyEvidence
@@ -2225,7 +2140,6 @@ ev-cisco-q3-blowout-ai-orders-may14:
   evidenceObservedAt: 2026-05-13T20:30:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://investor.cisco.com/news/news-details/2026/CISCO-REPORTS-THIRD-QUARTER-EARNINGS/default.aspx'
-  fin.corporateMetric: fin.forward-revenue-guide
   fin.reportingPeriod: fin.q3-2026
 
 ev-april-retail-sales-may14:
@@ -2261,7 +2175,6 @@ ev-10y-yield-thursday-close-446-may14:
   evidenceObservedAt: 2026-05-14T20:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://finance.yahoo.com/news/10-year-treasury-yield-rises-to-highest-level-in-10-months-on-hotter-than-expected-inflation-data-152901840.html'
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.461
 
 ev-tlt-thursday-close-8492-may14:
@@ -2331,7 +2244,6 @@ ev-gold-spot-4660-thursday-may14:
   evidenceStrength: wv.evidence-moderate
   citation: 'https://tradingeconomics.com/commodity/gold'
   fin.aboutSecurity: sec.gld
-  fin.marketMetric: fin.spot-price
   fin.observedValue: 4660.0
 
 ev-xle-thursday-close-5807-may14:
@@ -2431,7 +2343,6 @@ ev-bessent-china-hormuz-mediation-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/14/china-xi-trump-iran-war-oil-strait-hormuz-bessent.html'
-  speakerRole: wv.government-official
   statementDate: 2026-05-14
 
 ev-trump-xi-strategic-stability-may14:
@@ -2448,7 +2359,6 @@ ev-trump-200-boeing-deal-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://foreignpolicy.com/2026/05/14/trump-xi-jinping-china-summit-taiwan-iran-trade-beef/'
-  fin.corporateMetric: fin.commercial-agreement
 
 ev-cumulative-supply-loss-1b-bbl-may14:
   type: fin.MarketDataEvidence
@@ -2456,7 +2366,6 @@ ev-cumulative-supply-loss-1b-bbl-may14:
   evidenceObservedAt: 2026-05-14T15:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://www.cnbc.com/2026/05/14/oil-prices-today-wti-brent-hormuz-trump-xi-meeting.html'
-  fin.marketMetric: fin.supply-loss-cumulative
   fin.observedValue: 1.0
 
 ev-lebanon-israel-day1-productive-may14:
@@ -2541,7 +2450,6 @@ ev-china-fm-force-dead-end-may15:
   evidenceObservedAt: 2026-05-15T14:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.cnbc.com/2026/05/15/china-us-oil-iran-war-strait-hormuz-trump-xi.html'
-  speakerRole: wv.government-official
   statementDate: 2026-05-15
 
 ev-china-continue-iran-oil-may15:
@@ -2635,7 +2543,6 @@ ev-mu-friday-down-66pct-may15:
   evidenceObservedAt: 2026-05-15T20:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://247wallst.com/investing/2026/05/15/intel-slumps-7-amd-and-nvidia-slide-4-in-chipmaker-selloff/'
-  fin.marketMetric: fin.percent-change
   fin.observedValue: -0.066
 
 ev-csco-friday-close-11821-may15:
@@ -2653,7 +2560,6 @@ ev-csco-hsbc-upgrade-may15:
   evidenceObservedAt: 2026-05-15T14:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://www.thestreet.com/investing/stocks/morgan-stanley-massively-resets-surging-cisco-stock-price-target-after-strong-earnings'
-  fin.analystInstitution: fin.hsbc
   fin.forecastValue: 137.0
   fin.forecastHorizon: fin.horizon-12-month
 
@@ -2684,7 +2590,6 @@ ev-gold-spot-4530-friday-may15:
   evidenceStrength: wv.evidence-moderate
   citation: 'https://tradingeconomics.com/commodity/gold'
   fin.aboutSecurity: sec.gld
-  fin.marketMetric: fin.spot-price
   fin.observedValue: 4530.0
 
 ev-xle-friday-close-5944-may15:
@@ -2741,7 +2646,6 @@ ev-wti-weekly-11pct-may15:
   evidenceObservedAt: 2026-05-15T20:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://tradingeconomics.com/commodity/crude-oil'
-  fin.marketMetric: fin.weekly-percent-change
   fin.observedValue: 0.11
 
 ev-lmt-friday-close-51601-may15:
@@ -2790,7 +2694,6 @@ ev-10y-yield-friday-459-may15:
   evidenceObservedAt: 2026-05-15T20:00:00Z
   evidenceStrength: wv.evidence-strong
   citation: 'https://tradingeconomics.com/united-states/government-bond-yield'
-  fin.marketMetric: fin.yield
   fin.observedValue: 4.59
 
 ev-fedwatch-hike-by-dec-56pct-may15:
@@ -2808,7 +2711,6 @@ ev-yield-weekly-jump-since-april-2025-may15:
   evidenceObservedAt: 2026-05-15T20:00:00Z
   evidenceStrength: wv.evidence-moderate
   citation: 'https://finance.yahoo.com/economy/policy/articles/global-bond-selloff-worsens-rising-103712848.html'
-  fin.marketMetric: fin.weekly-yield-change
 
 ev-lebanon-israel-day2-framework-may15:
   type: wv.GeopoliticalEvidence

@@ -7,11 +7,11 @@ events:
       packages:
         - package: core-rdf
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: rdfs
         - package: core-owl
           match: ^
-          version: 2.0.0
+          version: 2.1.0
           alias: owl
         - package: core-xsd
           match: ^
@@ -21,12 +21,16 @@ events:
       packages:
         - package: core
           match: ^
-          version: 1.0.0
+          version: 1.2.0
           alias: wv
         - package: finance
           match: ^
-          version: 1.0.0
+          version: 2.1.0
           alias: fin
+        - package: securities
+          match: ^
+          version: 1.2.0
+          alias: sec
 
 # =============================================================================
 # Public event log + Event-subclass taxonomy.
@@ -140,7 +144,7 @@ amd-q1-2026-earnings:
   type: EarningsEvent
   label: AMD Q1 2026 earnings release
   eventDate: 2026-05-05
-  affectsSecurity: fin.amd
+  affectsSecurity: sec.amd
   eventDescription: >-
     AMD reports Q1 2026 results after market close. Consensus EPS $1.29,
     revenue $9.88B. Bull case requires data center revenue above $5.6B
@@ -162,7 +166,7 @@ nvda-q1-fy2027-earnings:
   type: EarningsEvent
   label: NVIDIA Q1 FY2027 earnings release
   eventDate: 2026-05-20
-  affectsSecurity: fin.nvda
+  affectsSecurity: sec.nvda
   eventDescription: >-
     NVIDIA reports Q1 FY2027 after market close. Revenue forecast $78B
     (+77% YoY), explicitly excludes all China data-center compute.
@@ -202,7 +206,7 @@ iran-ceasefire-status:
   type: GeopoliticalEvent
   label: Iran ceasefire status review
   eventDate: 2026-05-10
-  affectsSecurity: fin.xle
+  affectsSecurity: sec.xle
   eventDescription: >-
     Ongoing review of fragile Iran ceasefire. UAE intercepted Iranian
     missiles May 4. Status not bound to a specific date but each week

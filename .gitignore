@@ -1,6 +1,7 @@
 # Build artifacts
 build/
 dist/
+_site/
 
 # Local kanonak CLI cache
 .kanonak/
