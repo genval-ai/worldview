@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f /tmp/sec-test/*)",
+      "Bash(kanonak derive *)",
+      "Bash(kanonak validate *)",
+      "Bash(rm -rf /c/Users/Administrator/.kanonak/packages/worldview.genval.ai/)",
+      "Bash(kanonak transform *)",
+      "Bash(rm -f kanonak-packages/worldview.genval.ai/security-bindings@1.0.0.kan.yml)"
+    ]
+  }
+}
