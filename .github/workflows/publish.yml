@@ -136,6 +136,14 @@ jobs:
               --scope "worldview.genval.ai/${base}" \
               --format html \
               --out "$out_dir/" 2>&1 | tail -3 || true
+            # Iconic thesis card SVG — each thesis gets a .svg sibling
+            # at /snapshot/<ver>/<thesis-name>.svg suitable for embeds,
+            # link previews, og:image, etc. Status-colored frame, theme
+            # hue confidence fill, big confidence value.
+            kanonak transform run worldview.genval.ai/worldview-chrome/thesis-svg-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format svg \
+              --out "$out_dir/" 2>&1 | tail -3 || true
           done
 
       # ---------------------------------------------------------------

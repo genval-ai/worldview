@@ -611,6 +611,132 @@ rdfs.Resource:
         tx.version: 1.0.0
         tx.name: any-resource-renderer
 
+thesis-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewThesis
+    tx.requires:
+      - wv.confidence
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+                            <style>
+                            .frame.s-active{stroke:#34d399}
+                            .frame.s-retired{stroke:#64748b;stroke-dasharray:4 3}
+                            .frame.s-invalidated{stroke:#f87171}
+                            .status-text.s-active{fill:#34d399}
+                            .status-text.s-retired{fill:#9aa5b8}
+                            .status-text.s-invalidated{fill:#f87171}
+                            </style>
+                            <rect x="4" y="4" width="192" height="192" rx="14" fill="#0a0e1a" stroke-width="3" class="frame s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <g transform="translate(28, 24)">
+                            <rect width="144" height="120" rx="8" fill="#0f1524"/>
+                            <svg width="144" height="120" viewBox="0 0 1 1" preserveAspectRatio="none">
+                            <g transform="rotate(180 0.5 0.5)">
+                            <rect width="1" height="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,60%,50%)" opacity="0.55"/>
+                            </g>
+                            </svg>
+                            <rect x="0.5" y="0.5" width="143" height="119" rx="8" fill="none" stroke="rgba(255,255,255,0.04)"/>
+                            </g>
+                            <text x="100" y="92" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="38" font-weight="600" fill="#e6eaf2">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="100" y="114" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="8" letter-spacing="3" fill="#6b7689">CONFIDENCE</text>
+                            <text x="100" y="180" text-anchor="middle" font-family="'SF Mono', ui-monospace, Consolas, Menlo, monospace" font-size="11" font-weight="600" letter-spacing="4" class="status-text s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" style="text-transform:uppercase">'
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </svg>
+
 wv.WorldviewThesis:
   derivation.derivations:
     - type: derivation.Derivation
@@ -622,3 +748,12 @@ wv.WorldviewThesis:
         tx.package: worldview-chrome
         tx.version: 1.0.0
         tx.name: thesis-html-renderer
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 1.0.0
+        tx.name: thesis-svg-renderer
