@@ -55,6 +55,29 @@ jobs:
             xargs -P 4 -I {} kanonak validate "{}"
 
       # ---------------------------------------------------------------
+      # 1b. Render ontology-concept SVGs (4-tier semantic zoom).
+      #
+      # The Evidence-strength enum (strong/moderate/weak) and the
+      # generic Evidence subclasses (Policy / Geopolitical /
+      # OfficialStatement / EconomicData) each carry an `iconGlyph`
+      # value in core@1.2.0. These transformations wrap each glyph
+      # in semantic-zoom chrome and emit one SVG per concept at its
+      # canonical Kanonak URL (`/core/1.2.0/<name>.svg`). Reusable
+      # icons that compose into evidence cards everywhere without
+      # generating per-instance SVGs.
+      # ---------------------------------------------------------------
+      - name: Render ontology concept SVGs
+        run: |
+          set -euo pipefail
+          mkdir -p _site/core/1.2.0
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-strength-svg-renderer \
+            --scope worldview.genval.ai/core@1.2.0 \
+            --format svg --out _site/core/1.2.0/ >/dev/null
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
+            --scope worldview.genval.ai/core@1.2.0 \
+            --format svg --out _site/core/1.2.0/ >/dev/null
+
+      # ---------------------------------------------------------------
       # 2. Render every ontology concept inside each snapshot package.
       #
       # Per the project's "render only the ontology concepts we care
@@ -72,11 +95,13 @@ jobs:
       #     confidence meter, theme chip, statement, rationale,
       #     supporting evidence list).
       #   WorldviewThesis   -> 4-tier semantic-zoom SVG identifier.
-      #   wv.Evidence       -> 4-tier semantic-zoom SVG. SVG is the
-      #     PRIMARY rendered artifact for evidence — no per-evidence
-      #     HTML page is generated. Evidence is consumed inline by
-      #     thesis cards on the snapshot page and by the chip
-      #     injection in narrative prose.
+      #
+      # Evidence intentionally has NO per-instance renderer: there
+      # would be hundreds of files per snapshot growing with every
+      # publish. Instead, evidence is displayed by composing a small
+      # finite set of hand-authored icons (Evidence type + strength)
+      # mounted at /icons/ with per-instance text rendered into the
+      # snapshot page directly.
       #
       # Also runs the universal-derivations markdown-with-frontmatter
       # renderer for every resource in the snapshot package, useful
@@ -105,11 +130,6 @@ jobs:
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
             # Snapshot's own regime-portrait SVG — one per snapshot package.
             kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
-            # Evidence SVGs — primary rendered artifact for every
-            # wv.Evidence (and subclass) in the snapshot package.
-            kanonak transform run worldview.genval.ai/worldview-chrome/evidence-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
             # Markdown for every resource in the snapshot package

@@ -1590,29 +1590,20 @@ snapshot-svg-renderer:
                             </svg>
 
 # =============================================================================
-# wv.Evidence -> evidence.svg  (4-tier semantic-zoom visual identifier)
+# wv.EvidenceStrength -> {evidence-strong,moderate,weak}.svg
 #
-# Renders any wv.Evidence (or subclass) as a self-contained SVG that becomes
-# the *primary* rendered artifact for the evidence resource. Per the SVG
-# semantic-zoom convention, ONE file serves four scales:
-#   chip  (<60px)  : solid strength-color square — chromatic identifier only
-#   icon  (60-160) : dark card + strength left-band + observed date centered
-#   card  (160-400): + strength label + observed date long-form
-#   full  (>=400)  : card + canonical URI footer
-#
-# Phase 1: subclass-agnostic — uses only the wv.Evidence base properties
-# (evidenceStrength, evidenceObservedAt) so all 9 evidence subclasses get a
-# usable visual without per-subclass code. Phase 2 will add per-subclass
-# renderers (PolicyEvidence, GeopoliticalEvidence, OfficialStatementEvidence,
-# EconomicDataEvidence, fin.MarketDataEvidence, fin.CorporateEvidence,
-# fin.AnalystEvidence, fin.CentralBankEvidence, fin.InstitutionalFlowEvidence)
-# whose iconography overrides this base for the icon/card/full tiers.
+# 4-tier semantic-zoom renderer for the three EvidenceStrength enum
+# members. Reads the instance's iconGlyph (raw SVG fragment authored on
+# each member below) + rdfs.label, wraps in tiered chrome. The outer
+# group carries a per-instance CSS class that maps the strength URI to
+# its semantic color via currentColor — the same color the snapshot
+# page already uses (--strong / --moderate / --weak in pages@1.2.0).
 # =============================================================================
-evidence-svg-renderer:
+evidence-strength-svg-renderer:
   type: tx.InstanceTransformation
 
   tx.inputPattern:
-    tx.matchesClass: wv.Evidence
+    tx.matchesClass: wv.EvidenceStrength
 
   tx.artifactName:
     type: tx.UriName
@@ -1651,18 +1642,205 @@ evidence-svg-renderer:
                             <style>
                             text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
                             svg{overflow:hidden}
-                            .ev-bg{fill:#0a0e1a}
-                            .ev-frame{fill:none;stroke:#1e293b;stroke-width:2}
-                            /* Strength palette keyed off EvidenceStrength URI names. */
-                            .ev-s-evidence-strong{fill:#34d399}
-                            .ev-s-evidence-moderate{fill:#fbbf24}
-                            .ev-s-evidence-weak{fill:#64748b}
-                            .ev-date-big{fill:#e6eaf2;font-weight:600;letter-spacing:0.5px}
-                            .ev-date{fill:#9aa5b8;letter-spacing:0.5px}
-                            .ev-strength-label{font-weight:700;letter-spacing:2px;text-transform:uppercase}
-                            .ev-slug{fill:#9aa5b8;font-style:italic}
-                            .ev-uri{fill:#7dd3fc;letter-spacing:0.5px}
-                            /* 4-tier semantic zoom cascade. */
+                            .es-bg{fill:#0a0e1a}
+                            .es-frame{fill:none;stroke:#1e293b;stroke-width:2}
+                            /* Per-instance color: currentColor in iconGlyph resolves
+                               to the wrapper's color. */
+                            .es-c-evidence-strong{color:#34d399}
+                            .es-c-evidence-moderate{color:#fbbf24}
+                            .es-c-evidence-weak{color:#64748b}
+                            .es-label{font-weight:700;letter-spacing:2px;text-transform:uppercase}
+                            .es-type-label{fill:#6b7689;font-size:10px;letter-spacing:2.5px;text-transform:uppercase}
+                            .es-uri{fill:#7dd3fc;letter-spacing:0.5px}
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            </style>
+                            <g class="es-c-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ">
+
+                        # ===== chip: glyph filling viewBox =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-chip">
+                            <svg x="80" y="0" width="240" height="240" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+
+                        # ===== icon: glyph + label below =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon">
+                            <svg x="140" y="20" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="200" y="180" text-anchor="middle" class="es-label" fill="currentColor" font-size="26">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # ===== card: dark card + glyph (left) + label + type-label =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-frame"/>
+                            <svg x="20" y="60" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="160" y="50" class="es-type-label">Evidence strength</text>
+                            <text x="160" y="120" class="es-label" fill="currentColor" font-size="32">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # ===== full: card layout + canonical URI footer =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-frame"/>
+                            <svg x="20" y="50" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="160" y="50" class="es-type-label">Evidence strength</text>
+                            <text x="160" y="110" class="es-label" fill="currentColor" font-size="32">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="226" text-anchor="middle" class="es-uri" font-size="9" letter-spacing="0.5">
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                            </g>
+                            </svg>
+
+# =============================================================================
+# rdfs.Class (subclasses of wv.Evidence) -> {ClassName}.svg
+#
+# 4-tier semantic-zoom renderer for each Evidence subclass treated as
+# an rdfs.Class instance. Matches rdfs.Class with iconGlyph required —
+# the property's presence is the filter. Reads the class's iconGlyph
+# (authored on each evidence subclass below) + rdfs.label. The icon
+# renders in the page's neutral accent color since evidence-type is
+# orthogonal to strength (which carries its own semantic color).
+# =============================================================================
+evidence-type-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: rdfs.Class
+    tx.requires:
+      - wv.iconGlyph
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
+                            .et-bg{fill:#0a0e1a}
+                            .et-frame{fill:none;stroke:#1e293b;stroke-width:2}
+                            .et-glyph{color:#7dd3fc}
+                            .et-label{fill:#e6eaf2;font-weight:600;letter-spacing:0.5px}
+                            .et-type-label{fill:#6b7689;font-size:10px;letter-spacing:2.5px;text-transform:uppercase}
+                            .et-uri{fill:#7dd3fc;letter-spacing:0.5px}
                             .tier-chip,.tier-icon,.tier-card{display:none}
                             .tier-full{display:block}
                             @media (max-width:400px){
@@ -1679,206 +1857,102 @@ evidence-svg-renderer:
                             }
                             </style>
 
-                        # =====================================================
-                        # tier-chip — solid strength color square. Color is the
-                        # only legible signal at <60px so no text is attempted.
-                        # =====================================================
+                        # ===== chip =====
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            <g class="tier-chip">
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
+                            <g class="tier-chip et-glyph">
+                            <svg x="80" y="0" width="240" height="240" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            "/>
+                            </svg>
                             </g>
 
-                        # =====================================================
-                        # tier-icon — dark card + strength left-band + the
-                        # observed date as the iconic content.
-                        # =====================================================
+                        # ===== icon =====
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            <g class="tier-icon">
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
-                            <rect x="4" y="4" width="80" height="232" class="ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
+                            <g class="tier-icon et-glyph">
+                            <svg x="140" y="20" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            "/>
-                            <text x="244" y="135" text-anchor="middle" class="ev-date-big" font-size="40"><![CDATA[
-                        - type: tx.Fallback
-                          tx.primary:
-                            type: tx.DateFormat
-                            tx.dateSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.evidenceObservedAt
-                            tx.dateFormat: short-date
-                          tx.alternate:
-                            type: tx.StringLiteral
-                            tx.stringLiteral: '—'
+                            </svg>
+                            <text x="200" y="180" text-anchor="middle" class="et-label" font-size="20"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             ]]></text>
                             </g>
 
-                        # =====================================================
-                        # tier-card — strength accent band + uppercase strength
-                        # label + long-form observed date + URI-name slug as
-                        # the textual identifier.
-                        # =====================================================
+                        # ===== card =====
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             <g class="tier-card">
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
-                            <rect x="14" y="14" width="372" height="6" rx="3" class="ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            "/>
-                            <text x="20" y="52" class="ev-strength-label ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            " font-size="13"><![CDATA[
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-frame"/>
+                            <g class="et-glyph">
+                            <svg x="20" y="60" width="120" height="120" viewBox="0 0 24 24">
                         - type: tx.PropertyRead
                           tx.readSource:
-                            type: tx.ResolveRef
-                            tx.resolveSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.evidenceStrength
-                          tx.readProp: rdfs.label
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            ]]></text>
-                            <text x="380" y="52" text-anchor="end" class="ev-date" font-size="12">
-                        - type: tx.Fallback
-                          tx.primary:
-                            type: tx.DateFormat
-                            tx.dateSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.evidenceObservedAt
-                            tx.dateFormat: long-date
-                          tx.alternate:
-                            type: tx.StringLiteral
-                            tx.stringLiteral: '—'
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            </text>
-                            <text x="200" y="140" text-anchor="middle" class="ev-slug" font-size="13"><![CDATA[
-                        - type: tx.UriName
-                          tx.uriNameOf:
                             type: tx.VarRef
                             tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+                            <text x="160" y="50" class="et-type-label">Evidence type</text>
+                            <text x="160" y="120" class="et-label" font-size="22"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             ]]></text>
                             </g>
 
-                        # =====================================================
-                        # tier-full — card layout + canonical URI footer.
-                        # =====================================================
+                        # ===== full =====
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             <g class="tier-full">
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
-                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
-                            <rect x="14" y="14" width="372" height="6" rx="3" class="ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            "/>
-                            <text x="20" y="52" class="ev-strength-label ev-s-
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.PropertyRead
-                            tx.readSource:
-                              type: tx.VarRef
-                              tx.varName: input
-                            tx.readProp: wv.evidenceStrength
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            " font-size="13"><![CDATA[
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-frame"/>
+                            <g class="et-glyph">
+                            <svg x="20" y="50" width="120" height="120" viewBox="0 0 24 24">
                         - type: tx.PropertyRead
                           tx.readSource:
-                            type: tx.ResolveRef
-                            tx.resolveSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.evidenceStrength
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+                            <text x="160" y="50" class="et-type-label">Evidence type</text>
+                            <text x="160" y="110" class="et-label" font-size="22"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
                           tx.readProp: rdfs.label
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             ]]></text>
-                            <text x="380" y="52" text-anchor="end" class="ev-date" font-size="12">
-                        - type: tx.Fallback
-                          tx.primary:
-                            type: tx.DateFormat
-                            tx.dateSource:
-                              type: tx.PropertyRead
-                              tx.readSource:
-                                type: tx.VarRef
-                                tx.varName: input
-                              tx.readProp: wv.evidenceObservedAt
-                            tx.dateFormat: long-date
-                          tx.alternate:
-                            type: tx.StringLiteral
-                            tx.stringLiteral: '—'
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            </text>
-                            <text x="200" y="130" text-anchor="middle" class="ev-slug" font-size="13"><![CDATA[
-                        - type: tx.UriName
-                          tx.uriNameOf:
-                            type: tx.VarRef
-                            tx.varName: input
-                        - type: tx.StringLiteral
-                          tx.stringLiteral: |-
-                            ]]></text>
-                            <text x="200" y="226" text-anchor="middle" class="ev-uri" font-size="9" letter-spacing="0.5">
+                            <text x="200" y="226" text-anchor="middle" class="et-uri" font-size="9" letter-spacing="0.5">
                         - type: tx.SubjectUri
                           tx.subjectOf:
                             type: tx.VarRef
@@ -1887,6 +1961,7 @@ evidence-svg-renderer:
                           tx.stringLiteral: |-
                             </text>
                             </g>
+
                             </svg>
 
 wv.WorldviewSnapshot:
@@ -1922,7 +1997,11 @@ wv.WorldviewThesis:
         tx.version: 1.0.0
         tx.name: thesis-svg-renderer
 
-wv.Evidence:
+# =============================================================================
+# Derivation bindings for the new SVG renderers
+# =============================================================================
+
+wv.EvidenceStrength:
   derivation.derivations:
     - type: derivation.Derivation
       derivation.format: formats.svg
@@ -1932,4 +2011,4 @@ wv.Evidence:
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
         tx.version: 1.0.0
-        tx.name: evidence-svg-renderer
+        tx.name: evidence-strength-svg-renderer
