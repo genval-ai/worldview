@@ -69,13 +69,19 @@ jobs:
       - name: Render ontology concept SVGs
         run: |
           set -euo pipefail
-          mkdir -p _site/core/1.2.0
+          mkdir -p _site/core/1.2.0 _site/finance/2.1.0
+          # Strength enum members (3) -> /core/1.2.0/evidence-{strong,moderate,weak}.svg
           kanonak transform run worldview.genval.ai/worldview-chrome/evidence-strength-svg-renderer \
             --scope worldview.genval.ai/core@1.2.0 \
             --format svg --out _site/core/1.2.0/ >/dev/null
+          # Evidence-type icons defined in core (4) -> /core/1.2.0/<ClassName>.svg
           kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
             --scope worldview.genval.ai/core@1.2.0 \
             --format svg --out _site/core/1.2.0/ >/dev/null
+          # Evidence-type icons defined in finance (5) -> /finance/2.1.0/<ClassName>.svg
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
+            --scope worldview.genval.ai/finance@2.1.0 \
+            --format svg --out _site/finance/2.1.0/ >/dev/null
 
       # ---------------------------------------------------------------
       # 2. Render every ontology concept inside each snapshot package.
