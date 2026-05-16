@@ -329,7 +329,7 @@ jobs:
           @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
           article.about{max-width:880px;margin:0 auto;padding:48px 32px 96px}
           @media (max-width:760px){article.about{padding:32px 20px 64px}}
-          header.intro{padding:0 0 56px;border-bottom:1px solid var(--border);margin-bottom:56px;position:relative}
+          header.intro{padding:0 0 56px;margin-bottom:56px;position:relative}
           header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
           .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
           h1{font-family:var(--font-display);font-size:56px;font-weight:400;letter-spacing:-0.025em;margin-bottom:28px;line-height:1.05;color:var(--fg)}
