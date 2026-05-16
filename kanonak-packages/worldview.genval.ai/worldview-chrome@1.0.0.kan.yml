@@ -44,6 +44,57 @@ worldview-chrome:
           version: 1.0.0
           alias: vis
 
+# =============================================================================
+# SVG SEMANTIC-ZOOM TIER CONVENTION (worldview-chrome's reusable pattern)
+#
+# An SVG renderer for any resource MAY package multiple semantic-zoom
+# representations of the resource into one .svg file using sibling <g>
+# groups and CSS @media queries inside the SVG <style> block. When the
+# SVG is loaded via <img src="...">, the media queries evaluate against
+# the image's own rendered viewport in CSS pixels — so the right tier
+# auto-shows at the right size, and browser zoom or container resizing
+# trips the threshold to reveal more or less detail.
+#
+# Three named tiers:
+#
+#   .tier-icon  shown rendered <  120px — inline / favicon / chip
+#               pure visual identity; no readable text expected below
+#               ~50px render; one or two glyphs sized VERY large in
+#               user-space units so they survive scale-down; strokes
+#               carry vector-effect="non-scaling-stroke" so the frame
+#               stays crisp at favicon size.
+#
+#   .tier-card  shown rendered 120 - 360px — thumbnail / hero visual
+#               big centered value, one or two large secondary labels,
+#               one visual element (bar / dot / fill). No legends, no
+#               fine print. Fonts sized in user-space so they read at
+#               ~200px render.
+#
+#   .tier-full  shown rendered >= 360px — standalone view / detail page
+#               full information density: labels, legends, multi-element
+#               visualizations, every facet of the resource that admits
+#               a visual treatment.
+#
+# CSS cascade (default = tier-full; smaller media queries override
+# down through card then icon):
+#
+#   .tier-icon, .tier-card { display: none; }
+#   .tier-full { display: block; }
+#   @media (max-width: 360px) { .tier-full { display: none } .tier-card { display: block } }
+#   @media (max-width: 120px) { .tier-card { display: none } .tier-icon { display: block } }
+#
+# All three tiers share one viewBox; each layout positions itself
+# within that viewBox using whatever shape fits its information
+# density. The viewBox aspect ratio is the publisher's choice — keep
+# it consistent across all your class SVG renderers for visual
+# uniformity. worldview-chrome uses 400x240 (5:3 landscape).
+#
+# First adopter: wv.WorldviewThesis (thesis-svg-renderer below). Other
+# classes (fin.Security, wv.Evidence, regimes, indicators) can adopt
+# the same three-tier pattern when their SVG renderer is built — the
+# class names and breakpoints are the convention's contract.
+# =============================================================================
+
 any-resource-renderer:
   type: tx.InstanceTransformation
 
@@ -675,20 +726,25 @@ thesis-svg-renderer:
                             .status-text.s-active{fill:#34d399}
                             .status-text.s-retired{fill:#9aa5b8}
                             .status-text.s-invalidated{fill:#f87171}
-                            /* SEMANTIC ZOOM. Two layouts in one SVG.
-                               When embedded via <img>, @media queries inside the SVG evaluate
-                               against the image's own rendered viewport — so the right layout
-                               auto-shows based on how big the image is on screen. Browser zoom
-                               grows the rendered viewport too, so zooming a small thumbnail
-                               eventually reveals the full card. */
-                            .layout-full{display:block}
-                            .layout-compact{display:none}
-                            @media (max-width:320px){
-                              .layout-full{display:none}
-                              .layout-compact{display:block}
+                            /* SEMANTIC ZOOM — see convention block at top of file.
+                               Default to tier-full; cascade down to tier-card then tier-icon
+                               as the SVG's rendered viewport shrinks. */
+                            .tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:360px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
                             }
-                            /* Compact layout: large fonts in user-space so they stay readable
-                               when scaled down to small render sizes. */
+                            @media (max-width:120px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            /* tier-icon — pure visual identity, no readable text expected
+                               below ~50px render. Non-scaling stroke keeps the frame crisp
+                               down to favicon size. */
+                            .i-conf{font-size:110px;font-weight:700;fill:#e6eaf2}
+                            /* tier-card — large fonts in user-space so they stay readable
+                               when scaled down to ~200px renders. */
                             .c-status{font-size:30px;font-weight:600;letter-spacing:8px}
                             .c-conf{font-size:120px;font-weight:700;fill:#e6eaf2}
                             .c-theme{font-size:18px;fill:#9aa5b8;letter-spacing:4px}
@@ -722,7 +778,7 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             "/>
-                            <g class="layout-full">
+                            <g class="tier-full">
                             <text x="24" y="32" class="meta-label">THEME</text>
                             <text x="24" y="50" class="meta-value">
                         - type: tx.PropertyRead
@@ -840,7 +896,7 @@ thesis-svg-renderer:
                           tx.stringLiteral: |-
                             </text>
                             </g>
-                            <g class="layout-compact">
+                            <g class="tier-card">
                             <text x="200" y="68" text-anchor="middle" style="text-transform:uppercase" class="c-status status-text s-
                         - type: tx.UriName
                           tx.uriNameOf:
@@ -909,6 +965,49 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             ,65%,55%)"/></svg>
+                            </g>
+                            <g class="tier-icon">
+                            <rect x="60" y="20" width="280" height="200" rx="20" fill="#0a0e1a" stroke-width="3" vector-effect="non-scaling-stroke" class="frame s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <svg x="60" y="20" width="280" height="200" viewBox="0 0 1 1" preserveAspectRatio="none"><g transform="rotate(180 0.5 0.5)"><rect width="1" height="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,50%)" opacity="0.5"/></g></svg>
+                            <text x="200" y="148" text-anchor="middle" class="i-conf">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
                             </g>
                             </svg>
 
