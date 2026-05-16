@@ -87,9 +87,11 @@ jobs:
           # the install.
           kanonak install kanonak.org/universal-derivations
           # Per-package render function — runs the worldview-chrome
-          # HTML transformation + universal markdown side-by-side per
-          # package. Each instance of rdfs.Resource in the package
-          # gets batched in one CLI call per format.
+          # HTML transformation per package. Each rdfs.Resource in the
+          # package gets batched in one CLI call. Markdown is only
+          # generated for snapshot packages (see snapshot loop below)
+          # since that's the only place a .md sibling is useful for
+          # downstream consumption.
           render_pkg() {
             local pkg_file="$1"
             local base name version out_dir
@@ -101,9 +103,6 @@ jobs:
             kanonak transform run worldview.genval.ai/worldview-chrome/any-resource-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format html --out "$out_dir/" >/dev/null 2>&1 || true
-            kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format markdown-with-frontmatter --out "$out_dir/" >/dev/null 2>&1 || true
             echo "  rendered $base"
           }
           export -f render_pkg
@@ -150,6 +149,13 @@ jobs:
             kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
+            # Markdown for every resource in the snapshot package
+            # (view, theses, evidence). Useful for LLM / AI agent
+            # consumption of snapshot content. Not generated for
+            # other packages — see render_pkg above.
+            kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format markdown-with-frontmatter --out "$out_dir/" >/dev/null 2>&1 || true
             echo "  rendered $base"
           }
           export -f render_snapshot
