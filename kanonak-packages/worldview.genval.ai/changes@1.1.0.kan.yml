@@ -361,23 +361,7 @@ changes-transformation:
                                     - type: tx.UriVersion
                                       tx.uriVersionOf: { type: tx.VarRef, tx.varName: curr }
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '/view.svg" alt="snapshot after" loading="lazy"/></a></div><span class="diff-pair-versions"><span class="v">v'
-                                    - type: tx.UriVersion
-                                      tx.uriVersionOf: { type: tx.VarRef, tx.varName: prev }
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '</span><span class="arrow">&rarr;</span><span class="v">v'
-                                    - type: tx.UriVersion
-                                      tx.uriVersionOf: { type: tx.VarRef, tx.varName: curr }
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '</span></span><span class="diff-pair-time">'
-                                    - type: tx.DateFormat
-                                      tx.dateSource:
-                                        type: tx.PropertyRead
-                                        tx.readSource: { type: tx.VarRef, tx.varName: curr }
-                                        tx.readProp: wv.observedAt
-                                      tx.dateFormat: long-date
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '</span></header><ul class="diff-changes">'
+                                      tx.stringLiteral: '/view.svg" alt="snapshot after" loading="lazy"/></a></div></header><ul class="diff-changes">'
 
                                     # New + changed thesis rows (iterate curr.hasThesis)
                                     - type: tx.ForEach
@@ -621,18 +605,13 @@ changes-stylesheet:
                       .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
                       .empty-state{padding:24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:8px;color:var(--fg-faint);font-size:13px;line-height:1.6;font-style:italic}
                       .diff-pair{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;margin-bottom:24px;overflow:hidden;position:relative}
-                      .diff-pair-header{padding:20px 28px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:var(--bg-elev)}
-                      .diff-pair-visual{display:flex;align-items:center;gap:14px;flex-basis:100%;justify-content:center;padding:8px 0 4px}
+                      .diff-pair-header{padding:24px 28px 18px;border-bottom:1px solid var(--border-soft);background:var(--bg-elev)}
+                      .diff-pair-visual{display:flex;align-items:center;gap:14px;justify-content:center}
                       .diff-snap-link{display:block;line-height:0;transition:transform 150ms,box-shadow 150ms;border-radius:8px}
                       .diff-snap-link:hover{transform:translateY(-2px);box-shadow:0 6px 22px -4px rgba(14,165,233,0.25)}
-                      .diff-snap{display:block;width:180px;height:auto;border-radius:8px}
-                      .diff-snap-arrow{color:var(--fg-faint);font-size:20px;font-family:var(--font-mono)}
+                      .diff-snap{display:block;width:200px;height:auto;border-radius:8px}
+                      .diff-snap-arrow{color:var(--fg-faint);font-size:24px;font-family:var(--font-mono)}
                       @media (max-width:520px){.diff-snap{width:140px}}
-                      .diff-pair-versions{font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;gap:10px}
-                      .diff-pair-versions .v{background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);color:var(--accent);padding:2px 8px;border-radius:4px;letter-spacing:0.05em}
-                      .diff-pair-versions .arrow{color:var(--fg-faint);font-size:14px}
-                      .diff-pair-time{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);letter-spacing:0.06em}
-                      .diff-pair-stats{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;margin-left:auto}
                       .diff-changes{list-style:none;padding:0;margin:0}
                       .diff-change{padding:18px 28px;border-bottom:1px solid var(--border-soft)}
                       .diff-change:last-child{border-bottom:none}
