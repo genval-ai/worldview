@@ -146,6 +146,10 @@ jobs:
             kanonak transform run worldview.genval.ai/worldview-chrome/thesis-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
+            # Snapshot's own regime-portrait SVG — one per snapshot package.
+            kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
             echo "  rendered $base"
           }
           export -f render_snapshot

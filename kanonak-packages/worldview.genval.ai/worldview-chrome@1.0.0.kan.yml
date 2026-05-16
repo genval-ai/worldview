@@ -1011,6 +1011,385 @@ thesis-svg-renderer:
                             </g>
                             </svg>
 
+# =============================================================================
+# snapshot-svg-renderer — wv.WorldviewSnapshot as a regime portrait
+#
+# Applies the 3-tier semantic-zoom convention. The visual primitive is one
+# theme-colored dot per thesis, sized proportionally to that thesis's
+# confidence (via SVG font-size em — confidence 0-1 maps directly to em
+# multiplier, no math primitive needed), opacity reduced for non-active
+# theses. The dot row becomes a snapshot's regime fingerprint — same shape
+# across all three tiers, more surrounding context as you zoom in.
+# =============================================================================
+
+snapshot-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.requires:
+      - wv.hasThesis
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            .bg{fill:#0a0e1a}
+                            .frame{stroke:#1e293b;fill:none}
+                            .t-active{opacity:1}
+                            .t-retired{opacity:0.35}
+                            .t-invalidated{opacity:0.45;filter:saturate(0.4) brightness(0.7)}
+                            .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .meta-value{fill:#9aa5b8;font-size:11px}
+                            .version-chip{fill:#7dd3fc;font-size:11px;letter-spacing:0.5px}
+                            .stat{fill:#9aa5b8;font-size:10px;letter-spacing:2px}
+                            .stat-num{fill:#e6eaf2;font-weight:700;font-size:13px}
+                            .full-label{fill:#9aa5b8;font-size:11px}
+                            .full-conf{fill:#e6eaf2;font-weight:600;font-size:11px}
+                            /* Semantic zoom — see worldview-chrome convention block. */
+                            .tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:360px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:120px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            </style>
+                            <rect class="bg" x="4" y="4" width="392" height="232" rx="14" stroke="#1e293b" stroke-width="2" vector-effect="non-scaling-stroke"/>
+
+                        # =====================================================
+                        # tier-icon — pure regime fingerprint, centered dot row
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon">
+                            <text x="200" y="155" text-anchor="middle" font-size="90" letter-spacing="-4">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # =====================================================
+                        # tier-card — version + date header, dot row, count
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <text x="24" y="36" class="version-chip">SNAPSHOT v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="376" y="36" text-anchor="end" class="meta-value">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="150" text-anchor="middle" font-size="70" letter-spacing="-2">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="205" text-anchor="middle" class="stat"><tspan class="stat-num">
+                        - type: tx.Count
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </tspan> THESES</text>
+                            </g>
+
+                        # =====================================================
+                        # tier-full — version + date header, dot row, thesis list
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <text x="24" y="32" class="meta-label">SNAPSHOT</text>
+                            <text x="24" y="50" class="version-chip">v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="376" y="32" text-anchor="end" class="meta-label">OBSERVED</text>
+                            <text x="376" y="50" text-anchor="end" class="meta-value">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.observedAt
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="110" text-anchor="middle" font-size="56" letter-spacing="-1">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="24" y="148" font-size="11">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan x="24" dy="14" class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '"><tspan fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)" font-size="14">●</tspan> <tspan class="full-label">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: rdfs.label
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</tspan> <tspan class="full-conf">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: wv.confidence
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</tspan></tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+                            </svg>
+
+wv.WorldviewSnapshot:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 1.0.0
+        tx.name: snapshot-svg-renderer
+
 wv.WorldviewThesis:
   derivation.derivations:
     - type: derivation.Derivation
