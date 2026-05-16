@@ -1633,20 +1633,34 @@ snapshot-to-html-transformation:
                                             tx.stringLiteral: |-
                                               ">
 
-                                          # HEAD: strength dot + type label + observedAt
+                                          # HEAD: type icon + type label + strength icon + observedAt
+                                          # Icons resolve via canonical Kanonak URL of each concept;
+                                          # /<UriPackage>/<UriVersion>/<UriName>.svg. fin.* subclasses
+                                          # currently 404 (no iconGlyph yet) — onerror hides them.
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '<header class="ev-head"><span class="ev-strength strength-'
-                                          - type: tx.UriName
-                                            tx.uriNameOf:
+                                            tx.stringLiteral: '<header class="ev-head"><img class="ev-type-icon" src="/'
+                                          - type: tx.UriPackage
+                                            tx.uriPackageOf:
                                               type: tx.PropertyRead
                                               tx.readSource:
                                                 type: tx.ResolveRef
                                                 tx.resolveSource:
                                                   type: tx.VarRef
                                                   tx.varName: evRef
-                                              tx.readProp: wv.evidenceStrength
+                                              tx.readProp: rdfs.type
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '"></span><span class="ev-type" data-type="'
+                                            tx.stringLiteral: '/'
+                                          - type: tx.UriVersion
+                                            tx.uriVersionOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: rdfs.type
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '/'
                                           - type: tx.UriName
                                             tx.uriNameOf:
                                               type: tx.PropertyRead
@@ -1657,7 +1671,51 @@ snapshot-to-html-transformation:
                                                   tx.varName: evRef
                                               tx.readProp: rdfs.type
                                           - type: tx.StringLiteral
-                                            tx.stringLiteral: '"></span>'
+                                            tx.stringLiteral: '.svg" alt="" loading="lazy" onerror="this.style.display=&apos;none&apos;"/><span class="ev-type" data-type="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: rdfs.type
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '"></span><img class="ev-strength-icon" src="/'
+                                          - type: tx.UriPackage
+                                            tx.uriPackageOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '/'
+                                          - type: tx.UriVersion
+                                            tx.uriVersionOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '/'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '.svg" alt="" loading="lazy"/>'
                                           - type: tx.When
                                             tx.condition:
                                               type: tx.IsSet
@@ -3593,11 +3651,9 @@ snapshot-stylesheet:
                       .evidence-item.strength-evidence-strong{border-left-color:var(--strong)}
                       .evidence-item.strength-evidence-moderate{border-left-color:var(--moderate)}
                       .evidence-item.strength-evidence-weak{border-left-color:var(--weak)}
-                      .ev-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-                      .ev-strength{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-                      .ev-strength.strength-evidence-strong{background:var(--strong);box-shadow:0 0 6px rgba(52,211,153,0.4)}
-                      .ev-strength.strength-evidence-moderate{background:var(--moderate);box-shadow:0 0 6px rgba(251,191,36,0.4)}
-                      .ev-strength.strength-evidence-weak{background:var(--weak)}
+                      .ev-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+                      .ev-type-icon{width:22px;height:22px;flex-shrink:0;display:inline-block}
+                      .ev-strength-icon{width:22px;height:22px;flex-shrink:0;display:inline-block}
                       .ev-type{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--fg-dim);font-weight:600}
                       .ev-type::before{content:attr(data-type-label)}
                       .ev-time{font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-left:auto;letter-spacing:0.04em}
