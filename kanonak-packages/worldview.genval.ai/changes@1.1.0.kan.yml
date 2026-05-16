@@ -618,7 +618,7 @@ changes-stylesheet:
                       .diff-change.major{background:rgba(125,211,252,0.03)}
                       .diff-change-header{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:10px}
                       .change-thesis-label{font-size:15px;color:var(--fg);font-weight:500;display:inline-flex;align-items:center;gap:10px}
-                      .thesis-icon-inline{display:inline-block;width:44px;height:auto;border-radius:5px;vertical-align:middle;flex-shrink:0}
+                      .thesis-icon-inline{display:inline-block;width:44px;height:auto;border-radius:3px;vertical-align:middle;flex-shrink:0}
                       .change-shift{font-family:var(--font-mono);font-size:13px;color:var(--fg-dim);display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
                       .change-shift .from-conf{color:var(--fg-faint)}
                       .change-shift .to-conf{color:var(--fg)}

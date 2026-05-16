@@ -1024,7 +1024,7 @@ thesis-svg-renderer:
                             </text>
                             </g>
                             <g class="tier-chip">
-                            <rect x="60" y="20" width="280" height="200" rx="20" fill="#0a0e1a" stroke-width="3" vector-effect="non-scaling-stroke" class="frame s-
+                            <rect x="4" y="4" width="392" height="232" rx="14" fill="#0a0e1a" stroke-width="3" vector-effect="non-scaling-stroke" class="frame s-
                         - type: tx.UriName
                           tx.uriNameOf:
                             type: tx.PropertyRead
@@ -1035,7 +1035,7 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             "/>
-                            <svg x="60" y="20" width="280" height="200" viewBox="0 0 1 1" preserveAspectRatio="none"><g transform="rotate(180 0.5 0.5)"><rect width="1" height="
+                            <svg x="4" y="4" width="392" height="232" viewBox="0 0 1 1" preserveAspectRatio="none"><g transform="rotate(180 0.5 0.5)"><rect width="1" height="
                         - type: tx.PropertyRead
                           tx.readSource:
                             type: tx.VarRef
