@@ -251,6 +251,12 @@ jobs:
             kanonak transform run worldview.genval.ai/securities-to-html/security-to-html-transformation \
               --scope "worldview.genval.ai/${base}" \
               --format html --out "$out_dir/" >/dev/null
+            # Sector-colored security SVG (4-tier semantic zoom).
+            # Becomes /securities/<ver>/<ticker>.svg — embed anywhere
+            # a security needs an inline / thumbnail / card identifier.
+            kanonak transform run worldview.genval.ai/securities-to-html/security-svg-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format svg --out "$out_dir/" >/dev/null
           }
           export -f render_sec_pkg
           ls kanonak-packages/worldview.genval.ai/securities@*.kan.yml | \
