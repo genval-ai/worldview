@@ -55,76 +55,34 @@ jobs:
             xargs -P 4 -I {} kanonak validate "{}"
 
       # ---------------------------------------------------------------
-      # 1b. GENERIC RESOURCE RENDER.
-      # Walk every package; for every top-level typed resource (any
-      # subject whose `type:` is not Package), run `kanonak derive
-      # --format html` and write to the canonical filesystem path
-      # `_site/<package>/<version>/<resource>.html`.
+      # 2. Render every ontology concept inside each snapshot package.
       #
-      # Discovery cascade (instance override → class hierarchy →
-      # universal default at rdfs.Resource) picks the most specific
-      # transformation for each resource. Resources without a class-
-      # specific binding fall through to
-      # `kanonak.org/universal-derivations/any-resource-renderer`, so
-      # EVERY canonical URI gets a renderable page out of the box.
+      # Per the project's "render only the ontology concepts we care
+      # about" principle, this step has no generic rdfs.Resource
+      # fallback — each render below targets a specific class:
       #
-      # Runs BEFORE the class-specific steps below so they overwrite
-      # where the publisher has richer custom renderers (snapshot view,
-      # security pages). Per-resource failures are logged and skipped
-      # so one broken resource never blocks the rest of the deploy.
+      #   WorldviewSnapshot -> rich self-contained view.html (themed
+      #     nav, thesis rail, confidence bars, evidence cards) plus
+      #     a paired snapshot.css. Uses `kanonak derive` (not
+      #     `transform run`) because snapshot-stylesheet uses
+      #     `tx.CallFragment(pages.worldview-chrome-fragment)` which
+      #     only the derive code path resolves cleanly.
+      #   WorldviewSnapshot -> regime-portrait SVG (one per snapshot)
+      #   WorldviewThesis   -> rich standalone HTML page (status pill,
+      #     confidence meter, theme chip, statement, rationale,
+      #     supporting evidence list).
+      #   WorldviewThesis   -> 4-tier semantic-zoom SVG identifier.
+      #   wv.Evidence       -> 4-tier semantic-zoom SVG. SVG is the
+      #     PRIMARY rendered artifact for evidence — no per-evidence
+      #     HTML page is generated. Evidence is consumed inline by
+      #     thesis cards on the snapshot page and by the chip
+      #     injection in narrative prose.
       #
-      # This step is publisher-agnostic apart from the hardcoded
-      # publisher directory — extracting that into a workflow input
-      # would make this the basis of a reusable GH Action that any
-      # Kanonak publisher could drop into their repo.
+      # Also runs the universal-derivations markdown-with-frontmatter
+      # renderer for every resource in the snapshot package, useful
+      # for LLM/AI agent consumption.
       # ---------------------------------------------------------------
-      - name: Render every resource (canonical URL form)
-        run: |
-          set -euo pipefail
-          # universal-derivations augments rdfs.Resource without being
-          # explicitly imported by any workspace package; pre-cache it
-          # before parallel rendering so worker processes don't race
-          # the install.
-          kanonak install kanonak.org/universal-derivations
-          # Per-package render function — runs the worldview-chrome
-          # HTML transformation per package. Each rdfs.Resource in the
-          # package gets batched in one CLI call. Markdown is only
-          # generated for snapshot packages (see snapshot loop below)
-          # since that's the only place a .md sibling is useful for
-          # downstream consumption.
-          render_pkg() {
-            local pkg_file="$1"
-            local base name version out_dir
-            base=$(basename "$pkg_file" .kan.yml)
-            name="${base%@*}"
-            version="${base#*@}"
-            out_dir="_site/${name}/${version}"
-            mkdir -p "$out_dir"
-            kanonak transform run worldview.genval.ai/worldview-chrome/any-resource-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format html --out "$out_dir/" >/dev/null 2>&1 || true
-            echo "  rendered $base"
-          }
-          export -f render_pkg
-          ls kanonak-packages/worldview.genval.ai/*.kan.yml | \
-            xargs -P 4 -I {} bash -c 'render_pkg "$@"' _ {}
-
-      # ---------------------------------------------------------------
-      # 2. Custom snapshot rendering — overwrites the generic universal-
-      # rendered view.html for each snapshot version with the rich
-      # snapshot-to-html-transformation output (themed nav, thesis rail,
-      # confidence bars, evidence cards). Uses `kanonak derive` (not
-      # `transform run`) because snapshot-stylesheet uses
-      # `tx.CallFragment(pages.worldview-chrome-fragment)` which only
-      # the derive code path resolves cleanly.
-      #
-      # Also: WorldviewThesis instances get a rich custom standalone
-      # page via worldview-chrome's thesis-html-renderer (status pill,
-      # confidence meter, theme chip, statement, rationale, supporting
-      # evidence list). Overwrites the generic any-resource-renderer
-      # output for each thesis.
-      # ---------------------------------------------------------------
-      - name: Render WorldviewSnapshots (rich custom view)
+      - name: Render snapshot-package resources
         run: |
           set -euo pipefail
           render_snapshot() {
@@ -149,10 +107,14 @@ jobs:
             kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
+            # Evidence SVGs — primary rendered artifact for every
+            # wv.Evidence (and subclass) in the snapshot package.
+            kanonak transform run worldview.genval.ai/worldview-chrome/evidence-svg-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
             # Markdown for every resource in the snapshot package
             # (view, theses, evidence). Useful for LLM / AI agent
-            # consumption of snapshot content. Not generated for
-            # other packages — see render_pkg above.
+            # consumption of snapshot content.
             kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format markdown-with-frontmatter --out "$out_dir/" >/dev/null 2>&1 || true

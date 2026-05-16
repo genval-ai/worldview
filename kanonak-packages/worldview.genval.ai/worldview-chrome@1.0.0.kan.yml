@@ -1589,6 +1589,306 @@ snapshot-svg-renderer:
                             </g>
                             </svg>
 
+# =============================================================================
+# wv.Evidence -> evidence.svg  (4-tier semantic-zoom visual identifier)
+#
+# Renders any wv.Evidence (or subclass) as a self-contained SVG that becomes
+# the *primary* rendered artifact for the evidence resource. Per the SVG
+# semantic-zoom convention, ONE file serves four scales:
+#   chip  (<60px)  : solid strength-color square — chromatic identifier only
+#   icon  (60-160) : dark card + strength left-band + observed date centered
+#   card  (160-400): + strength label + observed date long-form
+#   full  (>=400)  : card + canonical URI footer
+#
+# Phase 1: subclass-agnostic — uses only the wv.Evidence base properties
+# (evidenceStrength, evidenceObservedAt) so all 9 evidence subclasses get a
+# usable visual without per-subclass code. Phase 2 will add per-subclass
+# renderers (PolicyEvidence, GeopoliticalEvidence, OfficialStatementEvidence,
+# EconomicDataEvidence, fin.MarketDataEvidence, fin.CorporateEvidence,
+# fin.AnalystEvidence, fin.CentralBankEvidence, fin.InstitutionalFlowEvidence)
+# whose iconography overrides this base for the icon/card/full tiers.
+# =============================================================================
+evidence-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.Evidence
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
+                            .ev-bg{fill:#0a0e1a}
+                            .ev-frame{fill:none;stroke:#1e293b;stroke-width:2}
+                            /* Strength palette keyed off EvidenceStrength URI names. */
+                            .ev-s-evidence-strong{fill:#34d399}
+                            .ev-s-evidence-moderate{fill:#fbbf24}
+                            .ev-s-evidence-weak{fill:#64748b}
+                            .ev-date-big{fill:#e6eaf2;font-weight:600;letter-spacing:0.5px}
+                            .ev-date{fill:#9aa5b8;letter-spacing:0.5px}
+                            .ev-strength-label{font-weight:700;letter-spacing:2px;text-transform:uppercase}
+                            .ev-slug{fill:#9aa5b8;font-style:italic}
+                            .ev-uri{fill:#7dd3fc;letter-spacing:0.5px}
+                            /* 4-tier semantic zoom cascade. */
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            </style>
+
+                        # =====================================================
+                        # tier-chip — solid strength color square. Color is the
+                        # only legible signal at <60px so no text is attempted.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-chip">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            </g>
+
+                        # =====================================================
+                        # tier-icon — dark card + strength left-band + the
+                        # observed date as the iconic content.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
+                            <rect x="4" y="4" width="80" height="232" class="ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <text x="244" y="135" text-anchor="middle" class="ev-date-big" font-size="40"><![CDATA[
+                        - type: tx.Fallback
+                          tx.primary:
+                            type: tx.DateFormat
+                            tx.dateSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.evidenceObservedAt
+                            tx.dateFormat: short-date
+                          tx.alternate:
+                            type: tx.StringLiteral
+                            tx.stringLiteral: '—'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            </g>
+
+                        # =====================================================
+                        # tier-card — strength accent band + uppercase strength
+                        # label + long-form observed date + URI-name slug as
+                        # the textual identifier.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
+                            <rect x="14" y="14" width="372" height="6" rx="3" class="ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <text x="20" y="52" class="ev-strength-label ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            " font-size="13"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.evidenceStrength
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            <text x="380" y="52" text-anchor="end" class="ev-date" font-size="12">
+                        - type: tx.Fallback
+                          tx.primary:
+                            type: tx.DateFormat
+                            tx.dateSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.evidenceObservedAt
+                            tx.dateFormat: long-date
+                          tx.alternate:
+                            type: tx.StringLiteral
+                            tx.stringLiteral: '—'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="140" text-anchor="middle" class="ev-slug" font-size="13"><![CDATA[
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            </g>
+
+                        # =====================================================
+                        # tier-full — card layout + canonical URI footer.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="ev-frame"/>
+                            <rect x="14" y="14" width="372" height="6" rx="3" class="ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <text x="20" y="52" class="ev-strength-label ev-s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.evidenceStrength
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            " font-size="13"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.evidenceStrength
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            <text x="380" y="52" text-anchor="end" class="ev-date" font-size="12">
+                        - type: tx.Fallback
+                          tx.primary:
+                            type: tx.DateFormat
+                            tx.dateSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.evidenceObservedAt
+                            tx.dateFormat: long-date
+                          tx.alternate:
+                            type: tx.StringLiteral
+                            tx.stringLiteral: '—'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="130" text-anchor="middle" class="ev-slug" font-size="13"><![CDATA[
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            <text x="200" y="226" text-anchor="middle" class="ev-uri" font-size="9" letter-spacing="0.5">
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+                            </svg>
+
 wv.WorldviewSnapshot:
   derivation.derivations:
     - type: derivation.Derivation
@@ -1621,3 +1921,15 @@ wv.WorldviewThesis:
         tx.package: worldview-chrome
         tx.version: 1.0.0
         tx.name: thesis-svg-renderer
+
+wv.Evidence:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 1.0.0
+        tx.name: evidence-svg-renderer
