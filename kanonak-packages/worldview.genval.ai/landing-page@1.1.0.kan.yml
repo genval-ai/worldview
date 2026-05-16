@@ -192,6 +192,10 @@ landing-page-transformation:
                               # workflow mirrors each rendered HTML at the
                               # canonical Kanonak path, so the link resolves
                               # correctly when the publisher origin serves it.
+                              # Card layout: SVG on the left (regime portrait), narrative
+                              # excerpt on the right. Version / date / thesis count are
+                              # already inside the SVG (tier-card content), so removed
+                              # the redundant text header.
                               - type: tx.StringLiteral
                                 tx.stringLiteral: '<li class="snapshot-card"><a class="snapshot-card-link" href="/snapshot/'
                               - type: tx.UriVersion
@@ -205,7 +209,7 @@ landing-page-transformation:
                                   type: tx.VarRef
                                   tx.varName: snapshot
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '"><img class="snapshot-card-svg" src="/snapshot/'
+                                tx.stringLiteral: '"><div class="snapshot-card-layout"><img class="snapshot-card-svg" src="/snapshot/'
                               - type: tx.UriVersion
                                 tx.uriVersionOf:
                                   type: tx.VarRef
@@ -213,48 +217,7 @@ landing-page-transformation:
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |-
                                   /view.svg" alt="" loading="lazy"/>
-                                  <div class="snapshot-card-header">
-                                  <span class="snapshot-version">v
-                              - type: tx.UriVersion
-                                tx.uriVersionOf:
-                                  type: tx.VarRef
-                                  tx.varName: snapshot
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: |-
-                                  </span>
-                                  <time class="snapshot-date" datetime="
-                              - type: tx.PropertyRead
-                                tx.readSource:
-                                  type: tx.VarRef
-                                  tx.varName: snapshot
-                                tx.readProp: wv.observedAt
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: '">'
-                              - type: tx.PropertyRead
-                                tx.readSource:
-                                  type: tx.VarRef
-                                  tx.varName: snapshot
-                                tx.readProp: wv.observedAt
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: |-
-                                  </time>
-                                  <div class="snapshot-stats">
-                                  <span class="stat"><span class="stat-value">
-
-                              # Count of theses (using v3's tx.Count primitive!)
-                              - type: tx.Count
-                                tx.source:
-                                  type: tx.PropertyRead
-                                  tx.readSource:
-                                    type: tx.VarRef
-                                    tx.varName: snapshot
-                                  tx.readProp: wv.hasThesis
-
-                              - type: tx.StringLiteral
-                                tx.stringLiteral: |-
-                                  </span> theses</span>
-                                  </div>
-                                  </div>
+                                  <div class="snapshot-card-body">
                                   <p class="snapshot-narrative">
                               - type: tx.Normalize
                                 tx.normKind: tx.trim-end
@@ -267,6 +230,9 @@ landing-page-transformation:
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |-
                                   </p>
+                                  <span class="snapshot-card-readmore">Read snapshot &rarr;</span>
+                                  </div>
+                                  </div>
                                   </a>
                                   </li>
 
@@ -403,16 +369,19 @@ landing-page-stylesheet:
                       ol.snapshot-list{list-style:none;padding:0;margin:0}
                       li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:16px;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative}
                       li.snapshot-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15);transform:translateY(-1px)}
-                      a.snapshot-card-link{display:block;padding:32px;color:inherit;text-decoration:none}
-                      .snapshot-card-svg{display:block;width:100%;max-width:340px;height:auto;border-radius:8px;margin:0 auto 20px;background:#0a0e1a}
+                      a.snapshot-card-link{display:block;padding:24px 28px;color:inherit;text-decoration:none}
                       a.snapshot-card-link:hover{color:inherit}
-                      @media (max-width:760px){a.snapshot-card-link{padding:24px 20px}}
-                      .snapshot-card-header{display:flex;align-items:baseline;gap:16px;margin-bottom:16px;flex-wrap:wrap}
-                      .snapshot-version{font-family:var(--font-mono);color:var(--accent);font-size:13px;letter-spacing:0.05em;background:rgba(125,211,252,0.1);border:1px solid rgba(125,211,252,0.25);padding:2px 8px;border-radius:4px}
-                      time.snapshot-date{font-family:var(--font-mono);font-size:13px;letter-spacing:0.04em;color:var(--accent);font-weight:500}
-                      .snapshot-stats{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);text-transform:uppercase;letter-spacing:0.08em;margin-left:auto}
-                      .snapshot-stats .stat-value{color:var(--fg);font-weight:600;font-size:14px;text-transform:none}
-                      p.snapshot-narrative{font-size:15px;line-height:1.7;color:var(--fg-dim);font-weight:300;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
+                      @media (max-width:760px){a.snapshot-card-link{padding:20px}}
+                      .snapshot-card-layout{display:flex;gap:24px;align-items:flex-start}
+                      .snapshot-card-svg{display:block;flex:0 0 320px;width:320px;height:auto;border-radius:8px;background:#0a0e1a}
+                      .snapshot-card-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;align-self:stretch}
+                      @media (max-width:760px){
+                        .snapshot-card-layout{flex-direction:column;gap:18px}
+                        .snapshot-card-svg{flex:0 0 auto;width:100%;max-width:380px}
+                      }
+                      p.snapshot-narrative{font-size:14px;line-height:1.65;color:var(--fg-dim);font-weight:300;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;margin:0;flex:1}
+                      .snapshot-card-readmore{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;align-self:flex-start;transition:color 120ms}
+                      li.snapshot-card:hover .snapshot-card-readmore{color:var(--accent-2)}
                       section.ecosystem ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
                       section.ecosystem li{padding:18px 20px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px}
                       section.ecosystem li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:6px;font-weight:500}
