@@ -666,7 +666,7 @@ thesis-svg-renderer:
 
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" width="400" height="240">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240">
                             <style>
                             text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
                             .frame.s-active{stroke:#34d399}
@@ -675,6 +675,25 @@ thesis-svg-renderer:
                             .status-text.s-active{fill:#34d399}
                             .status-text.s-retired{fill:#9aa5b8}
                             .status-text.s-invalidated{fill:#f87171}
+                            /* SEMANTIC ZOOM. Two layouts in one SVG.
+                               When embedded via <img>, @media queries inside the SVG evaluate
+                               against the image's own rendered viewport — so the right layout
+                               auto-shows based on how big the image is on screen. Browser zoom
+                               grows the rendered viewport too, so zooming a small thumbnail
+                               eventually reveals the full card. */
+                            .layout-full{display:block}
+                            .layout-compact{display:none}
+                            @media (max-width:320px){
+                              .layout-full{display:none}
+                              .layout-compact{display:block}
+                            }
+                            /* Compact layout: large fonts in user-space so they stay readable
+                               when scaled down to small render sizes. */
+                            .c-status{font-size:30px;font-weight:600;letter-spacing:8px}
+                            .c-conf{font-size:120px;font-weight:700;fill:#e6eaf2}
+                            .c-theme{font-size:18px;fill:#9aa5b8;letter-spacing:4px}
+                            /* Full layout typography stays small in user-space because at full
+                               render size it's already large enough on screen. */
                             .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
                             .meta-value{fill:#9aa5b8;font-size:11px}
                             .conf-value{fill:#e6eaf2;font-size:50px;font-weight:600}
@@ -703,6 +722,7 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             "/>
+                            <g class="layout-full">
                             <text x="24" y="32" class="meta-label">THEME</text>
                             <text x="24" y="50" class="meta-value">
                         - type: tx.PropertyRead
@@ -819,6 +839,77 @@ thesis-svg-renderer:
                         - type: tx.StringLiteral
                           tx.stringLiteral: |-
                             </text>
+                            </g>
+                            <g class="layout-compact">
+                            <text x="200" y="68" text-anchor="middle" style="text-transform:uppercase" class="c-status status-text s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '">'
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="160" text-anchor="middle" class="c-conf">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="195" text-anchor="middle" style="text-transform:uppercase" class="c-theme">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <rect x="32" y="214" width="336" height="6" rx="3" fill="#1a2233"/>
+                            <svg x="32" y="214" width="336" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.confidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" height="1" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,55%)"/></svg>
+                            </g>
                             </svg>
 
 wv.WorldviewThesis:
