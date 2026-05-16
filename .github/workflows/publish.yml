@@ -29,17 +29,30 @@ jobs:
         run: npm install -g @kanonak-protocol/cli
 
       # ---------------------------------------------------------------
-      # 1. Validate every .kan.yml in the publisher tree.
-      # Any validation failure halts the publish; we never publish
-      # broken packages.
+      # Cache the kanonak package cache (~/.kanonak/packages) so
+      # upstream package fetches happen once and reuse across runs.
+      # Keyed on the workspace .kan.yml hashes — invalidates when
+      # the publisher tree changes; restoreKey provides graceful
+      # fallback to a partial restore on first build after edits.
+      # ---------------------------------------------------------------
+      - name: Cache kanonak package cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.kanonak
+          key: kanonak-${{ runner.os }}-${{ hashFiles('kanonak-packages/**/*.kan.yml') }}
+          restore-keys: |
+            kanonak-${{ runner.os }}-
+
+      # ---------------------------------------------------------------
+      # 1. Validate every .kan.yml in the publisher tree IN PARALLEL.
+      # Each invocation is independent; -P 4 saturates ubuntu-latest's
+      # cores without thrashing memory. Any failure halts the publish.
       # ---------------------------------------------------------------
       - name: Validate packages
         run: |
-          set -e
-          for pkg in kanonak-packages/worldview.genval.ai/*.kan.yml; do
-            echo "Validating $pkg"
-            kanonak validate "$pkg"
-          done
+          set -euo pipefail
+          ls kanonak-packages/worldview.genval.ai/*.kan.yml | \
+            xargs -P 4 -I {} kanonak validate "{}"
 
       # ---------------------------------------------------------------
       # 1b. GENERIC RESOURCE RENDER.
@@ -67,36 +80,35 @@ jobs:
       # ---------------------------------------------------------------
       - name: Render every resource (canonical URL form)
         run: |
-          set -e
-          # universal-derivations is needed for the .md rendering below.
-          # It augments rdfs.Resource without being explicitly imported by
-          # any workspace package, so the validate step doesn't cache it.
+          set -euo pipefail
+          # universal-derivations augments rdfs.Resource without being
+          # explicitly imported by any workspace package; pre-cache it
+          # before parallel rendering so worker processes don't race
+          # the install.
           kanonak install kanonak.org/universal-derivations
-          # ONE `transform run` per package renders every rdfs.Resource
-          # instance — HTML via the publisher's worldview-chrome renderer
-          # (themed nav + dark theme), markdown via universal-derivations
-          # (frontmatter + structural body). Each matches rdfs.Resource
-          # so a single invocation batches all instances per package.
-          #
-          # Class-specific overrides for snapshot / security run in
-          # the steps below and overwrite where they have richer
-          # custom transformations.
-          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
+          # Per-package render function — runs the worldview-chrome
+          # HTML transformation + universal markdown side-by-side per
+          # package. Each instance of rdfs.Resource in the package
+          # gets batched in one CLI call per format.
+          render_pkg() {
+            local pkg_file="$1"
+            local base name version out_dir
             base=$(basename "$pkg_file" .kan.yml)
             name="${base%@*}"
             version="${base#*@}"
             out_dir="_site/${name}/${version}"
             mkdir -p "$out_dir"
-            echo "-> $base"
             kanonak transform run worldview.genval.ai/worldview-chrome/any-resource-renderer \
               --scope "worldview.genval.ai/${base}" \
-              --format html \
-              --out "$out_dir/" 2>&1 | tail -3 || true
+              --format html --out "$out_dir/" >/dev/null 2>&1 || true
             kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
               --scope "worldview.genval.ai/${base}" \
-              --format markdown-with-frontmatter \
-              --out "$out_dir/" 2>&1 | tail -3 || true
-          done
+              --format markdown-with-frontmatter --out "$out_dir/" >/dev/null 2>&1 || true
+            echo "  rendered $base"
+          }
+          export -f render_pkg
+          ls kanonak-packages/worldview.genval.ai/*.kan.yml | \
+            xargs -P 4 -I {} bash -c 'render_pkg "$@"' _ {}
 
       # ---------------------------------------------------------------
       # 2. Custom snapshot rendering — overwrites the generic universal-
@@ -115,36 +127,30 @@ jobs:
       # ---------------------------------------------------------------
       - name: Render WorldviewSnapshots (rich custom view)
         run: |
-          set -e
-          for pkg_file in kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml; do
+          set -euo pipefail
+          render_snapshot() {
+            local pkg_file="$1"
+            local base name version view_uri out_dir
             base=$(basename "$pkg_file" .kan.yml)
             name="${base%@*}"
             version="${base#*@}"
             view_uri="worldview.genval.ai/${base}/view"
             out_dir="_site/${name}/${version}"
             mkdir -p "$out_dir"
-            kanonak derive "$view_uri" --format html --out "$out_dir/"
-            kanonak derive "$view_uri" --format stylesheet --out "$out_dir/"
-            # snapshot-to-html-transformation's artifactName is `snapshot`;
-            # rename to `view` to match the canonical URI.
-            if [ -f "$out_dir/snapshot.html" ]; then
-              mv "$out_dir/snapshot.html" "$out_dir/view.html"
-            fi
-            # Rich per-thesis pages — one transform-run renders every
-            # WorldviewThesis in this snapshot package.
+            kanonak derive "$view_uri" --format html --out "$out_dir/" >/dev/null 2>&1
+            kanonak derive "$view_uri" --format stylesheet --out "$out_dir/" >/dev/null 2>&1
+            [ -f "$out_dir/snapshot.html" ] && mv "$out_dir/snapshot.html" "$out_dir/view.html"
             kanonak transform run worldview.genval.ai/worldview-chrome/thesis-html-renderer \
               --scope "worldview.genval.ai/${base}" \
-              --format html \
-              --out "$out_dir/" 2>&1 | tail -3 || true
-            # Iconic thesis card SVG — each thesis gets a .svg sibling
-            # at /snapshot/<ver>/<thesis-name>.svg suitable for embeds,
-            # link previews, og:image, etc. Status-colored frame, theme
-            # hue confidence fill, big confidence value.
+              --format html --out "$out_dir/" >/dev/null 2>&1 || true
             kanonak transform run worldview.genval.ai/worldview-chrome/thesis-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
-              --format svg \
-              --out "$out_dir/" 2>&1 | tail -3 || true
-          done
+              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
+            echo "  rendered $base"
+          }
+          export -f render_snapshot
+          ls kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml | \
+            xargs -P 4 -I {} bash -c 'render_snapshot "$@"' _ {}
 
       # ---------------------------------------------------------------
       # 3. Render the LATEST WorldviewSnapshot to _site/index.html so
@@ -224,17 +230,21 @@ jobs:
       # ---------------------------------------------------------------
       - name: Render Security pages
         run: |
-          set -e
-          for pkg_file in kanonak-packages/worldview.genval.ai/securities@*.kan.yml; do
+          set -euo pipefail
+          render_sec_pkg() {
+            local pkg_file="$1"
+            local base version out_dir
             base=$(basename "$pkg_file" .kan.yml)
             version="${base#*@}"
             out_dir="_site/securities/${version}"
             mkdir -p "$out_dir"
             kanonak transform run worldview.genval.ai/securities-to-html/security-to-html-transformation \
               --scope "worldview.genval.ai/${base}" \
-              --format html \
-              --out "$out_dir/"
-          done
+              --format html --out "$out_dir/" >/dev/null
+          }
+          export -f render_sec_pkg
+          ls kanonak-packages/worldview.genval.ai/securities@*.kan.yml | \
+            xargs -P 4 -I {} bash -c 'render_sec_pkg "$@"' _ {}
 
       # ---------------------------------------------------------------
       # 5. Render every site.AggregateView in the workspace via
@@ -253,25 +263,20 @@ jobs:
       # ---------------------------------------------------------------
       - name: Render AggregateViews via kanonak site build
         run: |
-          set -e
+          set -euo pipefail
           kanonak site build --out _site
-
-          # Paired stylesheets. Each aggregate's HTML lives at
-          # `_site/<dir>/index.html` and links to a sibling `index.css`;
-          # derive each one from its AggregateView resource (per-instance
-          # binding fires).
-          kanonak derive worldview.genval.ai/pages@1.2.0/snapshots-aggregate \
-            --format stylesheet \
-            --out _site/snapshots/
-          kanonak derive worldview.genval.ai/pages@1.2.0/timeline-aggregate \
-            --format stylesheet \
-            --out _site/timeline/
-          kanonak derive worldview.genval.ai/pages@1.2.0/horizon-aggregate \
-            --format stylesheet \
-            --out _site/horizon/
-          kanonak derive worldview.genval.ai/pages@1.2.0/changes-aggregate \
-            --format stylesheet \
-            --out _site/changes/
+          # Paired stylesheets — each aggregate's HTML lives at
+          # `_site/<dir>/index.html` and links to a sibling `index.css`.
+          # Derive in parallel; each is an independent call.
+          printf '%s\n' \
+            'snapshots-aggregate _site/snapshots/' \
+            'timeline-aggregate _site/timeline/' \
+            'horizon-aggregate _site/horizon/' \
+            'changes-aggregate _site/changes/' | \
+            xargs -n 2 -P 4 sh -c '
+              kanonak derive "worldview.genval.ai/pages@1.2.0/$1" \
+                --format stylesheet --out "$2" >/dev/null
+            ' _
 
       # ---------------------------------------------------------------
       # 6. Write the About page. Static HTML; same visual language as
