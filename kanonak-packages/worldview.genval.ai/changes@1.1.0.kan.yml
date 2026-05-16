@@ -442,14 +442,15 @@ changes-transformation:
                                                 type: tx.Concat
                                                 tx.parts:
                                                   - type: tx.StringLiteral
-                                                    tx.stringLiteral: '<p class="change-rationale">'
-                                                  - type: tx.PropertyRead
-                                                    tx.readSource:
+                                                    tx.stringLiteral: '<div class="change-rationale">'
+                                                  - type: tx.RenderMarkdown
+                                                    tx.renderSource:
                                                       type: tx.ResolveRef
                                                       tx.resolveSource: { type: tx.VarRef, tx.varName: currThesisRef }
-                                                    tx.readProp: wv.confidenceRationale
+                                                    tx.renderProp: wv.confidenceRationale
+                                                    tx.renderFormat: tx.render-html
                                                   - type: tx.StringLiteral
-                                                    tx.stringLiteral: '</p>'
+                                                    tx.stringLiteral: '</div>'
                                             - type: tx.StringLiteral
                                               tx.stringLiteral: '</li>'
                                         tx.elseBuild:
@@ -547,6 +548,27 @@ changes-transformation:
                             <span>Apache 2.0</span>
                             </footer>
                             </article>
+                            <script>
+                            // Inject chip-tier SVGs before [[ref]] links inside change rationales.
+                            // Mirror of the snapshot/thesis pages — consistent treatment of
+                            // narrative prose across the publisher.
+                            (function(){
+                              var RE = /^(?:https?:\/\/[^/]+)?\/(securities|snapshot)\/([^/]+)\/([^/?#]+)$/;
+                              document.querySelectorAll('.change-rationale a').forEach(function(link){
+                                var href = link.getAttribute('href') || '';
+                                var m = href.match(RE);
+                                if (!m) return;
+                                var klass = m[1], version = m[2], name = m[3];
+                                if (klass === 'snapshot' && (name === 'view' || name.indexOf('ev-') === 0)) return;
+                                var img = document.createElement('img');
+                                img.src = '/' + klass + '/' + version + '/' + name + '.svg';
+                                img.className = 'narrative-chip';
+                                img.alt = '';
+                                img.loading = 'lazy';
+                                link.insertBefore(img, link.firstChild);
+                              });
+                            })();
+                            </script>
 
 
 # =============================================================================
@@ -630,6 +652,9 @@ changes-stylesheet:
                       .change-shift .delta.flat{color:var(--fg-faint)}
                       .change-status{padding:2px 8px;border-radius:4px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;background:var(--bg-elev);border:1px solid var(--border);color:var(--fg-dim)}
                       .change-rationale{font-size:13px;color:var(--fg-dim);line-height:1.65;border-left:2px solid var(--accent);padding:6px 0 6px 14px;margin:8px 0;font-style:italic}
+                      .change-rationale p{margin:0 0 6px}
+                      .change-rationale p:last-child{margin-bottom:0}
+                      .narrative-chip{display:inline-block;height:0.95em;width:1.58em;vertical-align:-0.18em;margin-right:0.3em;border-radius:2px;background:#0a0e1a}
                       .change-evidence{margin-top:12px}
                       .change-evidence summary{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;padding:6px 0;list-style:none;display:inline-flex;align-items:center;gap:8px}
                       .change-evidence summary::-webkit-details-marker{display:none}

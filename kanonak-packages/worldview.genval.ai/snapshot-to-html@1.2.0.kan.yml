@@ -635,7 +635,7 @@ snapshot-to-html-transformation:
                                   </span></span>
                                   </div>
 
-                              # --- CONFIDENCE RATIONALE (optional, new in this version) ---
+                              # --- CONFIDENCE RATIONALE (optional, rendered as markdown) ---
                               - type: tx.When
                                 tx.condition:
                                   type: tx.IsSet
@@ -651,30 +651,32 @@ snapshot-to-html-transformation:
                                   type: tx.Concat
                                   tx.parts:
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '<p class="confidence-rationale"><span class="rationale-label">Why this confidence:</span> '
-                                    - type: tx.PropertyRead
-                                      tx.readSource:
+                                      tx.stringLiteral: '<div class="confidence-rationale">'
+                                    - type: tx.RenderMarkdown
+                                      tx.renderSource:
                                         type: tx.ResolveRef
                                         tx.resolveSource:
                                           type: tx.VarRef
                                           tx.varName: thesisRefMain
-                                      tx.readProp: wv.confidenceRationale
+                                      tx.renderProp: wv.confidenceRationale
+                                      tx.renderFormat: tx.render-html
                                     - type: tx.StringLiteral
-                                      tx.stringLiteral: '</p>'
+                                      tx.stringLiteral: '</div>'
 
-                              # --- STATEMENT ---
+                              # --- STATEMENT (rendered as markdown) ---
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '<p class="thesis-statement">'
-                              - type: tx.PropertyRead
-                                tx.readSource:
+                                tx.stringLiteral: '<div class="thesis-statement">'
+                              - type: tx.RenderMarkdown
+                                tx.renderSource:
                                   type: tx.ResolveRef
                                   tx.resolveSource:
                                     type: tx.VarRef
                                     tx.varName: thesisRefMain
-                                tx.readProp: wv.thesisStatement
+                                tx.renderProp: wv.thesisStatement
+                                tx.renderFormat: tx.render-html
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |
-                                  </p>
+                                  </div>
 
                               # --- INVALIDATION (structured tree) ---
                               # Renders the Condition tree via two recursive
@@ -3310,7 +3312,7 @@ snapshot-to-html-transformation:
                             // representation per the worldview-chrome semantic-zoom convention.
                             (function(){
                               var RE = /^(?:https?:\/\/[^/]+)?\/(securities|snapshot)\/([^/]+)\/([^/?#]+)$/;
-                              document.querySelectorAll('.hero-narrative a').forEach(function(link){
+                              document.querySelectorAll('.hero-narrative a, .thesis-statement a, .confidence-rationale a').forEach(function(link){
                                 var href = link.getAttribute('href') || '';
                                 var m = href.match(RE);
                                 if (!m) return;
@@ -3476,8 +3478,11 @@ snapshot-stylesheet:
                       .confidence-label .conf-value{color:var(--fg);font-weight:600}
                       /* STATEMENT */
                       .thesis-statement{font-size:16px;line-height:1.7;color:var(--fg);margin-bottom:8px;font-weight:300}
+                      .thesis-statement p{margin:0 0 8px}
+                      .thesis-statement p:last-child{margin-bottom:0}
                       .confidence-rationale{font-size:13px;line-height:1.55;color:var(--fg-dim);margin:4px 0 12px;border-left:2px solid var(--accent);padding-left:12px}
-                      .confidence-rationale .rationale-label{color:var(--fg-faint);font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;margin-right:6px}
+                      .confidence-rationale p{margin:0 0 6px}
+                      .confidence-rationale p:last-child{margin-bottom:0}
                       .condition-type{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--bg-elev);padding:1px 6px;border-radius:3px}
                       .invalidation-note{padding:4px 0 8px;color:var(--fg-dim);font-size:13px}
                       .hero-prev{font-family:var(--font-mono);font-size:11px;color:var(--fg-dim);margin-top:8px;letter-spacing:0.06em}

@@ -384,8 +384,12 @@ thesis-html-renderer:
                             .confidence-label{font-family:var(--font-mono);font-size:12px;color:var(--fg-dim);min-width:90px;text-align:right;letter-spacing:0.04em}
                             .confidence-label .conf-value{color:var(--fg);font-weight:600}
                             .thesis-statement{font-size:17px;color:var(--fg);line-height:1.7;font-weight:300;margin-bottom:20px}
+                            .thesis-statement p{margin:0 0 12px}
+                            .thesis-statement p:last-child{margin-bottom:0}
                             .confidence-rationale{font-size:13px;line-height:1.55;color:var(--fg-dim);margin:8px 0 24px;border-left:2px solid var(--accent);padding-left:14px;font-style:italic}
-                            .confidence-rationale .rationale-label{color:var(--fg-faint);font-family:var(--font-mono);text-transform:uppercase;font-size:10px;letter-spacing:0.1em;margin-right:6px;font-style:normal}
+                            .confidence-rationale p{margin:0 0 8px}
+                            .confidence-rationale p:last-child{margin-bottom:0}
+                            .narrative-chip{display:inline-block;height:0.95em;width:1.58em;vertical-align:-0.18em;margin-right:0.3em;border-radius:2px;background:#0a0e1a}
                             .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin:32px 0 12px;display:flex;align-items:center;gap:12px}
                             .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
                             .invalidation{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;padding:14px 18px;font-family:var(--font-mono);font-size:12px;color:var(--fg-dim)}
@@ -554,14 +558,15 @@ thesis-html-renderer:
                           tx.stringLiteral: |-
                             </header>
 
-                            <p class="thesis-statement">
-                        - type: tx.PropertyRead
-                          tx.readSource:
+                            <div class="thesis-statement">
+                        - type: tx.RenderMarkdown
+                          tx.renderSource:
                             type: tx.VarRef
                             tx.varName: input
-                          tx.readProp: wv.thesisStatement
+                          tx.renderProp: wv.thesisStatement
+                          tx.renderFormat: tx.render-html
                         - type: tx.StringLiteral
-                          tx.stringLiteral: '</p>'
+                          tx.stringLiteral: '</div>'
 
                         - type: tx.When
                           tx.condition:
@@ -576,14 +581,15 @@ thesis-html-renderer:
                             type: tx.Concat
                             tx.parts:
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '<p class="confidence-rationale"><span class="rationale-label">Rationale</span>'
-                              - type: tx.PropertyRead
-                                tx.readSource:
+                                tx.stringLiteral: '<div class="confidence-rationale">'
+                              - type: tx.RenderMarkdown
+                                tx.renderSource:
                                   type: tx.VarRef
                                   tx.varName: input
-                                tx.readProp: wv.confidenceRationale
+                                tx.renderProp: wv.confidenceRationale
+                                tx.renderFormat: tx.render-html
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '</p>'
+                                tx.stringLiteral: '</div>'
 
                         - type: tx.When
                           tx.condition:
@@ -673,6 +679,27 @@ thesis-html-renderer:
                             .kan.yml">Source</a></p>
                             </footer>
                             </article>
+                            <script>
+                            // Inject chip-tier SVGs before [[ref]] links inside thesisStatement /
+                            // confidenceRationale markdown. Mirror of the snapshot-view script —
+                            // same convention applies wherever worldview prose is rendered.
+                            (function(){
+                              var RE = /^(?:https?:\/\/[^/]+)?\/(securities|snapshot)\/([^/]+)\/([^/?#]+)$/;
+                              document.querySelectorAll('.thesis-statement a, .confidence-rationale a').forEach(function(link){
+                                var href = link.getAttribute('href') || '';
+                                var m = href.match(RE);
+                                if (!m) return;
+                                var klass = m[1], version = m[2], name = m[3];
+                                if (klass === 'snapshot' && (name === 'view' || name.indexOf('ev-') === 0)) return;
+                                var img = document.createElement('img');
+                                img.src = '/' + klass + '/' + version + '/' + name + '.svg';
+                                img.className = 'narrative-chip';
+                                img.alt = '';
+                                img.loading = 'lazy';
+                                link.insertBefore(img, link.firstChild);
+                              });
+                            })();
+                            </script>
 
 rdfs.Resource:
   derivation.derivations:
