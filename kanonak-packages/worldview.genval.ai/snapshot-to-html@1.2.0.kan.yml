@@ -509,6 +509,22 @@ snapshot-to-html-transformation:
                                 tx.stringLiteral: |-
                                   ">
 
+                              # --- THESIS CARD VISUAL (links to standalone thesis page) ---
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<a class="thesis-card-visual" href="'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.VarRef
+                                  tx.varName: thesisRefMain
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" aria-label="Thesis card"><img src="'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.VarRef
+                                  tx.varName: thesisRefMain
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '.svg" alt="" loading="lazy"/></a>'
+
                               # --- HEADER (icon + label + status pill) ---
                               - type: tx.StringLiteral
                                 tx.stringLiteral: |-
@@ -3426,6 +3442,10 @@ snapshot-stylesheet:
                       .ev-count-chip .ev-count-breakdown .ev-cited{color:var(--accent)}
                       /* THESIS CARD */
                       .thesis-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);padding:32px;margin-bottom:16px;counter-increment:thesis-counter;transition:border-color 120ms,box-shadow 120ms;position:relative}
+                      .thesis-card-visual{position:absolute;top:20px;right:20px;width:72px;height:72px;display:none;border-radius:8px;overflow:hidden;transition:transform 150ms,box-shadow 150ms}
+                      .thesis-card-visual img{width:100%;height:100%;display:block}
+                      .thesis-card-visual:hover{transform:scale(1.05);box-shadow:0 4px 14px -2px rgba(14,165,233,0.35)}
+                      @media (min-width:900px){.thesis-card-visual{display:block}}
                       .thesis-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15)}
                       .thesis-card.status-active::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--accent);border-radius:0 2px 2px 0}
                       .thesis-card.status-retired::before{content:"";position:absolute;left:-1px;top:32px;width:3px;height:24px;background:var(--weak);border-radius:0 2px 2px 0}
