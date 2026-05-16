@@ -609,9 +609,10 @@ changes-stylesheet:
                       .diff-pair-visual{display:flex;align-items:center;gap:14px;justify-content:center}
                       .diff-snap-link{display:block;line-height:0;transition:transform 150ms,box-shadow 150ms;border-radius:8px}
                       .diff-snap-link:hover{transform:translateY(-2px);box-shadow:0 6px 22px -4px rgba(14,165,233,0.25)}
-                      .diff-snap{display:block;width:200px;height:auto;border-radius:8px}
-                      .diff-snap-arrow{color:var(--fg-faint);font-size:24px;font-family:var(--font-mono)}
-                      @media (max-width:520px){.diff-snap{width:140px}}
+                      .diff-snap{display:block;width:300px;height:auto;border-radius:8px}
+                      .diff-snap-arrow{color:var(--fg-faint);font-size:28px;font-family:var(--font-mono)}
+                      @media (max-width:760px){.diff-snap{width:220px}}
+                      @media (max-width:520px){.diff-snap{width:160px}}
                       .diff-changes{list-style:none;padding:0;margin:0}
                       .diff-change{padding:18px 28px;border-bottom:1px solid var(--border-soft)}
                       .diff-change:last-child{border-bottom:none}
