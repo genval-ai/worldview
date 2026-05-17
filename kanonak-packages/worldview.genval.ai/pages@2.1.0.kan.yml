@@ -179,6 +179,8 @@ worldview-chrome-fragment:
             .viz-forest .forest-posterior-bg{fill:var(--bg-elev);fill-opacity:0.6}
             .viz-forest .forest-posterior-curve{fill:hsl(var(--viz-hue,200),65%,55%);fill-opacity:0.35;stroke:hsl(var(--viz-hue,200),65%,68%);stroke-width:1.5}
             .viz-forest .forest-divider{stroke:var(--border);stroke-width:1;stroke-dasharray:2 3}
+            .viz-forest .forest-source-bubble{cursor:pointer;transition:fill-opacity 120ms,stroke-opacity 120ms}
+            .viz-forest .forest-source-bubble:hover{fill-opacity:0.65;stroke-opacity:1}
             .viz-forest text.forest-section-label{fill:var(--fg-faint);font-size:10px;font-family:var(--font-mono);letter-spacing:0.18em;text-transform:uppercase}
             /* Source diversity sunburst */
             .viz-sunburst{display:block;margin:0 auto}
@@ -459,11 +461,14 @@ worldview-viz-js-fragment:
                 });
                 el.appendChild(svg);
               }
-              // ===== Bayesian forest plot viz =====
-              // Supports JSON blob OR data-attribute authoring (data-fp-* on the
-              // host element for thesis params; child elements with
-              // data-fe-mean / data-fe-weight / data-fe-hue / data-fe-label
-              // for each evidence contribution)
+              // ===== Bayesian forest plot viz - source bubble scatter =====
+              // Groups evidence by source publisher. Each unique source becomes
+              // ONE bubble: x=source trust, y=citation count from this thesis,
+              // bubble radius=total weight contribution (sum of strength*trust
+              // across all citations from that source), color=sourceHue. Much
+              // quieter visually than per-evidence color bars - color is now
+              // identity rather than fighting for attention; size + position
+              // carry the load.
               function renderForest(el){
                 var data=readJson(el);
                 if(!data){
@@ -483,71 +488,138 @@ worldview-viz-js-fragment:
                       label:c.dataset.feLabel||'',
                       mean:parseFloat(c.dataset.feMean),
                       weight:strengthW*trust,
+                      trust:trust,
+                      strength:strength,
                       hue:parseFloat(c.dataset.feHue)||data.hue
                     });
                   });
                 }
-                var w=el.clientWidth||640;
-                var rowH=22,headerH=26,gap=4,divH=28,posteriorH=80,padX=14;
                 var ev=data.evidence||[];
-                var h=headerH+(ev.length*(rowH+gap))+divH+posteriorH+headerH;
+                // Group by source label - one bubble per publisher
+                var groups={};
+                ev.forEach(function(e){
+                  var k=e.label||'unknown';
+                  if(!groups[k]){
+                    groups[k]={
+                      label:k,
+                      hue:e.hue||data.hue||200,
+                      trust:e.trust||0.75,
+                      count:0,
+                      totalWeight:0,
+                      strongCount:0,modCount:0,weakCount:0
+                    };
+                  }
+                  groups[k].count++;
+                  groups[k].totalWeight+=(e.weight||0);
+                  var s=(e.strength||'').toLowerCase();
+                  if(s.indexOf('strong')>=0)groups[k].strongCount++;
+                  else if(s.indexOf('weak')>=0)groups[k].weakCount++;
+                  else groups[k].modCount++;
+                });
+                var sources=Object.keys(groups).map(function(k){return groups[k];});
+                if(!sources.length){el.innerHTML='';return;}
+
+                var w=el.clientWidth||640;
+                var padL=64,padR=40,padT=30,padB=58;
+                var scatterH=Math.max(220,Math.min(280,sources.length*32));
+                var posteriorH=84,headerH=20,gapH=24;
+                var totalH=padT+scatterH+padB+headerH+gapH+posteriorH;
+                var pw=w-padL-padR;
+
+                var xMin=0.4,xMax=1.0;
+                var maxCount=0;sources.forEach(function(s){if(s.count>maxCount)maxCount=s.count;});
+                var yMaxAxis=Math.max(maxCount+0.5,2);
+                var maxTotalW=0;sources.forEach(function(s){if(s.totalWeight>maxTotalW)maxTotalW=s.totalWeight;});
+                if(maxTotalW<=0)maxTotalW=1;
+
+                var xPx=function(x){return padL+(x-xMin)/(xMax-xMin)*pw;};
+                var yPx=function(y){return padT+scatterH-y/yMaxAxis*scatterH;};
+                var rPx=function(weight){return 7+Math.sqrt(weight/maxTotalW)*22;};
+
                 el.innerHTML='';
                 el.style.setProperty('--viz-hue',data.hue||200);
-                var svg=svgEl('svg',{viewBox:'0 0 '+w+' '+h,width:'100%',height:h});
-                // header
-                var lbl=svgEl('text',{x:padX,y:18,class:'forest-section-label'});lbl.textContent='Evidence contributions';svg.appendChild(lbl);
-                var nLbl=svgEl('text',{x:w-padX,y:18,'text-anchor':'end',class:'forest-section-label'});
-                nLbl.textContent=(ev.length||'0')+' items';svg.appendChild(nLbl);
-                // strips
-                var stripX=padX+90,stripW=w-padX*2-90-50;
-                ev.forEach(function(e,i){
-                  var y=headerH+i*(rowH+gap);
-                  // label (truncated source name)
-                  var srcLbl=svgEl('text',{x:padX,y:y+rowH/2+3,class:'forest-strip-label'});
-                  srcLbl.textContent=(e.label||'').slice(0,20);svg.appendChild(srcLbl);
-                  // bg strip
-                  svg.appendChild(svgEl('rect',{x:stripX,y:y+4,width:stripW,height:rowH-8,class:'forest-strip-bg',rx:2}));
-                  // Weight bar: left-aligned, width DIRECTLY proportional to
-                  // contribution weight (strength * source.trust). High-weight
-                  // evidence reads as a wide bar; low-weight reads as a narrow
-                  // bar. Visually unambiguous.
-                  var weight=Math.max(0,Math.min(1,e.weight||0.5));
-                  var weightPx=Math.max(6,weight*stripW);
-                  var hue=e.hue||data.hue||200;
-                  svg.appendChild(svgEl('rect',{
-                    x:stripX,y:y+4,
-                    width:weightPx,
-                    height:rowH-8,
-                    class:'forest-strip-fill forest-strip',
-                    fill:'hsl('+hue+',65%,55%)',
-                    rx:2
-                  }));
-                  // right-side numeric: the actual contribution WEIGHT (different
-                  // per evidence, not the thesis mean). Shows why some bars are
-                  // wider than others.
-                  var num=svgEl('text',{x:w-padX,y:y+rowH/2+3,'text-anchor':'end',class:'forest-strip-label'});
-                  num.textContent='w '+weight.toFixed(2);svg.appendChild(num);
+                var svg=svgEl('svg',{viewBox:'0 0 '+w+' '+totalH,width:'100%',height:totalH});
+
+                // Header
+                var lbl=svgEl('text',{x:padL,y:18,class:'forest-section-label'});
+                lbl.textContent='Sources by trust × citation count';
+                svg.appendChild(lbl);
+                var nLbl=svgEl('text',{x:w-padR,y:18,'text-anchor':'end',class:'forest-section-label'});
+                nLbl.textContent=sources.length+' src · '+ev.length+' cites';
+                svg.appendChild(nLbl);
+
+                // Grid lines + x-tick labels
+                [0.4,0.5,0.6,0.7,0.8,0.9,1.0].forEach(function(x){
+                  svg.appendChild(svgEl('line',{x1:xPx(x),y1:padT,x2:xPx(x),y2:padT+scatterH,stroke:'var(--border-soft)','stroke-dasharray':'2 3','stroke-opacity':0.5}));
                 });
-                // divider
-                var divY=headerH+ev.length*(rowH+gap)+8;
-                svg.appendChild(svgEl('line',{x1:padX,y1:divY,x2:w-padX,y2:divY,class:'forest-divider'}));
-                var dLbl=svgEl('text',{x:padX,y:divY+18,class:'forest-section-label'});dLbl.textContent='Posterior';svg.appendChild(dLbl);
-                // posterior at bottom
-                var postY=divY+divH;
-                svg.appendChild(svgEl('rect',{x:stripX,y:postY,width:stripW,height:posteriorH-10,class:'forest-posterior-bg',rx:4}));
-                // density
+                [0.4,0.6,0.8,1.0].forEach(function(x){
+                  var t=svgEl('text',{x:xPx(x),y:padT+scatterH+16,'text-anchor':'middle',class:'forest-strip-label'});
+                  t.textContent=x.toFixed(1);svg.appendChild(t);
+                });
+                var xL=svgEl('text',{x:padL+pw/2,y:padT+scatterH+38,'text-anchor':'middle',class:'forest-section-label'});
+                xL.textContent='Source trust';svg.appendChild(xL);
+
+                // Y-axis count labels
+                for(var i=1;i<=Math.ceil(maxCount);i++){
+                  var t=svgEl('text',{x:padL-8,y:yPx(i)+3,'text-anchor':'end',class:'forest-strip-label'});
+                  t.textContent=i.toFixed(0);svg.appendChild(t);
+                  svg.appendChild(svgEl('line',{x1:padL,y1:yPx(i),x2:padL+pw,y2:yPx(i),stroke:'var(--border-soft)','stroke-dasharray':'2 3','stroke-opacity':0.35}));
+                }
+                var yL=svgEl('text',{x:18,y:padT+scatterH/2,'text-anchor':'middle',class:'forest-section-label',transform:'rotate(-90 18 '+(padT+scatterH/2)+')'});
+                yL.textContent='Cites';svg.appendChild(yL);
+
+                // Axes
+                svg.appendChild(svgEl('line',{x1:padL,y1:padT+scatterH,x2:padL+pw,y2:padT+scatterH,stroke:'var(--border)','stroke-width':1}));
+                svg.appendChild(svgEl('line',{x1:padL,y1:padT,x2:padL,y2:padT+scatterH,stroke:'var(--border)','stroke-width':1}));
+
+                // Bubbles - sort by weight descending so big ones layer behind small (small drawn last on top)
+                sources.sort(function(a,b){return b.totalWeight-a.totalWeight;});
+                sources.forEach(function(s){
+                  var x=xPx(Math.max(xMin,Math.min(xMax,s.trust)));
+                  var y=yPx(s.count);
+                  var r=rPx(s.totalWeight);
+                  var hue=s.hue||200;
+                  var c=svgEl('circle',{
+                    cx:x,cy:y,r:r,
+                    fill:'hsl('+hue+',65%,55%)',
+                    'fill-opacity':0.42,
+                    stroke:'hsl('+hue+',70%,70%)',
+                    'stroke-width':1.3,
+                    'stroke-opacity':0.85,
+                    class:'forest-source-bubble'
+                  });
+                  var strengthSummary=[];
+                  if(s.strongCount)strengthSummary.push(s.strongCount+' strong');
+                  if(s.modCount)strengthSummary.push(s.modCount+' moderate');
+                  if(s.weakCount)strengthSummary.push(s.weakCount+' weak');
+                  var ti=svgEl('title');
+                  ti.textContent=s.label+' · trust '+s.trust.toFixed(2)+' · '+s.count+' citation'+(s.count>1?'s':'')+' ('+strengthSummary.join(', ')+') · total weight '+s.totalWeight.toFixed(2);
+                  c.appendChild(ti);
+                  svg.appendChild(c);
+                  // Label below bubble
+                  var label=s.label||'';
+                  var maxChars=Math.max(8,Math.round(r*1.3));
+                  if(label.length>maxChars)label=label.substring(0,maxChars-1)+'…';
+                  var tt=svgEl('text',{x:x,y:y+r+14,'text-anchor':'middle',class:'forest-strip-label'});
+                  tt.textContent=label;svg.appendChild(tt);
+                });
+
+                // Posterior section
+                var postY=padT+scatterH+padB+headerH;
+                var dLbl=svgEl('text',{x:padL,y:postY-8,class:'forest-section-label'});
+                dLbl.textContent='Posterior';svg.appendChild(dLbl);
+                svg.appendChild(svgEl('rect',{x:padL,y:postY,width:pw,height:posteriorH-14,class:'forest-posterior-bg',rx:4}));
                 var a=data.alpha,b=data.beta;
                 if(!isFinite(a)||!isFinite(b)){
                   var ab=abFromMeanStd(data.mean,data.stddev);
                   if(ab){a=ab[0];b=ab[1];}else{a=data.mean*20;b=(1-data.mean)*20;}
                 }
                 var pts=betaDensity(a,b,80);
-                var baseY=postY+posteriorH-14;
-                var plotH=posteriorH-24;
-                svg.appendChild(svgEl('path',{d:densityPath(pts,0,1,stripW,plotH,baseY),class:'forest-posterior-curve',transform:'translate('+stripX+',0)'}));
-                // mean tick on posterior
-                svg.appendChild(svgEl('line',{x1:stripX+data.mean*stripW,y1:baseY-plotH*1.05,x2:stripX+data.mean*stripW,y2:baseY,stroke:'hsl('+(data.hue||200)+',65%,80%)','stroke-width':1.8}));
-                var meanText=svgEl('text',{x:stripX+data.mean*stripW,y:postY-4,'text-anchor':'middle',class:'forest-strip-label'});
+                var baseY=postY+posteriorH-18;
+                var plotH=posteriorH-28;
+                svg.appendChild(svgEl('path',{d:densityPath(pts,0,1,pw,plotH,baseY),class:'forest-posterior-curve',transform:'translate('+padL+',0)'}));
+                svg.appendChild(svgEl('line',{x1:padL+data.mean*pw,y1:baseY-plotH*1.05,x2:padL+data.mean*pw,y2:baseY,stroke:'hsl('+(data.hue||200)+',65%,80%)','stroke-width':1.8}));
+                var meanText=svgEl('text',{x:padL+data.mean*pw,y:postY-22,'text-anchor':'middle',class:'forest-strip-label'});
                 meanText.textContent='μ='+data.mean.toFixed(2)+(data.stddev?' ± '+data.stddev.toFixed(2):'');
                 svg.appendChild(meanText);
                 el.appendChild(svg);
