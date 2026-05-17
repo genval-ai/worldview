@@ -1710,6 +1710,218 @@ snapshot-to-html-transformation:
                                         </div>
                                         </details>
 
+                              # --- BAYESIAN FOREST PLOT (per-evidence contribution decomposition) ---
+                              # Each evidence becomes a horizontal strip sized by
+                              # strength*trust, colored by source hue. The thesis's
+                              # posterior beta density draws below. Reader literally
+                              # sees how individual evidence composes into the 0.82.
+                              - type: tx.When
+                                tx.condition:
+                                  type: tx.IsSet
+                                  tx.checkExpr:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRefMain
+                                    tx.readProp: wv.supportingEvidence
+                                tx.thenBuild:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<h4 class="ev-section-heading">Bayesian decomposition</h4><div data-viz="forest" class="viz-forest" data-mean="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thesisRefMain
+                                        tx.readProp: wv.confidence
+                                      tx.readProp: est.estimateMean
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-stddev="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateStdDev
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-alpha="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaAlpha
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-beta="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRefMain
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaBeta
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-hue="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: thesisRefMain
+                                            tx.readProp: vis.thesisTheme
+                                        tx.readProp: vis.themeHue
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '200'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '">'
+                                    # Per-evidence contribution strips
+                                    - type: tx.ForEach
+                                      tx.source:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thesisRefMain
+                                        tx.readProp: wv.supportingEvidence
+                                      tx.loopVar: feRef
+                                      tx.emit:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<div data-fe-mean="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: thesisRefMain
+                                              tx.readProp: wv.confidence
+                                            tx.readProp: est.estimateMean
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-fe-strength="'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.VarRef
+                                                    tx.varName: feRef
+                                                tx.readProp: wv.evidenceStrength
+                                            tx.alternate:
+                                              type: tx.StringLiteral
+                                              tx.stringLiteral: 'moderate'
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-fe-trust="'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.PropertyRead
+                                                tx.readSource:
+                                                  type: tx.ResolveRef
+                                                  tx.resolveSource:
+                                                    type: tx.PropertyRead
+                                                    tx.readSource:
+                                                      type: tx.ResolveRef
+                                                      tx.resolveSource:
+                                                        type: tx.VarRef
+                                                        tx.varName: feRef
+                                                    tx.readProp: wv.citationSource
+                                                tx.readProp: src.trustEstimate
+                                              tx.readProp: est.estimateMean
+                                            tx.alternate:
+                                              type: tx.StringLiteral
+                                              tx.stringLiteral: '0.75'
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-fe-hue="'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: feRef
+                                                  tx.readProp: wv.citationSource
+                                              tx.readProp: vis.sourceHue
+                                            tx.alternate:
+                                              type: tx.StringLiteral
+                                              tx.stringLiteral: '200'
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-fe-label="'
+                                          - type: tx.Fallback
+                                            tx.primary:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.PropertyRead
+                                                  tx.readSource:
+                                                    type: tx.ResolveRef
+                                                    tx.resolveSource:
+                                                      type: tx.VarRef
+                                                      tx.varName: feRef
+                                                  tx.readProp: wv.citationSource
+                                              tx.readProp: src.sourceName
+                                            tx.alternate:
+                                              type: tx.UriName
+                                              tx.uriNameOf:
+                                                type: tx.VarRef
+                                                tx.varName: feRef
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '"></div>'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</div>'
+
                               # --- SUPPORTING EVIDENCE (collapsible, open default) ---
                               - type: tx.When
                                 tx.condition:

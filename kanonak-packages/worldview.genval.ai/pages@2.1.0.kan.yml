@@ -460,8 +460,33 @@ worldview-viz-js-fragment:
                 el.appendChild(svg);
               }
               // ===== Bayesian forest plot viz =====
+              // Supports JSON blob OR data-attribute authoring (data-fp-* on the
+              // host element for thesis params; child elements with
+              // data-fe-mean / data-fe-weight / data-fe-hue / data-fe-label
+              // for each evidence contribution)
               function renderForest(el){
-                var data=readJson(el);if(!data)return;
+                var data=readJson(el);
+                if(!data){
+                  data={
+                    mean:parseFloat(el.dataset.mean),
+                    stddev:parseFloat(el.dataset.stddev),
+                    alpha:parseFloat(el.dataset.alpha),
+                    beta:parseFloat(el.dataset.beta),
+                    hue:parseFloat(el.dataset.hue)||200,
+                    evidence:[]
+                  };
+                  el.querySelectorAll(':scope > [data-fe-mean]').forEach(function(c){
+                    var strength=c.dataset.feStrength||'moderate';
+                    var strengthW={'strong':1.0,'moderate':0.6,'weak':0.3,'evidence-strong':1.0,'evidence-moderate':0.6,'evidence-weak':0.3}[strength]||0.5;
+                    var trust=parseFloat(c.dataset.feTrust);if(!isFinite(trust))trust=0.75;
+                    data.evidence.push({
+                      label:c.dataset.feLabel||'',
+                      mean:parseFloat(c.dataset.feMean),
+                      weight:strengthW*trust,
+                      hue:parseFloat(c.dataset.feHue)||data.hue
+                    });
+                  });
+                }
                 var w=el.clientWidth||640;
                 var rowH=22,headerH=26,gap=4,divH=28,posteriorH=80,padX=14;
                 var ev=data.evidence||[];
