@@ -144,6 +144,7 @@ sources-network-transformation:
                             <li><a href="/">Latest</a></li>
                             <li><a href="/snapshots/">Snapshots</a></li>
                             <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/regime/">Regime</a></li>
                             <li><a href="/changes/">Changes</a></li>
                             <li><a href="/horizon/">Horizon</a></li>
                             <li><a href="/sources/" class="active">Sources</a></li>
@@ -460,7 +461,7 @@ sources-stylesheet:
 
   tx.artifactName:
     type: tx.StringLiteral
-    tx.stringLiteral: index
+    tx.stringLiteral: index.css
 
   tx.outputs:
     - tx.stylesheet

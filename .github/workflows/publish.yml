@@ -276,9 +276,11 @@ jobs:
             'snapshots-aggregate _site/snapshots/' \
             'timeline-aggregate _site/timeline/' \
             'horizon-aggregate _site/horizon/' \
-            'changes-aggregate _site/changes/' | \
+            'changes-aggregate _site/changes/' \
+            'sources-aggregate _site/sources/' \
+            'regime-aggregate _site/regime/' | \
             xargs -n 2 -P 4 sh -c '
-              kanonak derive "worldview.genval.ai/pages@1.2.0/$1" \
+              kanonak derive "worldview.genval.ai/pages@2.1.0/$1" \
                 --format stylesheet --out "$2" >/dev/null
             ' _
 
@@ -345,8 +347,10 @@ jobs:
           <li><a href="/">Latest</a></li>
           <li><a href="/snapshots/">Snapshots</a></li>
           <li><a href="/timeline/">Timeline</a></li>
+          <li><a href="/regime/">Regime</a></li>
           <li><a href="/changes/">Changes</a></li>
           <li><a href="/horizon/">Horizon</a></li>
+          <li><a href="/sources/">Sources</a></li>
           <li><a href="/about/" class="active">About</a></li>
           </ul>
           </div>

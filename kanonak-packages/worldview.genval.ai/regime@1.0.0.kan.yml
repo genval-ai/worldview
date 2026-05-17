@@ -422,7 +422,7 @@ regime-stylesheet:
 
   tx.artifactName:
     type: tx.StringLiteral
-    tx.stringLiteral: index
+    tx.stringLiteral: index.css
 
   tx.outputs:
     - tx.stylesheet
