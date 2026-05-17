@@ -217,163 +217,14 @@ landing-page-transformation:
                                   type: tx.VarRef
                                   tx.varName: snapshot
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '"><div class="snapshot-card-layout"><div class="snapshot-card-fingerprint-wrap"><div class="snapshot-card-version-pill">v'
+                                tx.stringLiteral: '"><div class="snapshot-card-layout"><img class="snapshot-card-svg" src="/snapshot/'
                               - type: tx.UriVersion
                                 tx.uriVersionOf:
                                   type: tx.VarRef
                                   tx.varName: snapshot
                               - type: tx.StringLiteral
-                                tx.stringLiteral: '</div><div data-viz="fingerprint" data-height="120" class="viz-fingerprint snapshot-card-fingerprint">'
-                              # ForEach over hasThesis - emit one <div data-fp-*> per thesis.
-                              # The viz library's renderFingerprint scans children with
-                              # [data-fp-mean] and builds the violin row.
-                              - type: tx.ForEach
-                                tx.source:
-                                  type: tx.PropertyRead
-                                  tx.readSource:
-                                    type: tx.VarRef
-                                    tx.varName: snapshot
-                                  tx.readProp: wv.hasThesis
-                                tx.loopVar: thRef
-                                tx.emit:
-                                  type: tx.Concat
-                                  tx.parts:
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '<div data-fp-mean="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.confidence
-                                        tx.readProp: est.estimateMean
-                                      tx.alternate:
-                                        # Fallback: 1.x snapshots had scalar confidence -
-                                        # try reading wv.confidence directly as the number
-                                        type: tx.Fallback
-                                        tx.primary:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.confidence
-                                        tx.alternate:
-                                          type: tx.StringLiteral
-                                          tx.stringLiteral: '0.5'
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-stddev="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.confidence
-                                        tx.readProp: est.estimateStdDev
-                                      tx.alternate:
-                                        type: tx.StringLiteral
-                                        tx.stringLiteral: ''
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-alpha="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.confidence
-                                        tx.readProp: est.betaAlpha
-                                      tx.alternate:
-                                        type: tx.StringLiteral
-                                        tx.stringLiteral: ''
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-beta="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.confidence
-                                        tx.readProp: est.betaBeta
-                                      tx.alternate:
-                                        type: tx.StringLiteral
-                                        tx.stringLiteral: ''
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-hue="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.ResolveRef
-                                          tx.resolveSource:
-                                            type: tx.PropertyRead
-                                            tx.readSource:
-                                              type: tx.ResolveRef
-                                              tx.resolveSource:
-                                                type: tx.VarRef
-                                                tx.varName: thRef
-                                            tx.readProp: vis.thesisTheme
-                                        tx.readProp: vis.themeHue
-                                      tx.alternate:
-                                        type: tx.StringLiteral
-                                        tx.stringLiteral: '200'
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-status="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.UriName
-                                        tx.uriNameOf:
-                                          type: tx.PropertyRead
-                                          tx.readSource:
-                                            type: tx.ResolveRef
-                                            tx.resolveSource:
-                                              type: tx.VarRef
-                                              tx.varName: thRef
-                                          tx.readProp: wv.status
-                                      tx.alternate:
-                                        type: tx.StringLiteral
-                                        tx.stringLiteral: 'active'
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '" data-fp-label="'
-                                    - type: tx.Fallback
-                                      tx.primary:
-                                        type: tx.PropertyRead
-                                        tx.readSource:
-                                          type: tx.ResolveRef
-                                          tx.resolveSource:
-                                            type: tx.VarRef
-                                            tx.varName: thRef
-                                        tx.readProp: rdfs.label
-                                      tx.alternate:
-                                        type: tx.UriName
-                                        tx.uriNameOf:
-                                          type: tx.VarRef
-                                          tx.varName: thRef
-                                    - type: tx.StringLiteral
-                                      tx.stringLiteral: '"></div>'
-                              - type: tx.StringLiteral
                                 tx.stringLiteral: |-
-                                  </div></div>
+                                  /view.svg" alt="" loading="lazy"/>
                                   <div class="snapshot-card-body">
                                   <p class="snapshot-narrative">
                               - type: tx.Normalize
@@ -537,13 +388,10 @@ landing-page-stylesheet:
                       @media (max-width:760px){a.snapshot-card-link{padding:20px}}
                       .snapshot-card-layout{display:flex;gap:24px;align-items:flex-start}
                       .snapshot-card-svg{display:block;flex:0 0 320px;width:320px;height:auto;border-radius:8px;background:#0a0e1a}
-                      .snapshot-card-fingerprint-wrap{flex:0 0 320px;width:320px;background:linear-gradient(180deg,rgba(10,14,26,0.6),rgba(15,21,36,0.95));border-radius:8px;padding:16px 14px 10px;display:flex;flex-direction:column;gap:8px}
-                      .snapshot-card-version-pill{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;font-weight:600;background:rgba(125,211,252,0.08);border:1px solid rgba(125,211,252,0.2);padding:3px 10px;border-radius:10px;align-self:flex-start}
-                      .snapshot-card-fingerprint{display:flex;align-items:flex-end;height:120px;width:100%}
                       .snapshot-card-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;align-self:stretch}
                       @media (max-width:760px){
                         .snapshot-card-layout{flex-direction:column;gap:18px}
-                        .snapshot-card-svg,.snapshot-card-fingerprint-wrap{flex:0 0 auto;width:100%;max-width:380px}
+                        .snapshot-card-svg{flex:0 0 auto;width:100%;max-width:380px}
                       }
                       p.snapshot-narrative{font-size:14px;line-height:1.65;color:var(--fg-dim);font-weight:300;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;margin:0;flex:1}
                       .snapshot-card-readmore{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;align-self:flex-start;transition:color 120ms}
