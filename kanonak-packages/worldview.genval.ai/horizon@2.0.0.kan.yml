@@ -1,0 +1,692 @@
+horizon:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+        - package: pages
+          match: ^
+          version: 2.0.0
+          alias: pages
+
+# =============================================================================
+# Worldview horizon — the temporal axis of the publisher.
+#
+# Multi-scope SetTransformation walks every published snapshot in scope,
+# embeds per-evidence data points (evidenceObservedAt + thesis theme hue
+# + statement + strength), and the inline JS renders a single horizontal
+# time axis with all evidence markers, snapshot vertical lines, and
+# (forthcoming) forward-looking markers for analyst horizons and policy
+# effective dates.
+#
+# The view answers: when did each piece of evidence land? When did each
+# snapshot publish? Where in time is each thesis's case being made?
+# Combined with /timeline/ (confidence trajectory) and /changes/ (diff
+# log), this completes the cross-version analytical surface.
+# =============================================================================
+
+horizon-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.ascending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: 'Horizon · worldview.genval.ai'
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        # =====================================================
+                        # STYLE BLOCK
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <link rel="stylesheet" href="index.css">
+
+                        # =====================================================
+                        # SITE NAV
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/" class="active">Horizon</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+
+                        # =====================================================
+                        # ARTICLE OPEN + HERO + CHART HOST
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <article class="horizon">
+                            <header class="intro">
+                            <span class="eyebrow">Horizon</span>
+                            <h1>The temporal axis</h1>
+                            <p class="lead">Every piece of evidence on a single time axis. Each marker is a typed observation dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports. Vertical lines mark snapshot publication dates. Use the legend below to isolate one thesis at a time and read its temporal pattern &mdash; whether the case is being built from steady recent data or has gone stale.</p>
+                            </header>
+                            <section class="chart-section">
+                            <h2 class="section-title">Evidence over time</h2>
+                            <div class="horizon-host" id="horizon-host">
+                            <div class="horizon-toolbar">
+                            <button data-action="zoom-out" title="Zoom out (or scroll down on chart)" aria-label="Zoom out">&minus;</button>
+                            <button data-action="reset" title="Fit all data" aria-label="Fit all">&#8634;</button>
+                            <button data-action="zoom-in" title="Zoom in (or scroll up on chart)" aria-label="Zoom in">+</button>
+                            <span class="horizon-hint">drag &middot; scroll to zoom</span>
+                            </div>
+                            <div class="horizon-svg-wrap" id="horizon-svg-wrap"></div>
+                            </div>
+                            <div class="horizon-summary" id="horizon-summary"></div>
+                            </section>
+                            <section class="data" aria-hidden="true">
+
+                        # =====================================================
+                        # PER-SNAPSHOT DATA EMBEDDING
+                        # Triple-nested ForEach: snapshots -> theses -> evidence refs
+                        # Same shape as /changes/ but with theme hue embedded so the
+                        # JS can color markers by thesisTheme directly.
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snapshot
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<div class="snapshot-data" data-snapshot-version="'
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" data-observed-at="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                                tx.readProp: wv.observedAt
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">'
+
+                              - type: tx.ForEach
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.hasThesis
+                                tx.loopVar: thesisRef
+                                tx.emit:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div class="thesis-data" data-thesis-name="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-thesis-label="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.ResolveRef
+                                        tx.resolveSource:
+                                          type: tx.VarRef
+                                          tx.varName: thesisRef
+                                      tx.readProp: rdfs.label
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-theme-hue="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.ResolveRef
+                                        tx.resolveSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRef
+                                          tx.readProp: vis.thesisTheme
+                                      tx.readProp: vis.themeHue
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '">'
+
+                                    - type: tx.ForEach
+                                      tx.source:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thesisRef
+                                        tx.readProp: wv.supportingEvidence
+                                      tx.loopVar: evRef
+                                      tx.emit:
+                                        type: tx.Concat
+                                        tx.parts:
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '<div class="evidence-ref" data-evidence-name="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.VarRef
+                                              tx.varName: evRef
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-statement="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.evidenceStatement
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-observed-at="'
+                                          - type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.evidenceObservedAt
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '" data-evidence-strength="'
+                                          - type: tx.UriName
+                                            tx.uriNameOf:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.evidenceStrength
+                                          - type: tx.StringLiteral
+                                            tx.stringLiteral: '"></div>'
+
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '</div>'
+
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</div>'
+
+                        # =====================================================
+                        # ARTICLE CLOSE + INLINE SCRIPT
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </section>
+                            <footer class="horizon-footer">
+                            <span><a href="/about/">About this publisher</a></span>
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            </footer>
+                            </article>
+                            <script>
+                            (function(){
+                              // === Collect data ===
+                              // Each evidence may appear in multiple (snapshot, thesis) tuples.
+                              // For the horizon view we group: by EVIDENCE name, recording every
+                              // thesis it supports (one evidence can be loadbearing across
+                              // multiple theses). The marker's color is the theme of its primary
+                              // thesis (= the first theme we see for it across snapshots).
+                              var evidence={};
+                              var theses={};
+                              var snaps=[];
+                              var snapSeen={};
+                              document.querySelectorAll('.snapshot-data').forEach(function(s){
+                                var sv=s.dataset.snapshotVersion;
+                                var st=new Date(s.dataset.observedAt);
+                                if(!snapSeen[sv]){snapSeen[sv]=true;snaps.push({version:sv,observedAt:st});}
+                                s.querySelectorAll('.thesis-data').forEach(function(t){
+                                  var name=t.dataset.thesisName;
+                                  var label=t.dataset.thesisLabel||name;
+                                  var hue=parseInt(t.dataset.themeHue,10);
+                                  if(isNaN(hue)) hue=200;
+                                  if(!theses[name]) theses[name]={name:name,label:label,hue:hue,evidenceCount:0,latestEv:null};
+                                  t.querySelectorAll('.evidence-ref').forEach(function(e){
+                                    var en=e.dataset.evidenceName;
+                                    if(!en) return;
+                                    var ev=evidence[en];
+                                    if(!ev){
+                                      var dt=e.dataset.evidenceObservedAt?new Date(e.dataset.evidenceObservedAt):null;
+                                      if(!dt||isNaN(dt.getTime())) return;
+                                      ev=evidence[en]={name:en,observedAt:dt,statement:e.dataset.evidenceStatement||'',strength:e.dataset.evidenceStrength||'evidence-moderate',theses:[],primaryHue:hue};
+                                    }
+                                    if(ev.theses.indexOf(name)<0) ev.theses.push(name);
+                                    theses[name].evidenceCount++;
+                                    if(!theses[name].latestEv||ev.observedAt>theses[name].latestEv) theses[name].latestEv=ev.observedAt;
+                                  });
+                                });
+                              });
+                              snaps.sort(function(a,b){return a.observedAt-b.observedAt;});
+                              var evList=Object.keys(evidence).map(function(k){return evidence[k];});
+                              if(!evList.length){
+                                document.getElementById('horizon-host').innerHTML='<div style="padding:40px;text-align:center;color:var(--fg-faint)">No dated evidence to plot yet.</div>';
+                                return;
+                              }
+                              evList.sort(function(a,b){return a.observedAt-b.observedAt;});
+                              // === Initial time range — earliest evidence to latest snapshot, with padding ===
+                              var tMin=evList[0].observedAt.getTime();
+                              var tMax=evList[evList.length-1].observedAt.getTime();
+                              snaps.forEach(function(s){if(s.observedAt.getTime()>tMax) tMax=s.observedAt.getTime();});
+                              var span0=tMax-tMin||(7*86400000);
+                              var initialT0=tMin-span0*0.04, initialT1=tMax+span0*0.08;
+                              // === Mutable range state (zoom + pan) ===
+                              var stateT0=initialT0, stateT1=initialT1;
+                              // === SVG geometry — left gutter widens to fit per-thesis lane labels ===
+                              var W=1280, H=400, M={top:34,right:30,bottom:60,left:160};
+                              var iW=W-M.left-M.right, iH=H-M.top-M.bottom;
+                              function rootStyle(name,fb){var x=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return x||fb;}
+                              var ARC_S=rootStyle('--theme-arc-saturation','60%');
+                              var ARC_L=rootStyle('--theme-arc-lightness','62%');
+                              function strengthRadius(s){if(s==='evidence-strong') return 5; if(s==='evidence-weak') return 3; return 4;}
+                              function monthTicks(t0,t1){
+                                var out=[]; var d=new Date(t0); d.setUTCDate(1); d.setUTCHours(0,0,0,0);
+                                while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d)); d.setUTCMonth(d.getUTCMonth()+1);}
+                                return out;
+                              }
+                              function dayTicks(t0,t1,everyN){
+                                var out=[]; var d=new Date(t0); d.setUTCHours(0,0,0,0);
+                                while(d.getTime()<=t1){if(d.getTime()>=t0) out.push(new Date(d)); d.setUTCDate(d.getUTCDate()+everyN);}
+                                return out;
+                              }
+                              // === Lane assignment — Y is now meaningful: one row per thesis,
+                              // sorted by theme hue. Evidence supporting multiple theses renders
+                              // a marker in each lane it belongs to, so cross-thesis evidence
+                              // becomes a visually aligned vertical column. ===
+                              var lanesOrdered=Object.keys(theses).map(function(k){return theses[k];});
+                              lanesOrdered.sort(function(a,b){return a.hue-b.hue;});
+                              var laneIndex={};
+                              lanesOrdered.forEach(function(t,i){laneIndex[t.name]=i;});
+                              // Truncate long thesis labels so they fit the left gutter
+                              function truncLabel(s,n){return (s||'').length>n?(s.substring(0,n-1)+'…'):(s||'');}
+                              // === Render — reads stateT0/stateT1, rebuilds SVG markup ===
+                              function render(){
+                                var t0=stateT0, t1=stateT1, span=t1-t0;
+                                function xS(t){return M.left+((t-t0)/span)*iW;}
+                                var nLanes=lanesOrdered.length||1;
+                                var laneH=iH/nLanes;
+                                function laneCenterY(i){return M.top+laneH*(i+0.5);}
+                                var p=[];
+                                p.push('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet">');
+                                // Lane backgrounds — alternating zebra tint at the theme hue, very faint
+                                lanesOrdered.forEach(function(t,i){
+                                  var y=M.top+laneH*i;
+                                  var fill='hsla('+t.hue+', 40%, 50%, 0.04)';
+                                  if(i%2===1) fill='hsla('+t.hue+', 40%, 50%, 0.07)';
+                                  p.push('<rect class="lane-bg" data-thesis="'+t.name+'" x="'+M.left+'" y="'+y+'" width="'+iW+'" height="'+laneH+'" fill="'+fill+'"/>');
+                                });
+                                // Lane centerlines + left labels
+                                lanesOrdered.forEach(function(t,i){
+                                  var cy=laneCenterY(i);
+                                  p.push('<line class="lane-line" data-thesis="'+t.name+'" x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+cy+'" y2="'+cy+'" stroke="hsla('+t.hue+', 30%, 50%, 0.18)" stroke-width="1"/>');
+                                  // Lane label on left (right-aligned to the chart edge)
+                                  p.push('<text class="lane-label" data-thesis="'+t.name+'" x="'+(M.left-10)+'" y="'+(cy+0.5)+'" fill="hsl('+t.hue+', '+ARC_S+', '+ARC_L+')" font-size="10" font-family="ui-monospace, monospace" text-anchor="end" dominant-baseline="middle" letter-spacing="0.04em">'+escapeText(truncLabel(t.label,22))+'</text>');
+                                });
+                                // Snapshot vertical lines + version labels (only those within range)
+                                snaps.forEach(function(s){
+                                  var st=s.observedAt.getTime();
+                                  if(st<t0||st>t1) return;
+                                  var x=xS(st);
+                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+M.top+'" y2="'+(H-M.bottom+6)+'" stroke="rgba(125,211,252,0.32)" stroke-width="1" stroke-dasharray="3,3"/>');
+                                  p.push('<text x="'+x+'" y="'+(M.top-12)+'" fill="var(--accent)" font-size="10" font-family="ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">v'+s.version+'</text>');
+                                });
+                                // Tick scale picker — adapts with zoom
+                                var dayMs=86400000, ticks, fmtFn;
+                                if(span<8*dayMs){
+                                  ticks=dayTicks(t0,t1,1);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else if(span<35*dayMs){
+                                  ticks=dayTicks(t0,t1,7);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else if(span<95*dayMs){
+                                  ticks=dayTicks(t0,t1,14);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});};
+                                } else {
+                                  ticks=monthTicks(t0,t1);
+                                  fmtFn=function(d){return d.toLocaleDateString('en-US',{month:'short',timeZone:'UTC'});};
+                                }
+                                var axisY=H-M.bottom;
+                                p.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+axisY+'" y2="'+axisY+'" stroke="rgba(148,163,184,0.25)" stroke-width="1"/>');
+                                ticks.forEach(function(d,i){
+                                  var x=xS(d.getTime());
+                                  p.push('<line x1="'+x+'" x2="'+x+'" y1="'+(axisY-4)+'" y2="'+(axisY+4)+'" stroke="rgba(148,163,184,0.35)" stroke-width="1"/>');
+                                  p.push('<text x="'+x+'" y="'+(axisY+18)+'" fill="#9aa5b8" font-size="11" font-family="ui-monospace, monospace" text-anchor="middle">'+fmtFn(d)+'</text>');
+                                  if(i===0||(d.getUTCMonth()===0&&d.getUTCDate()===1)){
+                                    p.push('<text x="'+x+'" y="'+(axisY+34)+'" fill="#6b7689" font-size="9" font-family="ui-monospace, monospace" text-anchor="middle">'+d.getUTCFullYear()+'</text>');
+                                  }
+                                });
+                                // Evidence markers — one per (evidence, thesis) pair, placed in
+                                // the corresponding thesis lane. Same-day collisions inside a lane
+                                // get a small Y jitter (+/- 4px alternating).
+                                var visibleEv=evList.filter(function(ev){var t=ev.observedAt.getTime();return t>=t0&&t<=t1;});
+                                var laneCollisions={}; // key: thesisName + ":" + xBucket  -> count
+                                var instances=[]; // { ev, thesis, x, y, r }
+                                visibleEv.forEach(function(ev){
+                                  var x=xS(ev.observedAt.getTime());
+                                  var bucket=Math.round(x/6);
+                                  ev.theses.forEach(function(thesisName){
+                                    var li=laneIndex[thesisName];
+                                    if(li===undefined) return;
+                                    var t=lanesOrdered[li];
+                                    var key=thesisName+':'+bucket;
+                                    var n=(laneCollisions[key]||0)+1;
+                                    laneCollisions[key]=n;
+                                    var dir=(n%2===1)?-1:1;
+                                    var rank=Math.ceil(n/2)-1;
+                                    var jitter=rank*5;
+                                    var y=laneCenterY(li)+(n===1?0:dir*jitter);
+                                    instances.push({ev:ev,thesisName:thesisName,thesis:t,x:x,y:y});
+                                  });
+                                });
+                                // Stems (a small vertical tick from the lane line to each marker
+                                // when jittered, otherwise just the marker on the line).
+                                instances.forEach(function(it){
+                                  var lineY=laneCenterY(laneIndex[it.thesisName]);
+                                  if(Math.abs(it.y-lineY)>0.5){
+                                    p.push('<line class="stem" data-thesis="'+it.thesisName+'" x1="'+it.x+'" x2="'+it.x+'" y1="'+lineY+'" y2="'+it.y+'" stroke="hsl('+it.thesis.hue+', 30%, 35%)" stroke-width="1" opacity="0.5"/>');
+                                  }
+                                });
+                                // Markers — color = host lane's theme hue (not the evidence's "primary"
+                                // hue), so each lane reads as a single color column visually.
+                                instances.forEach(function(it){
+                                  var r=strengthRadius(it.ev.strength);
+                                  var fill='hsl('+it.thesis.hue+', '+ARC_S+', '+ARC_L+')';
+                                  var stroke='hsl('+it.thesis.hue+', 60%, 35%)';
+                                  p.push('<circle class="ev-marker" data-thesis="'+it.thesisName+'" data-all-theses="'+escapeAttr(it.ev.theses.join(','))+'" cx="'+it.x+'" cy="'+it.y+'" r="'+r+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1.2" opacity="0.9"><title>'+escapeAttr(it.ev.statement+' (observed '+fmtFull(it.ev.observedAt)+', '+escapeText(it.thesis.label)+')')+'</title></circle>');
+                                });
+                                p.push('</svg>');
+                                document.getElementById('horizon-svg-wrap').innerHTML=p.join('');
+                              }
+                              function setRange(t0,t1){
+                                var span=t1-t0;
+                                var minSpan=4*60*60*1000; // 4h floor
+                                var maxSpan=(initialT1-initialT0)*8;
+                                if(span<minSpan||span>maxSpan) return;
+                                stateT0=t0; stateT1=t1;
+                                render();
+                              }
+                              function zoomAt(factor,anchorT){
+                                setRange(
+                                  anchorT-(anchorT-stateT0)*factor,
+                                  anchorT+(stateT1-anchorT)*factor
+                                );
+                              }
+                              function clientToData(clientX){
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return (stateT0+stateT1)/2;
+                                var rect=svgEl.getBoundingClientRect();
+                                var ratio=Math.max(0,Math.min(1,(clientX-rect.left)/rect.width));
+                                // Map screen ratio to data, accounting for SVG viewBox left margin
+                                var innerLeft=M.left/W, innerRight=(W-M.right)/W;
+                                var dataRatio=(ratio-innerLeft)/(innerRight-innerLeft);
+                                return stateT0+dataRatio*(stateT1-stateT0);
+                              }
+                              // === Initial render ===
+                              render();
+                              // === Interactive handlers ===
+                              var wrapEl=document.getElementById('horizon-svg-wrap');
+                              wrapEl.addEventListener('wheel',function(e){
+                                e.preventDefault();
+                                var anchor=clientToData(e.clientX);
+                                zoomAt(e.deltaY>0?1.18:0.85,anchor);
+                              },{passive:false});
+                              var dragX=null, dragT0, dragT1;
+                              wrapEl.addEventListener('mousedown',function(e){
+                                if(e.button!==0) return;
+                                dragX=e.clientX; dragT0=stateT0; dragT1=stateT1;
+                                wrapEl.classList.add('dragging');
+                                e.preventDefault();
+                              });
+                              window.addEventListener('mousemove',function(e){
+                                if(dragX===null) return;
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return;
+                                var rect=svgEl.getBoundingClientRect();
+                                var dx=e.clientX-dragX;
+                                var dt=-dx/rect.width*(dragT1-dragT0);
+                                setRange(dragT0+dt, dragT1+dt);
+                              });
+                              window.addEventListener('mouseup',function(){
+                                if(dragX!==null){dragX=null; wrapEl.classList.remove('dragging');}
+                              });
+                              // Touch — pan only (single finger). Pinch-to-zoom would need more handlers.
+                              var touchX=null, touchT0, touchT1;
+                              wrapEl.addEventListener('touchstart',function(e){
+                                if(e.touches.length!==1) return;
+                                touchX=e.touches[0].clientX; touchT0=stateT0; touchT1=stateT1;
+                              },{passive:true});
+                              wrapEl.addEventListener('touchmove',function(e){
+                                if(touchX===null||e.touches.length!==1) return;
+                                var svgEl=document.querySelector('#horizon-svg-wrap svg');
+                                if(!svgEl) return;
+                                var rect=svgEl.getBoundingClientRect();
+                                var dx=e.touches[0].clientX-touchX;
+                                var dt=-dx/rect.width*(touchT1-touchT0);
+                                setRange(touchT0+dt, touchT1+dt);
+                                e.preventDefault();
+                              },{passive:false});
+                              wrapEl.addEventListener('touchend',function(){touchX=null;});
+                              // Toolbar buttons
+                              document.querySelector('.horizon-toolbar [data-action="zoom-in"]').addEventListener('click',function(){zoomAt(0.7,(stateT0+stateT1)/2);});
+                              document.querySelector('.horizon-toolbar [data-action="zoom-out"]').addEventListener('click',function(){zoomAt(1.43,(stateT0+stateT1)/2);});
+                              document.querySelector('.horizon-toolbar [data-action="reset"]').addEventListener('click',function(){stateT0=initialT0; stateT1=initialT1; render();});
+                              // === Build per-thesis summary rows (legend with stats) ===
+                              var summaryEl=document.getElementById('horizon-summary');
+                              var thesisList=Object.keys(theses).map(function(k){return theses[k];});
+                              // Sort by hue (matches the chart's color sweep)
+                              thesisList.sort(function(a,b){return a.hue-b.hue;});
+                              var rows=thesisList.map(function(t){
+                                var color='hsl('+t.hue+', '+ARC_S+', '+ARC_L+')';
+                                var recency=t.latestEv?fmtRecent(t.latestEv):'no dated evidence';
+                                return '<div class="summary-row" data-thesis="'+t.name+'"><span class="summary-swatch" style="color:'+color+';background:'+color+'"></span><span class="summary-label">'+escapeText(t.label)+'</span><span class="summary-stats"><span class="count">'+t.evidenceCount+'</span><span>obs</span><span class="recency">latest '+escapeText(recency)+'</span></span></div>';
+                              });
+                              summaryEl.innerHTML=rows.join('');
+                              // Hover: isolate one thesis (markers + stems + the lane row itself)
+                              summaryEl.querySelectorAll('.summary-row').forEach(function(row){
+                                row.addEventListener('mouseenter',function(){
+                                  var t=row.dataset.thesis;
+                                  summaryEl.querySelectorAll('.summary-row').forEach(function(o){if(o.dataset.thesis!==t) o.classList.add('dimmed');});
+                                  document.querySelectorAll('.ev-marker, .stem').forEach(function(el){
+                                    if(el.dataset.thesis!==t) el.style.opacity='0.08';
+                                  });
+                                  document.querySelectorAll('.lane-bg, .lane-line, .lane-label').forEach(function(el){
+                                    if(el.dataset.thesis!==t) el.style.opacity='0.25';
+                                  });
+                                });
+                                row.addEventListener('mouseleave',function(){
+                                  summaryEl.querySelectorAll('.summary-row').forEach(function(o){o.classList.remove('dimmed');});
+                                  document.querySelectorAll('.ev-marker').forEach(function(el){el.style.opacity='0.9';});
+                                  document.querySelectorAll('.stem').forEach(function(el){el.style.opacity='0.5';});
+                                  document.querySelectorAll('.lane-bg, .lane-line, .lane-label').forEach(function(el){el.style.opacity='';});
+                                });
+                              });
+                              // === Helpers ===
+                              function escapeText(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+                              function escapeAttr(s){return escapeText(s).replace(/"/g,'&quot;');}
+                              function fmtFull(d){return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});}
+                              function fmtRecent(d){
+                                var now=Date.now(); var diffDays=Math.floor((now-d.getTime())/86400000);
+                                if(diffDays===0) return 'today'; if(diffDays===1) return '1 day ago';
+                                if(diffDays<14) return diffDays+' days ago';
+                                if(diffDays<60) return Math.floor(diffDays/7)+' wk ago';
+                                return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'});
+                              }
+                              // Reformat ISO datetimes anywhere in the document body
+                              var DATE_RE=/\b(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z\b/g;
+                              if(DATE_RE.test(document.title)){DATE_RE.lastIndex=0;document.title=document.title.replace(DATE_RE,function(_,y,m,d,hh,mm,ss){var dt=new Date(y+'-'+m+'-'+d+'T'+hh+':'+mm+':'+ss+'Z');return dt.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'});});}
+                            })();
+                            </script>
+
+
+# =============================================================================
+# Horizon-aggregate -> index.css
+#
+# Paired stylesheet SetTransformation. `pages@1.1.0/horizon-aggregate`
+# binds (formats.stylesheet, default) → this transformation.
+# =============================================================================
+
+horizon-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index.css
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.horizon{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+                      @media (max-width:760px){article.horizon{padding:32px 20px 64px}}
+                      header.intro{padding:0 0 56px;margin-bottom:56px;position:relative}
+                      header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+                      header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                      @media (max-width:760px){header.intro h1{font-size:42px}}
+                      header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                      header.intro .lead code{font-family:var(--font-mono);font-size:14px;color:var(--accent);background:rgba(125,211,252,0.08);border:1px solid rgba(125,211,252,0.2);padding:1px 7px;border-radius:3px;letter-spacing:0.02em;font-weight:400;vertical-align:1px}
+                      section.chart-section{margin-top:64px}
+                      .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                      .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      .horizon-host{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:18px 20px 22px}
+                      .horizon-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-family:var(--font-mono);font-size:11px}
+                      .horizon-toolbar button{background:var(--bg-elev);border:1px solid var(--border);color:var(--fg-dim);padding:4px 10px;border-radius:4px;font-family:var(--font-mono);font-size:13px;cursor:pointer;transition:color 120ms,border-color 120ms;line-height:1;font-weight:600;min-width:30px}
+                      .horizon-toolbar button:hover{color:var(--accent);border-color:var(--accent)}
+                      .horizon-toolbar button:active{background:var(--bg-input)}
+                      .horizon-toolbar .horizon-hint{margin-left:auto;color:var(--fg-faint);letter-spacing:0.06em;text-transform:uppercase;font-size:10px}
+                      .horizon-svg-wrap{cursor:grab;user-select:none;-webkit-user-select:none}
+                      .horizon-svg-wrap.dragging{cursor:grabbing}
+                      .horizon-svg-wrap svg{display:block;width:100%;height:auto}
+                      .horizon-summary{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+                      .summary-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;font-size:13px;cursor:default;transition:border-color 120ms,opacity 120ms}
+                      .summary-row.dimmed{opacity:0.35}
+                      .summary-row:hover{border-color:var(--accent-3)}
+                      .summary-swatch{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:1.5px solid currentColor}
+                      .summary-label{flex:1;color:var(--fg-dim);line-height:1.4;min-width:0}
+                      .summary-stats{font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em;flex-shrink:0;display:flex;align-items:center;gap:10px}
+                      .summary-stats .count{color:var(--fg);font-weight:600}
+                      .summary-stats .recency{color:var(--fg-faint)}
+                      .data{display:none}
+                      footer.horizon-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                      footer.horizon-footer a{color:var(--accent)}

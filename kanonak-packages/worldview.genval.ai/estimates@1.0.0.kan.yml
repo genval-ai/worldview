@@ -1,0 +1,274 @@
+estimates:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+
+# =============================================================================
+# estimates @ 1.0.0 - reusable distributional-estimate primitives
+#
+# Promotes any belief-laden numeric value (a thesis confidence, a forecast
+# value, a trust score, an estimated audience reach) from a single xsd.decimal
+# to a typed Estimate with explicit uncertainty. Two concrete shapes:
+#
+#   PointEstimate         - a single value, no uncertainty stated. Escape
+#                           hatch for authors who genuinely want to disclaim
+#                           that any distribution is implied.
+#   DistributionEstimate  - mean + optional stdDev + optional family + optional
+#                           credible-interval bounds + optional shape parameters.
+#                           The workhorse. Authors typically write the embedded
+#                           shorthand `{ mean: 0.82, stdDev: 0.05 }` and the
+#                           parser infers the type from the parent property's
+#                           range (which downstream packages set to
+#                           DistributionEstimate for the common case).
+#
+# Authoring ergonomics: properties that hold an Estimate should declare
+# range as DistributionEstimate (not the abstract Estimate base) so that
+# embedded values can omit the `type:` line per the protocol's
+# prefer-implicit-embedded-type-rule. A property whose author needs to mix
+# point and distribution shapes declares range as the abstract Estimate, and
+# embeds carry explicit `type:` narrowing.
+#
+# Visualization rationale: a scalar 0..1 confidence drives a single rect-width
+# or font-size-em in every renderer. A DistributionEstimate carries enough
+# shape to drive violin densities (beta family), fan-chart bands (lower/upper
+# percentiles), forest-plot priors-and-posteriors, and Bayesian-update
+# animations across snapshot versions - visualizations that simply cannot be
+# expressed from a point estimate. The estimate fields here are the data
+# substrate; the renderers consume them via the same 4-tier semantic-zoom
+# convention used elsewhere in the publisher.
+#
+# This package is intentionally independent of worldview.genval.ai/core so
+# any publisher (not just worldview) can adopt distributional estimates
+# without pulling in the worldview ontology.
+# =============================================================================
+
+
+# =============================================================================
+# 1. ESTIMATE BASE
+# =============================================================================
+
+Estimate:
+  type: rdfs.Class
+  label: Estimate
+  comment: >
+    Abstract base for a numeric value that may or may not carry uncertainty.
+    Never instantiated directly - authors instantiate PointEstimate (no
+    uncertainty stated) or DistributionEstimate (full distributional shape).
+    Embedded under a property whose range is the concrete subclass, the
+    `type:` line is omitted per the implicit-embedded-type rule; embedded
+    under a property whose range is the abstract Estimate, the `type:` line
+    is required to narrow.
+
+
+# =============================================================================
+# 2. POINT ESTIMATE
+# =============================================================================
+
+PointEstimate:
+  type: rdfs.Class
+  subClassOf: Estimate
+  label: Point Estimate
+  comment: >
+    A single numeric value with no uncertainty stated. Use when the author
+    genuinely has no distribution to express (e.g. a directly observed price
+    print) or when explicitly disclaiming that the value should be
+    interpreted as distributional. Renderers treat a PointEstimate as a
+    Dirac at `estimateValue` - a vertical tick rather than a curve.
+
+estimateValue:
+  type: owl.DatatypeProperty
+  domain: PointEstimate
+  range: xsd.decimal
+  label: Estimate Value
+  comment: The single numeric value. Required on every PointEstimate.
+
+
+# =============================================================================
+# 3. DISTRIBUTION ESTIMATE
+# =============================================================================
+
+DistributionEstimate:
+  type: rdfs.Class
+  subClassOf: Estimate
+  label: Distribution Estimate
+  comment: >
+    A numeric value carrying explicit uncertainty. At minimum requires
+    `estimateMean`; `estimateStdDev` is optional but strongly recommended -
+    a DistributionEstimate with no stdDev is semantically equivalent to a
+    PointEstimate and renderers degrade to a vertical tick. Optional
+    `estimateDistribution` names the family (beta for 0..1 bounded values,
+    normal for unbounded, log-normal for non-negative scale, triangular for
+    bounded-with-mode); when present, renderers may draw the corresponding
+    density curve. Optional `estimateLower95` / `estimateUpper95` carry the
+    95% credible interval as an explicit override of whatever the family +
+    moments would imply - useful for non-symmetric authoring (e.g. a fat
+    upside tail expressed as a wider upper bound than mean-and-stddev would
+    produce). Optional shape parameters (`betaAlpha` / `betaBeta`,
+    `estimateMode`) carry family-specific parameterizations when the author
+    has them; when absent, the renderer estimates them from mean and stdDev.
+
+estimateMean:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Mean
+  comment: >
+    Central tendency of the distribution. Required. For a 0..1 confidence,
+    this is the point a renderer plots as the "headline" value (matching
+    the current scalar-confidence behaviour for back-compatibility).
+
+estimateStdDev:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Standard Deviation
+  comment: >
+    Standard deviation of the distribution. Optional but strongly
+    recommended. Absent stdDev = point-shaped distribution. For a beta
+    distribution on 0..1, the stdDev is bounded by sqrt(mean * (1-mean))
+    (the variance of a Bernoulli with that mean); authors who exceed this
+    bound should reconsider whether beta is the right family.
+
+estimateDistribution:
+  type: owl.ObjectProperty
+  domain: DistributionEstimate
+  range: DistributionFamily
+  label: Distribution Family
+  comment: >
+    The parametric family the estimate belongs to. Optional. When absent,
+    renderers default to beta for values bounded in 0..1 and normal
+    otherwise (a reasonable but blunt heuristic - authors who care should
+    declare the family explicitly). The family affects which visual
+    primitive a renderer chooses (violin density vs box-and-whisker vs fan
+    band).
+
+estimateLower95:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Lower 95% Bound
+  comment: >
+    Lower bound of the 95% credible interval. Optional. When present,
+    overrides what the family + moments alone would produce - the explicit
+    override matters when the author wants to express asymmetric tails
+    that mean-and-stddev cannot capture. When both lower95 and stdDev are
+    present and disagree, renderers prefer the explicit bound.
+
+estimateUpper95:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Upper 95% Bound
+  comment: Upper bound of the 95% credible interval. Mirror of estimateLower95.
+
+estimateMode:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Mode
+  comment: >
+    The most-likely single value of the distribution. Optional. For
+    symmetric distributions, equals the mean and need not be declared. For
+    skewed distributions (log-normal, triangular, asymmetric beta), the
+    mode is the visual "peak" of the density and is what readers' eyes
+    naturally lock onto - declaring it explicitly avoids the renderer
+    having to derive it from family + moments.
+
+betaAlpha:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Beta Alpha
+  comment: >
+    Alpha (shape-1) parameter for a beta distribution. Optional. Pair with
+    betaBeta. The Bayesian interpretation - "successes" - makes alpha+beta
+    the effective sample size, which renderers can surface as a "weight"
+    badge. When the family is beta and both alpha and beta are declared,
+    renderers prefer them over mean/stdDev for the density curve.
+
+betaBeta:
+  type: owl.DatatypeProperty
+  domain: DistributionEstimate
+  range: xsd.decimal
+  label: Beta Beta
+  comment: >
+    Beta (shape-2) parameter for a beta distribution. Optional. Pair with
+    betaAlpha. Interpreted as "failures" in the Bayesian frame; alpha+beta
+    is the effective sample size.
+
+
+# =============================================================================
+# 4. DISTRIBUTION FAMILY
+# =============================================================================
+
+DistributionFamily:
+  type: rdfs.Class
+  label: Distribution Family
+  comment: >
+    Categorical name of a parametric distribution family. Open enumeration -
+    the five instances below cover the cases this publisher cares about;
+    consumers may add more. Renderers map each family to a density-curve
+    drawing strategy.
+
+beta:
+  type: DistributionFamily
+  label: Beta
+  comment: >
+    Two-parameter distribution bounded on [0, 1]. Natural for confidence,
+    trust scores, fractions, and any other 0..1-bounded belief. The
+    Bayesian interpretation (alpha = successes, beta = failures) means
+    that authoring beta(alpha, beta) is equivalent to authoring a posterior
+    after observing alpha-and-beta independent trials - the mass and shape
+    encode both central tendency and evidence weight in one object.
+
+normal:
+  type: DistributionFamily
+  label: Normal
+  comment: >
+    Gaussian distribution on the real line. Default for unbounded
+    quantities (price changes, yield levels) where the symmetry assumption
+    is acceptable. Parameterised by mean and stdDev directly.
+
+log-normal:
+  type: DistributionFamily
+  label: Log-Normal
+  comment: >
+    Distribution of a quantity whose logarithm is normally distributed.
+    Natural for non-negative scale quantities that span orders of
+    magnitude - reach estimates (audience sizes), volume measurements,
+    holding sizes. Authored as mean / stdDev of the underlying log; a
+    renderer derives the visible mode and percentile bounds from those.
+
+triangular:
+  type: DistributionFamily
+  label: Triangular
+  comment: >
+    Bounded distribution defined by a minimum, mode, and maximum. Natural
+    when the author has clear low/high envelopes and a best-guess peak but
+    no formal parameterisation - "between X and Y, most likely Z." Use
+    estimateLower95 / estimateUpper95 (or the broader min/max if added in
+    v1.1) plus estimateMode to author.
+
+uniform:
+  type: DistributionFamily
+  label: Uniform
+  comment: >
+    Constant density over a bounded interval. Conveys "no preference
+    between any value in the range." Used as a deliberate prior when the
+    author wants to express maximum uncertainty within a known interval -
+    rendered as a flat-topped band rather than a peak.
