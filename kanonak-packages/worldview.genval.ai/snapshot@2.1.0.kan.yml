@@ -54,14 +54,14 @@ view:
       derivation.transformation:
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
-        tx.version: 2.0.0
+        tx.version: 2.1.0
         tx.name: snapshot-to-html-transformation
     - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
-        tx.version: 2.0.0
+        tx.version: 2.1.0
         tx.name: snapshot-stylesheet
   narrative: |
     Saturday-evening 2.1.0 refresh - the first operational 2.x snapshot,
