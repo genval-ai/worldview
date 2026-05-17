@@ -165,9 +165,9 @@ stagflation-risk:
     minutes Wednesday May 20 2 PM ET, Walmart Q1 FY2027 Thursday May 21
     pre-open, April PCE the formal invalidation indicator on May 28.
   confidence:
+    type: est.BetaEstimate
     estimateMean: 0.82
     estimateStdDev: 0.04
-    estimateDistribution: est.beta
     estimateLower95: 0.74
     estimateUpper95: 0.89
     betaAlpha: 33.0
@@ -237,9 +237,9 @@ persistent-energy-shock:
     remains procedurally incompatible with the durable-reopening leg of
     the SequencedCondition.
   confidence:
+    type: est.BetaEstimate
     estimateMean: 0.68
     estimateStdDev: 0.07
-    estimateDistribution: est.beta
     estimateLower95: 0.54
     estimateUpper95: 0.81
     betaAlpha: 14.0
@@ -303,9 +303,9 @@ iran-war-rearmament:
     NOC $540.69 (-1.45%). Daily rotation does not bend the multi-year
     procurement cycle.
   confidence:
+    type: est.BetaEstimate
     estimateMean: 0.82
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
     estimateLower95: 0.71
     estimateUpper95: 0.91
     betaAlpha: 23.0

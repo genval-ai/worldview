@@ -43,46 +43,79 @@ sources:
 # `citationSource: Source` lands on wv.Evidence in core@2.0.0 to make the
 # typed reference first-class.
 #
-# Trust evolution: this package version pins each source's trust at a point
-# in time. To revise a trust estimate (after a retraction, a leadership
-# change, an ownership shift) publish sources@1.0.N with the updated values;
-# the chain of package versions IS the trust trajectory. A future
-# source-observations package may add explicit per-observation records for
-# events worth annotating, but the version chain is the default trajectory.
+# Class hierarchy (tagged-by-type tree, parallel to the Condition DSL in
+# worldview.genval.ai/core and the Estimate hierarchy in
+# worldview.genval.ai/estimates):
+#
+#   Source                       (abstract base; carries name / homepage /
+#                                 primariness / independence / trust / reach)
+#   |-- Tier1WireSource          Reuters, Bloomberg, AP, AFP
+#   |-- MajorNewspaperSource     WSJ, FT, NYT, The Economist
+#   |-- BusinessPressSource      CNBC, MarketWatch, Yahoo Finance, Barron's
+#   |-- TradePressSource         vertical specialty publications
+#   |-- OfficialReleaseSource    Federal Reserve / Treasury / BLS / BEA /
+#                                White House press
+#   |-- IntergovernmentalAgencySource  IEA, IMF, World Bank, UN agencies
+#   |-- IndustryBodySource       World Gold Council, API, OPEC Secretariat
+#   |-- AggregatorSource         republication / syndication platforms
+#   |-- SocialPlatformSource     X / Truth Social / LinkedIn / Bluesky posts
+#   |-- IndependentBlogSource    Substacks, newsletters, niche analyst sites
+#   |-- AcademicSource           peer-reviewed papers, working papers
+#   `-- BroadcastSource          TV / radio with transcript or clip
+#
+# Each seeded Source instance declares its concrete subclass directly
+# (`type: Tier1WireSource` etc.) - the tagged-by-type pattern from the
+# kanonak.org/transformations-conventions explicit-embedded-type rule.
+# A SourceType enumeration property is the wrong shape and was the
+# initial 1.0.0 draft; this is the corrected schema.
+#
+# SourcePrimariness (primary / secondary / tertiary) and
+# EditorialIndependence (independent / state-affiliated / corporate-
+# affiliated / platform-distributed / anonymous) remain as PROPERTIES
+# pointing at small enumeration classes. These are orthogonal quality
+# attributes of a source's editorial process rather than structural
+# typing - the word "Primariness" and "Independence" are quality
+# suffixes, not Type/Kind/Category words. They share semantic shape
+# with wv.ThesisStatus (also a state-like quality, kept as enum +
+# property in core).
+#
+# Trust evolution: this package version pins each source's trust at a
+# point in time. To revise a trust estimate (after a retraction, a
+# leadership change, an ownership shift) publish sources@1.0.N with the
+# updated values; the chain of package versions IS the trust trajectory.
 #
 # Visualization rationale: typed sources unlock the source-network graph
-# (nodes = Source, sized by reach, hued by source type), trust-weighted
-# evidence card sizing on thesis pages (card height = strength * trust),
-# echo-chamber detection (sources clustered by co-citation), and per-source
-# trust-trajectory sparklines. None of this is possible while citation is
-# a free-form URL string.
+# (nodes = Source, sized by reach, hued by source subclass), trust-
+# weighted evidence card sizing on thesis pages (card height = strength
+# * trust), echo-chamber detection (sources clustered by co-citation),
+# and per-source trust-trajectory sparklines. None of this is possible
+# while citation is a free-form URL string.
 #
 # Independence note: this package does NOT import worldview.genval.ai/core
-# or any worldview-specific vocabulary. Sources are an epistemic layer that
-# any publisher (worldview, climate, scientific) can adopt. The wv.Evidence
-# augmentation for citationSource lives in core@2.0.0, not here.
+# or any worldview-specific vocabulary. Sources are an epistemic layer
+# that any publisher (worldview, climate, scientific) can adopt. The
+# wv.Evidence augmentation for citationSource lives in core@2.0.0, not
+# here.
 # =============================================================================
 
 
 # =============================================================================
-# 1. SOURCE CLASS
+# 1. SOURCE BASE CLASS
 # =============================================================================
 
 Source:
   type: rdfs.Class
   label: Source
   comment: >
-    A typed publisher of cited material - a wire service, newspaper,
-    official press office, intergovernmental agency, industry body, social
-    platform, or blog. The instance NAME is a stable kebab-case identifier
-    (`reuters`, `fed-press`); the displayed name is in `sourceName`.
-    Concrete Source instances live in this package and in any publisher
-    extension package that wants to add domain-specific sources. Trust and
-    reach estimates are typed as distributions so renderers can show
-    confidence-in-the-source, not just a point trust score. Source has no
-    declared subClassOf so it serves as the union root for any sources
-    taxonomy; classification facets live on the `sourceType`,
-    `sourcePrimariness`, and `sourceEditorialIndependence` properties.
+    Abstract base for a typed publisher of cited material. Never
+    instantiated directly - authors instantiate one of the concrete
+    Source subclasses below (Tier1WireSource, MajorNewspaperSource,
+    OfficialReleaseSource, etc.). Carries the properties every source
+    shares: display name, homepage URL, primariness + independence
+    quality classifications, and distributional trust + reach
+    estimates. The concrete subclass identifies the publishing category
+    (wire service, newspaper, official release, ...) without needing a
+    separate sourceType enumeration property.
 
 sourceName:
   type: owl.DatatypeProperty
@@ -91,9 +124,10 @@ sourceName:
   label: Source Name
   comment: >
     The displayed name of the publisher ("Reuters", "Federal Reserve",
-    "The Wall Street Journal"). Distinct from the instance name (kebab-case
-    URI fragment) - the displayed name is what appears in evidence cards,
-    network-graph node labels, and source-trajectory page headers.
+    "The Wall Street Journal"). Distinct from the instance name
+    (kebab-case URI fragment) - the displayed name is what appears in
+    evidence cards, network-graph node labels, and source-trajectory
+    page headers.
 
 sourceHomepage:
   type: owl.DatatypeProperty
@@ -102,19 +136,9 @@ sourceHomepage:
   label: Source Homepage
   comment: >
     The publisher's canonical homepage URL. Used as the link target on
-    source chips and as the data-uri attribute on source nodes in network
-    visualizations. Not the same as a specific article's URL - that lives
-    on each Evidence's `citation` property.
-
-sourceType:
-  type: owl.ObjectProperty
-  domain: Source
-  range: SourceType
-  label: Source Type
-  comment: >
-    Categorical type of publisher. References a SourceType named instance.
-    Drives renderer node-shape and node-color in source-network graphs and
-    serves as a faceting axis for source filters.
+    source chips and as the data-uri attribute on source nodes in
+    network visualizations. Not the same as a specific article's URL -
+    that lives on each Evidence's `citation` property.
 
 sourcePrimariness:
   type: owl.ObjectProperty
@@ -122,14 +146,14 @@ sourcePrimariness:
   range: SourcePrimariness
   label: Source Primariness
   comment: >
-    Whether the source is reporting first-hand (primary), reporting on
-    another source's reporting (secondary), or aggregating multiple
-    secondary sources (tertiary). A primary report of a Fed statement is
-    a Federal Reserve press release; a secondary is Reuters reporting on
-    it; a tertiary is a Yahoo Finance roundup citing several wires. Trust
-    typically degrades with primariness distance but the dimensions are
-    orthogonal - a primary blog can be less trustworthy than a secondary
-    wire report.
+    Whether the source typically reports first-hand (primary), reports
+    on another source's reporting (secondary), or aggregates multiple
+    secondary sources (tertiary). A primary report of a Fed statement
+    is a Federal Reserve press release; a secondary is Reuters reporting
+    on it; a tertiary is a Yahoo Finance roundup citing several wires.
+    Modeled as a property pointing at an enum (rather than as another
+    layer of subclassing) because primariness is a quality attribute of
+    the editorial process, orthogonal to publisher category.
 
 sourceEditorialIndependence:
   type: owl.ObjectProperty
@@ -137,14 +161,14 @@ sourceEditorialIndependence:
   range: EditorialIndependence
   label: Editorial Independence
   comment: >
-    The structural relationship between the publisher and the entities it
-    typically reports on. Independent = no formal affiliation; state-
-    affiliated = government-owned or government-funded; corporate-
-    affiliated = owned by an entity it covers (or whose competitors it
-    covers); platform-distributed = republication-only (aggregator,
-    syndicator). Material for trust calibration but does not directly
-    drive the trustEstimate - authors choose how heavily to weigh
-    independence in their trust authoring.
+    The structural relationship between the publisher and the entities
+    it typically reports on. Independent = no formal affiliation;
+    state-affiliated = government-owned or government-funded;
+    corporate-affiliated = owned by an entity it covers (or whose
+    competitors it covers); platform-distributed = republication-only
+    (aggregator, syndicator). Orthogonal to publisher category and to
+    primariness; informs interpretation rather than directly determining
+    trust.
 
 trustEstimate:
   type: owl.ObjectProperty
@@ -154,12 +178,14 @@ trustEstimate:
   comment: >
     Distributional estimate of how much the publisher's editorial process
     can be trusted to accurately convey the underlying facts it reports.
-    Mean in 0..1. The beta family is the natural choice (declare
-    `estimateDistribution: est.beta`); the stdDev encodes how confident
-    the publisher OF this worldview is about its own trust estimate -
-    well-known wires deserve tight bounds, lesser-known specialty outlets
-    or new entrants deserve wider ones. Calibration scale (working
-    heuristic, not formal):
+    Mean in 0..1. Embed as `{ type: est.BetaEstimate, estimateMean: ...,
+    estimateStdDev: ..., betaAlpha: ..., betaBeta: ... }` - the embedded
+    `type:` line narrows the abstract DistributionEstimate range to the
+    BetaEstimate subclass per the embedded-type-must-narrow-range rule.
+    The stdDev encodes how confident the publisher OF this worldview is
+    about its own trust estimate - well-known wires deserve tight bounds,
+    lesser-known specialty outlets or new entrants deserve wider ones.
+    Calibration scale (working heuristic, not formal):
       0.90-0.98 - tier-1 wire or primary official release, decades of
                   audited editorial process.
       0.80-0.90 - major newspaper / financial press with documented
@@ -177,40 +203,33 @@ reachEstimate:
   label: Reach Estimate
   comment: >
     Distributional estimate of the publisher's monthly audience reach in
-    direct users (not including syndication and re-publication, which
-    inflate numbers wildly and are hard to attribute). Authored in actual
-    user count - a renderer rendering log-normal density does the log
-    transform internally; authors think and write in the underlying unit.
-    Use the `log-normal` family for almost all reach estimates since
-    reach spans orders of magnitude. Mean is the headline; stdDev
-    expresses how much the underlying audience varies month-over-month
-    and how confident the author is about the central tendency.
+    direct users (not including syndication and re-publication). Embed
+    as `{ type: est.LogNormalEstimate, estimateMean: ..., estimateStdDev:
+    ... }` - log-normal is natural for reach since audiences span orders
+    of magnitude. Authored in actual user count - a renderer rendering
+    the log-normal density does the log transform internally; authors
+    think and write in the underlying unit. The stdDev expresses how
+    much the underlying audience varies month-over-month and how
+    confident the author is about the central tendency.
 
 
 # =============================================================================
-# 2. SOURCE TYPE - categorical publisher classification
+# 2. SOURCE SUBCLASSES - tagged-by-type tree
 # =============================================================================
 
-SourceType:
+Tier1WireSource:
   type: rdfs.Class
-  label: Source Type
-  comment: >
-    Open enumeration of publisher categories. The instances below cover
-    the broad working set; extension packages may add specialty categories
-    (e.g. `central-bank-research`, `military-public-affairs`,
-    `equity-research-buy-side`) when usage justifies.
-
-tier-1-wire:
-  type: SourceType
-  label: Tier-1 Wire Service
+  subClassOf: Source
+  label: Tier-1 Wire Source
   comment: >
     Reuters, Bloomberg, AP, AFP. Real-time newswires with primary access
     to officials and decades of audited editorial process. The high-trust,
     high-reach reference class.
 
-major-newspaper:
-  type: SourceType
-  label: Major Newspaper
+MajorNewspaperSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Major Newspaper Source
   comment: >
     Mainstream newspapers with national or international reach and
     documented editorial standards - WSJ, FT, NYT, Washington Post, The
@@ -218,9 +237,10 @@ major-newspaper:
     (daily/weekly vs real-time) and by typical primariness (more
     interpretive, less first-report).
 
-business-press:
-  type: SourceType
-  label: Business Press
+BusinessPressSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Business Press Source
   comment: >
     Financial-focused outlets aimed at investors and operators - CNBC,
     MarketWatch, Yahoo Finance, Barron's. Variable editorial standards;
@@ -228,16 +248,18 @@ business-press:
     because audience is engaged; trust is lower than tier-1 wires because
     primary access is more selective.
 
-trade-press:
-  type: SourceType
-  label: Trade Press
+TradePressSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Trade Press Source
   comment: >
     Industry-vertical publications - Oil & Gas Journal, Defense News,
     Semiconductor Engineering. Lower reach, higher specialist depth.
 
-official-release:
-  type: SourceType
-  label: Official Release
+OfficialReleaseSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Official Release Source
   comment: >
     First-party press releases from a government body, central bank,
     regulator, court, or multilateral. The institution itself is the
@@ -246,92 +268,106 @@ official-release:
     true). Examples - Federal Reserve press releases, Treasury
     statements, OPEC communiques, IEA reports.
 
-intergovernmental-agency:
-  type: SourceType
-  label: Intergovernmental Agency
+IntergovernmentalAgencySource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Intergovernmental Agency Source
   comment: >
     Reports and analyses from formally constituted intergovernmental
     bodies - IEA, IMF, World Bank, UN agencies. Distinct from
-    official-release because the agency is not party to the events it
-    reports; closer to journalism in primariness, closer to officials in
-    methodology.
+    OfficialReleaseSource because the agency is not party to the events
+    it reports; closer to journalism in primariness, closer to officials
+    in methodology.
 
-industry-body:
-  type: SourceType
-  label: Industry Body
+IndustryBodySource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Industry Body Source
   comment: >
     Trade associations and producer councils - World Gold Council, API,
     OPEC Secretariat in its data-publishing role, SIA. Carry sector
     agendas; valuable for sector-specific structural data, suspect on
     sector-favouring forecasts.
 
-aggregator:
-  type: SourceType
-  label: Aggregator
+AggregatorSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Aggregator Source
   comment: >
     Platforms that republish or summarize other sources without primary
     reporting - Yahoo Finance, Apple News, Google News, financial
     portals. Reach is high; trust derives entirely from the underlying
-    sources they redistribute, so an aggregator citation is effectively a
-    pointer that needs resolution.
+    sources they redistribute, so an aggregator citation is effectively
+    a pointer that needs resolution.
 
-social-platform:
-  type: SourceType
-  label: Social Platform
+SocialPlatformSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Social Platform Source
   comment: >
     Posts on social platforms - X, Truth Social, LinkedIn, Bluesky.
     Variable trust dominated by the speaker's identity (an authenticated
-    official's account is closer to official-release; an anonymous
+    official's account is closer to OfficialReleaseSource; an anonymous
     account is closer to rumour).
 
-independent-blog:
-  type: SourceType
-  label: Independent Blog
+IndependentBlogSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Independent Blog Source
   comment: >
     Individual-author or small-team analytical publications - Substacks,
     newsletters, niche analyst sites. Wide trust range depending on
     author identity, track record, and primary access.
 
-academic:
-  type: SourceType
-  label: Academic
+AcademicSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Academic Source
   comment: >
     Peer-reviewed academic papers, working papers, and conference
     proceedings. High primariness for original research, slow latency,
     narrow direct reach but high citation propagation.
 
-broadcast:
-  type: SourceType
-  label: Broadcast
+BroadcastSource:
+  type: rdfs.Class
+  subClassOf: Source
+  label: Broadcast Source
   comment: >
     Television or radio news with a transcript or video clip as the
     primary artifact. May or may not have a written companion piece.
-    Distinct from business-press because the artifact is a broadcast
-    segment rather than written text.
+    Distinct from BusinessPressSource because the artifact is a
+    broadcast segment rather than written text.
 
 
 # =============================================================================
-# 3. SOURCE PRIMARINESS
+# 3. SOURCE PRIMARINESS - quality attribute, kept as enum
 # =============================================================================
 
 SourcePrimariness:
   type: rdfs.Class
   label: Source Primariness
-  comment: Closed enumeration of how far a source is from the underlying fact.
+  comment: >
+    Closed enumeration of how far a source typically sits from the
+    underlying fact. A quality attribute of the editorial process
+    rather than a structural typing facet (Reuters publishes both
+    primary and secondary content depending on the article; this
+    captures the typical mode). Same shape as wv.ThesisStatus -
+    state-like quality, kept as enum + property.
 
 primary:
   type: SourcePrimariness
   label: Primary
   comment: >
-    The source is the originator of the fact - the issuing institution's
-    own release, a direct quote from a named speaker, an audited filing,
-    a first-hand observation. The closest possible report to ground truth.
+    The source is typically the originator of the fact - the issuing
+    institution's own release, a direct quote from a named speaker, an
+    audited filing, a first-hand observation. The closest possible
+    report to ground truth.
 
 secondary:
   type: SourcePrimariness
   label: Secondary
   comment: >
-    The source is reporting on a primary source's release - a wire
+    The source typically reports on a primary source's release - a wire
     summarizing a Fed statement, a newspaper reproducing a court ruling,
     an analyst note interpreting a 10-K. Adds editorial framing.
 
@@ -339,22 +375,25 @@ tertiary:
   type: SourcePrimariness
   label: Tertiary
   comment: >
-    The source is aggregating or rolling up multiple secondary sources -
-    a market summary citing several wires, a daily roundup, a "morning
-    notes" post. Furthest from primary; most editorial framing.
+    The source typically aggregates or rolls up multiple secondary
+    sources - a market summary citing several wires, a daily roundup,
+    a "morning notes" post. Furthest from primary; most editorial
+    framing.
 
 
 # =============================================================================
-# 4. EDITORIAL INDEPENDENCE
+# 4. EDITORIAL INDEPENDENCE - quality attribute, kept as enum
 # =============================================================================
 
 EditorialIndependence:
   type: rdfs.Class
   label: Editorial Independence
   comment: >
-    Closed enumeration of the structural relationship between a publisher
-    and the entities it typically reports on. Orthogonal to trust;
-    informs interpretation rather than directly determining it.
+    Closed enumeration of the structural relationship between a
+    publisher and the entities it typically reports on. Orthogonal
+    quality attribute rather than structural typing - informs
+    interpretation rather than directly determining it. Same shape
+    as wv.ThesisStatus - kept as enum + property.
 
 independent:
   type: EditorialIndependence
@@ -367,21 +406,21 @@ state-affiliated:
   type: EditorialIndependence
   label: State-Affiliated
   comment: >
-    Owned, funded, or controlled by a government. Includes official press
-    offices (where the state IS the subject), state media (RT, PressTV,
-    Xinhua), and government-funded broadcasters with editorial firewalls
-    (BBC, NPR, DW) which sit somewhere between independent and
-    state-affiliated and should generally use this tag with a note in
-    sourceName or a future structured field.
+    Owned, funded, or controlled by a government. Includes official
+    press offices (where the state IS the subject), state media (RT,
+    PressTV, Xinhua), and government-funded broadcasters with editorial
+    firewalls (BBC, NPR, DW) which sit somewhere between independent
+    and state-affiliated and should generally use this tag with a note
+    in sourceName or a future structured field.
 
 corporate-affiliated:
   type: EditorialIndependence
   label: Corporate-Affiliated
   comment: >
     Owned by an entity with material business interests in the subjects
-    it reports on. CNBC (NBCUniversal/Comcast), MarketWatch (News Corp),
-    industry-body publications. Editorial firewall claims should be
-    weighed against ownership stake.
+    it reports on. CNBC (NBCUniversal/Comcast), MarketWatch (News
+    Corp), industry-body publications. Editorial firewall claims should
+    be weighed against ownership stake.
 
 platform-distributed:
   type: EditorialIndependence
@@ -404,354 +443,335 @@ anonymous:
 # =============================================================================
 # 5. SEED SOURCE INSTANCES
 #
-# Initial working set for worldview.genval.ai. Trust estimates are
-# subjective working numbers, not measurements - bumping in 1.0.N as the
-# publisher gathers more evidence is the intended workflow. Reach estimates
-# are order-of-magnitude monthly direct users (not syndication).
+# Initial working set for worldview.genval.ai. Each instance declares
+# its concrete Source subclass via `type:` (the canonical tagged-by-type
+# pattern). Trust estimates are subjective working numbers, not
+# measurements - bumping in 1.0.N as the publisher gathers more evidence
+# is the intended workflow. Reach estimates are order-of-magnitude
+# monthly direct users (not syndication).
 # =============================================================================
 
 # --- Tier-1 wires ---
 
 reuters:
-  type: Source
+  type: Tier1WireSource
   sourceName: Reuters
   sourceHomepage: https://www.reuters.com
-  sourceType: tier-1-wire
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.93
     estimateStdDev: 0.04
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 150000000
     estimateStdDev: 30000000
-    estimateDistribution: est.log-normal
 
 bloomberg:
-  type: Source
+  type: Tier1WireSource
   sourceName: Bloomberg
   sourceHomepage: https://www.bloomberg.com
-  sourceType: tier-1-wire
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.92
     estimateStdDev: 0.04
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 100000000
     estimateStdDev: 25000000
-    estimateDistribution: est.log-normal
 
 ap:
-  type: Source
+  type: Tier1WireSource
   sourceName: Associated Press
   sourceHomepage: https://apnews.com
-  sourceType: tier-1-wire
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.93
     estimateStdDev: 0.04
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 200000000
     estimateStdDev: 40000000
-    estimateDistribution: est.log-normal
 
 afp:
-  type: Source
+  type: Tier1WireSource
   sourceName: Agence France-Presse
   sourceHomepage: https://www.afp.com
-  sourceType: tier-1-wire
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.90
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 80000000
     estimateStdDev: 20000000
-    estimateDistribution: est.log-normal
 
 # --- Major newspapers ---
 
 wsj:
-  type: Source
+  type: MajorNewspaperSource
   sourceName: The Wall Street Journal
   sourceHomepage: https://www.wsj.com
-  sourceType: major-newspaper
   sourcePrimariness: secondary
   sourceEditorialIndependence: corporate-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.88
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 45000000
     estimateStdDev: 8000000
-    estimateDistribution: est.log-normal
 
 ft:
-  type: Source
+  type: MajorNewspaperSource
   sourceName: Financial Times
   sourceHomepage: https://www.ft.com
-  sourceType: major-newspaper
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.90
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 30000000
     estimateStdDev: 6000000
-    estimateDistribution: est.log-normal
 
 nyt:
-  type: Source
+  type: MajorNewspaperSource
   sourceName: The New York Times
   sourceHomepage: https://www.nytimes.com
-  sourceType: major-newspaper
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.06
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 110000000
     estimateStdDev: 20000000
-    estimateDistribution: est.log-normal
 
 the-economist:
-  type: Source
+  type: MajorNewspaperSource
   sourceName: The Economist
   sourceHomepage: https://www.economist.com
-  sourceType: major-newspaper
   sourcePrimariness: secondary
   sourceEditorialIndependence: independent
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.88
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 12000000
     estimateStdDev: 3000000
-    estimateDistribution: est.log-normal
 
 # --- Business press ---
 
 cnbc:
-  type: Source
+  type: BusinessPressSource
   sourceName: CNBC
   sourceHomepage: https://www.cnbc.com
-  sourceType: business-press
   sourcePrimariness: secondary
   sourceEditorialIndependence: corporate-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.08
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 150000000
     estimateStdDev: 30000000
-    estimateDistribution: est.log-normal
 
 marketwatch:
-  type: Source
+  type: BusinessPressSource
   sourceName: MarketWatch
   sourceHomepage: https://www.marketwatch.com
-  sourceType: business-press
   sourcePrimariness: tertiary
   sourceEditorialIndependence: corporate-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.70
     estimateStdDev: 0.08
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 60000000
     estimateStdDev: 12000000
-    estimateDistribution: est.log-normal
 
 yahoo-finance:
-  type: Source
+  type: AggregatorSource
   sourceName: Yahoo Finance
   sourceHomepage: https://finance.yahoo.com
-  sourceType: aggregator
   sourcePrimariness: tertiary
   sourceEditorialIndependence: platform-distributed
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.66
     estimateStdDev: 0.09
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 200000000
     estimateStdDev: 40000000
-    estimateDistribution: est.log-normal
 
 barrons:
-  type: Source
+  type: BusinessPressSource
   sourceName: Barron's
   sourceHomepage: https://www.barrons.com
-  sourceType: business-press
   sourcePrimariness: secondary
   sourceEditorialIndependence: corporate-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.80
     estimateStdDev: 0.06
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 18000000
     estimateStdDev: 4000000
-    estimateDistribution: est.log-normal
 
 # --- Official US releases ---
 
 fed-press:
-  type: Source
+  type: OfficialReleaseSource
   sourceName: Federal Reserve Press
   sourceHomepage: https://www.federalreserve.gov/newsevents/pressreleases.htm
-  sourceType: official-release
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.97
     estimateStdDev: 0.02
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 5000000
     estimateStdDev: 2000000
-    estimateDistribution: est.log-normal
 
 treasury-press:
-  type: Source
+  type: OfficialReleaseSource
   sourceName: US Department of the Treasury Press
   sourceHomepage: https://home.treasury.gov/news/press-releases
-  sourceType: official-release
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.96
     estimateStdDev: 0.03
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 3000000
     estimateStdDev: 1500000
-    estimateDistribution: est.log-normal
 
 white-house-press:
-  type: Source
+  type: OfficialReleaseSource
   sourceName: White House Press
   sourceHomepage: https://www.whitehouse.gov/news/
-  sourceType: official-release
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.92
     estimateStdDev: 0.05
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 15000000
     estimateStdDev: 5000000
-    estimateDistribution: est.log-normal
 
 bls-press:
-  type: Source
+  type: OfficialReleaseSource
   sourceName: US Bureau of Labor Statistics
   sourceHomepage: https://www.bls.gov/bls/newsrels.htm
-  sourceType: official-release
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.96
     estimateStdDev: 0.03
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 4000000
     estimateStdDev: 2000000
-    estimateDistribution: est.log-normal
 
 bea-press:
-  type: Source
+  type: OfficialReleaseSource
   sourceName: US Bureau of Economic Analysis
   sourceHomepage: https://www.bea.gov/news
-  sourceType: official-release
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.96
     estimateStdDev: 0.03
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 2500000
     estimateStdDev: 1200000
-    estimateDistribution: est.log-normal
 
 # --- Intergovernmental agencies + industry bodies ---
 
 iea:
-  type: Source
+  type: IntergovernmentalAgencySource
   sourceName: International Energy Agency
   sourceHomepage: https://www.iea.org
-  sourceType: intergovernmental-agency
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.90
     estimateStdDev: 0.06
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 8000000
     estimateStdDev: 3000000
-    estimateDistribution: est.log-normal
 
 opec-secretariat:
-  type: Source
+  type: IndustryBodySource
   sourceName: OPEC Secretariat
   sourceHomepage: https://www.opec.org/opec_web/en/press_room/28.htm
-  sourceType: industry-body
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.78
     estimateStdDev: 0.10
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 4000000
     estimateStdDev: 2000000
-    estimateDistribution: est.log-normal
 
 world-gold-council:
-  type: Source
+  type: IndustryBodySource
   sourceName: World Gold Council
   sourceHomepage: https://www.gold.org
-  sourceType: industry-body
   sourcePrimariness: primary
   sourceEditorialIndependence: corporate-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.78
     estimateStdDev: 0.08
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 3000000
     estimateStdDev: 1500000
-    estimateDistribution: est.log-normal
 
 imf:
-  type: Source
+  type: IntergovernmentalAgencySource
   sourceName: International Monetary Fund
   sourceHomepage: https://www.imf.org
-  sourceType: intergovernmental-agency
   sourcePrimariness: primary
   sourceEditorialIndependence: state-affiliated
   trustEstimate:
+    type: est.BetaEstimate
     estimateMean: 0.88
     estimateStdDev: 0.06
-    estimateDistribution: est.beta
   reachEstimate:
+    type: est.LogNormalEstimate
     estimateMean: 10000000
     estimateStdDev: 3000000
-    estimateDistribution: est.log-normal
