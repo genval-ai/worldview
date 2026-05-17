@@ -1,0 +1,563 @@
+landing-page:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.1.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+        - package: pages
+          match: ^
+          version: 2.1.0
+          alias: pages
+
+# =============================================================================
+# Landing-page SetTransformation.
+#
+# Reads every wv.WorldviewSnapshot in scope (across all packages), sorts by
+# observedAt descending, and emits a single index.html that lists every
+# snapshot as a rich card with date, narrative excerpt, and thesis count
+# (computed via tx.Count over wv.hasThesis - the v3 set-theoretic primitive
+# that unblocked aggregate transformations and is what makes this page
+# possible at all).
+#
+# v1 caveats:
+#
+#   * Each snapshot card is wrapped in an `<a class="snapshot-card-link">`
+#     whose href is a protocol-relative absolute URL composed from the
+#     snapshot's tx.SubjectUri (added in transformations@3.1.0) plus a
+#     ".html" suffix - which works because the workflow mirrors each
+#     rendered HTML at the canonical path
+#     `<publisher>/<package>@<version>/snapshot.html`. Robust against
+#     multi-snapshot-per-package and any future shape change in the
+#     matched set.
+#
+#   * The "narrative" property is a multi-paragraph block of prose. We trim
+#     the trailing newline and let CSS clamp it to a few lines via line-clamp
+#     (graceful overflow with ellipsis). v2 may add an explicit
+#     `narrativeSummary` short-form property if the prose is genuinely
+#     unwieldy.
+#
+#   * No regime markers, no per-thesis breakdowns, no narrative-diff column,
+#     no SVG sparklines for confidence trajectories - those need either
+#     arithmetic (for SVG coordinates) or string-diffing primitives that
+#     v3 didn't ship. The placeholder timeline section at the bottom of the
+#     page references those followups.
+# =============================================================================
+
+landing-page-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.descending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      # =========================================================
+      # METADATA — read by the HTML backend for the <title> tag.
+      # Static title; this page is always the snapshots index.
+      # =========================================================
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: "Snapshots · worldview.genval.ai"
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        # =====================================================
+                        # STYLE BLOCK + PAGE HEADER
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <link rel="stylesheet" href="index.css">
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/" class="active">Snapshots</a></li>
+                            <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+                            <article class="landing">
+                            <header class="intro">
+                            <span class="eyebrow">Snapshots</span>
+                            <h1>Worldview snapshots</h1>
+                            <p class="lead">Every published snapshot, newest first. Each entry is a self-contained record of theses, evidence, and invalidation conditions at a single point in time &mdash; immutable once published.</p>
+                            </header>
+
+                            <section class="snapshots">
+                            <h2 class="section-title">All snapshots</h2>
+                            <ol class="snapshot-list">
+
+                        # =====================================================
+                        # PER-SNAPSHOT CARD - one per matched WorldviewSnapshot
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snapshot
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+
+                              # Card open + numbered counter + date.
+                              # Each card is a real <a> link via tx.SubjectUri
+                              # (added in transformations@3.1.0). The href is
+                              # composed from the SubjectUri (e.g.
+                              # "worldview.genval.ai/snapshot@1.0.1/view")
+                              # + ".html" suffix, prefixed with "//" to form a
+                              # protocol-relative absolute URL. The static-site
+                              # workflow mirrors each rendered HTML at the
+                              # canonical Kanonak path, so the link resolves
+                              # correctly when the publisher origin serves it.
+                              # Card layout: SVG on the left (regime portrait), narrative
+                              # excerpt on the right. Version / date / thesis count are
+                              # already inside the SVG (tier-card content), so removed
+                              # the redundant text header.
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<li class="snapshot-card"><a class="snapshot-card-link" href="/snapshot/'
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '/view" data-snapshot-name="'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '"><div class="snapshot-card-layout"><div class="snapshot-card-fingerprint-wrap"><div class="snapshot-card-version-pill">v'
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</div><div data-viz="fingerprint" data-height="120" class="viz-fingerprint snapshot-card-fingerprint">'
+                              # ForEach over hasThesis - emit one <div data-fp-*> per thesis.
+                              # The viz library's renderFingerprint scans children with
+                              # [data-fp-mean] and builds the violin row.
+                              - type: tx.ForEach
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.hasThesis
+                                tx.loopVar: thRef
+                                tx.emit:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div data-fp-mean="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateMean
+                                      tx.alternate:
+                                        # Fallback: 1.x snapshots had scalar confidence -
+                                        # try reading wv.confidence directly as the number
+                                        type: tx.Fallback
+                                        tx.primary:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.alternate:
+                                          type: tx.StringLiteral
+                                          tx.stringLiteral: '0.5'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-stddev="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateStdDev
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-alpha="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaAlpha
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-beta="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaBeta
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-hue="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: thRef
+                                            tx.readProp: vis.thesisTheme
+                                        tx.readProp: vis.themeHue
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '200'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-status="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.status
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: 'active'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-fp-label="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thRef
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.VarRef
+                                          tx.varName: thRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '"></div>'
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </div></div>
+                                  <div class="snapshot-card-body">
+                                  <p class="snapshot-narrative">
+                              - type: tx.Normalize
+                                tx.normKind: tx.trim-end
+                                tx.normSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.narrative
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: |-
+                                  </p>
+                                  <span class="snapshot-card-readmore">Read snapshot &rarr;</span>
+                                  </div>
+                                  </div>
+                                  </a>
+                                  </li>
+
+                        # =====================================================
+                        # CLOSE SNAPSHOT LIST + ECOSYSTEM SECTION + FOOTER
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            </ol>
+                            </section>
+
+                            <footer class="landing-footer">
+                            <span><a href="/about/">About this publisher</a></span>
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            </footer>
+                            </article>
+                            <script>
+                            // Reformat ISO datetimes to readable form. Pure presentation —
+                            // raw timestamps stay in the source YAML for tools that want them.
+                            (function(){
+                              var RE = /\b(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?Z\b/g;
+                              var DAY_OPTS = { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' };
+                              var DT_OPTS = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short' };
+                              function fmt(_, y, m, d, hh, mm, ss){
+                                var date = new Date(y+'-'+m+'-'+d+'T'+hh+':'+mm+':'+ss+'Z');
+                                if (hh === '00' && mm === '00' && ss === '00') {
+                                  return date.toLocaleDateString('en-US', DAY_OPTS);
+                                }
+                                return date.toLocaleString('en-US', DT_OPTS);
+                              }
+                              function walk(node){
+                                if (node.nodeType === 3) {
+                                  if (RE.test(node.nodeValue)) { RE.lastIndex = 0; node.nodeValue = node.nodeValue.replace(RE, fmt); }
+                                  return;
+                                }
+                                if (node.nodeType === 1 && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+                                  var c = node.firstChild;
+                                  while (c) { var n = c.nextSibling; walk(c); c = n; }
+                                }
+                              }
+                              walk(document.body);
+                              if (RE.test(document.title)) { RE.lastIndex = 0; document.title = document.title.replace(RE, fmt); }
+                              // GitHub source link per snapshot card. The card-link href is
+                              // the canonical /<package>/<version>/<name> form; parse it to
+                              // build the github raw-source URL for the underlying .kan.yml.
+                              document.querySelectorAll('li.snapshot-card a.snapshot-card-link').forEach(function(link) {
+                                var href = link.getAttribute('href') || '';
+                                var m = href.match(/^\/([^/]+)\/([^/]+)\/[^/]+$/);
+                                if (!m) return;
+                                var pkg = m[1];
+                                var ver = m[2];
+                                var ghUrl = 'https://github.com/genval-ai/worldview/blob/main/kanonak-packages/worldview.genval.ai/' + pkg + '@' + ver + '.kan.yml';
+                                var card = link.closest('li.snapshot-card');
+                                if (!card) return;
+                                var src = document.createElement('a');
+                                src.className = 'source-link';
+                                src.href = ghUrl;
+                                src.target = '_blank';
+                                src.rel = 'noopener';
+                                src.textContent = 'source';
+                                card.appendChild(src);
+                              });
+                            })();
+                            </script>
+
+            # Include the worldview-viz JS primitive library so the
+            # data-viz="fingerprint" divs on each snapshot card auto-render
+            # their violin rows on DOMContentLoaded.
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-viz-js-fragment
+
+
+# =============================================================================
+# Snapshots-aggregate -> index.css
+#
+# Paired stylesheet SetTransformation for `landing-page-transformation`.
+# `pages@1.1.0/snapshots-aggregate` carries a per-instance binding at
+# (formats.stylesheet, default) → this transformation, so the site builder
+# materializes `snapshots/index.css` alongside `snapshots/index.html`.
+#
+# Composition: chrome fragment (publisher-wide tokens, body resets, site-nav,
+# anchor-scroll offset) + landing-page-specific CSS (intro, snapshot card
+# grid, source-link chip, ecosystem cards, footer).
+#
+# The page-specific RawBlock includes some chrome rules verbatim (the ones
+# this transformation inlined in 1.0.0); CSS cascade resolves identical
+# rules to the same value, so emitting them twice is benign. Future cleanup
+# can prune duplicates once the chrome fragment is the documented source.
+# =============================================================================
+
+landing-page-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index.css
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.landing{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+                      @media (max-width:760px){article.landing{padding:32px 20px 64px}}
+                      header.intro{padding:0 0 56px;margin-bottom:56px;position:relative}
+                      header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+                      header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                      @media (max-width:760px){header.intro h1{font-size:42px}}
+                      header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                      header.intro .lead a{color:var(--accent);font-weight:400}
+                      section.snapshots,section.packages,section.ecosystem{margin-top:64px}
+                      .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                      .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      ol.snapshot-list{list-style:none;padding:0;margin:0}
+                      li.snapshot-card{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:var(--radius);margin-bottom:16px;transition:border-color 120ms,transform 120ms,box-shadow 120ms;position:relative}
+                      li.snapshot-card:hover{border-color:var(--accent-3);box-shadow:0 4px 24px -8px rgba(14,165,233,0.15);transform:translateY(-1px)}
+                      a.snapshot-card-link{display:block;padding:24px 28px;color:inherit;text-decoration:none}
+                      a.snapshot-card-link:hover{color:inherit}
+                      @media (max-width:760px){a.snapshot-card-link{padding:20px}}
+                      .snapshot-card-layout{display:flex;gap:24px;align-items:flex-start}
+                      .snapshot-card-svg{display:block;flex:0 0 320px;width:320px;height:auto;border-radius:8px;background:#0a0e1a}
+                      .snapshot-card-fingerprint-wrap{flex:0 0 320px;width:320px;background:linear-gradient(180deg,rgba(10,14,26,0.6),rgba(15,21,36,0.95));border-radius:8px;padding:16px 14px 10px;display:flex;flex-direction:column;gap:8px}
+                      .snapshot-card-version-pill{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;font-weight:600;background:rgba(125,211,252,0.08);border:1px solid rgba(125,211,252,0.2);padding:3px 10px;border-radius:10px;align-self:flex-start}
+                      .snapshot-card-fingerprint{display:flex;align-items:flex-end;height:120px;width:100%}
+                      .snapshot-card-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;align-self:stretch}
+                      @media (max-width:760px){
+                        .snapshot-card-layout{flex-direction:column;gap:18px}
+                        .snapshot-card-svg,.snapshot-card-fingerprint-wrap{flex:0 0 auto;width:100%;max-width:380px}
+                      }
+                      p.snapshot-narrative{font-size:14px;line-height:1.65;color:var(--fg-dim);font-weight:300;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;margin:0;flex:1}
+                      .snapshot-card-readmore{font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;align-self:flex-start;transition:color 120ms}
+                      li.snapshot-card:hover .snapshot-card-readmore{color:var(--accent-2)}
+                      section.ecosystem ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+                      section.ecosystem li{padding:18px 20px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px}
+                      section.ecosystem li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:6px;font-weight:500}
+                      section.ecosystem li .pkg-purpose{font-size:13px;color:var(--fg-dim);line-height:1.55}
+                      section.ecosystem li a{color:var(--accent)}
+                      footer.landing-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                      li.snapshot-card{position:relative}
+                      li.snapshot-card a.snapshot-card-link{padding-bottom:56px}
+                      a.source-link{position:absolute;bottom:16px;right:16px;background:var(--bg-elev);border:1px solid var(--border);padding:5px 11px;border-radius:4px;font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;transition:color 120ms,border-color 120ms;display:inline-flex;align-items:center;gap:6px;z-index:5}
+                      a.source-link::before{content:"<>";opacity:0.55;font-size:9px}
+                      a.source-link:hover{color:var(--accent);border-color:var(--accent)}
+                      footer.landing-footer a{color:var(--accent)}
+                      .timeline-pending{padding:20px 24px;background:var(--bg-card);border:1px dashed var(--border);border-radius:6px;color:var(--fg-faint);font-size:13px;line-height:1.55;font-style:italic}

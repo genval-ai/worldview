@@ -839,8 +839,27 @@ worldview-viz-js-fragment:
                 el.appendChild(svg);
               }
               // ===== Regime fingerprint (violin row per thesis) =====
+              // Supports two data shapes: a JSON script blob OR child elements
+              // with data-fp-mean etc. attributes (more tx-friendly).
               function renderFingerprint(el){
-                var data=readJson(el);if(!data||!data.theses)return;
+                var data=readJson(el);
+                if(!data){
+                  var theses=[];
+                  el.querySelectorAll(':scope > [data-fp-mean]').forEach(function(c){
+                    theses.push({
+                      label:c.dataset.fpLabel||'',
+                      mean:parseFloat(c.dataset.fpMean),
+                      stddev:parseFloat(c.dataset.fpStddev),
+                      alpha:parseFloat(c.dataset.fpAlpha),
+                      beta:parseFloat(c.dataset.fpBeta),
+                      hue:parseFloat(c.dataset.fpHue)||200,
+                      status:c.dataset.fpStatus||'active'
+                    });
+                  });
+                  if(!theses.length)return;
+                  data={theses:theses};
+                }
+                if(!data.theses)return;
                 var w=el.clientWidth||320,h=parseInt(el.dataset.height,10)||80;
                 var cellW=w/data.theses.length;
                 el.innerHTML='';
@@ -1004,7 +1023,7 @@ snapshots-aggregate:
     type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: landing-page
-    tx.version: 2.0.0
+    tx.version: 2.1.0
     tx.name: landing-page-transformation
   derivation.derivations:
     - type: derivation.Derivation
@@ -1014,7 +1033,7 @@ snapshots-aggregate:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: landing-page
-        tx.version: 2.0.0
+        tx.version: 2.1.0
         tx.name: landing-page-stylesheet
 
 timeline-aggregate:
@@ -1027,7 +1046,7 @@ timeline-aggregate:
     type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: timeline
-    tx.version: 2.0.0
+    tx.version: 2.1.0
     tx.name: timeline-transformation
   derivation.derivations:
     - type: derivation.Derivation
@@ -1037,7 +1056,7 @@ timeline-aggregate:
         type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: timeline
-        tx.version: 2.0.0
+        tx.version: 2.1.0
         tx.name: timeline-stylesheet
 
 horizon-aggregate:

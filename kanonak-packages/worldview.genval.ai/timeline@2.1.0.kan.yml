@@ -1,0 +1,498 @@
+timeline:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.1.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+        - package: pages
+          match: ^
+          version: 2.1.0
+          alias: pages
+
+# =============================================================================
+# Cross-version timeline view of WorldviewSnapshot confidence trajectories.
+#
+# Multi-scope SetTransformation (#9) iterates every WorldviewSnapshot in
+# scope and, per snapshot, walks each thesis to emit a structured
+# (snapshot, thesis, confidence) data point. Inline JS reads those
+# points from the DOM and draws an SVG line chart — one line per
+# thesis, X axis = snapshot order (ordinal), Y axis = confidence 0..1.
+#
+# This is the first non-list aggregate transformation in the publisher;
+# the SetTransformation rule embeds rendering data rather than producing
+# a list of cards. It demonstrates that aggregate transformations are
+# a primitive for ANY cross-input view, not just indexes.
+# =============================================================================
+
+timeline-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.ascending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      # =========================================================
+      # METADATA - HTML <title>
+      # =========================================================
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: 'Timeline · worldview.genval.ai'
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        # =====================================================
+                        # STYLE BLOCK
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <link rel="stylesheet" href="index.css">
+
+                        # =====================================================
+                        # SITE NAV
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/timeline/" class="active">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+
+                        # =====================================================
+                        # ARTICLE OPEN + HERO + CHART HOST
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <article class="timeline">
+                            <header class="intro">
+                            <span class="eyebrow">Timeline</span>
+                            <h1>Confidence over time</h1>
+                            <p class="lead">One band per thesis. Each band's center line is the thesis's mean confidence across snapshots; the lighter outer envelope is the 95% credible interval and the inner shading is the IQR. <strong>Tightening bands</strong> mean evidence accumulated and conviction sharpened; <strong>widening bands</strong> mean contradictory evidence arrived. Where pre-2.x snapshots had only scalar confidence, the band collapses to a line.</p>
+                            </header>
+                            <section class="chart-section">
+                            <h2 class="section-title">Confidence trajectories</h2>
+                            <div class="chart-host" id="chart-host"><svg id="confidence-chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" preserveAspectRatio="xMidYMid meet"></svg></div>
+                            <div class="chart-legend" id="chart-legend"></div>
+                            </section>
+                            <section class="data" aria-hidden="true">
+
+                        # =====================================================
+                        # PER-SNAPSHOT DATA EMBEDDING
+                        # ForEach over inputs (sorted ascending by observedAt).
+                        # Each snapshot wraps a set of thesis-point divs that
+                        # the inline script reads to build the chart.
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snapshot
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<div class="snapshot-data" data-snapshot-version="'
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" data-observed-at="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: snapshot
+                                tx.readProp: wv.observedAt
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">'
+
+                              # Inner ForEach: each thesis reference on this snapshot
+                              - type: tx.ForEach
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snapshot
+                                  tx.readProp: wv.hasThesis
+                                tx.loopVar: thesisRef
+                                tx.emit:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div class="thesis-point" data-thesis-name="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-thesis-label="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.ResolveRef
+                                        tx.resolveSource:
+                                          type: tx.VarRef
+                                          tx.varName: thesisRef
+                                      tx.readProp: rdfs.label
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-confidence="'
+                                    - type: tx.PropertyRead
+                                      tx.readSource:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thesisRef
+                                        tx.readProp: wv.confidence
+                                      tx.readProp: est.estimateMean
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-stddev="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateStdDev
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-lower95="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateLower95
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-upper95="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thesisRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateUpper95
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-hue="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: thesisRef
+                                            tx.readProp: vis.thesisTheme
+                                        tx.readProp: vis.themeHue
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '200'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-status="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thesisRef
+                                        tx.readProp: wv.status
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '"></div>'
+
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</div>'
+
+                        # =====================================================
+                        # ARTICLE CLOSE + INLINE SCRIPT
+                        # The script reads .thesis-point divs, groups them by
+                        # data-thesis-name, sorts each series by snapshot order,
+                        # and draws an SVG line chart with hover-isolating legend.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </section>
+                            <footer class="timeline-footer">
+                            <span><a href="/about/">About this publisher</a></span>
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            </footer>
+                            </article>
+                            <script>
+                            // Aggregator: read embedded .snapshot-data / .thesis-point divs,
+                            // group by thesis, and dispatch to the viz library's fan-chart
+                            // renderer with proper distributional series. The legacy line-chart
+                            // script was replaced - the fan chart shows median + IQR + 95% CI
+                            // band per thesis, encoding distributional confidence directly.
+                            (function(){
+                              function parseOrNull(s){var v=parseFloat(s);return isFinite(v)?v:null;}
+                              function ready(fn){if(document.readyState!=='loading')fn();else document.addEventListener('DOMContentLoaded',fn);}
+                              ready(function(){
+                                var snaps=[];
+                                document.querySelectorAll('.snapshot-data').forEach(function(s){
+                                  snaps.push({version:s.dataset.snapshotVersion,observedAt:new Date(s.dataset.observedAt),el:s});
+                                });
+                                snaps.sort(function(a,b){return a.observedAt-b.observedAt;});
+                                if(!snaps.length)return;
+                                var seriesMap={};
+                                snaps.forEach(function(snap,xi){
+                                  var seen={};
+                                  snap.el.querySelectorAll('.thesis-point').forEach(function(pt){
+                                    var name=pt.dataset.thesisName;seen[name]=true;
+                                    if(!seriesMap[name])seriesMap[name]={id:name,label:pt.dataset.thesisLabel||name,hue:parseFloat(pt.dataset.hue)||200,points:[]};
+                                    seriesMap[name].points[xi]={
+                                      mean:parseOrNull(pt.dataset.confidence),
+                                      stddev:parseOrNull(pt.dataset.stddev),
+                                      lower95:parseOrNull(pt.dataset.lower95),
+                                      upper95:parseOrNull(pt.dataset.upper95),
+                                      status:pt.dataset.status||'active'
+                                    };
+                                  });
+                                });
+                                // Fill nulls for series that don't appear in every snapshot
+                                Object.keys(seriesMap).forEach(function(k){
+                                  for(var i=0;i<snaps.length;i++)if(!seriesMap[k].points[i])seriesMap[k].points[i]=null;
+                                });
+                                var payload={
+                                  snapshots:snaps.map(function(s){var d=s.observedAt;return (d.getUTCMonth()+1)+'/'+d.getUTCDate()+' v'+s.version;}),
+                                  series:Object.keys(seriesMap).map(function(k){return seriesMap[k];})
+                                };
+                                var host=document.getElementById('chart-host');
+                                if(!host)return;
+                                host.innerHTML='';
+                                var fan=document.createElement('div');
+                                fan.setAttribute('data-viz','fan-chart');fan.setAttribute('data-height','520');
+                                fan.className='viz-fan-chart';
+                                var script=document.createElement('script');
+                                script.type='application/json';script.textContent=JSON.stringify(payload);
+                                fan.appendChild(script);
+                                host.appendChild(fan);
+                                if(window.WorldviewViz)window.WorldviewViz.renderers['fan-chart'](fan);
+                                // Build a richer legend showing current mean ± stddev and the trend
+                                var legend=document.getElementById('chart-legend');
+                                if(legend){
+                                  var lh=payload.series.map(function(s){
+                                    var lastIdx=s.points.length-1;
+                                    while(lastIdx>=0&&!s.points[lastIdx])lastIdx--;
+                                    if(lastIdx<0)return '';
+                                    var last=s.points[lastIdx];
+                                    var prev=null;
+                                    for(var i=lastIdx-1;i>=0;i--){if(s.points[i]){prev=s.points[i];break;}}
+                                    var trend='';
+                                    if(prev&&last){var d=last.mean-prev.mean;if(Math.abs(d)>0.005)trend=' <span class="legend-delta '+(d>0?'up':'down')+'">'+(d>0?'+':'')+(d*100).toFixed(0)+'pt</span>';}
+                                    var widthChange='';
+                                    if(prev&&prev.stddev!=null&&last.stddev!=null){
+                                      var dw=last.stddev-prev.stddev;
+                                      if(Math.abs(dw)>0.005)widthChange=' <span class="legend-width '+(dw<0?'tighter':'wider')+'">'+(dw<0?'tighter':'wider')+'</span>';
+                                    }
+                                    var pm=last.stddev!=null?' ± '+last.stddev.toFixed(2):'';
+                                    return '<div class="legend-item" data-thesis="'+s.id+'" style="--viz-hue:'+s.hue+'"><span class="legend-swatch"></span><span class="legend-label">'+s.label+'</span><span class="legend-current">μ='+last.mean.toFixed(2)+pm+trend+widthChange+'</span></div>';
+                                  });
+                                  legend.innerHTML=lh.join('');
+                                }
+                              });
+                            })();
+                            </script>
+
+            # Include the worldview-viz JS primitive library (provides
+            # window.WorldviewViz.renderers['fan-chart'] used by the
+            # aggregator script above).
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-viz-js-fragment
+
+
+# =============================================================================
+# Timeline-aggregate -> index.css
+#
+# Paired stylesheet SetTransformation. `pages@1.1.0/timeline-aggregate`
+# binds (formats.stylesheet, default) → this transformation; site builder
+# materializes `timeline/index.css` alongside `timeline/index.html`.
+# =============================================================================
+
+timeline-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index.css
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.timeline{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+                      @media (max-width:760px){article.timeline{padding:32px 20px 64px}}
+                      header.intro{padding:0 0 56px;margin-bottom:56px;position:relative}
+                      header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      header.intro .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
+                      header.intro h1{font-family:var(--font-display);font-size:64px;font-weight:400;letter-spacing:-0.025em;margin-bottom:32px;line-height:1.0;color:var(--fg)}
+                      @media (max-width:760px){header.intro h1{font-size:42px}}
+                      header.intro .lead{font-size:19px;color:var(--fg-dim);line-height:1.7;font-weight:300}
+                      section.chart-section{margin-top:64px}
+                      .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
+                      .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      .chart-host{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:24px;overflow-x:auto}
+                      .chart-host svg{display:block;width:100%;height:auto;min-width:760px}
+                      .chart-legend{margin-top:24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+                      .legend-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;font-size:13px;cursor:default;transition:border-color 120ms,opacity 120ms}
+                      .legend-item.dimmed{opacity:0.35}
+                      .legend-item:hover{border-color:var(--accent-3)}
+                      .legend-swatch{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+                      .legend-label{flex:1;color:var(--fg-dim);line-height:1.4}
+                      .legend-current{font-family:var(--font-mono);font-size:12px;color:var(--fg);background:var(--bg-elev);border:1px solid var(--border);padding:2px 8px;border-radius:4px;letter-spacing:0.05em;flex-shrink:0}
+                      .legend-current.up{color:var(--strong);border-color:rgba(52,211,153,0.3)}
+                      .legend-current.down{color:var(--danger);border-color:rgba(248,113,113,0.3)}
+                      .legend-current.flat{color:var(--fg-faint)}
+                      .data{display:none}
+                      footer.timeline-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
+                      footer.timeline-footer a{color:var(--accent)}
