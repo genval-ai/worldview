@@ -507,23 +507,26 @@ worldview-viz-js-fragment:
                   srcLbl.textContent=(e.label||'').slice(0,20);svg.appendChild(srcLbl);
                   // bg strip
                   svg.appendChild(svgEl('rect',{x:stripX,y:y+4,width:stripW,height:rowH-8,class:'forest-strip-bg',rx:2}));
-                  // weighted fill: width = weight * stripW, centered on mean
-                  var meanPx=stripX+e.mean*stripW;
-                  var widthPx=Math.max(8,(e.weight||0.5)*stripW*0.45);
+                  // Weight bar: left-aligned, width DIRECTLY proportional to
+                  // contribution weight (strength * source.trust). High-weight
+                  // evidence reads as a wide bar; low-weight reads as a narrow
+                  // bar. Visually unambiguous.
+                  var weight=Math.max(0,Math.min(1,e.weight||0.5));
+                  var weightPx=Math.max(6,weight*stripW);
                   var hue=e.hue||data.hue||200;
                   svg.appendChild(svgEl('rect',{
-                    x:Math.max(stripX,meanPx-widthPx/2),y:y+4,
-                    width:Math.min(stripW-(meanPx-widthPx/2-stripX),widthPx),
+                    x:stripX,y:y+4,
+                    width:weightPx,
                     height:rowH-8,
                     class:'forest-strip-fill forest-strip',
                     fill:'hsl('+hue+',65%,55%)',
                     rx:2
                   }));
-                  // mean tick
-                  svg.appendChild(svgEl('line',{x1:meanPx,y1:y+2,x2:meanPx,y2:y+rowH-2,stroke:'hsl('+hue+',60%,80%)','stroke-width':1.5}));
-                  // right-side numeric
+                  // right-side numeric: the actual contribution WEIGHT (different
+                  // per evidence, not the thesis mean). Shows why some bars are
+                  // wider than others.
                   var num=svgEl('text',{x:w-padX,y:y+rowH/2+3,'text-anchor':'end',class:'forest-strip-label'});
-                  num.textContent=e.mean.toFixed(2);svg.appendChild(num);
+                  num.textContent='w '+weight.toFixed(2);svg.appendChild(num);
                 });
                 // divider
                 var divY=headerH+ev.length*(rowH+gap)+8;
