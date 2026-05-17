@@ -1,0 +1,372 @@
+securities:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.1.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+    - publisher: worldview.genval.ai
+      packages:
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+
+AssetClass:
+  type: rdfs.Class
+  label: Asset Class
+  comment: >-
+    Closed taxonomy of broad instrument classifications. Industry term
+    retained as-is. Drives strategy applicability filters and execution
+    routing in downstream portfolio systems.
+
+equity:
+  type: AssetClass
+  label: Equity
+  comment: Common stock or share. Direct ownership claim on a company.
+
+etf:
+  type: AssetClass
+  label: ETF
+  comment: Exchange-traded fund. Basket security with intraday liquidity.
+
+etn:
+  type: AssetClass
+  label: ETN
+  comment: >-
+    Exchange-traded note. Unsecured debt instrument tracking an underlying
+    index. Carries issuer credit risk.
+
+index:
+  type: AssetClass
+  label: Index
+  comment: >-
+    An index value (e.g., SPX, VIX). Directly observable but not directly
+    tradable.
+
+futures:
+  type: AssetClass
+  label: Futures
+  comment: Standardized exchange-traded forward contract.
+
+option:
+  type: AssetClass
+  label: Option
+  comment: >-
+    Options contract granting the right to buy or sell an underlying at
+    a strike.
+
+bond:
+  type: AssetClass
+  label: Bond
+  comment: Fixed-income debt instrument.
+
+commodity:
+  type: AssetClass
+  label: Commodity
+  comment: Physical commodity exposure.
+
+Sector:
+  type: rdfs.Class
+  label: Sector
+  comment: >-
+    Industry or asset-category sector classification. Open-ended -
+    downstream packages may define additional sector instances beyond
+    the starter set provided here. Used for thesis-to-security matching
+    and exposure aggregation.
+
+defense:
+  type: Sector
+  label: Defense
+  comment: Aerospace and defense industry.
+
+energy:
+  type: Sector
+  label: Energy
+  comment: Oil, gas, refining, pipelines, integrated majors, energy services.
+
+semiconductors:
+  type: Sector
+  label: Semiconductors
+  comment: Chip designers, foundries, equipment makers, and adjacent IP companies.
+
+precious-metals:
+  type: Sector
+  label: Precious Metals
+  comment: Gold, silver, platinum, and the miners or streamers producing them.
+
+broad-market:
+  type: Sector
+  label: Broad Market
+  comment: Diversified market exposure (SPY, VTI, SPX). Equity beta without sector tilt.
+
+volatility:
+  type: Sector
+  label: Volatility
+  comment: VIX-linked instruments and volatility products.
+
+media-entertainment:
+  type: Sector
+  label: Media and Entertainment
+  comment: Studios, streaming services, theme parks, sports rights.
+
+long-treasury:
+  type: Sector
+  label: Long Treasury
+  comment: Long-duration US Treasury exposure (20+ years).
+
+medium-treasury:
+  type: Sector
+  label: Medium Treasury
+  comment: Intermediate-duration US Treasury exposure (7-10 years).
+
+managed-futures:
+  type: Sector
+  label: Managed Futures
+  comment: Trend-following exposure across rates, commodities, and currencies via futures.
+
+tech-hardware:
+  type: Sector
+  label: Tech Hardware
+  comment: >-
+    Networking equipment, servers, storage, and adjacent enterprise IT
+    hardware companies. Distinct from semiconductors (chip designers /
+    foundries) - the box-builders rather than the silicon designers.
+    Cisco, Arista, Dell, HPE land here.
+
+typedAssetClass:
+  type: owl.ObjectProperty
+  domain: fin.Security
+  range: AssetClass
+  label: Typed Asset Class
+  comment: >-
+    Typed AssetClass reference. Closed-taxonomy alternative to
+    fin.assetClass (which is a string). Use whichever fits your
+    consumer needs.
+
+typedSector:
+  type: owl.ObjectProperty
+  domain: fin.Security
+  range: Sector
+  label: Typed Sector
+  comment: >-
+    Sector classification of the security. Used for thesis-to-security
+    matching and exposure aggregation.
+
+referencePrice:
+  type: owl.DatatypeProperty
+  domain: fin.Security
+  range: xsd.decimal
+  label: Reference Price
+  comment: >-
+    Approximate reference price at the security record's authoring time.
+    Live execution should query the actual quote; this field is a
+    sanity-check anchor for the definition.
+
+priceAsOf:
+  type: owl.DatatypeProperty
+  domain: fin.Security
+  range: xsd.date
+  label: Price As Of
+  comment: Date the referencePrice was observed.
+
+amd:
+  type: fin.Security
+  fin.ticker: AMD
+  label: Advanced Micro Devices
+  typedAssetClass: equity
+  typedSector: semiconductors
+
+nvda:
+  type: fin.Security
+  fin.ticker: NVDA
+  label: NVIDIA
+  typedAssetClass: equity
+  typedSector: semiconductors
+
+spy:
+  type: fin.Security
+  fin.ticker: SPY
+  label: SPDR S&P 500 ETF
+  typedAssetClass: etf
+  typedSector: broad-market
+
+spx:
+  type: fin.Security
+  fin.ticker: SPX
+  label: S&P 500 Index
+  typedAssetClass: index
+  typedSector: broad-market
+
+vix:
+  type: fin.Security
+  fin.ticker: VIX
+  label: CBOE Volatility Index
+  typedAssetClass: index
+  typedSector: volatility
+
+gld:
+  type: fin.Security
+  fin.ticker: GLD
+  label: SPDR Gold Shares ETF
+  typedAssetClass: etf
+  typedSector: precious-metals
+
+gdx:
+  type: fin.Security
+  fin.ticker: GDX
+  label: VanEck Gold Miners ETF
+  typedAssetClass: etf
+  typedSector: precious-metals
+
+xle:
+  type: fin.Security
+  fin.ticker: XLE
+  label: Energy Select Sector SPDR Fund
+  typedAssetClass: etf
+  typedSector: energy
+
+xom:
+  type: fin.Security
+  fin.ticker: XOM
+  label: Exxon Mobil
+  typedAssetClass: equity
+  typedSector: energy
+
+cvx:
+  type: fin.Security
+  fin.ticker: CVX
+  label: Chevron
+  typedAssetClass: equity
+  typedSector: energy
+
+lmt:
+  type: fin.Security
+  fin.ticker: LMT
+  label: Lockheed Martin
+  typedAssetClass: equity
+  typedSector: defense
+
+rtx:
+  type: fin.Security
+  fin.ticker: RTX
+  label: RTX Corporation
+  typedAssetClass: equity
+  typedSector: defense
+
+noc:
+  type: fin.Security
+  fin.ticker: NOC
+  label: Northrop Grumman
+  typedAssetClass: equity
+  typedSector: defense
+
+tlt:
+  type: fin.Security
+  fin.ticker: TLT
+  label: iShares 20+ Year Treasury Bond ETF
+  typedAssetClass: etf
+  typedSector: long-treasury
+
+vti:
+  type: fin.Security
+  fin.ticker: VTI
+  label: Vanguard Total Stock Market ETF
+  typedAssetClass: etf
+  typedSector: broad-market
+  referencePrice: 365.0
+  priceAsOf: 2026-05-04
+
+uvix:
+  type: fin.Security
+  fin.ticker: UVIX
+  label: 2x Long VIX Futures ETF
+  typedAssetClass: etf
+  typedSector: volatility
+  referencePrice: 5.36
+  priceAsOf: 2026-05-04
+
+iau:
+  type: fin.Security
+  fin.ticker: IAU
+  label: iShares Gold Trust
+  typedAssetClass: etf
+  typedSector: precious-metals
+  referencePrice: 86.0
+  priceAsOf: 2026-05-04
+
+dis:
+  type: fin.Security
+  fin.ticker: DIS
+  label: The Walt Disney Company
+  typedAssetClass: equity
+  typedSector: media-entertainment
+  referencePrice: 105.0
+  priceAsOf: 2026-05-04
+
+ief:
+  type: fin.Security
+  fin.ticker: IEF
+  label: iShares 7-10 Year Treasury Bond ETF
+  typedAssetClass: etf
+  typedSector: medium-treasury
+  referencePrice: 96.0
+  priceAsOf: 2026-05-04
+
+kmlm:
+  type: fin.Security
+  fin.ticker: KMLM
+  label: KFA Mount Lucas Managed Futures ETF
+  typedAssetClass: etf
+  typedSector: managed-futures
+  referencePrice: 27.0
+  priceAsOf: 2026-05-04
+
+dbmf:
+  type: fin.Security
+  fin.ticker: DBMF
+  label: iMGP DBi Managed Futures Strategy ETF
+  typedAssetClass: etf
+  typedSector: managed-futures
+  referencePrice: 30.0
+  priceAsOf: 2026-05-04
+
+ixic:
+  type: fin.Security
+  fin.ticker: IXIC
+  label: Nasdaq Composite Index
+  typedAssetClass: index
+  typedSector: broad-market
+
+intc:
+  type: fin.Security
+  fin.ticker: INTC
+  label: Intel Corporation
+  typedAssetClass: equity
+  typedSector: semiconductors
+
+mu:
+  type: fin.Security
+  fin.ticker: MU
+  label: Micron Technology
+  typedAssetClass: equity
+  typedSector: semiconductors
+
+csco:
+  type: fin.Security
+  fin.ticker: CSCO
+  label: Cisco Systems
+  typedAssetClass: equity
+  typedSector: tech-hardware
