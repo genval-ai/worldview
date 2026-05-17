@@ -64,15 +64,11 @@ view:
         tx.version: 2.0.0
         tx.name: snapshot-stylesheet
   narrative: |
-    Saturday-evening 2.1.0 refresh - the first operational 2.x snapshot
-    extending the 2.0.0 schema demo from three theses to the full
-    seven-thesis worldview carried over from [[powell-warsh-transition-risk|1.0.15]].
-    The four migrated theses ([[gold-debasement-bid]],
-    [[ai-capex-cycle-with-china-tail]], [[equity-melt-up-vs-recession-risk]],
-    [[powell-warsh-transition-risk]]) re-author their 1.0.15 scalar
-    confidences as distributional Beta estimates with explicit width
-    rationale per the [[stagflation-risk]] / [[persistent-energy-shock]] /
-    [[iran-war-rearmament]] precedent set by 2.0.0. Friday May 15 closes
+    Saturday-evening 2.1.0 refresh - the first operational 2.x snapshot,
+    covering the full seven-thesis worldview carried over from
+    [[powell-warsh-transition-risk|1.0.15]]. Every thesis re-authors its
+    1.0.15 scalar confidence as a distributional Beta estimate with
+    explicit width rationale. Friday May 15 closes
     on [[sec.spy]] 739.17 / [[sec.nvda]] 225.32 / [[sec.amd]] 424.10 /
     [[sec.lmt]] 516.01 / [[sec.rtx]] 171.18 / [[sec.noc]] 540.69 /
     [[sec.gld]] 417.29 / [[sec.gdx]] 87.35 / [[sec.xom]] 157.92 were
@@ -135,11 +131,10 @@ view:
       low effective n (~16) - this isn't a thesis the snapshot
       knows much about yet.
 
-    **Three carried-over 2.0.0 theses.** [[stagflation-risk]] holds
+    **Three high-conviction structural theses.** [[stagflation-risk]]
     at Beta(33, 7.2), mean 0.82 stdDev 0.04. [[persistent-energy-shock]]
-    holds at Beta(14, 6.6), mean 0.68 stdDev 0.07.
-    [[iran-war-rearmament]] holds at Beta(23, 5.0), mean 0.82 stdDev
-    0.05. The weekend additions (presidential unit citation,
+    at Beta(14, 6.6), mean 0.68 stdDev 0.07. [[iran-war-rearmament]]
+    at Beta(23, 5.0), mean 0.82 stdDev 0.05. The weekend additions (presidential unit citation,
     Algemeiner corroboration) are directionally consistent with these
     confidence levels - no thesis-level movement.
 
@@ -194,8 +189,9 @@ stagflation-risk:
   vis.thesisTheme: vis.theme-inflation
   status: wv.active
   confidenceRationale: >-
-    Held from 2.0.0. Tight band (stdDev 0.04) reflects four independent
-    structural-inflation measurements in one trading week: CPI 3.8% YoY,
+    Mean carried over from the 1.0.15 scalar (0.82). Tight band
+    (stdDev 0.04) reflects four independent structural-inflation
+    measurements in one trading week: CPI 3.8% YoY,
     PPI +6.0% YoY, import prices +4.2% YoY, and the 10Y rate-path 20pp
     repricing. Beta(33, 7.2) parameterization encodes ~40 effective
     independent observations - the Bayesian frame makes the evidence
@@ -267,7 +263,8 @@ persistent-energy-shock:
   vis.thesisTheme: vis.theme-energy
   status: wv.active
   confidenceRationale: >-
-    Held from 2.0.0. Wider band (stdDev 0.07) reflects two genuinely
+    Mean carried over from the 1.0.15 scalar (0.68). Wider band
+    (stdDev 0.07) reflects two genuinely
     offsetting forces - the IEA structural-undersupply confirmation
     pushes confidence up, the Trump 20-year framing and possible
     Chinese-buyer sanction relief pushes it down. Beta(14, 6.6)
@@ -341,7 +338,8 @@ iran-war-rearmament:
   vis.thesisTheme: vis.theme-defense
   status: wv.active
   confidenceRationale: >-
-    Held from 2.0.0. Same mean as stagflation (0.82) but slightly wider
+    Mean carried over from the 1.0.15 scalar (0.82) - same mean as
+    stagflation but slightly wider
     band (stdDev 0.05 vs 0.04) because the structural conviction is
     multi-year procurement cycles (high) but the weekly mark-to-market
     is volatile (LMT/RTX/NOC trade on chip rotation as much as defense).
