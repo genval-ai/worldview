@@ -138,6 +138,19 @@ jobs:
             kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
               --scope "worldview.genval.ai/${base}" \
               --format svg --out "$out_dir/" >/dev/null 2>&1 || true
+            # Evidence pages - one per wv.Evidence instance in the
+            # snapshot. Resolves [[ev-foo]] narrative references that
+            # would otherwise 404. Rendered via direct transform-run
+            # (bypassing polymorphic discovery which the workspace-
+            # augmentation gotcha makes unreliable when multiple
+            # worldview-chrome versions coexist in the workspace).
+            # This produces all evidence in the snapshot, not only
+            # those referenced - the per-evidence render cost is
+            # modest (~100 per snapshot at ~8KB each) and ensures
+            # any future narrative ref is pre-rendered.
+            kanonak transform run worldview.genval.ai/worldview-chrome/evidence-html-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format html --out "$out_dir/" >/dev/null 2>&1 || true
             # Markdown for every resource in the snapshot package
             # (view, theses, evidence). Useful for LLM / AI agent
             # consumption of snapshot content.
@@ -249,6 +262,32 @@ jobs:
           export -f render_sec_pkg
           ls kanonak-packages/worldview.genval.ai/securities@*.kan.yml | \
             xargs -P 4 -I {} bash -c 'render_sec_pkg "$@"' _ {}
+
+      # ---------------------------------------------------------------
+      # 4c. Render Source HTML pages from every sources@<version>
+      # package. Each src.Source instance becomes a self-contained page
+      # at _site/sources/<version>/<name>.html, so [[src.reuters]]
+      # / [[src.fed-press]] / etc. references in narrative resolve
+      # to a real page. Rendered via direct transform-run for the
+      # same workspace-augmentation-gotcha reasons as evidence.
+      # ---------------------------------------------------------------
+      - name: Render Source pages
+        run: |
+          set -euo pipefail
+          render_src_pkg() {
+            local pkg_file="$1"
+            local base version out_dir
+            base=$(basename "$pkg_file" .kan.yml)
+            version="${base#*@}"
+            out_dir="_site/sources/${version}"
+            mkdir -p "$out_dir"
+            kanonak transform run worldview.genval.ai/worldview-chrome/source-html-renderer \
+              --scope "worldview.genval.ai/${base}" \
+              --format html --out "$out_dir/" >/dev/null
+          }
+          export -f render_src_pkg
+          ls kanonak-packages/worldview.genval.ai/sources@*.kan.yml | \
+            xargs -P 4 -I {} bash -c 'render_src_pkg "$@"' _ {}
 
       # ---------------------------------------------------------------
       # 5. Render every site.AggregateView in the workspace via
