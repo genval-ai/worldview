@@ -404,22 +404,52 @@ jobs:
 
           <section class="about-section">
           <h2 class="section-title">The ontology</h2>
-          <p>Domain-general vocabulary plus a finance extension. Consumers can adopt the abstract layer alone without inheriting any domain bias.</p>
+          <p>Domain-general vocabulary plus a finance extension plus the epistemic layer (typed sources + distributional estimates). Consumers can adopt the abstract layer alone without inheriting any domain bias.</p>
           <ul>
           <li>
           <code>worldview.genval.ai/core</code>
-          <span>Snapshot, Thesis, Evidence base; the Condition DSL (And / Or / Not, Threshold, Event, Sequenced, IndicatorAvailable, Persistence, Durability); status / strength / comparator / time-unit enums; and abstract reference-vocabulary stubs (Indicator, Event, Institution, etc.).</span>
-          <a href="/core/1.0.0.kan.yml">core/1.0.0.kan.yml &rarr;</a>
+          <span>WorldviewSnapshot, WorldviewThesis, Evidence base; the Condition DSL (AndCondition, OrCondition, NotCondition, ThresholdCondition, IndicatorComparison, EventCondition, SequencedCondition, BeforeCondition, IndicatorAvailable + PersistenceWindow / TimeWindow); status / strength / comparator / time-unit / durability / evaluation-state enums; DerivedIndicator + MovingAverage; abstract reference-vocabulary stubs (Indicator, Event, Institution, GovernmentBody, Location, Party, Role). As of 2.0.0, <code>wv.confidence</code> is range <code>est.DistributionEstimate</code> (not a scalar) and Evidence carries a typed <code>citationSource</code> reference.</span>
+          <a href="/core/2.0.0.kan.yml">core/2.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/estimates</code>
+          <span>Reusable distributional-estimate primitives: <code>Estimate</code> base, <code>PointEstimate</code> escape hatch, and the <code>DistributionEstimate</code> tagged-by-type hierarchy: <code>BetaEstimate</code> (alpha+beta shape, bounded 0..1), <code>NormalEstimate</code>, <code>LogNormalEstimate</code>, <code>TriangularEstimate</code> (with mode), <code>UniformEstimate</code>. Used by every confidence / trust / reach number in the publisher.</span>
+          <a href="/estimates/1.0.0.kan.yml">estimates/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/sources</code>
+          <span>Typed citation publishers. <code>Source</code> base with 12 concrete subclasses (Tier1WireSource, MajorNewspaperSource, BusinessPressSource, OfficialReleaseSource, IntergovernmentalAgencySource, IndustryBodySource, etc.) plus <code>SourcePrimariness</code> and <code>EditorialIndependence</code> quality enums. Each seeded source instance (Reuters, Bloomberg, AP, Fed Press, IEA, ...) carries distributional <code>trustEstimate</code> + <code>reachEstimate</code> rather than a single scalar. Evidence cites by typed reference, unlocking source-network visualizations and trust-weighted rendering.</span>
+          <a href="/sources/1.1.0.kan.yml">sources/1.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/finance</code>
-          <span>Finance-domain extension &mdash; Evidence subclasses (MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow), the Security class with named instances, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FinEventType, FiscalPeriod, ForecastHorizon, FlowDirection).</span>
-          <a href="/finance/1.0.0.kan.yml">finance/1.0.0.kan.yml &rarr;</a>
+          <span>Finance-domain extension &mdash; Evidence subclasses (MarketDataEvidence, CorporateEvidence, AnalystEvidence, CentralBankEvidence, InstitutionalFlowEvidence), the <code>Security</code> class, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FiscalPeriod, ForecastHorizon, FlowDirection, plus seeded Indicator / CentralBank / Role / Policy / MarketEvent instances). As of 3.0.0, Security <em>instances</em> live in <code>securities</code>; this package is schema only.</span>
+          <a href="/finance/3.0.0.kan.yml">finance/3.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/securities</code>
+          <span>The instance layer for <code>fin.Security</code>: every cited ticker (sec.spy, sec.amd, sec.nvda, sec.lmt, ...) typed against the closed <code>AssetClass</code> taxonomy and the open <code>Sector</code> taxonomy. Versioned independently so adding a new ticker is a minor bump that doesn't touch the schema.</span>
+          <a href="/securities/2.1.0.kan.yml">securities/2.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/visual</code>
-          <span>Visual extension &mdash; the <code>Theme</code> class and <code>thesisTheme</code> property that color-code each <code>WorldviewThesis</code> by domain (defense, energy, monetary, inflation, gold, ai, equity, geopolitical), each carrying an HSL hue. Drives the inline thesis icons on the snapshot view and (forthcoming) the regime portrait.</span>
-          <a href="/visual/1.0.0.kan.yml">visual/1.0.0.kan.yml &rarr;</a>
+          <span>Visual identity. <code>Theme</code> + <code>thesisTheme</code> color-code each thesis by domain (defense, energy, monetary, inflation, gold, ai, equity, geopolitical); <code>sourceHue</code> assigns a hue per Source subclass cluster. HSL hues drive every cross-surface visual: thesis cards, fan charts, regime fingerprints, source-network nodes, evidence forest plots.</span>
+          <a href="/visual/2.0.0.kan.yml">visual/2.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/events</code>
+          <span>Event-log taxonomy (EarningsEvent, FOMCEvent, EconomicDataEvent, GeopoliticalEvent, RegulatoryEvent) + seeded forward-calendar event instances. Consumed by the Condition DSL's <code>EventCondition</code> for falsifiability checks.</span>
+          <a href="/events/2.0.0.kan.yml">events/2.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/indicators</code>
+          <span>Indicator subclass taxonomy (VolatilityIndicator, TermStructureIndicator, TrendIndicator, MacroIndicator, CorrelationIndicator, SentimentIndicator) + <code>IndicatorBand</code> / <code>RegimeVote</code> classifier inputs for downstream regime detection.</span>
+          <a href="/indicators/2.0.0.kan.yml">indicators/2.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/regimes</code>
+          <span>Public regime taxonomy: quiet-contango, bull-trending, choppy-range, vol-expansion, crisis. Used by downstream classifiers; the regime instances themselves are the cross-publisher shared vocabulary.</span>
+          <a href="/regimes/1.0.0.kan.yml">regimes/1.0.0.kan.yml &rarr;</a>
           </li>
           </ul>
           </section>
@@ -430,40 +460,65 @@ jobs:
           <ul>
           <li>
           <code>worldview.genval.ai/snapshot</code>
-          <span>One <code>WorldviewSnapshot</code> per package version. The version number tracks observation order, the <code>observedAt</code> timestamp pins the data cutoff, and the <code>git</code> history of this repository is the long-form audit trail.</span>
-          <a href="/index.txt">index.txt &rarr;</a>
+          <span>One <code>WorldviewSnapshot</code> per package version. The version number tracks observation order, the <code>observedAt</code> timestamp pins the data cutoff, and the <code>git</code> history of this repository is the long-form audit trail. 2.x snapshots use distributional confidence (every thesis carries a beta-shape <code>est.BetaEstimate</code>) and typed citation sources on every Evidence.</span>
+          <a href="/index.txt">index.txt (every published version) &rarr;</a>
           </li>
           </ul>
           </section>
 
           <section class="about-section">
           <h2 class="section-title">Tooling</h2>
-          <p>Two transformations turn the raw ontology and snapshot data into the static site you're reading. Both are themselves Kanonak packages, importable and reusable.</p>
+          <p>Each rendered surface on this site corresponds to a Kanonak transformation package &mdash; importable and re-usable. The chrome, JS visualization library, and per-class renderers are all themselves published packages.</p>
           <ul>
           <li>
+          <code>worldview.genval.ai/pages</code>
+          <span>The publisher curation layer: declares every <code>site.AggregateView</code>, binds derivations on <code>wv.WorldviewSnapshot</code>, hosts the shared <code>worldview-chrome-fragment</code> CSS, and the <code>worldview-viz-js-fragment</code> inline-JS visualization library (~400 lines of vanilla JS &mdash; beta-density math, fan bands, sunburst arcs, force-directed network, condition-tree builder, regime fingerprints).</span>
+          <a href="/pages/2.1.0.kan.yml">pages/2.1.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/worldview-chrome</code>
+          <span>Per-class renderer library &mdash; thesis-html-renderer, evidence-html-renderer, source-html-renderer (each a standalone HTML page), plus the 4-tier semantic-zoom SVG renderers (thesis-svg-renderer, snapshot-svg-renderer, evidence-strength-svg-renderer, evidence-type-svg-renderer). The reusable visual language shared across every surface.</span>
+          <a href="/worldview-chrome/2.1.0.kan.yml">worldview-chrome/2.1.0.kan.yml &rarr;</a>
+          </li>
+          <li>
           <code>worldview.genval.ai/snapshot-to-html</code>
-          <span>An InstanceTransformation that emits a self-contained HTML report from any <code>WorldviewSnapshot</code>: inline CSS, dynamic SVG confidence bars, structured rendering of invalidation-condition trees down to three levels of nesting, evidence cards with hover tooltips for typed-instance references.</span>
-          <a href="/snapshot-to-html/1.1.0.kan.yml">snapshot-to-html/1.1.0.kan.yml &rarr;</a>
+          <span>InstanceTransformation that emits the per-snapshot view &mdash; distributional confidence strip (<code>viz-beta-density</code>), invalidation-condition graph, source-grouped Bayesian forest plot per thesis, evidence cards with source chips. The dominant per-snapshot surface.</span>
+          <a href="/snapshot-to-html/2.1.0.kan.yml">snapshot-to-html/2.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/landing-page</code>
-          <span>A SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending.</span>
-          <a href="/landing-page/1.1.0.kan.yml">landing-page/1.1.0.kan.yml &rarr;</a>
+          <span>SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending. Renders each snapshot's regime-portrait SVG as a thumbnail per card.</span>
+          <a href="/landing-page/2.1.0.kan.yml">landing-page/2.1.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/timeline</code>
-          <span>A SetTransformation that walks every published snapshot and emits one data point per (snapshot, thesis) pair; inline JS draws an SVG line chart of confidence trajectories. The first non-list aggregate transformation in the publisher.</span>
-          <a href="/timeline/1.1.0.kan.yml">timeline/1.1.0.kan.yml &rarr;</a>
+          <span>SetTransformation that walks every snapshot and embeds per-(snapshot, thesis) data points; inline JS aggregates and dispatches to the viz library's fan-chart renderer. Each thesis renders as a band (median + IQR + 95% CI), themeHue-colored. Tightening bands visualize accumulating evidence; widening bands visualize contradictory evidence.</span>
+          <a href="/timeline/2.1.0.kan.yml">timeline/2.1.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/regime</code>
+          <span>Single-screen "worldview at this moment" dashboard. Theme radar shows where the publisher's total conviction-weight lives across knowledge domains; conviction-vs-evidence-weight scatter separates speculative conviction (high mean, low effective-n) from earned conviction.</span>
+          <a href="/regime/1.0.0.kan.yml">regime/1.0.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/changes</code>
-          <span>A diff-centric SetTransformation that triple-walks each snapshot's theses and supportingEvidence; inline JS computes consecutive-pair set-differences and renders the change log newest-first &mdash; per-thesis confidence shifts, the author's rationale, and exactly which Evidence items landed alongside the change.</span>
-          <a href="/changes/1.1.0.kan.yml">changes/1.1.0.kan.yml &rarr;</a>
+          <span>Diff-centric SetTransformation that triple-walks each snapshot's theses and supportingEvidence; inline JS computes consecutive-pair set-differences and renders the change log newest-first &mdash; per-thesis confidence shifts, the author's rationale, and exactly which Evidence items landed alongside the change.</span>
+          <a href="/changes/2.0.0.kan.yml">changes/2.0.0.kan.yml &rarr;</a>
           </li>
           <li>
           <code>worldview.genval.ai/horizon</code>
-          <span>A temporal-axis SetTransformation that aggregates every snapshot's evidence into a single horizontal time axis. Each marker is a typed Evidence dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports via <code>vis.thesisTheme</code>. Snapshot publication dates land as vertical lines.</span>
-          <a href="/horizon/1.1.0.kan.yml">horizon/1.1.0.kan.yml &rarr;</a>
+          <span>Temporal-axis SetTransformation that aggregates every snapshot's evidence into a single horizontal time axis. Each marker is a typed Evidence dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports via <code>vis.thesisTheme</code>. Snapshot publication dates land as vertical lines.</span>
+          <a href="/horizon/2.0.0.kan.yml">horizon/2.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/sources-network</code>
+          <span>Source network graph aggregate &mdash; every <code>src.Source</code> ever cited rendered as a force-directed graph node, sized by log(reach), hued by sourceHue, halo by trust stddev. Edges = co-citation (sources cited in the same thesis). Reveals echo chambers + sourcing diversity. Below the graph, a trust-vs-reach scatter with error bars showing each source's distributional uncertainty.</span>
+          <a href="/sources-network/1.0.0.kan.yml">sources-network/1.0.0.kan.yml &rarr;</a>
+          </li>
+          <li>
+          <code>worldview.genval.ai/securities-to-html</code>
+          <span>Per-<code>fin.Security</code> page renderer + 4-tier sector-colored SVG identifier per ticker. Used wherever a security needs an inline thumbnail or standalone card.</span>
+          <a href="/securities-to-html/2.0.0.kan.yml">securities-to-html/2.0.0.kan.yml &rarr;</a>
           </li>
           </ul>
           </section>
@@ -476,8 +531,16 @@ jobs:
               packages:
                 - package: core
                   match: ^
+                  version: 2.0.0
+                  alias: wv
+                - package: estimates
+                  match: ^
                   version: 1.0.0
-                  alias: wv</pre>
+                  alias: est
+                - package: sources
+                  match: ^
+                  version: 1.1.0
+                  alias: src</pre>
           <p>Each package file is fetchable at its canonical Kanonak path:</p>
           <pre>https://worldview.genval.ai/&lt;package&gt;/&lt;version&gt;.kan.yml</pre>
           <p><a href="/index.txt">index.txt</a> &middot; <a href="/.well-known/kanonak.json">.well-known/kanonak.json</a></p>
@@ -485,15 +548,23 @@ jobs:
 
           <section class="about-section">
           <h2 class="section-title">What's next</h2>
-          <p>Cross-version aggregation, the confidence-trajectory chart at <a href="/timeline/">/timeline/</a>, and the diff-centric audit log at <a href="/changes/">/changes/</a> are all live. What's still on the bench:</p>
+          <p>The 2.x line shipped distributional confidence, typed citation sources, source-grouped Bayesian forest plots, the calibration fan chart at <a href="/timeline/">/timeline/</a>, the regime dashboard at <a href="/regime/">/regime/</a>, and the source network at <a href="/sources/">/sources/</a>. Still on the bench:</p>
           <ul>
           <li>
-          <code>Live invalidation distance</code>
-          <span>The killer-feature pass on the structured <code>invalidationCondition</code> trees: a rules engine that reads each thesis's typed conditions (<code>Threshold WTI &lt; 80 over 30 calendar-days</code>, etc.), binds the observables to live evidence streams, and computes how far each thesis is from invalidation at every snapshot. Charts that distance over time. Closes the audit loop &mdash; this is the publisher's claim to being meaningfully different from a Substack.</span>
+          <code>Condition tree visualization</code>
+          <span>The structured <code>invalidationCondition</code> trees are validated and machine-evaluable today but render only as a "structured condition declared" stub on the snapshot view. A proper recursive renderer would expand each thesis's And / Or / Sequenced / Event / Threshold tree as a visual node graph with per-leaf status badges.</span>
           </li>
           <li>
-          <code>More evidence sources</code>
-          <span>Additional research-skill integrations beyond market-data fetches &mdash; FRED economic data, SEC EDGAR filings, structured news feeds &mdash; so refreshing a snapshot is a single command rather than a research session.</span>
+          <code>Live invalidation distance</code>
+          <span>A rules engine that reads each thesis's typed conditions, binds the observables to live evidence streams, and computes how far each thesis is from invalidation at every snapshot. Charts that distance over time. Closes the audit loop &mdash; the publisher's claim to being meaningfully different from a Substack.</span>
+          </li>
+          <li>
+          <code>Calibration page</code>
+          <span>For every thesis that ever resolved (confirmed or invalidated), plot stated confidence band vs realized outcome. Brier scores. A long-running record of analytical discipline that no Substack can replicate.</span>
+          </li>
+          <li>
+          <code>More research-skill integrations</code>
+          <span>Beyond market-data fetches &mdash; FRED economic data, SEC EDGAR filings, structured news feeds &mdash; so refreshing a snapshot is a single command rather than a research session.</span>
           </li>
           <li>
           <code>Programmatic consumers</code>
