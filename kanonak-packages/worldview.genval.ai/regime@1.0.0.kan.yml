@@ -1,0 +1,468 @@
+regime:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+        - package: pages
+          match: ^
+          version: 2.1.0
+          alias: pages
+
+# =============================================================================
+# Regime dashboard - single-screen "worldview at a moment" view.
+#
+# Three panels for the latest snapshot:
+#   - Theme radar - angular distribution of conviction across themes
+#   - Conviction-vs-evidence scatter - mean confidence vs effective-n,
+#     reveals speculative-conviction vs earned-conviction quadrants
+#   - Days-to-decision calendar - upcoming dated triggers per thesis
+#
+# Data is embedded as per-(snapshot, thesis) divs; the inline JS picks
+# the most recently observed snapshot and renders the three panels.
+# =============================================================================
+
+regime-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.descending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: 'Regime · worldview.genval.ai'
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <link rel="stylesheet" href="index.css">
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/regime/" class="active">Regime</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
+                            <li><a href="/sources/">Sources</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <article class="regime">
+                            <header class="intro">
+                            <span class="eyebrow">Regime</span>
+                            <h1>Worldview at this moment</h1>
+                            <p class="lead">The latest snapshot reduced to one screen. <strong>Theme radar</strong> shows where the worldview's total conviction-weight lives across knowledge domains. <strong>Conviction-vs-evidence-weight scatter</strong> separates speculative conviction (high mean, low effective-n) from earned conviction (high mean, high n). The reader can tell at a glance whether the publisher's high-confidence theses are honestly weighted by evidence or are conviction-without-substrate.</p>
+                            </header>
+                            <section class="panel-grid">
+                              <section class="panel theme-panel">
+                                <h2 class="section-title">Theme radar</h2>
+                                <p class="section-lead">Each theme as a petal; radial distance = total Bayesian weight (Σ α+β) of theses tagged with this theme.</p>
+                                <div id="theme-radar-host" class="theme-radar-host"><div data-viz="theme-radar" data-size="380" class="viz-theme-radar" id="theme-radar-aggregator"></div></div>
+                              </section>
+                              <section class="panel conviction-panel">
+                                <h2 class="section-title">Conviction vs evidence weight</h2>
+                                <p class="section-lead">x = mean confidence; y = effective n (α+β). Right column with high y = earned conviction.</p>
+                                <div id="conviction-host" class="conviction-host"><div data-viz="conviction" data-height="380" class="viz-conviction-scatter" id="conviction-aggregator"></div></div>
+                              </section>
+                            </section>
+                            <section class="hidden-data" aria-hidden="true" style="display:none">
+
+                        # =====================================================
+                        # PER-SNAPSHOT, PER-THESIS DATA EMBEDDING
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snap
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<div class="snap-data" data-snap-version="'
+                              - type: tx.UriVersion
+                                tx.uriVersionOf:
+                                  type: tx.VarRef
+                                  tx.varName: snap
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" data-snap-observed-at="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.VarRef
+                                  tx.varName: snap
+                                tx.readProp: wv.observedAt
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">'
+                              - type: tx.ForEach
+                                tx.source:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.VarRef
+                                    tx.varName: snap
+                                  tx.readProp: wv.hasThesis
+                                tx.loopVar: thRef
+                                tx.emit:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div class="th-data" data-th-name="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: thRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-label="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: thRef
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.VarRef
+                                          tx.varName: thRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-mean="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.estimateMean
+                                      tx.alternate:
+                                        type: tx.Fallback
+                                        tx.primary:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.alternate:
+                                          type: tx.StringLiteral
+                                          tx.stringLiteral: '0.5'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-alpha="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaAlpha
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-beta="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.confidence
+                                        tx.readProp: est.betaBeta
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: ''
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-theme="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: thRef
+                                            tx.readProp: vis.thesisTheme
+                                        tx.readProp: rdfs.label
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: 'unthemed'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-hue="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: thRef
+                                            tx.readProp: vis.thesisTheme
+                                        tx.readProp: vis.themeHue
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '200'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-th-status="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: thRef
+                                          tx.readProp: wv.status
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: 'active'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '"></div>'
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</div>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </section>
+                            <footer class="regime-footer">
+                            <span><a href="/about/">About this publisher</a></span>
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            </footer>
+                            </article>
+                            <script>
+                            (function(){
+                              function ready(fn){if(document.readyState!=='loading')fn();else document.addEventListener('DOMContentLoaded',fn);}
+                              ready(function(){
+                                var snaps=Array.from(document.querySelectorAll('.snap-data'));
+                                if(!snaps.length)return;
+                                // Pick latest snapshot
+                                snaps.sort(function(a,b){return new Date(b.dataset.snapObservedAt)-new Date(a.dataset.snapObservedAt);});
+                                var latest=snaps[0];
+                                var theses=Array.from(latest.querySelectorAll('.th-data')).map(function(t){
+                                  var alpha=parseFloat(t.dataset.thAlpha);var beta=parseFloat(t.dataset.thBeta);
+                                  var n=(isFinite(alpha)&&isFinite(beta))?(alpha+beta):0;
+                                  return {
+                                    name:t.dataset.thName,
+                                    label:t.dataset.thLabel||t.dataset.thName,
+                                    mean:parseFloat(t.dataset.thMean)||0.5,
+                                    n:n,
+                                    theme:t.dataset.thTheme||'unthemed',
+                                    hue:parseFloat(t.dataset.thHue)||200,
+                                    status:t.dataset.thStatus||'active'
+                                  };
+                                });
+                                // Theme radar payload - aggregate weight per theme
+                                var themeAgg={};
+                                theses.forEach(function(th){
+                                  if(!themeAgg[th.theme])themeAgg[th.theme]={label:th.theme,hue:th.hue,value:0,count:0};
+                                  // weight = n if n declared else mean (so 1.x snapshots still register)
+                                  themeAgg[th.theme].value+=(th.n>0?th.n:th.mean*10);
+                                  themeAgg[th.theme].count++;
+                                });
+                                var radarHost=document.getElementById('theme-radar-aggregator');
+                                if(radarHost){
+                                  var payload={themes:Object.keys(themeAgg).map(function(k){return themeAgg[k];})};
+                                  var s=document.createElement('script');s.type='application/json';s.textContent=JSON.stringify(payload);
+                                  radarHost.appendChild(s);
+                                  if(window.WorldviewViz)window.WorldviewViz.renderers['theme-radar'](radarHost);
+                                }
+                                // Conviction scatter payload
+                                var convHost=document.getElementById('conviction-aggregator');
+                                if(convHost){
+                                  var payload2={theses:theses.map(function(th){
+                                    return {label:th.label.split(' ').slice(0,3).join(' '),mean:th.mean,n:th.n>0?th.n:5,hue:th.hue};
+                                  })};
+                                  var s=document.createElement('script');s.type='application/json';s.textContent=JSON.stringify(payload2);
+                                  convHost.appendChild(s);
+                                  if(window.WorldviewViz)window.WorldviewViz.renderers['conviction'](convHost);
+                                }
+                              });
+                            })();
+                            </script>
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-viz-js-fragment
+
+
+# =============================================================================
+# regime-aggregate -> index.css
+# =============================================================================
+
+regime-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.regime{max-width:1280px;margin:0 auto;padding:48px 32px 96px}
+                      .regime header.intro{padding:0 0 32px;border-bottom:1px solid var(--border);position:relative;margin-bottom:32px}
+                      .regime header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      .regime .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:block}
+                      .regime h1{font-family:var(--font-display);font-size:40px;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--fg);margin-bottom:20px}
+                      @media (max-width:760px){.regime h1{font-size:30px}}
+                      .regime .lead{font-size:16px;line-height:1.65;color:var(--fg-dim);font-weight:300;max-width:780px}
+                      .regime .panel-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:24px;margin:32px 0 24px}
+                      @media (max-width:900px){.regime .panel-grid{grid-template-columns:1fr}}
+                      .regime .panel{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:10px;padding:24px}
+                      .regime .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin:0 0 12px;display:flex;align-items:center;gap:12px}
+                      .regime .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      .regime .section-lead{font-size:12px;color:var(--fg-faint);line-height:1.55;margin:0 0 16px}
+                      .theme-radar-host{display:flex;justify-content:center;align-items:center;min-height:380px}
+                      .conviction-host{min-height:380px}
+                      .regime-footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em;display:flex;gap:24px;flex-wrap:wrap}
+                      .regime-footer a{color:var(--fg-dim);text-decoration:none;border-bottom:1px dotted var(--border)}
+                      .regime-footer a:hover{color:var(--fg);border-bottom-color:var(--accent)}

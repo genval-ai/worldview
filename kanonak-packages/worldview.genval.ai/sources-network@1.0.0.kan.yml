@@ -1,0 +1,503 @@
+sources-network:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: sources
+          match: ^
+          version: 1.0.0
+          alias: src
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+        - package: pages
+          match: ^
+          version: 2.1.0
+          alias: pages
+
+# =============================================================================
+# Source network graph aggregate view.
+#
+# Force-directed graph of every src.Source instance cited across the
+# publisher's snapshot history. Nodes are publishers (sized by reach,
+# colored by sourceHue, halo by trust stddev). Edges connect sources
+# co-cited in the same thesis (weight = co-citation count). Side panel
+# shows a trust-vs-reach scatter with error bars showing each source's
+# trust + reach stddev.
+#
+# The transformation emits raw (snapshot, thesis, source) tuples as
+# child divs of the viz-network host; an inline aggregator script
+# dedupes to nodes, computes edges as all-pairs within each
+# (snapshot, thesis), and dispatches to the renderNetwork +
+# renderScatter primitives in the worldview-viz-js library.
+# =============================================================================
+
+sources-network-transformation:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.sortBy:
+      - tx.byProperty: wv.observedAt
+        tx.order: tx.ascending
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.html
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+
+      - tx.field: docast.metadata
+        tx.bindValue:
+          type: tx.BuildAstNode
+          tx.astClass: docast.StructuredMap
+          tx.set:
+            - tx.field: docast.entries
+              tx.bindValue:
+                type: tx.Concat
+                tx.parts:
+                  - type: tx.BuildAstNode
+                    tx.astClass: docast.StructuredEntry
+                    tx.set:
+                      - tx.field: docast.key
+                        tx.bindValue:
+                          type: tx.StringLiteral
+                          tx.stringLiteral: title
+                      - tx.field: docast.value
+                        tx.bindValue:
+                          type: tx.BuildAstNode
+                          tx.astClass: docast.StringScalar
+                          tx.set:
+                            - tx.field: docast.stringValue
+                              tx.bindValue:
+                                type: tx.StringLiteral
+                                tx.stringLiteral: 'Sources · worldview.genval.ai'
+
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-html
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |
+                            <link rel="stylesheet" href="index.css">
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <nav class="site-nav">
+                            <div class="site-nav-inner">
+                            <a href="/" class="site-nav-brand">worldview.genval.ai</a>
+                            <ul class="site-nav-links">
+                            <li><a href="/">Latest</a></li>
+                            <li><a href="/snapshots/">Snapshots</a></li>
+                            <li><a href="/timeline/">Timeline</a></li>
+                            <li><a href="/changes/">Changes</a></li>
+                            <li><a href="/horizon/">Horizon</a></li>
+                            <li><a href="/sources/" class="active">Sources</a></li>
+                            <li><a href="/about/">About</a></li>
+                            </ul>
+                            </div>
+                            </nav>
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <article class="sources">
+                            <header class="intro">
+                            <span class="eyebrow">Sources</span>
+                            <h1>Source network</h1>
+                            <p class="lead">Every publisher cited in any snapshot across the publisher's history, sized by reach, colored by category, connected by co-citation. Two sources are linked when they support the same thesis in any single snapshot - the thicker the edge, the more times they've corroborated each other. The scatter below shows where each source sits in the trust-vs-reach plane, with error bars expressing distributional uncertainty in each estimate.</p>
+                            </header>
+                            <section class="network-section">
+                            <h2 class="section-title">Co-citation network</h2>
+                            <div id="network-host" class="network-host"><div data-viz="network" data-height="640" class="viz-network" id="network-aggregator">
+
+                        # =====================================================
+                        # PER-(snapshot, thesis, evidence) DATA EMBEDDING
+                        # Triple-nested ForEach emits one <div> per evidence,
+                        # carrying everything the aggregator needs to construct
+                        # nodes and edges.
+                        # =====================================================
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.VarRef
+                            tx.varName: inputs
+                          tx.loopVar: snap
+                          tx.emit:
+                            type: tx.ForEach
+                            tx.source:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: snap
+                              tx.readProp: wv.hasThesis
+                            tx.loopVar: thRef
+                            tx.emit:
+                              type: tx.ForEach
+                              tx.source:
+                                type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thRef
+                                tx.readProp: wv.supportingEvidence
+                              tx.loopVar: evRef
+                              tx.emit:
+                                type: tx.When
+                                tx.condition:
+                                  type: tx.IsSet
+                                  tx.checkExpr:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: evRef
+                                    tx.readProp: wv.citationSource
+                                tx.thenBuild:
+                                  type: tx.Concat
+                                  tx.parts:
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '<div data-snap="'
+                                    - type: tx.UriVersion
+                                      tx.uriVersionOf:
+                                        type: tx.VarRef
+                                        tx.varName: snap
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-thesis="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.VarRef
+                                        tx.varName: thRef
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src="'
+                                    - type: tx.UriName
+                                      tx.uriNameOf:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.VarRef
+                                            tx.varName: evRef
+                                        tx.readProp: wv.citationSource
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src-name="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.citationSource
+                                        tx.readProp: src.sourceName
+                                      tx.alternate:
+                                        type: tx.UriName
+                                        tx.uriNameOf:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.VarRef
+                                              tx.varName: evRef
+                                          tx.readProp: wv.citationSource
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src-hue="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.ResolveRef
+                                          tx.resolveSource:
+                                            type: tx.PropertyRead
+                                            tx.readSource:
+                                              type: tx.ResolveRef
+                                              tx.resolveSource:
+                                                type: tx.VarRef
+                                                tx.varName: evRef
+                                            tx.readProp: wv.citationSource
+                                        tx.readProp: vis.sourceHue
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '200'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src-trust="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.citationSource
+                                          tx.readProp: src.trustEstimate
+                                        tx.readProp: est.estimateMean
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '0.75'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src-trust-sd="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.citationSource
+                                          tx.readProp: src.trustEstimate
+                                        tx.readProp: est.estimateStdDev
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '0.05'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '" data-src-reach="'
+                                    - type: tx.Fallback
+                                      tx.primary:
+                                        type: tx.PropertyRead
+                                        tx.readSource:
+                                          type: tx.PropertyRead
+                                          tx.readSource:
+                                            type: tx.ResolveRef
+                                            tx.resolveSource:
+                                              type: tx.PropertyRead
+                                              tx.readSource:
+                                                type: tx.ResolveRef
+                                                tx.resolveSource:
+                                                  type: tx.VarRef
+                                                  tx.varName: evRef
+                                              tx.readProp: wv.citationSource
+                                          tx.readProp: src.reachEstimate
+                                        tx.readProp: est.estimateMean
+                                      tx.alternate:
+                                        type: tx.StringLiteral
+                                        tx.stringLiteral: '1000000'
+                                    - type: tx.StringLiteral
+                                      tx.stringLiteral: '"></div>'
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </div></div>
+                            </section>
+                            <section class="scatter-section">
+                            <h2 class="section-title">Trust × reach</h2>
+                            <p class="section-lead">Each cited source plotted by mean trust (vertical) vs log-10 of mean monthly reach (horizontal). Error bars show distributional uncertainty - taller bars mean wider trust stddev, wider bars mean wider reach stddev. Quadrant labels indicate the sourcing strategy each region represents.</p>
+                            <div id="scatter-host" class="scatter-host"><div data-viz="scatter" data-height="440" class="viz-scatter" id="scatter-aggregator"></div></div>
+                            </section>
+                            <footer class="sources-footer">
+                            <span><a href="/about/">About this publisher</a></span>
+                            <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
+                            <span>Apache 2.0</span>
+                            </footer>
+                            </article>
+                            <script>
+                            (function(){
+                              function ready(fn){if(document.readyState!=='loading')fn();else document.addEventListener('DOMContentLoaded',fn);}
+                              ready(function(){
+                                var host=document.getElementById('network-aggregator');
+                                if(!host)return;
+                                var tuples=Array.from(host.querySelectorAll('[data-src]'));
+                                if(!tuples.length)return;
+                                // Aggregate to nodes
+                                var nodes={};
+                                tuples.forEach(function(t){
+                                  var k=t.dataset.src;
+                                  if(!nodes[k]){
+                                    nodes[k]={
+                                      id:k,
+                                      label:t.dataset.srcName||k,
+                                      hue:parseFloat(t.dataset.srcHue)||200,
+                                      trust:parseFloat(t.dataset.srcTrust)||0.75,
+                                      trustSd:parseFloat(t.dataset.srcTrustSd)||0.05,
+                                      reach:parseFloat(t.dataset.srcReach)||1e6,
+                                      citationCount:0
+                                    };
+                                  }
+                                  nodes[k].citationCount++;
+                                });
+                                // Per (snap, thesis) groups for edges
+                                var groupKey=function(t){return t.dataset.snap+'::'+t.dataset.thesis;};
+                                var groups={};
+                                tuples.forEach(function(t){var g=groupKey(t);if(!groups[g])groups[g]=new Set();groups[g].add(t.dataset.src);});
+                                var edgeCounts={};
+                                Object.keys(groups).forEach(function(g){
+                                  var arr=Array.from(groups[g]);
+                                  for(var i=0;i<arr.length;i++)for(var j=i+1;j<arr.length;j++){
+                                    var ek=arr[i]<arr[j]?arr[i]+'|'+arr[j]:arr[j]+'|'+arr[i];
+                                    edgeCounts[ek]=(edgeCounts[ek]||0)+1;
+                                  }
+                                });
+                                // Build payload
+                                var nodeList=Object.keys(nodes).map(function(k){
+                                  var n=nodes[k];
+                                  var r=8+Math.log(n.reach)/Math.log(10)*1.8;
+                                  return {id:n.id,label:n.label,hue:n.hue,r:r,haloStdDev:n.trustSd,tooltip:'trust '+n.trust.toFixed(2)+' ± '+n.trustSd.toFixed(2)+' · '+n.citationCount+' citations · reach 10^'+(Math.log(n.reach)/Math.log(10)).toFixed(1)};
+                                });
+                                var edgeList=Object.keys(edgeCounts).map(function(ek){var parts=ek.split('|');return {source:parts[0],target:parts[1],weight:edgeCounts[ek]};});
+                                // Render network
+                                host.innerHTML='';
+                                var script=document.createElement('script');
+                                script.type='application/json';script.textContent=JSON.stringify({nodes:nodeList,edges:edgeList});
+                                host.appendChild(script);
+                                if(window.WorldviewViz)window.WorldviewViz.renderers['network'](host);
+
+                                // Render scatter
+                                var sc=document.getElementById('scatter-aggregator');
+                                if(sc){
+                                  var sxMax=0,sxMin=10;
+                                  var points=nodeList.map(function(n){
+                                    var node=nodes[n.id];
+                                    var logR=Math.log(node.reach)/Math.log(10);
+                                    if(logR>sxMax)sxMax=logR;
+                                    if(logR<sxMin)sxMin=logR;
+                                    return {
+                                      x:logR,y:node.trust,
+                                      xSd:0.2,ySd:node.trustSd,
+                                      r:6,hue:node.hue,label:node.label,
+                                      tooltip:'n='+node.citationCount+' cites'
+                                    };
+                                  });
+                                  var pl={
+                                    xMin:Math.floor(sxMin-0.5),xMax:Math.ceil(sxMax+0.5),
+                                    yMin:0.3,yMax:1.0,
+                                    xLabel:'reach (log10 monthly users)',yLabel:'trust',
+                                    xTickFmt:'log10',points:points
+                                  };
+                                  var sscript=document.createElement('script');
+                                  sscript.type='application/json';sscript.textContent=JSON.stringify(pl);
+                                  sc.appendChild(sscript);
+                                  if(window.WorldviewViz)window.WorldviewViz.renderers['scatter'](sc);
+                                }
+                              });
+                            })();
+                            </script>
+
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-viz-js-fragment
+
+
+# =============================================================================
+# sources-aggregate -> index.css
+# =============================================================================
+
+sources-stylesheet:
+  type: tx.SetTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+
+  tx.artifactName:
+    type: tx.StringLiteral
+    tx.stringLiteral: index
+
+  tx.outputs:
+    - tx.stylesheet
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.CallFragment
+              tx.fragmentRef: pages.worldview-chrome-fragment
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.text-css
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.StringLiteral
+                    tx.stringLiteral: |
+                      article.sources{max-width:1280px;margin:0 auto;padding:48px 32px 96px}
+                      .sources header.intro{padding:0 0 32px;border-bottom:1px solid var(--border);position:relative;margin-bottom:32px}
+                      .sources header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
+                      .sources .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:block}
+                      .sources h1{font-family:var(--font-display);font-size:40px;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--fg);margin-bottom:20px}
+                      @media (max-width:760px){.sources h1{font-size:30px}}
+                      .sources .lead{font-size:16px;line-height:1.65;color:var(--fg-dim);font-weight:300;max-width:780px}
+                      .sources .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin:36px 0 16px;display:flex;align-items:center;gap:12px}
+                      .sources .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
+                      .sources .section-lead{font-size:13px;color:var(--fg-faint);line-height:1.55;margin:0 0 18px;max-width:760px}
+                      .network-host{min-height:640px}
+                      .scatter-host{min-height:440px}
+                      .sources-footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);letter-spacing:0.04em;display:flex;gap:24px;flex-wrap:wrap}
+                      .sources-footer a{color:var(--fg-dim);text-decoration:none;border-bottom:1px dotted var(--border)}
+                      .sources-footer a:hover{color:var(--fg);border-bottom-color:var(--accent)}

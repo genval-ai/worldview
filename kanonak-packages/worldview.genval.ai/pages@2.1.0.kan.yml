@@ -1129,3 +1129,49 @@ changes-aggregate:
         tx.package: changes
         tx.version: 2.0.0
         tx.name: changes-stylesheet
+
+sources-aggregate:
+  type: site.AggregateView
+  site.outputPath: sources/index.html
+  site.scopeClass: wv.WorldviewSnapshot
+  site.scopeSources:
+    - worldview.genval.ai/snapshot@*
+  site.transformation:
+    type: tx.TransformationReference
+    tx.publisher: worldview.genval.ai
+    tx.package: sources-network
+    tx.version: 1.0.0
+    tx.name: sources-network-transformation
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.stylesheet
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: sources-network
+        tx.version: 1.0.0
+        tx.name: sources-stylesheet
+
+regime-aggregate:
+  type: site.AggregateView
+  site.outputPath: regime/index.html
+  site.scopeClass: wv.WorldviewSnapshot
+  site.scopeSources:
+    - worldview.genval.ai/snapshot@*
+  site.transformation:
+    type: tx.TransformationReference
+    tx.publisher: worldview.genval.ai
+    tx.package: regime
+    tx.version: 1.0.0
+    tx.name: regime-transformation
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.stylesheet
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: regime
+        tx.version: 1.0.0
+        tx.name: regime-stylesheet
