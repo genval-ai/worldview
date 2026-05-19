@@ -76,6 +76,35 @@ rdfs.Resource:
     tok.font-body: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
 
 wv.WorldviewThesis:
+  look.semanticSvg:
+    look.tierChip: |
+      <rect x="0" y="0" width="400" height="400" rx="80" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+    look.tierIcon: |
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+      <text x="200" y="245" text-anchor="middle" font-size="240" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{firstLetter}}</text>
+    look.tierCard: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="80" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+      <rect x="0" y="60" width="400" height="20" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+      <text x="40" y="50" font-size="22" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="40" y="140" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
+      <text x="40" y="165" font-size="16" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
+      <text x="220" y="140" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE</text>
+      <text x="220" y="165" font-size="16" font-weight="600" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+    look.tierFull: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+      <text x="24" y="32" font-size="11" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)" opacity="0.8">THESIS</text>
+      <text x="24" y="62" font-size="20" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="24" y="120" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE</text>
+      <text x="200" y="160" text-anchor="middle" font-size="48" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+      <rect x="24" y="190" width="352" height="6" rx="3" fill="var(--kan-border)"/>
+      <svg x="24" y="190" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="{{wv.confidence/est.estimateMean}}" height="1" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/></svg>
+      <text x="24" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
+      <text x="24" y="262" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
+      <text x="200" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">THEME</text>
+      <text x="200" y="262" font-size="14" font-weight="600" fill="var(--kan-text)">{{vis.thesisTheme/rdfs.label}}</text>
+      <text x="24" y="370" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">{{uri}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
@@ -133,6 +162,26 @@ site.StaticPage:
         look.source: site.body
 
 wv.WorldviewSnapshot:
+  look.semanticSvg:
+    look.tierIcon: |
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="var(--kan-accent)"/>
+      <text x="200" y="200" text-anchor="middle" font-size="120" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{firstLetter}}</text>
+      <text x="200" y="280" text-anchor="middle" font-size="44" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)">WV</text>
+    look.tierCard: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="var(--kan-accent)"/>
+      <text x="24" y="32" font-size="11" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)" opacity="0.8">WORLDVIEW SNAPSHOT</text>
+      <text x="24" y="62" font-size="20" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="24" y="140" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">OBSERVED</text>
+      <text x="24" y="165" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.observedAt}}</text>
+    look.tierFull: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="var(--kan-accent)"/>
+      <text x="24" y="32" font-size="11" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)" opacity="0.8">WORLDVIEW SNAPSHOT</text>
+      <text x="24" y="62" font-size="20" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="24" y="130" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">OBSERVED</text>
+      <text x="24" y="152" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.observedAt}}</text>
+      <text x="24" y="370" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">{{uri}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:

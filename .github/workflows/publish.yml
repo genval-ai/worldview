@@ -48,20 +48,6 @@ jobs:
             --workspace kanonak-packages/worldview.genval.ai \
             --out _site
 
-      - name: Render ontology concept SVGs
-        run: |
-          set -euo pipefail
-          mkdir -p _site/core/2.0.0 _site/finance/3.0.0
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-strength-svg-renderer \
-            --scope worldview.genval.ai/core@2.0.0 \
-            --format svg --out _site/core/2.0.0/ >/dev/null
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
-            --scope worldview.genval.ai/core@2.0.0 \
-            --format svg --out _site/core/2.0.0/ >/dev/null
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
-            --scope worldview.genval.ai/finance@3.0.0 \
-            --format svg --out _site/finance/3.0.0/ >/dev/null
-
       - name: Stage publisher manifest + package mirror
         run: |
           set -e
