@@ -66,16 +66,6 @@ jobs:
           sort -V _site/index.txt.unsorted > _site/index.txt
           rm _site/index.txt.unsorted
 
-      - name: Redirect / to the site index page
-        run: |
-          cat > _site/index.html <<'HTML'
-          <!doctype html>
-          <meta charset="utf-8">
-          <title>Redirecting…</title>
-          <meta http-equiv="refresh" content="0; url=/site/index">
-          <link rel="canonical" href="/site/index">
-          HTML
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -35,10 +35,6 @@ worldview-look:
           match: ^
           version: 1.1.0
           alias: look-styles
-        - package: site
-          match: ^
-          version: 1.0.0
-          alias: site
     - publisher: worldview.genval.ai
       packages:
         - package: core
@@ -162,15 +158,6 @@ reg.Regime:
       - type: look.Hero
         look.title: rdfs.label
         look.subtitle: rdfs.comment
-
-site.StaticPage:
-  derivation.look:
-    type: look.ResourceView
-    look.bands:
-      - type: look.Hero
-        look.title: site.title
-      - type: look.Markdown
-        look.source: site.body
 
 wv.WorldviewSnapshot:
   look.semanticSvg:
