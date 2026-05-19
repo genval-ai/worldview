@@ -74,6 +74,13 @@ rdfs.Resource:
     tok.badge-fg: "#7dd3fc"
     tok.font-display: "'Iowan Old Style', 'Palatino Linotype', Palatino, 'URW Palladio L', serif"
     tok.font-body: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: rdfs.type
+        look.subtitle: rdfs.comment
 
 wv.WorldviewThesis:
   look.semanticSvg:
