@@ -102,9 +102,15 @@ jobs:
         run: |
           set -e
           latest_dir=$(ls -d _site/snapshot/*/ 2>/dev/null | sort -V | tail -1 || true)
-          if [ -n "$latest_dir" ] && [ -f "${latest_dir}view.html" ]; then
-            cp "${latest_dir}view.html" _site/index.html
-            cp "${latest_dir}view.css" _site/snapshot.css 2>/dev/null || true
+          if [ -n "$latest_dir" ]; then
+            version=$(basename "$latest_dir")
+            cat > _site/index.html <<HTML
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>Redirecting…</title>
+          <meta http-equiv="refresh" content="0; url=/snapshot/${version}/view">
+          <link rel="canonical" href="/snapshot/${version}/view">
+          HTML
           else
             cat > _site/index.html <<'HTML'
           <!doctype html><html><head><meta charset="utf-8"><title>worldview.genval.ai</title></head>
