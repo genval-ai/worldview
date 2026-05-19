@@ -48,21 +48,6 @@ view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.2 - Monday-morning weekend-integration follow-through)
   observedAt: 2026-05-18T13:42:56Z
-  derivation.derivations:
-    - derivation.format: formats.html
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: snapshot-to-html
-        tx.version: 2.1.0
-        tx.name: snapshot-to-html-transformation
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: snapshot-to-html
-        tx.version: 2.1.0
-        tx.name: snapshot-stylesheet
   narrative: |
     Monday-morning 2.1.2 refresh, ~20.5 hours after [[view|2.1.1]] -
     the window covers Sunday-afternoon through Monday cash-open
