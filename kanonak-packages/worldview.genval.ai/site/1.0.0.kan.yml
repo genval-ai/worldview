@@ -13,12 +13,26 @@ site:
           match: ^
           version: 1.0.0
           alias: site
+        - package: look
+          match: ^
+          version: 1.1.0
+          alias: look
+    - publisher: worldview.genval.ai
+      packages:
+        - package: snapshot
+          match: ^
+          version: 2.1.4
+          alias: snap
+        - package: pages
+          match: ^
+          version: 2.1.0
+          alias: pages
   comment: >-
-    Publisher-curation content for worldview.genval.ai — the landing page
-    plus authored static pages (about, etc.). Each entry is a real Kanonak
-    resource that renders via the universal look layer, so the validator
-    sees broken nav targets and the URLs are not magic strings buried
-    inside a transformation.
+    Publisher-curation content for worldview.genval.ai — the landing page,
+    authored static pages (about), and the site-wide navigation. Every
+    entry is a real Kanonak resource that renders via the universal look
+    layer, so the validator catches broken nav targets and the URLs are
+    not magic strings buried inside a transformation.
 
 index:
   type: site.StaticPage
@@ -72,3 +86,56 @@ about:
     consumers without re-authoring.
 
     Source: <https://github.com/genval-ai/worldview>
+
+nav-latest:
+  type: look.NavLink
+  rdfs.label: "Latest"
+  look.target: snap.view
+
+nav-snapshots:
+  type: look.NavLink
+  rdfs.label: "Snapshots"
+  look.target: pages.snapshots-aggregate
+
+nav-timeline:
+  type: look.NavLink
+  rdfs.label: "Timeline"
+  look.target: pages.timeline-aggregate
+
+nav-regime:
+  type: look.NavLink
+  rdfs.label: "Regime"
+  look.target: pages.regime-aggregate
+
+nav-changes:
+  type: look.NavLink
+  rdfs.label: "Changes"
+  look.target: pages.changes-aggregate
+
+nav-horizon:
+  type: look.NavLink
+  rdfs.label: "Horizon"
+  look.target: pages.horizon-aggregate
+
+nav-sources:
+  type: look.NavLink
+  rdfs.label: "Sources"
+  look.target: pages.sources-aggregate
+
+nav-about:
+  type: look.NavLink
+  rdfs.label: "About"
+  look.target: about
+
+site-nav:
+  type: look.NavGroup
+  rdfs.label: "worldview.genval.ai navigation"
+  look.entries:
+    - nav-latest
+    - nav-snapshots
+    - nav-timeline
+    - nav-regime
+    - nav-changes
+    - nav-horizon
+    - nav-sources
+    - nav-about
