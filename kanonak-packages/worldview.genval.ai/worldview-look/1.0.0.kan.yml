@@ -41,7 +41,7 @@ worldview-look:
           match: ^
           version: 2.0.0
           alias: wv
-        - package: snapshot
+        - package: snapshots
           match: ^
           version: 2.1.4
           alias: snap
@@ -191,7 +191,7 @@ wv.WorldviewSnapshot:
       - type: look.ResourceGrid
         look.source: wv.hasThesis
 
-snap.snapshot:
+snap.snapshots:
   derivation.look:
     type: look.PackageView
     look.bands:
