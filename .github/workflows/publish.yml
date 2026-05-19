@@ -1,14 +1,5 @@
 name: Publish
 
-# Publishes worldview.genval.ai as a static GitHub Pages site using the
-# Kanonak Protocol look authoring surface. Per-class HTML + CSS rendering
-# is handled by `kanonak publish` walking the workspace and routing
-# resources through their declared `derivation.look` (in worldview-look).
-#
-# This workflow replaces the pre-3.0.0 publish.yml that orchestrated a
-# dozen explicit `kanonak transform run` calls. The look layer collapses
-# those into one `kanonak publish` step.
-
 on:
   push:
     branches: [main]
@@ -48,23 +39,15 @@ jobs:
       - name: Validate packages
         run: |
           set -euo pipefail
-          ls kanonak-packages/worldview.genval.ai/*.kan.yml | \
-            xargs -P 4 -I {} kanonak validate "{}"
+          find kanonak-packages/worldview.genval.ai -name '*.kan.yml' -print0 | \
+            xargs -0 -P 4 -I {} kanonak validate "{}"
 
-      # One step renders every resource — HTML and CSS — per its class's
-      # `derivation.look` declaration. Output lands at canonical Kanonak
-      # URL paths under _site/.
       - name: Publish resources via the look layer
         run: |
           kanonak publish \
             --workspace kanonak-packages/worldview.genval.ai \
             --out _site
 
-      # SVG identity icons. The look layer doesn't yet emit SVG; the
-      # 4-tier semantic-zoom renderers in worldview-chrome@3.0.0 still
-      # produce these via explicit transform-run. Two evidence concept
-      # sets land at /core/2.0.0/ and /finance/3.0.0/ for use as
-      # <img src> references in rendered HTML.
       - name: Render ontology concept SVGs
         run: |
           set -euo pipefail
@@ -79,9 +62,6 @@ jobs:
             --scope worldview.genval.ai/finance@3.0.0 \
             --format svg --out _site/finance/3.0.0/ >/dev/null
 
-      # Publisher manifest + canonical package mirror. Required at the
-      # publisher's origin so `import worldview.genval.ai/core` resolves
-      # over HTTPS.
       - name: Stage publisher manifest + package mirror
         run: |
           set -e
@@ -89,20 +69,19 @@ jobs:
           cp .well-known/kanonak.json _site/.well-known/kanonak.json
           echo "worldview.genval.ai" > _site/CNAME
           : > _site/index.txt.unsorted
-          for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
-            base=$(basename "$pkg_file" .kan.yml)
-            name="${base%@*}"
-            version="${base#*@}"
+          for pkg_dir in kanonak-packages/worldview.genval.ai/*/; do
+            name=$(basename "$pkg_dir")
             mkdir -p "_site/${name}"
-            cp "$pkg_file" "_site/${name}/${version}.kan.yml"
-            echo "${name}/${version}" >> _site/index.txt.unsorted
+            for pkg_file in "$pkg_dir"*.kan.yml; do
+              [ -f "$pkg_file" ] || continue
+              version=$(basename "$pkg_file" .kan.yml)
+              cp "$pkg_file" "_site/${name}/${version}.kan.yml"
+              echo "${name}/${version}" >> _site/index.txt.unsorted
+            done
           done
           sort -V _site/index.txt.unsorted > _site/index.txt
           rm _site/index.txt.unsorted
 
-      # Aggregate views (snapshots/, timeline/, horizon/, changes/,
-      # sources/, regime/). Uses `kanonak site build` until the look
-      # layer's package-view authoring fully replaces site.AggregateView.
       - name: Render aggregate views
         run: |
           set -e
@@ -119,9 +98,6 @@ jobs:
                 --format stylesheet --out "$2" >/dev/null 2>&1 || true
             ' _
 
-      # Latest snapshot → /index.html. The `kanonak publish` step already
-      # rendered `_site/snapshot/2.1.x/view.html`; copy it to the site
-      # root so visiting `/` shows the latest worldview.
       - name: Install latest snapshot at /index.html
         run: |
           set -e

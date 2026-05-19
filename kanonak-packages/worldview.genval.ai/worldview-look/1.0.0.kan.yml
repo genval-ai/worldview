@@ -1,0 +1,106 @@
+worldview-look:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Worldview Look
+  comment: >-
+    Declarative visual presentation for worldview.genval.ai classes.
+    Sets publisher brand tokens on rdfs.Resource and declares
+    derivation.look bands for WorldviewThesis, Evidence, Source,
+    fin.Security, and reg.Regime.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: derivation
+          match: ^
+          version: 1.1.0
+          alias: derivation
+        - package: look
+          match: ^
+          version: 1.0.0
+          alias: look
+        - package: look-tokens
+          match: ^
+          version: 1.0.0
+          alias: tok
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: sources
+          match: ^
+          version: 1.0.0
+          alias: src
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+        - package: regimes
+          match: ^
+          version: 1.0.0
+          alias: reg
+
+rdfs.Resource:
+  derivation.tokens:
+    tok.accent: "hsl(199, 90%, 60%)"
+    tok.accent-hover: "hsl(199, 90%, 70%)"
+    tok.font-display: "'Iowan Old Style', 'Palatino Linotype', Palatino, 'URW Palladio L', serif"
+    tok.font-body: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
+
+wv.WorldviewThesis:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: wv.status
+        look.subtitle: wv.thesisStatement
+      - type: look.ReferenceList
+        look.entries:
+          - wv.supportingEvidence
+
+wv.Evidence:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: wv.evidenceStatement
+        look.eyebrow: rdfs.type
+        look.badges: wv.evidenceStrength
+
+src.Source:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.subtitle: rdfs.comment
+
+fin.Security:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: fin.ticker
+      - type: look.ChipRow
+        look.chips:
+          - fin.assetClass
+
+reg.Regime:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.subtitle: rdfs.comment
