@@ -1,0 +1,32 @@
+# =============================================================================
+# worldview-chrome @ 3.0.0
+#
+# Placeholder package that previously held the per-class HTML / SVG
+# transformations. As of 3.0.0:
+#
+#   - All HTML rendering moves to the declarative look authoring
+#     surface — see `worldview.genval.ai/worldview-look@1.0.0` for the
+#     `derivation.look` declarations on WorldviewThesis, Evidence,
+#     Source, Security, and Regime.
+#   - SVG transformations have been removed pending the look layer's
+#     SVG output support (a v1.1 deliverable on the protocol side).
+#     Until then, the worldview site renders without per-class SVG
+#     identity icons.
+#
+# This package is kept (rather than deleted entirely) so consumers
+# importing `worldview.genval.ai/worldview-chrome` continue to find a
+# valid Kanonak package — empty of transformations but parseable. New
+# transformations may be added to a future minor bump.
+# =============================================================================
+
+worldview-chrome:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 3.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs

@@ -1,0 +1,153 @@
+# =============================================================================
+# worldview-look @ 1.0.0
+#
+# Declarative visual presentation for the worldview.genval.ai ontology
+# using the Kanonak look authoring surface (kanonak.org/look@1.0.0).
+# Replaces the per-class HTML transformations in worldview-chrome and
+# friends with declarative bands + token overrides.
+#
+# Covers (v0.1):
+#   - wv.WorldviewThesis    : hero + supporting-evidence references
+#   - wv.Evidence            : hero with strength badge + property list
+#   - src.Source             : hero + descriptive paragraph
+#   - fin.Security           : hero + asset/sector chips
+#   - reg.Regime             : hero + descriptive paragraph
+#
+# Deferred (still rendered through worldview-chrome / snapshot-to-html
+# in v0.1 of the migration):
+#   - wv.WorldviewSnapshot   : has rich Bayesian fan-chart + condition-
+#                              tree visualizations that need viz library
+#                              integration — keep custom for now.
+#   - Aggregate views (snapshots/, timeline/, etc.) — package view
+#     authoring surface in v0.1 of `kanonak publish` is too thin.
+#
+# Token overrides set the worldview brand's accent color (cool blue) at
+# the rdfs.Resource floor so every page on the worldview site picks it
+# up unless a specific class re-overrides.
+# =============================================================================
+
+worldview-look:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: derivation
+          match: ^
+          version: 1.1.0
+          alias: derivation
+        - package: look
+          match: ^
+          version: 1.0.0
+          alias: look
+        - package: look-tokens
+          match: ^
+          version: 1.0.0
+          alias: tok
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: sources
+          match: ^
+          version: 1.0.0
+          alias: src
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+        - package: regimes
+          match: ^
+          version: 1.0.0
+          alias: reg
+
+# =============================================================================
+# Publisher-wide token overrides — applied to rdfs.Resource so every
+# resource rendered for worldview.genval.ai picks up the brand accent.
+# =============================================================================
+
+rdfs.Resource:
+  derivation.tokens:
+    tok.accent: "hsl(199, 90%, 60%)"
+    tok.accent-hover: "hsl(199, 90%, 70%)"
+    tok.font-display: "'Iowan Old Style', 'Palatino Linotype', Palatino, 'URW Palladio L', serif"
+    tok.font-body: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
+
+# =============================================================================
+# WorldviewThesis — a single falsifiable claim
+# =============================================================================
+
+wv.WorldviewThesis:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: wv.status
+        look.subtitle: wv.thesisStatement
+      - type: look.ReferenceList
+        look.entries:
+          - wv.supportingEvidence
+
+# =============================================================================
+# Evidence — a single piece of evidence supporting a thesis
+# =============================================================================
+
+wv.Evidence:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: wv.evidenceStatement
+        look.eyebrow: rdfs.type
+        look.badges: wv.evidenceStrength
+
+# =============================================================================
+# Source — typed citation source
+# =============================================================================
+
+src.Source:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.subtitle: rdfs.comment
+
+# =============================================================================
+# Security — a tradable instrument
+# =============================================================================
+
+fin.Security:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: fin.ticker
+      - type: look.ChipRow
+        look.chips:
+          - fin.assetClass
+
+# =============================================================================
+# Regime — market / macroeconomic regime
+# =============================================================================
+
+reg.Regime:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.subtitle: rdfs.comment

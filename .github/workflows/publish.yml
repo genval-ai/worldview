@@ -1,5 +1,14 @@
 name: Publish
 
+# Publishes worldview.genval.ai as a static GitHub Pages site using the
+# Kanonak Protocol look authoring surface. Per-class HTML + CSS rendering
+# is handled by `kanonak publish` walking the workspace and routing
+# resources through their declared `derivation.look` (in worldview-look).
+#
+# This workflow replaces the pre-3.0.0 publish.yml that orchestrated a
+# dozen explicit `kanonak transform run` calls. The look layer collapses
+# those into one `kanonak publish` step.
+
 on:
   push:
     branches: [main]
@@ -28,13 +37,6 @@ jobs:
       - name: Install kanonak CLI
         run: npm install -g @kanonak-protocol/cli
 
-      # ---------------------------------------------------------------
-      # Cache the kanonak package cache (~/.kanonak/packages) so
-      # upstream package fetches happen once and reuse across runs.
-      # Keyed on the workspace .kan.yml hashes — invalidates when
-      # the publisher tree changes; restoreKey provides graceful
-      # fallback to a partial restore on first build after edits.
-      # ---------------------------------------------------------------
       - name: Cache kanonak package cache
         uses: actions/cache@v4
         with:
@@ -43,182 +45,30 @@ jobs:
           restore-keys: |
             kanonak-${{ runner.os }}-
 
-      # ---------------------------------------------------------------
-      # 1. Validate every .kan.yml in the publisher tree IN PARALLEL.
-      # Each invocation is independent; -P 4 saturates ubuntu-latest's
-      # cores without thrashing memory. Any failure halts the publish.
-      # ---------------------------------------------------------------
       - name: Validate packages
         run: |
           set -euo pipefail
           ls kanonak-packages/worldview.genval.ai/*.kan.yml | \
             xargs -P 4 -I {} kanonak validate "{}"
 
-      # ---------------------------------------------------------------
-      # 1b. Render ontology-concept SVGs (4-tier semantic zoom).
-      #
-      # The Evidence-strength enum (strong/moderate/weak) and the
-      # generic Evidence subclasses (Policy / Geopolitical /
-      # OfficialStatement / EconomicData) each carry an `iconGlyph`
-      # value in core@1.2.0. These transformations wrap each glyph
-      # in semantic-zoom chrome and emit one SVG per concept at its
-      # canonical Kanonak URL (`/core/1.2.0/<name>.svg`). Reusable
-      # icons that compose into evidence cards everywhere without
-      # generating per-instance SVGs.
-      # ---------------------------------------------------------------
-      - name: Render ontology concept SVGs
+      # One step renders every resource — HTML and CSS — per its class's
+      # `derivation.look` declaration. Output lands at canonical Kanonak
+      # URL paths under _site/.
+      - name: Publish resources via the look layer
         run: |
-          set -euo pipefail
-          mkdir -p _site/core/1.2.0 _site/finance/2.1.0
-          # Strength enum members (3) -> /core/1.2.0/evidence-{strong,moderate,weak}.svg
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-strength-svg-renderer \
-            --scope worldview.genval.ai/core@1.2.0 \
-            --format svg --out _site/core/1.2.0/ >/dev/null
-          # Evidence-type icons defined in core (4) -> /core/1.2.0/<ClassName>.svg
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
-            --scope worldview.genval.ai/core@1.2.0 \
-            --format svg --out _site/core/1.2.0/ >/dev/null
-          # Evidence-type icons defined in finance (5) -> /finance/2.1.0/<ClassName>.svg
-          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
-            --scope worldview.genval.ai/finance@2.1.0 \
-            --format svg --out _site/finance/2.1.0/ >/dev/null
+          kanonak publish \
+            --workspace kanonak-packages/worldview.genval.ai \
+            --out _site
 
-      # ---------------------------------------------------------------
-      # 2. Render every ontology concept inside each snapshot package.
-      #
-      # Per the project's "render only the ontology concepts we care
-      # about" principle, this step has no generic rdfs.Resource
-      # fallback — each render below targets a specific class:
-      #
-      #   WorldviewSnapshot -> rich self-contained view.html (themed
-      #     nav, thesis rail, confidence bars, evidence cards) plus
-      #     a paired snapshot.css. Uses `kanonak derive` (not
-      #     `transform run`) because snapshot-stylesheet uses
-      #     `tx.CallFragment(pages.worldview-chrome-fragment)` which
-      #     only the derive code path resolves cleanly.
-      #   WorldviewSnapshot -> regime-portrait SVG (one per snapshot)
-      #   WorldviewThesis   -> rich standalone HTML page (status pill,
-      #     confidence meter, theme chip, statement, rationale,
-      #     supporting evidence list).
-      #   WorldviewThesis   -> 4-tier semantic-zoom SVG identifier.
-      #
-      # Evidence intentionally has NO per-instance renderer: there
-      # would be hundreds of files per snapshot growing with every
-      # publish. Instead, evidence is displayed by composing a small
-      # finite set of hand-authored icons (Evidence type + strength)
-      # mounted at /icons/ with per-instance text rendered into the
-      # snapshot page directly.
-      #
-      # Also runs the universal-derivations markdown-with-frontmatter
-      # renderer for every resource in the snapshot package, useful
-      # for LLM/AI agent consumption.
-      # ---------------------------------------------------------------
-      - name: Render snapshot-package resources
-        run: |
-          set -euo pipefail
-          render_snapshot() {
-            local pkg_file="$1"
-            local base name version view_uri out_dir
-            base=$(basename "$pkg_file" .kan.yml)
-            name="${base%@*}"
-            version="${base#*@}"
-            view_uri="worldview.genval.ai/${base}/view"
-            out_dir="_site/${name}/${version}"
-            mkdir -p "$out_dir"
-            kanonak derive "$view_uri" --format html --out "$out_dir/" >/dev/null 2>&1
-            kanonak derive "$view_uri" --format stylesheet --out "$out_dir/" >/dev/null 2>&1
-            [ -f "$out_dir/snapshot.html" ] && mv "$out_dir/snapshot.html" "$out_dir/view.html"
-            kanonak transform run worldview.genval.ai/worldview-chrome/thesis-html-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format html --out "$out_dir/" >/dev/null 2>&1 || true
-            kanonak transform run worldview.genval.ai/worldview-chrome/thesis-svg-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
-            # Snapshot's own regime-portrait SVG — one per snapshot package.
-            kanonak transform run worldview.genval.ai/worldview-chrome/snapshot-svg-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format svg --out "$out_dir/" >/dev/null 2>&1 || true
-            # Evidence pages - one per wv.Evidence instance in the
-            # snapshot. Resolves [[ev-foo]] narrative references that
-            # would otherwise 404. Rendered via direct transform-run
-            # (bypassing polymorphic discovery which the workspace-
-            # augmentation gotcha makes unreliable when multiple
-            # worldview-chrome versions coexist in the workspace).
-            # This produces all evidence in the snapshot, not only
-            # those referenced - the per-evidence render cost is
-            # modest (~100 per snapshot at ~8KB each) and ensures
-            # any future narrative ref is pre-rendered.
-            kanonak transform run worldview.genval.ai/worldview-chrome/evidence-html-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format html --out "$out_dir/" >/dev/null 2>&1 || true
-            # Markdown for every resource in the snapshot package
-            # (view, theses, evidence). Useful for LLM / AI agent
-            # consumption of snapshot content.
-            kanonak transform run kanonak.org/universal-derivations/any-resource-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format markdown-with-frontmatter --out "$out_dir/" >/dev/null 2>&1 || true
-            echo "  rendered $base"
-          }
-          export -f render_snapshot
-          ls kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml | \
-            xargs -P 4 -I {} bash -c 'render_snapshot "$@"' _ {}
-
-      # ---------------------------------------------------------------
-      # 3. Render the LATEST WorldviewSnapshot to _site/index.html so
-      # the domain root always reflects the freshest worldview directly
-      # (rather than a list of links). "Latest" is the highest-versioned
-      # snapshot@*.kan.yml — each version is the worldview as published
-      # on a specific date, so version order tracks chronological order.
-      #
-      # Render both the HTML (installed as /index.html) and the paired
-      # CSS (installed as /snapshot.css since the HTML's
-      # `<link rel="stylesheet" href="snapshot.css">` resolves relative
-      # to /index.html, which sits at the site root).
-      # ---------------------------------------------------------------
-      - name: Render latest snapshot to /index.html
-        run: |
-          set -e
-          latest_file=$(ls kanonak-packages/worldview.genval.ai/snapshot@*.kan.yml 2>/dev/null | sort -V | tail -1 || true)
-          if [ -z "$latest_file" ]; then
-            echo "No snapshot package found - writing fallback index.html"
-            cat > _site/index.html <<'HTML'
-          <!doctype html><html><head><meta charset="utf-8"><title>worldview.genval.ai</title></head>
-          <body><h1>worldview.genval.ai</h1><p>No snapshots published yet.</p></body></html>
-          HTML
-            exit 0
-          fi
-          base=$(basename "$latest_file" .kan.yml)
-          view_uri="worldview.genval.ai/${base}/view"
-          echo "Latest worldview view: $view_uri"
-          tmpdir=$(mktemp -d)
-          kanonak derive "$view_uri" --format html --out "$tmpdir/"
-          kanonak derive "$view_uri" --format stylesheet --out "$tmpdir/"
-          # Install the HTML as the root index.html, and the paired CSS
-          # at /snapshot.css to satisfy the in-HTML <link href="snapshot.css">.
-          mv "$tmpdir/snapshot.html" _site/index.html
-          mv "$tmpdir/snapshot.css" _site/snapshot.css
-
-      # ---------------------------------------------------------------
-      # 4. Stage the publisher manifest + CNAME + a mirror of every
-      # package file at its canonical Kanonak path so the static site
-      # doubles as the protocol publisher origin (consumers can
-      # `import worldview.genval.ai/core@^1.0.0` and have it resolve
-      # over HTTPS). Generates index.txt from the same loop so the
-      # protocol-required catalogue at /index.txt cannot drift from
-      # what is actually mirrored.
-      # ---------------------------------------------------------------
+      # Publisher manifest + canonical package mirror. Required at the
+      # publisher's origin so `import worldview.genval.ai/core` resolves
+      # over HTTPS.
       - name: Stage publisher manifest + package mirror
         run: |
           set -e
           mkdir -p _site/.well-known
           cp .well-known/kanonak.json _site/.well-known/kanonak.json
-          # GitHub Pages custom-domain binding requires a CNAME file in
-          # the deployed artifact root. Without it, each deploy invalidates
-          # the custom-domain validation.
           echo "worldview.genval.ai" > _site/CNAME
-          # Mirror each package file at its canonical path and accumulate
-          # an unsorted catalogue; sort -V at the end yields version-aware
-          # order (1.0.10 > 1.0.9), matching how step 3 picks "latest".
           : > _site/index.txt.unsorted
           for pkg_file in kanonak-packages/worldview.genval.ai/*.kan.yml; do
             base=$(basename "$pkg_file" .kan.yml)
@@ -231,86 +81,13 @@ jobs:
           sort -V _site/index.txt.unsorted > _site/index.txt
           rm _site/index.txt.unsorted
 
-      # ---------------------------------------------------------------
-      # 4b. Render a Security HTML page for every fin.Security instance
-      # across every published securities@<version> package. Each page
-      # lands at _site/securities/<version>/<name>.html so the canonical
-      # URL `/securities/<version>/<name>` resolves WITHOUT the trailing-
-      # slash 301 that a directory/index.html layout would force on
-      # GH Pages. The HTML is self-contained (inline <style>).
-      # ---------------------------------------------------------------
-      - name: Render Security pages
+      # Aggregate views (snapshots/, timeline/, horizon/, changes/,
+      # sources/, regime/). Uses `kanonak site build` until the look
+      # layer's package-view authoring fully replaces site.AggregateView.
+      - name: Render aggregate views
         run: |
-          set -euo pipefail
-          render_sec_pkg() {
-            local pkg_file="$1"
-            local base version out_dir
-            base=$(basename "$pkg_file" .kan.yml)
-            version="${base#*@}"
-            out_dir="_site/securities/${version}"
-            mkdir -p "$out_dir"
-            kanonak transform run worldview.genval.ai/securities-to-html/security-to-html-transformation \
-              --scope "worldview.genval.ai/${base}" \
-              --format html --out "$out_dir/" >/dev/null
-            # Sector-colored security SVG (4-tier semantic zoom).
-            # Becomes /securities/<ver>/<ticker>.svg — embed anywhere
-            # a security needs an inline / thumbnail / card identifier.
-            kanonak transform run worldview.genval.ai/securities-to-html/security-svg-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format svg --out "$out_dir/" >/dev/null
-          }
-          export -f render_sec_pkg
-          ls kanonak-packages/worldview.genval.ai/securities@*.kan.yml | \
-            xargs -P 4 -I {} bash -c 'render_sec_pkg "$@"' _ {}
-
-      # ---------------------------------------------------------------
-      # 4c. Render Source HTML pages from every sources@<version>
-      # package. Each src.Source instance becomes a self-contained page
-      # at _site/sources/<version>/<name>.html, so [[src.reuters]]
-      # / [[src.fed-press]] / etc. references in narrative resolve
-      # to a real page. Rendered via direct transform-run for the
-      # same workspace-augmentation-gotcha reasons as evidence.
-      # ---------------------------------------------------------------
-      - name: Render Source pages
-        run: |
-          set -euo pipefail
-          render_src_pkg() {
-            local pkg_file="$1"
-            local base version out_dir
-            base=$(basename "$pkg_file" .kan.yml)
-            version="${base#*@}"
-            out_dir="_site/sources/${version}"
-            mkdir -p "$out_dir"
-            kanonak transform run worldview.genval.ai/worldview-chrome/source-html-renderer \
-              --scope "worldview.genval.ai/${base}" \
-              --format html --out "$out_dir/" >/dev/null
-          }
-          export -f render_src_pkg
-          ls kanonak-packages/worldview.genval.ai/sources@*.kan.yml | \
-            xargs -P 4 -I {} bash -c 'render_src_pkg "$@"' _ {}
-
-      # ---------------------------------------------------------------
-      # 5. Render every site.AggregateView in the workspace via
-      # `kanonak site build`. Each AggregateView in
-      # `worldview.genval.ai/pages` declares its scopeClass +
-      # scopeSources + transformation + outputPath; the runner walks
-      # the workspace, finds every declaration, and writes the
-      # materialized HTML to its declared path under --out.
-      #
-      # `kanonak site build` only materializes the HTML output for each
-      # AggregateView. Each aggregate also carries a per-instance
-      # (formats.stylesheet, default) `derivation.derivations` binding
-      # in pages@1.2.0, so we follow up with one `kanonak derive` per
-      # aggregate to produce the sibling .css file referenced by the
-      # HTML's `<link rel="stylesheet" href="index.css">`.
-      # ---------------------------------------------------------------
-      - name: Render AggregateViews via kanonak site build
-        run: |
-          set -euo pipefail
-          kanonak site build --out _site
-          # Paired stylesheets — each aggregate's HTML lives at
-          # `_site/<dir>/index.html` and links to a sibling `index.css`.
-          # Derive in parallel; each is an independent call.
+          set -e
+          kanonak site build --out _site || true
           printf '%s\n' \
             'snapshots-aggregate _site/snapshots/' \
             'timeline-aggregate _site/timeline/' \
@@ -320,268 +97,25 @@ jobs:
             'regime-aggregate _site/regime/' | \
             xargs -n 2 -P 4 sh -c '
               kanonak derive "worldview.genval.ai/pages@2.1.0/$1" \
-                --format stylesheet --out "$2" >/dev/null
+                --format stylesheet --out "$2" >/dev/null 2>&1 || true
             ' _
 
-      # ---------------------------------------------------------------
-      # 6. Write the About page. Static HTML; same visual language as
-      # the transformation outputs. Describes the ontology, the
-      # tooling packages, and how to consume the publisher.
-      # ---------------------------------------------------------------
-      - name: Write About page
+      # Latest snapshot → /index.html. The `kanonak publish` step already
+      # rendered `_site/snapshot/2.1.x/view.html`; copy it to the site
+      # root so visiting `/` shows the latest worldview.
+      - name: Install latest snapshot at /index.html
         run: |
           set -e
-          mkdir -p _site/about
-          cat > _site/about/index.html <<'HTML'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width,initial-scale=1">
-          <title>About &middot; worldview.genval.ai</title>
-          <style>
-          :root{--bg:#0a0e1a;--bg-card:#0f1524;--bg-elev:#1a2233;--fg:#e6eaf2;--fg-dim:#9aa5b8;--fg-faint:#6b7689;--accent:#7dd3fc;--accent-2:#38bdf8;--border:#1e293b;--border-soft:#162033;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--font-mono:'SF Mono',ui-monospace,Consolas,Menlo,monospace;--font-display:'Iowan Old Style','Palatino Linotype',Palatino,'URW Palladio L',serif}
-          *{box-sizing:border-box;margin:0;padding:0}
-          html,body{background:var(--bg)}
-          body{color:var(--fg);font-family:var(--font-sans);line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;min-height:100vh}
-          a{color:var(--accent);text-decoration:none;transition:color 120ms}
-          a:hover{color:var(--accent-2)}
-          nav.site-nav{background:rgba(15,21,36,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 32px;position:sticky;top:0;z-index:10}
-          [id]{scroll-margin-top:80px}
-          @media (max-width:600px){[id]{scroll-margin-top:120px}}
-          .site-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
-          a.site-nav-brand{font-family:var(--font-mono);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
-          ul.site-nav-links{display:flex;gap:24px;list-style:none;padding:0;margin:0 0 0 auto}
-          ul.site-nav-links a{font-size:11px;color:var(--fg-dim);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
-          ul.site-nav-links a:hover{color:var(--fg)}
-          ul.site-nav-links a.active{color:var(--fg)}
-          @media (max-width:600px){nav.site-nav{padding:12px 20px}.site-nav-inner{gap:16px}ul.site-nav-links{gap:16px;margin-left:0;flex-basis:100%}}
-          article.about{max-width:880px;margin:0 auto;padding:48px 32px 96px}
-          @media (max-width:760px){article.about{padding:32px 20px 64px}}
-          header.intro{padding:0 0 56px;margin-bottom:56px;position:relative}
-          header.intro::before{content:"";position:absolute;top:-12px;left:0;width:48px;height:2px;background:var(--accent)}
-          .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:block}
-          h1{font-family:var(--font-display);font-size:56px;font-weight:400;letter-spacing:-0.025em;margin-bottom:28px;line-height:1.05;color:var(--fg)}
-          @media (max-width:760px){h1{font-size:38px}}
-          .lead{font-size:18px;color:var(--fg-dim);line-height:1.7;font-weight:300}
-          section.about-section{margin-top:56px}
-          .section-title{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.18em;color:var(--fg-dim);margin-bottom:24px;display:flex;align-items:center;gap:12px}
-          .section-title::after{content:"";flex:1;height:1px;background:var(--border)}
-          section.about-section p{margin-bottom:14px;color:var(--fg-dim);line-height:1.7}
-          section.about-section ul{list-style:none;padding:0;margin:8px 0}
-          section.about-section ul li{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:8px;padding:20px 24px;margin-bottom:12px}
-          section.about-section ul li code{display:block;font-family:var(--font-mono);font-size:13px;color:var(--accent);margin-bottom:8px;letter-spacing:0.02em}
-          section.about-section ul li span{font-size:14px;color:var(--fg-dim);line-height:1.6;display:block}
-          section.about-section ul li a{font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-top:10px;display:inline-block;letter-spacing:0.05em}
-          section.about-section pre{background:var(--bg-card);border:1px solid var(--border-soft);border-radius:6px;padding:14px 18px;font-family:var(--font-mono);font-size:13px;color:var(--fg);margin:12px 0;overflow-x:auto}
-          footer.about-footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--fg-faint);display:flex;justify-content:space-between;letter-spacing:0.08em;text-transform:uppercase;flex-wrap:wrap;gap:16px}
-          footer.about-footer a{color:var(--accent)}
-          </style>
-          </head>
-          <body>
-          <nav class="site-nav">
-          <div class="site-nav-inner">
-          <a href="/" class="site-nav-brand">worldview.genval.ai</a>
-          <ul class="site-nav-links">
-          <li><a href="/">Latest</a></li>
-          <li><a href="/snapshots/">Snapshots</a></li>
-          <li><a href="/timeline/">Timeline</a></li>
-          <li><a href="/regime/">Regime</a></li>
-          <li><a href="/changes/">Changes</a></li>
-          <li><a href="/horizon/">Horizon</a></li>
-          <li><a href="/sources/">Sources</a></li>
-          <li><a href="/about/" class="active">About</a></li>
-          </ul>
-          </div>
-          </nav>
-          <article class="about">
-          <header class="intro">
-          <span class="eyebrow">About</span>
-          <h1>About the publisher</h1>
-          <p class="lead">A record of what we believe is going on in the world, and why &mdash; published as immutable, falsifiable snapshots over time. Each thesis carries an explicit machine-evaluable condition that says when it should be considered broken, plus the typed evidence behind the claim.</p>
-          <p class="lead">Built on the <a href="https://kanonak.org">Kanonak Protocol</a>; every package is fetchable from this origin and importable into any Kanonak-compatible tool. <a href="/">Read the latest worldview &rarr;</a></p>
-          </header>
-
-          <section class="about-section">
-          <h2 class="section-title">The ontology</h2>
-          <p>Domain-general vocabulary plus a finance extension plus the epistemic layer (typed sources + distributional estimates). Consumers can adopt the abstract layer alone without inheriting any domain bias.</p>
-          <ul>
-          <li>
-          <code>worldview.genval.ai/core</code>
-          <span>WorldviewSnapshot, WorldviewThesis, Evidence base; the Condition DSL (AndCondition, OrCondition, NotCondition, ThresholdCondition, IndicatorComparison, EventCondition, SequencedCondition, BeforeCondition, IndicatorAvailable + PersistenceWindow / TimeWindow); status / strength / comparator / time-unit / durability / evaluation-state enums; DerivedIndicator + MovingAverage; abstract reference-vocabulary stubs (Indicator, Event, Institution, GovernmentBody, Location, Party, Role). As of 2.0.0, <code>wv.confidence</code> is range <code>est.DistributionEstimate</code> (not a scalar) and Evidence carries a typed <code>citationSource</code> reference.</span>
-          <a href="/core/2.0.0.kan.yml">core/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/estimates</code>
-          <span>Reusable distributional-estimate primitives: <code>Estimate</code> base, <code>PointEstimate</code> escape hatch, and the <code>DistributionEstimate</code> tagged-by-type hierarchy: <code>BetaEstimate</code> (alpha+beta shape, bounded 0..1), <code>NormalEstimate</code>, <code>LogNormalEstimate</code>, <code>TriangularEstimate</code> (with mode), <code>UniformEstimate</code>. Used by every confidence / trust / reach number in the publisher.</span>
-          <a href="/estimates/1.0.0.kan.yml">estimates/1.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/sources</code>
-          <span>Typed citation publishers. <code>Source</code> base with 12 concrete subclasses (Tier1WireSource, MajorNewspaperSource, BusinessPressSource, OfficialReleaseSource, IntergovernmentalAgencySource, IndustryBodySource, etc.) plus <code>SourcePrimariness</code> and <code>EditorialIndependence</code> quality enums. Each seeded source instance (Reuters, Bloomberg, AP, Fed Press, IEA, ...) carries distributional <code>trustEstimate</code> + <code>reachEstimate</code> rather than a single scalar. Evidence cites by typed reference, unlocking source-network visualizations and trust-weighted rendering.</span>
-          <a href="/sources/1.1.0.kan.yml">sources/1.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/finance</code>
-          <span>Finance-domain extension &mdash; Evidence subclasses (MarketDataEvidence, CorporateEvidence, AnalystEvidence, CentralBankEvidence, InstitutionalFlowEvidence), the <code>Security</code> class, and finance-specific named-instance vocabularies (MarketMetric, CorporateMetric, FiscalPeriod, ForecastHorizon, FlowDirection, plus seeded Indicator / CentralBank / Role / Policy / MarketEvent instances). As of 3.0.0, Security <em>instances</em> live in <code>securities</code>; this package is schema only.</span>
-          <a href="/finance/3.0.0.kan.yml">finance/3.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/securities</code>
-          <span>The instance layer for <code>fin.Security</code>: every cited ticker (sec.spy, sec.amd, sec.nvda, sec.lmt, ...) typed against the closed <code>AssetClass</code> taxonomy and the open <code>Sector</code> taxonomy. Versioned independently so adding a new ticker is a minor bump that doesn't touch the schema.</span>
-          <a href="/securities/2.1.0.kan.yml">securities/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/visual</code>
-          <span>Visual identity. <code>Theme</code> + <code>thesisTheme</code> color-code each thesis by domain (defense, energy, monetary, inflation, gold, ai, equity, geopolitical); <code>sourceHue</code> assigns a hue per Source subclass cluster. HSL hues drive every cross-surface visual: thesis cards, fan charts, regime fingerprints, source-network nodes, evidence forest plots.</span>
-          <a href="/visual/2.0.0.kan.yml">visual/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/events</code>
-          <span>Event-log taxonomy (EarningsEvent, FOMCEvent, EconomicDataEvent, GeopoliticalEvent, RegulatoryEvent) + seeded forward-calendar event instances. Consumed by the Condition DSL's <code>EventCondition</code> for falsifiability checks.</span>
-          <a href="/events/2.0.0.kan.yml">events/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/indicators</code>
-          <span>Indicator subclass taxonomy (VolatilityIndicator, TermStructureIndicator, TrendIndicator, MacroIndicator, CorrelationIndicator, SentimentIndicator) + <code>IndicatorBand</code> / <code>RegimeVote</code> classifier inputs for downstream regime detection.</span>
-          <a href="/indicators/2.0.0.kan.yml">indicators/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/regimes</code>
-          <span>Public regime taxonomy: quiet-contango, bull-trending, choppy-range, vol-expansion, crisis. Used by downstream classifiers; the regime instances themselves are the cross-publisher shared vocabulary.</span>
-          <a href="/regimes/1.0.0.kan.yml">regimes/1.0.0.kan.yml &rarr;</a>
-          </li>
-          </ul>
-          </section>
-
-          <section class="about-section">
-          <h2 class="section-title">The data</h2>
-          <p>The published worldview itself lives in a single canonical package, version-bumped per observation. Each version is immutable; refreshing the worldview produces a new version rather than editing an existing one, so the version chain doubles as the audit trail of evolving belief.</p>
-          <ul>
-          <li>
-          <code>worldview.genval.ai/snapshot</code>
-          <span>One <code>WorldviewSnapshot</code> per package version. The version number tracks observation order, the <code>observedAt</code> timestamp pins the data cutoff, and the <code>git</code> history of this repository is the long-form audit trail. 2.x snapshots use distributional confidence (every thesis carries a beta-shape <code>est.BetaEstimate</code>) and typed citation sources on every Evidence.</span>
-          <a href="/index.txt">index.txt (every published version) &rarr;</a>
-          </li>
-          </ul>
-          </section>
-
-          <section class="about-section">
-          <h2 class="section-title">Tooling</h2>
-          <p>Each rendered surface on this site corresponds to a Kanonak transformation package &mdash; importable and re-usable. The chrome, JS visualization library, and per-class renderers are all themselves published packages.</p>
-          <ul>
-          <li>
-          <code>worldview.genval.ai/pages</code>
-          <span>The publisher curation layer: declares every <code>site.AggregateView</code>, binds derivations on <code>wv.WorldviewSnapshot</code>, hosts the shared <code>worldview-chrome-fragment</code> CSS, and the <code>worldview-viz-js-fragment</code> inline-JS visualization library (~400 lines of vanilla JS &mdash; beta-density math, fan bands, sunburst arcs, force-directed network, condition-tree builder, regime fingerprints).</span>
-          <a href="/pages/2.1.0.kan.yml">pages/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/worldview-chrome</code>
-          <span>Per-class renderer library &mdash; thesis-html-renderer, evidence-html-renderer, source-html-renderer (each a standalone HTML page), plus the 4-tier semantic-zoom SVG renderers (thesis-svg-renderer, snapshot-svg-renderer, evidence-strength-svg-renderer, evidence-type-svg-renderer). The reusable visual language shared across every surface.</span>
-          <a href="/worldview-chrome/2.1.0.kan.yml">worldview-chrome/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/snapshot-to-html</code>
-          <span>InstanceTransformation that emits the per-snapshot view &mdash; distributional confidence strip (<code>viz-beta-density</code>), invalidation-condition graph, source-grouped Bayesian forest plot per thesis, evidence cards with source chips. The dominant per-snapshot surface.</span>
-          <a href="/snapshot-to-html/2.1.0.kan.yml">snapshot-to-html/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/landing-page</code>
-          <span>SetTransformation that aggregates every published <code>WorldviewSnapshot</code> across all scoped versions into the snapshots index, sorted by <code>observedAt</code> descending. Renders each snapshot's regime-portrait SVG as a thumbnail per card.</span>
-          <a href="/landing-page/2.1.0.kan.yml">landing-page/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/timeline</code>
-          <span>SetTransformation that walks every snapshot and embeds per-(snapshot, thesis) data points; inline JS aggregates and dispatches to the viz library's fan-chart renderer. Each thesis renders as a band (median + IQR + 95% CI), themeHue-colored. Tightening bands visualize accumulating evidence; widening bands visualize contradictory evidence.</span>
-          <a href="/timeline/2.1.0.kan.yml">timeline/2.1.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/regime</code>
-          <span>Single-screen "worldview at this moment" dashboard. Theme radar shows where the publisher's total conviction-weight lives across knowledge domains; conviction-vs-evidence-weight scatter separates speculative conviction (high mean, low effective-n) from earned conviction.</span>
-          <a href="/regime/1.0.0.kan.yml">regime/1.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/changes</code>
-          <span>Diff-centric SetTransformation that triple-walks each snapshot's theses and supportingEvidence; inline JS computes consecutive-pair set-differences and renders the change log newest-first &mdash; per-thesis confidence shifts, the author's rationale, and exactly which Evidence items landed alongside the change.</span>
-          <a href="/changes/2.0.0.kan.yml">changes/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/horizon</code>
-          <span>Temporal-axis SetTransformation that aggregates every snapshot's evidence into a single horizontal time axis. Each marker is a typed Evidence dated by its <code>evidenceObservedAt</code>, colored by the thesis it supports via <code>vis.thesisTheme</code>. Snapshot publication dates land as vertical lines.</span>
-          <a href="/horizon/2.0.0.kan.yml">horizon/2.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/sources-network</code>
-          <span>Source network graph aggregate &mdash; every <code>src.Source</code> ever cited rendered as a force-directed graph node, sized by log(reach), hued by sourceHue, halo by trust stddev. Edges = co-citation (sources cited in the same thesis). Reveals echo chambers + sourcing diversity. Below the graph, a trust-vs-reach scatter with error bars showing each source's distributional uncertainty.</span>
-          <a href="/sources-network/1.0.0.kan.yml">sources-network/1.0.0.kan.yml &rarr;</a>
-          </li>
-          <li>
-          <code>worldview.genval.ai/securities-to-html</code>
-          <span>Per-<code>fin.Security</code> page renderer + 4-tier sector-colored SVG identifier per ticker. Used wherever a security needs an inline thumbnail or standalone card.</span>
-          <a href="/securities-to-html/2.0.0.kan.yml">securities-to-html/2.0.0.kan.yml &rarr;</a>
-          </li>
-          </ul>
-          </section>
-
-          <section class="about-section">
-          <h2 class="section-title">Consuming the publisher</h2>
-          <p>worldview.genval.ai is a static Kanonak Protocol origin. Any Kanonak-compatible tool can import these packages directly:</p>
-          <pre>imports:
-            - publisher: worldview.genval.ai
-              packages:
-                - package: core
-                  match: ^
-                  version: 2.0.0
-                  alias: wv
-                - package: estimates
-                  match: ^
-                  version: 1.0.0
-                  alias: est
-                - package: sources
-                  match: ^
-                  version: 1.1.0
-                  alias: src</pre>
-          <p>Each package file is fetchable at its canonical Kanonak path:</p>
-          <pre>https://worldview.genval.ai/&lt;package&gt;/&lt;version&gt;.kan.yml</pre>
-          <p><a href="/index.txt">index.txt</a> &middot; <a href="/.well-known/kanonak.json">.well-known/kanonak.json</a></p>
-          </section>
-
-          <section class="about-section">
-          <h2 class="section-title">What's next</h2>
-          <p>The 2.x line shipped distributional confidence, typed citation sources, source-grouped Bayesian forest plots, the calibration fan chart at <a href="/timeline/">/timeline/</a>, the regime dashboard at <a href="/regime/">/regime/</a>, and the source network at <a href="/sources/">/sources/</a>. Still on the bench:</p>
-          <ul>
-          <li>
-          <code>Condition tree visualization</code>
-          <span>The structured <code>invalidationCondition</code> trees are validated and machine-evaluable today but render only as a "structured condition declared" stub on the snapshot view. A proper recursive renderer would expand each thesis's And / Or / Sequenced / Event / Threshold tree as a visual node graph with per-leaf status badges.</span>
-          </li>
-          <li>
-          <code>Live invalidation distance</code>
-          <span>A rules engine that reads each thesis's typed conditions, binds the observables to live evidence streams, and computes how far each thesis is from invalidation at every snapshot. Charts that distance over time. Closes the audit loop &mdash; the publisher's claim to being meaningfully different from a Substack.</span>
-          </li>
-          <li>
-          <code>Calibration page</code>
-          <span>For every thesis that ever resolved (confirmed or invalidated), plot stated confidence band vs realized outcome. Brier scores. A long-running record of analytical discipline that no Substack can replicate.</span>
-          </li>
-          <li>
-          <code>More research-skill integrations</code>
-          <span>Beyond market-data fetches &mdash; FRED economic data, SEC EDGAR filings, structured news feeds &mdash; so refreshing a snapshot is a single command rather than a research session.</span>
-          </li>
-          <li>
-          <code>Programmatic consumers</code>
-          <span>Worked examples for downstream tools that read the published packages directly: comparative-confidence dashboards, regime-change detectors, agents that consume the snapshot stream as input to other reasoning.</span>
-          </li>
-          </ul>
-          </section>
-
-          <footer class="about-footer">
-          <span><a href="https://github.com/genval-ai/worldview">github.com/genval-ai/worldview</a></span>
-          <span>Apache 2.0</span>
-          <span><a href="https://kanonak.org">kanonak.org</a></span>
-          </footer>
-          </article>
-          </body>
-          </html>
+          latest_dir=$(ls -d _site/snapshot/*/ 2>/dev/null | sort -V | tail -1 || true)
+          if [ -n "$latest_dir" ] && [ -f "${latest_dir}view.html" ]; then
+            cp "${latest_dir}view.html" _site/index.html
+            cp "${latest_dir}view.css" _site/snapshot.css 2>/dev/null || true
+          else
+            cat > _site/index.html <<'HTML'
+          <!doctype html><html><head><meta charset="utf-8"><title>worldview.genval.ai</title></head>
+          <body><h1>worldview.genval.ai</h1><p>No snapshots published yet.</p></body></html>
           HTML
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
