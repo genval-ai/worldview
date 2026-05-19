@@ -32,9 +32,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.kanonak
-          key: kanonak-${{ runner.os }}-${{ hashFiles('kanonak-packages/**/*.kan.yml') }}
-          restore-keys: |
-            kanonak-${{ runner.os }}-
+          key: kanonak-v2-${{ runner.os }}-${{ hashFiles('kanonak-packages/**/*.kan.yml') }}
 
       - name: Validate packages
         run: |
