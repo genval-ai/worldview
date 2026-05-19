@@ -36,7 +36,7 @@ site:
 
 index:
   type: site.StaticPage
-  label: "worldview.genval.ai"
+  rdfs.label: "worldview.genval.ai"
   site.title: "worldview.genval.ai"
   site.body: |
     Macro worldview tracking — point-in-time reads of the market regime,
@@ -56,7 +56,7 @@ index:
 
 about:
   type: site.StaticPage
-  label: "About"
+  rdfs.label: "About"
   site.title: "About worldview.genval.ai"
   site.body: |
     worldview.genval.ai is a public log of macro-market readings. It
@@ -89,47 +89,47 @@ about:
 
 nav-latest:
   type: look.NavLink
-  label: "Latest"
+  rdfs.label: "Latest"
   look.target: snap.view
 
 nav-snapshots:
   type: look.NavLink
-  label: "Snapshots"
+  rdfs.label: "Snapshots"
   look.target: pages.snapshots-aggregate
 
 nav-timeline:
   type: look.NavLink
-  label: "Timeline"
+  rdfs.label: "Timeline"
   look.target: pages.timeline-aggregate
 
 nav-regime:
   type: look.NavLink
-  label: "Regime"
+  rdfs.label: "Regime"
   look.target: pages.regime-aggregate
 
 nav-changes:
   type: look.NavLink
-  label: "Changes"
+  rdfs.label: "Changes"
   look.target: pages.changes-aggregate
 
 nav-horizon:
   type: look.NavLink
-  label: "Horizon"
+  rdfs.label: "Horizon"
   look.target: pages.horizon-aggregate
 
 nav-sources:
   type: look.NavLink
-  label: "Sources"
+  rdfs.label: "Sources"
   look.target: pages.sources-aggregate
 
 nav-about:
   type: look.NavLink
-  label: "About"
+  rdfs.label: "About"
   look.target: about
 
 site-nav:
   type: look.NavGroup
-  label: "worldview.genval.ai navigation"
+  rdfs.label: "worldview.genval.ai navigation"
   look.entries:
     - nav-latest
     - nav-snapshots
