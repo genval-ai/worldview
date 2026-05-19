@@ -100,15 +100,12 @@ jobs:
 
       - name: Redirect / to the site index page
         run: |
-          set -e
-          latest_dir=$(ls -d _site/site/*/ 2>/dev/null | sort -V | tail -1)
-          version=$(basename "$latest_dir")
-          cat > _site/index.html <<HTML
+          cat > _site/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
           <title>Redirecting…</title>
-          <meta http-equiv="refresh" content="0; url=/site/${version}/index">
-          <link rel="canonical" href="/site/${version}/index">
+          <meta http-equiv="refresh" content="0; url=/site/index">
+          <link rel="canonical" href="/site/index">
           HTML
 
       - name: Upload Pages artifact
