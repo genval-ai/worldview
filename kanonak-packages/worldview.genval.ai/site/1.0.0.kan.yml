@@ -17,22 +17,25 @@ site:
           match: ^
           version: 1.1.0
           alias: look
+        - package: derivation
+          match: ^
+          version: 1.1.0
+          alias: derivation
     - publisher: worldview.genval.ai
       packages:
         - package: snapshot
           match: ^
           version: 2.1.4
           alias: snap
-        - package: pages
+        - package: core
           match: ^
-          version: 2.1.0
-          alias: pages
+          version: 2.0.0
+          alias: wv
   comment: >-
-    Publisher-curation content for worldview.genval.ai — the landing page,
-    authored static pages (about), and the site-wide navigation. Every
-    entry is a real Kanonak resource that renders via the universal look
-    layer, so the validator catches broken nav targets and the URLs are
-    not magic strings buried inside a transformation.
+    Publisher-curation content for worldview.genval.ai — landing page,
+    about, aggregate pages, and site-wide navigation. Every entry is a
+    real Kanonak resource rendered by the look layer; the validator
+    catches broken nav targets and no URLs are hidden inside transformations.
 
 index:
   type: site.StaticPage
@@ -95,32 +98,32 @@ nav-latest:
 nav-snapshots:
   type: look.NavLink
   rdfs.label: "Snapshots"
-  look.target: pages.snapshots-aggregate
+  look.target: snapshots-aggregate
 
 nav-timeline:
   type: look.NavLink
   rdfs.label: "Timeline"
-  look.target: pages.timeline-aggregate
+  look.target: timeline-aggregate
 
 nav-regime:
   type: look.NavLink
   rdfs.label: "Regime"
-  look.target: pages.regime-aggregate
+  look.target: regime-aggregate
 
 nav-changes:
   type: look.NavLink
   rdfs.label: "Changes"
-  look.target: pages.changes-aggregate
+  look.target: changes-aggregate
 
 nav-horizon:
   type: look.NavLink
   rdfs.label: "Horizon"
-  look.target: pages.horizon-aggregate
+  look.target: horizon-aggregate
 
 nav-sources:
   type: look.NavLink
   rdfs.label: "Sources"
-  look.target: pages.sources-aggregate
+  look.target: sources-aggregate
 
 nav-about:
   type: look.NavLink
@@ -139,3 +142,104 @@ site-nav:
     - nav-horizon
     - nav-sources
     - nav-about
+
+snapshots-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Snapshots"
+  site.title: "All snapshots"
+  site.body: |
+    Every published worldview snapshot, newest first. Each entry links
+    to the full report.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
+
+timeline-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Timeline"
+  site.title: "Worldview timeline"
+  site.body: |
+    The full sequence of snapshots as a time series.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
+
+horizon-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Horizon"
+  site.title: "Catalyst horizon"
+  site.body: |
+    Upcoming catalysts that could invalidate active theses or shift
+    the read on the current regime.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
+
+changes-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Changes"
+  site.title: "Changes between snapshots"
+  site.body: |
+    What moved between each consecutive worldview snapshot — confidence
+    shifts, new evidence, retired theses.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
+
+sources-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Sources"
+  site.title: "Evidence sources"
+  site.body: |
+    The underlying sources that every thesis depends on, grouped by
+    publication.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
+
+regime-aggregate:
+  type: site.StaticPage
+  rdfs.label: "Regime"
+  site.title: "Market regime"
+  site.body: |
+    The structural read on the current market regime, threaded across
+    all published snapshots.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
