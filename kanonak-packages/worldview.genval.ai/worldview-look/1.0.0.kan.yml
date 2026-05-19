@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: look-styles
         - package: site
           match: ^
