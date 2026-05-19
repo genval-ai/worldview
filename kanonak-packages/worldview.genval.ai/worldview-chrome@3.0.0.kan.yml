@@ -1,22 +1,19 @@
 # =============================================================================
 # worldview-chrome @ 3.0.0
 #
-# Placeholder package that previously held the per-class HTML / SVG
-# transformations. As of 3.0.0:
+# SVG identity renderers for the worldview ontology. HTML rendering
+# moved to the declarative look authoring surface in worldview-look@1.0.0;
+# this package now hosts only the SVG transformations that have no
+# look-layer equivalent yet (4-tier semantic-zoom identity icons).
 #
-#   - All HTML rendering moves to the declarative look authoring
-#     surface — see `worldview.genval.ai/worldview-look@1.0.0` for the
-#     `derivation.look` declarations on WorldviewThesis, Evidence,
-#     Source, Security, and Regime.
-#   - SVG transformations have been removed pending the look layer's
-#     SVG output support (a v1.1 deliverable on the protocol side).
-#     Until then, the worldview site renders without per-class SVG
-#     identity icons.
+# Bound SVG renderers:
+#   - wv.WorldviewSnapshot   → snapshot-svg-renderer (regime portrait)
+#   - wv.WorldviewThesis     → thesis-svg-renderer (4-tier semantic-zoom)
+#   - wv.EvidenceStrength    → evidence-strength-svg-renderer
 #
-# This package is kept (rather than deleted entirely) so consumers
-# importing `worldview.genval.ai/worldview-chrome` continue to find a
-# valid Kanonak package — empty of transformations but parseable. New
-# transformations may be added to a future minor bump.
+# evidence-type-svg-renderer also lives here for invocation against
+# Evidence subclass-defining packages (core, finance) via explicit
+# kanonak transform run in the publish workflow.
 # =============================================================================
 
 worldview-chrome:
@@ -28,5 +25,1442 @@ worldview-chrome:
       packages:
         - package: core-rdf
           match: ^
-          version: 1.0.0
+          version: 1.1.0
           alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.0.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+        - package: document-ast
+          match: ^
+          version: 1.2.0
+          alias: docast
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+        - package: derivation
+          match: ^
+          version: 1.0.0
+          alias: derivation
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: sources
+          match: ^
+          version: 1.0.0
+          alias: src
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+
+# SVG SEMANTIC-ZOOM TIER CONVENTION (worldview-chrome's reusable pattern)
+#
+# An SVG renderer for any resource MAY package multiple semantic-zoom
+# representations of the resource into one .svg file using sibling <g>
+# groups and CSS @media queries inside the SVG <style> block. When the
+# SVG is loaded via <img src="...">, the media queries evaluate against
+# the image's own rendered viewport in CSS pixels — so the right tier
+# auto-shows at the right size, and browser zoom or container resizing
+# trips the threshold to reveal more or less detail.
+#
+# FOUR named tiers (each adds one layer of information over the prior):
+#
+#   .tier-chip  shown rendered <  60px  — inline text-flow, char-level
+#               pure visual identity, NO text. One or two filled shapes
+#               encoding the most discriminating dimensions via color
+#               and proportion only. Designed for narrative inline use,
+#               favicons, and any context where text would be unreadable
+#               at the rendered scale.
+#
+#   .tier-icon  shown rendered 60-160px — small thumbnail, badge
+#               + ONE primary value as text (sized very large in user-
+#               space so it remains readable when scaled down). Adds
+#               the single most-asked-about number. Strokes carry
+#               vector-effect="non-scaling-stroke" to stay crisp.
+#
+#   .tier-card  shown rendered 160-400px — list thumbnail, hero visual
+#               + summary stats, secondary labels, one visualization
+#               (bar / dot / fill). No legends, no fine print. Fonts
+#               sized in user-space so they read at ~200px render.
+#
+#   .tier-full  shown rendered >= 400px — standalone, detail, billboard
+#               full information density: labels, legends, multi-element
+#               visualizations, every facet of the resource that admits
+#               a visual treatment.
+#
+# CSS cascade (default = tier-full; smaller media queries override
+# down through card → icon → chip):
+#
+#   .tier-chip, .tier-icon, .tier-card { display: none; }
+#   .tier-full { display: block; }
+#   @media (max-width: 400px) { .tier-full { display: none } .tier-card { display: block } }
+#   @media (max-width: 160px) { .tier-card { display: none } .tier-icon { display: block } }
+#   @media (max-width: 60px)  { .tier-icon { display: none } .tier-chip { display: block } }
+#
+# All four tiers share one viewBox; each layout positions itself
+# within that viewBox using whatever shape fits its information
+# density. The viewBox aspect ratio is the publisher's choice — keep
+# it consistent across all your class SVG renderers for visual
+# uniformity. worldview-chrome uses 400x240 (5:3 landscape).
+#
+# Progressive disclosure: chip → icon adds the primary value as text;
+# icon → card adds secondary text + a visualization; card → full adds
+# labeled lists + legends. Each next-larger tier is a strict superset.
+#
+# Adopters: wv.WorldviewThesis (thesis-svg-renderer below), wv.Worldview
+# Snapshot (snapshot-svg-renderer below). Other classes (fin.Security,
+# wv.Evidence, regimes, indicators) can adopt the same four-tier pattern
+# when their SVG renderer is built — the class names and breakpoints are
+# the convention's contract.
+# =============================================================================
+
+thesis-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewThesis
+    tx.requires:
+      - wv.confidence
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            .frame.s-active{stroke:#34d399}
+                            .frame.s-retired{stroke:#64748b;stroke-dasharray:4 3}
+                            .frame.s-invalidated{stroke:#f87171}
+                            .status-text.s-active{fill:#34d399}
+                            .status-text.s-retired{fill:#9aa5b8}
+                            .status-text.s-invalidated{fill:#f87171}
+                            /* SEMANTIC ZOOM — see convention block at top of file.
+                               Default to tier-full; cascade down through tier-card →
+                               tier-icon → tier-chip as the SVG's rendered viewport shrinks. */
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            /* tier-icon — adds the confidence value as text over the
+                               status-framed, theme-filled body. */
+                            .i-conf{font-size:110px;font-weight:700;fill:#e6eaf2}
+                            /* tier-card — large fonts in user-space so they stay readable
+                               when scaled down to ~200px renders. */
+                            .c-status{font-size:30px;font-weight:600;letter-spacing:8px}
+                            .c-conf{font-size:120px;font-weight:700;fill:#e6eaf2}
+                            .c-theme{font-size:18px;fill:#9aa5b8;letter-spacing:4px}
+                            /* Full layout typography stays small in user-space because at full
+                               render size it's already large enough on screen. */
+                            .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .meta-value{fill:#9aa5b8;font-size:11px}
+                            .conf-value{fill:#e6eaf2;font-size:50px;font-weight:600}
+                            .conf-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .ev-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .ev-count{fill:#e6eaf2;font-weight:600}
+                            .ev-row{font-size:11px;letter-spacing:1px}
+                            .ev-row tspan{fill:#6b7689}
+                            .ev-row tspan.evidence-strong{fill:#34d399}
+                            .ev-row tspan.evidence-moderate{fill:#fbbf24}
+                            .ev-row tspan.evidence-weak{fill:#64748b}
+                            .ev-row tspan.evidence-unknown{fill:#6b7689;opacity:0.4}
+                            .ev-legend{fill:#6b7689;font-size:8px;letter-spacing:1.5px}
+                            .lg-strong{fill:#34d399}
+                            .lg-moderate{fill:#fbbf24}
+                            .lg-weak{fill:#64748b}
+                            </style>
+                            <rect x="4" y="4" width="392" height="232" rx="14" fill="#0a0e1a" stroke-width="2.5" class="frame s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <g class="tier-full">
+                            <text x="24" y="32" class="meta-label">THEME</text>
+                            <text x="24" y="50" class="meta-value">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="376" y="32" text-anchor="end" class="meta-label">STATUS</text>
+                            <text x="376" y="50" text-anchor="end" font-weight="600" style="text-transform:uppercase" class="status-text s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" font-size="11">'
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="125" text-anchor="middle" class="conf-value">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="142" text-anchor="middle" class="conf-label">CONFIDENCE</text>
+                            <rect x="24" y="156" width="352" height="6" rx="3" fill="#1a2233"/>
+                            <svg x="24" y="156" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" height="1" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,55%)"/></svg>
+                            <text x="24" y="188" class="ev-label">EVIDENCE (<tspan class="ev-count">
+                        - type: tx.Count
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.supportingEvidence
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </tspan> ITEMS)</text>
+                            <text x="376" y="188" text-anchor="end" class="ev-legend"><tspan class="lg-strong">● STRONG</tspan>  <tspan class="lg-moderate">● MOD</tspan>  <tspan class="lg-weak">● WEAK</tspan></text>
+                            <text x="24" y="212" class="ev-row">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.supportingEvidence
+                          tx.loopVar: ev
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="'
+                              - type: tx.Fallback
+                                tx.primary:
+                                  type: tx.UriName
+                                  tx.uriNameOf:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: ev
+                                    tx.readProp: wv.evidenceStrength
+                                tx.alternate:
+                                  type: tx.StringLiteral
+                                  tx.stringLiteral: 'evidence-unknown'
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+                            <g class="tier-card">
+                            <text x="200" y="68" text-anchor="middle" style="text-transform:uppercase" class="c-status status-text s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '">'
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: wv.status
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="160" text-anchor="middle" class="c-conf">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="195" text-anchor="middle" style="text-transform:uppercase" class="c-theme">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <rect x="32" y="214" width="336" height="6" rx="3" fill="#1a2233"/>
+                            <svg x="32" y="214" width="336" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" height="1" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,55%)"/></svg>
+                            </g>
+                            <g class="tier-icon">
+                            <rect x="60" y="20" width="280" height="200" rx="20" fill="#0a0e1a" stroke-width="3" vector-effect="non-scaling-stroke" class="frame s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <svg x="60" y="20" width="280" height="200" viewBox="0 0 1 1" preserveAspectRatio="none"><g transform="rotate(180 0.5 0.5)"><rect width="1" height="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,50%)" opacity="0.5"/></g></svg>
+                            <text x="200" y="148" text-anchor="middle" class="i-conf">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+                            <g class="tier-chip">
+                            <rect x="4" y="4" width="392" height="232" rx="14" fill="#0a0e1a" stroke-width="3" vector-effect="non-scaling-stroke" class="frame s-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.status
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            "/>
+                            <svg x="4" y="4" width="392" height="232" viewBox="0 0 1 1" preserveAspectRatio="none"><g transform="rotate(180 0.5 0.5)"><rect width="1" height="
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.confidence
+                          tx.readProp: est.estimateMean
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: '" fill="hsl('
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.ResolveRef
+                            tx.resolveSource:
+                              type: tx.PropertyRead
+                              tx.readSource:
+                                type: tx.VarRef
+                                tx.varName: input
+                              tx.readProp: vis.thesisTheme
+                          tx.readProp: vis.themeHue
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ,65%,50%)" opacity="0.65"/></g></svg>
+                            </g>
+                            </svg>
+
+# =============================================================================
+# snapshot-svg-renderer — wv.WorldviewSnapshot as a regime portrait
+#
+# Applies the 4-tier semantic-zoom convention. The visual primitive is one
+# theme-colored dot per thesis, sized proportionally to that thesis's
+# confidence (via SVG font-size em — confidence 0-1 maps directly to em
+# multiplier, no math primitive needed), opacity reduced for non-active
+# theses. The dot row becomes a snapshot's regime fingerprint — same shape
+# across all four tiers, more surrounding context as you zoom in.
+# =============================================================================
+
+snapshot-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.WorldviewSnapshot
+    tx.requires:
+      - wv.hasThesis
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
+                            .bg{fill:#0a0e1a}
+                            .frame{stroke:#1e293b;fill:none}
+                            .t-active{opacity:1}
+                            .t-retired{opacity:0.35}
+                            .t-invalidated{opacity:0.45;filter:saturate(0.4) brightness(0.7)}
+                            .meta-label{fill:#6b7689;font-size:9px;letter-spacing:2.5px}
+                            .meta-value{fill:#9aa5b8;font-size:11px}
+                            .big-version{fill:#e6eaf2;font-size:24px;font-weight:700;letter-spacing:1px}
+                            .big-version .v-prefix{fill:#6b7689;font-weight:500;letter-spacing:2.5px}
+                            .card-date{fill:#9aa5b8;font-size:12px;letter-spacing:0.5px}
+                            .stat{fill:#9aa5b8;font-size:10px;letter-spacing:2px}
+                            .stat-num{fill:#e6eaf2;font-weight:700;font-size:13px}
+                            .full-label{fill:#9aa5b8;font-size:9px}
+                            .full-conf{fill:#e6eaf2;font-weight:600;font-size:9px}
+                            .conf-row{font-size:11px;font-weight:600;letter-spacing:0.5px}
+                            /* Semantic zoom — 4-tier cascade. See convention block at top. */
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            </style>
+                            <rect class="bg" x="4" y="4" width="392" height="232" rx="14" stroke="#1e293b" stroke-width="2" vector-effect="non-scaling-stroke"/>
+
+                        # =====================================================
+                        # tier-chip — pure regime fingerprint, centered dot row,
+                        # no text. Inline-text / favicon-size use.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-chip">
+                            <text x="200" y="155" text-anchor="middle" font-size="90" letter-spacing="-4">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # =====================================================
+                        # tier-icon — dot row + prominent version label.
+                        # Adds the version as the "primary value" text over
+                        # the chip's pure dot row, per the 4-tier convention.
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon">
+                            <text x="200" y="110" text-anchor="middle" font-size="68" letter-spacing="-3">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="195" text-anchor="middle" font-size="58" font-weight="700" fill="#e6eaf2" letter-spacing="0.5">v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # =====================================================
+                        # tier-card — prominent version + formatted date,
+                        # dot row, per-theme confidence row, count footer
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <text x="200" y="48" text-anchor="middle" class="big-version"><tspan class="v-prefix">SNAPSHOT </tspan>v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="70" text-anchor="middle" class="card-date">
+                        - type: tx.DateFormat
+                          tx.dateSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.observedAt
+                          tx.dateFormat: long-date
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="135" text-anchor="middle" font-size="60" letter-spacing="-2">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="172" text-anchor="middle" class="conf-row">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)"> '
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ' </tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="212" text-anchor="middle" class="stat"><tspan class="stat-num">
+                        - type: tx.Count
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </tspan> THESES</text>
+                            </g>
+
+                        # =====================================================
+                        # tier-full — prominent version + formatted date,
+                        # dot row, thesis list (labels left, conf right-aligned)
+                        # =====================================================
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <text x="24" y="46" class="big-version"><tspan class="v-prefix">SNAPSHOT </tspan>v
+                        - type: tx.UriVersion
+                          tx.uriVersionOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="376" y="32" text-anchor="end" class="meta-label">OBSERVED</text>
+                            <text x="376" y="48" text-anchor="end" class="card-date">
+                        - type: tx.DateFormat
+                          tx.dateSource:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.observedAt
+                          tx.dateFormat: long-date
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="108" text-anchor="middle" font-size="50" letter-spacing="-1">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '" font-size="'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: 'em" fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)">●</tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="24" y="148" font-size="9">
+                        - type: tx.ForEach
+                          tx.source:
+                            type: tx.PropertyRead
+                            tx.readSource:
+                              type: tx.VarRef
+                              tx.varName: input
+                            tx.readProp: wv.hasThesis
+                          tx.loopVar: thesisRef
+                          tx.emit:
+                            type: tx.Concat
+                            tx.parts:
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '<tspan x="24" dy="13" class="t-'
+                              - type: tx.UriName
+                                tx.uriNameOf:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.status
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '"><tspan fill="hsl('
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.PropertyRead
+                                    tx.readSource:
+                                      type: tx.ResolveRef
+                                      tx.resolveSource:
+                                        type: tx.VarRef
+                                        tx.varName: thesisRef
+                                    tx.readProp: vis.thesisTheme
+                                tx.readProp: vis.themeHue
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: ',65%,55%)" font-size="12">●</tspan> <tspan class="full-label">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.ResolveRef
+                                  tx.resolveSource:
+                                    type: tx.VarRef
+                                    tx.varName: thesisRef
+                                tx.readProp: rdfs.label
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</tspan><tspan x="376" text-anchor="end" class="full-conf">'
+                              - type: tx.PropertyRead
+                                tx.readSource:
+                                  type: tx.PropertyRead
+                                  tx.readSource:
+                                    type: tx.ResolveRef
+                                    tx.resolveSource:
+                                      type: tx.VarRef
+                                      tx.varName: thesisRef
+                                  tx.readProp: wv.confidence
+                                tx.readProp: est.estimateMean
+                              - type: tx.StringLiteral
+                                tx.stringLiteral: '</tspan></tspan>'
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+                            </svg>
+
+# =============================================================================
+# wv.EvidenceStrength -> {evidence-strong,moderate,weak}.svg
+#
+# 4-tier semantic-zoom renderer for the three EvidenceStrength enum
+# members. Reads the instance's iconGlyph (raw SVG fragment authored on
+# each member below) + rdfs.label, wraps in tiered chrome. The outer
+# group carries a per-instance CSS class that maps the strength URI to
+# its semantic color via currentColor — the same color the snapshot
+# page already uses (--strong / --moderate / --weak in pages@1.2.0).
+# =============================================================================
+evidence-strength-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: wv.EvidenceStrength
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
+                            .es-bg{fill:#0a0e1a}
+                            .es-frame{fill:none;stroke:#1e293b;stroke-width:2}
+                            /* Per-instance color: currentColor in iconGlyph resolves
+                               to the wrapper's color. */
+                            .es-c-evidence-strong{color:#34d399}
+                            .es-c-evidence-moderate{color:#fbbf24}
+                            .es-c-evidence-weak{color:#64748b}
+                            .es-label{font-weight:700;letter-spacing:2px;text-transform:uppercase}
+                            .es-type-label{fill:#6b7689;font-size:10px;letter-spacing:2.5px;text-transform:uppercase}
+                            .es-uri{fill:#7dd3fc;letter-spacing:0.5px}
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            </style>
+                            <g class="es-c-
+                        - type: tx.UriName
+                          tx.uriNameOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ">
+
+                        # ===== chip: glyph filling viewBox =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-chip">
+                            <svg x="80" y="0" width="240" height="240" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+
+                        # ===== icon: glyph + label below =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon">
+                            <svg x="140" y="20" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="200" y="180" text-anchor="middle" class="es-label" fill="currentColor" font-size="26">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # ===== card: dark card + glyph (left) + label + type-label =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-frame"/>
+                            <svg x="20" y="60" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="160" y="50" class="es-type-label">Evidence strength</text>
+                            <text x="160" y="120" class="es-label" fill="currentColor" font-size="32">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                        # ===== full: card layout + canonical URI footer =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="es-frame"/>
+                            <svg x="20" y="50" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="160" y="50" class="es-type-label">Evidence strength</text>
+                            <text x="160" y="110" class="es-label" fill="currentColor" font-size="32">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            <text x="200" y="226" text-anchor="middle" class="es-uri" font-size="9" letter-spacing="0.5">
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                            </g>
+                            </svg>
+
+# =============================================================================
+# rdfs.Class (subclasses of wv.Evidence) -> {ClassName}.svg
+#
+# 4-tier semantic-zoom renderer for each Evidence subclass treated as
+# an rdfs.Class instance. Matches rdfs.Class with iconGlyph required —
+# the property's presence is the filter. Reads the class's iconGlyph
+# (authored on each evidence subclass below) + rdfs.label. The icon
+# renders in the page's neutral accent color since evidence-type is
+# orthogonal to strength (which carries its own semantic color).
+# =============================================================================
+evidence-type-svg-renderer:
+  type: tx.InstanceTransformation
+
+  tx.inputPattern:
+    tx.matchesClass: rdfs.Class
+    tx.requires:
+      - wv.iconGlyph
+
+  tx.artifactName:
+    type: tx.UriName
+    tx.uriNameOf:
+      type: tx.VarRef
+      tx.varName: input
+
+  tx.outputs:
+    - tx.svg
+
+  tx.rule:
+    type: tx.BuildAstNode
+    tx.astClass: docast.Document
+    tx.set:
+      - tx.field: docast.children
+        tx.bindValue:
+          type: tx.Concat
+          tx.parts:
+            - type: tx.BuildAstNode
+              tx.astClass: docast.RawBlock
+              tx.set:
+                - tx.field: docast.mediaType
+                  tx.bindValue:
+                    type: tx.UriLiteral
+                    tx.refTo: docast.image-svg-xml
+                - tx.field: docast.rawContent
+                  tx.bindValue:
+                    type: tx.Join
+                    tx.separator: ""
+                    tx.source:
+                      type: tx.Concat
+                      tx.parts:
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" overflow="hidden">
+                            <style>
+                            text{font-family:'SF Mono',ui-monospace,Consolas,Menlo,monospace}
+                            svg{overflow:hidden}
+                            .et-bg{fill:#0a0e1a}
+                            .et-frame{fill:none;stroke:#1e293b;stroke-width:2}
+                            .et-glyph{color:#7dd3fc}
+                            .et-label{fill:#e6eaf2;font-weight:600;letter-spacing:0.5px}
+                            .et-type-label{fill:#6b7689;font-size:10px;letter-spacing:2.5px;text-transform:uppercase}
+                            .et-uri{fill:#7dd3fc;letter-spacing:0.5px}
+                            .tier-chip,.tier-icon,.tier-card{display:none}
+                            .tier-full{display:block}
+                            @media (max-width:400px){
+                              .tier-full{display:none}
+                              .tier-card{display:block}
+                            }
+                            @media (max-width:160px){
+                              .tier-card{display:none}
+                              .tier-icon{display:block}
+                            }
+                            @media (max-width:60px){
+                              .tier-icon{display:none}
+                              .tier-chip{display:block}
+                            }
+                            </style>
+
+                        # ===== chip =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-chip et-glyph">
+                            <svg x="80" y="0" width="240" height="240" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+
+                        # ===== icon =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-icon et-glyph">
+                            <svg x="140" y="20" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            <text x="200" y="180" text-anchor="middle" class="et-label" font-size="20"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            </g>
+
+                        # ===== card =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-card">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-frame"/>
+                            <g class="et-glyph">
+                            <svg x="20" y="60" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+                            <text x="160" y="50" class="et-type-label">Evidence type</text>
+                            <text x="160" y="120" class="et-label" font-size="22"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            </g>
+
+                        # ===== full =====
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            <g class="tier-full">
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-bg"/>
+                            <rect x="4" y="4" width="392" height="232" rx="14" class="et-frame"/>
+                            <g class="et-glyph">
+                            <svg x="20" y="50" width="120" height="120" viewBox="0 0 24 24">
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: wv.iconGlyph
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </svg>
+                            </g>
+                            <text x="160" y="50" class="et-type-label">Evidence type</text>
+                            <text x="160" y="110" class="et-label" font-size="22"><![CDATA[
+                        - type: tx.PropertyRead
+                          tx.readSource:
+                            type: tx.VarRef
+                            tx.varName: input
+                          tx.readProp: rdfs.label
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            ]]></text>
+                            <text x="200" y="226" text-anchor="middle" class="et-uri" font-size="9" letter-spacing="0.5">
+                        - type: tx.SubjectUri
+                          tx.subjectOf:
+                            type: tx.VarRef
+                            tx.varName: input
+                        - type: tx.StringLiteral
+                          tx.stringLiteral: |-
+                            </text>
+                            </g>
+
+                            </svg>
+
+# =============================================================================
+# SVG BINDINGS
+# =============================================================================
+
+wv.WorldviewSnapshot:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 3.0.0
+        tx.name: snapshot-svg-renderer
+
+wv.WorldviewThesis:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 3.0.0
+        tx.name: thesis-svg-renderer
+
+wv.EvidenceStrength:
+  derivation.derivations:
+    - type: derivation.Derivation
+      derivation.format: formats.svg
+      derivation.variant: derivation.default
+      derivation.transformation:
+        type: tx.TransformationReference
+        tx.publisher: worldview.genval.ai
+        tx.package: worldview-chrome
+        tx.version: 3.0.0
+        tx.name: evidence-strength-svg-renderer

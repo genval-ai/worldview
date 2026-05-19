@@ -60,6 +60,25 @@ jobs:
             --workspace kanonak-packages/worldview.genval.ai \
             --out _site
 
+      # SVG identity icons. The look layer doesn't yet emit SVG; the
+      # 4-tier semantic-zoom renderers in worldview-chrome@3.0.0 still
+      # produce these via explicit transform-run. Two evidence concept
+      # sets land at /core/2.0.0/ and /finance/3.0.0/ for use as
+      # <img src> references in rendered HTML.
+      - name: Render ontology concept SVGs
+        run: |
+          set -euo pipefail
+          mkdir -p _site/core/2.0.0 _site/finance/3.0.0
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-strength-svg-renderer \
+            --scope worldview.genval.ai/core@2.0.0 \
+            --format svg --out _site/core/2.0.0/ >/dev/null
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
+            --scope worldview.genval.ai/core@2.0.0 \
+            --format svg --out _site/core/2.0.0/ >/dev/null
+          kanonak transform run worldview.genval.ai/worldview-chrome/evidence-type-svg-renderer \
+            --scope worldview.genval.ai/finance@3.0.0 \
+            --format svg --out _site/finance/3.0.0/ >/dev/null
+
       # Publisher manifest + canonical package mirror. Required at the
       # publisher's origin so `import worldview.genval.ai/core` resolves
       # over HTTPS.
