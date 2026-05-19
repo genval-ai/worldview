@@ -131,3 +131,15 @@ site.StaticPage:
         look.title: site.title
       - type: look.Markdown
         look.source: site.body
+
+wv.WorldviewSnapshot:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: wv.observedAt
+      - type: look.Markdown
+        look.source: wv.narrative
+      - type: look.ResourceGrid
+        look.source: wv.hasThesis

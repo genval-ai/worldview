@@ -82,22 +82,6 @@ jobs:
           sort -V _site/index.txt.unsorted > _site/index.txt
           rm _site/index.txt.unsorted
 
-      - name: Render aggregate views
-        run: |
-          set -e
-          kanonak site build --out _site || true
-          printf '%s\n' \
-            'snapshots-aggregate _site/snapshots/' \
-            'timeline-aggregate _site/timeline/' \
-            'horizon-aggregate _site/horizon/' \
-            'changes-aggregate _site/changes/' \
-            'sources-aggregate _site/sources/' \
-            'regime-aggregate _site/regime/' | \
-            xargs -n 2 -P 4 sh -c '
-              kanonak derive "worldview.genval.ai/pages@2.1.0/$1" \
-                --format stylesheet --out "$2" >/dev/null 2>&1 || true
-            ' _
-
       - name: Redirect / to the site index page
         run: |
           cat > _site/index.html <<'HTML'

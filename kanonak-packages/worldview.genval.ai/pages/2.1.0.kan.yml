@@ -9,6 +9,14 @@ pages:
           match: ^
           version: 1.0.0
           alias: site
+        - package: look
+          match: ^
+          version: 1.1.0
+          alias: look
+        - package: core-rdf
+          match: ^
+          version: 1.0.0
+          alias: rdfs
         - package: derivation
           match: ^
           version: 1.0.0
@@ -1059,172 +1067,104 @@ worldview-viz-js-fragment:
             })();
             </script>
 
-# =============================================================================
-# DERIVATION BINDINGS ON wv.WorldviewSnapshot
-#
-# Open-world augmentation: this top-level entry adds derivations to the
-# existing `worldview.genval.ai/core@1.0.0/WorldviewSnapshot` class. The
-# parser merges by canonical URI, so this binding attaches to the same
-# subject the core package declared. Pattern mirrors
-# kanonak.org/universal-derivations@1.0.0 augmenting rdfs.Resource.
-#
-# Two bindings:
-#   - (formats.html, default)       → snapshot-to-html-transformation
-#   - (formats.stylesheet, default) → snapshot-stylesheet
-# =============================================================================
-
-wv.WorldviewSnapshot:
-  derivation.derivations:
-    - derivation.format: formats.html
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: snapshot-to-html
-        tx.version: 2.1.0
-        tx.name: snapshot-to-html-transformation
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: snapshot-to-html
-        tx.version: 2.1.0
-        tx.name: snapshot-stylesheet
-
-# =============================================================================
-# AGGREGATE VIEWS
-#
-# Each AggregateView declares one cross-version page produced by a
-# SetTransformation aggregating across every published snapshot. After
-# `kanonak site build`, those steps collapse to one `kanonak site build`
-# invocation that materializes every AggregateView at its outputPath.
-#
-# scopeSources uses the `publisher/package@*` wildcard form so each view
-# automatically picks up new snapshot versions on the next build — no
-# workflow edit needed.
-#
-# Each AggregateView carries a per-instance (formats.stylesheet, default)
-# `derivation.derivations` binding pointing at its package's stylesheet
-# transformation. The site builder materializes the sibling `.css`
-# artifact at `<dirname-of-outputPath>/index.css` so the HTML's
-# `<link rel="stylesheet" href="index.css">` resolves path-relative.
-# =============================================================================
 
 snapshots-aggregate:
-  type: site.AggregateView
-  site.outputPath: snapshots/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: landing-page
-    tx.version: 2.1.0
-    tx.name: landing-page-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: landing-page
-        tx.version: 2.1.0
-        tx.name: landing-page-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Snapshots"
+  site.title: "All snapshots"
+  site.body: |
+    Every published worldview snapshot, newest first. Each entry links
+    to the full report.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
 
 timeline-aggregate:
-  type: site.AggregateView
-  site.outputPath: timeline/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: timeline
-    tx.version: 2.1.0
-    tx.name: timeline-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: timeline
-        tx.version: 2.1.0
-        tx.name: timeline-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Timeline"
+  site.title: "Worldview timeline"
+  site.body: |
+    The full sequence of snapshots as a time series.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
 
 horizon-aggregate:
-  type: site.AggregateView
-  site.outputPath: horizon/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: horizon
-    tx.version: 2.0.0
-    tx.name: horizon-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: horizon
-        tx.version: 2.0.0
-        tx.name: horizon-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Horizon"
+  site.title: "Catalyst horizon"
+  site.body: |
+    Upcoming catalysts that could invalidate active theses or shift
+    the read on the current regime.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
 
 changes-aggregate:
-  type: site.AggregateView
-  site.outputPath: changes/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: changes
-    tx.version: 2.0.0
-    tx.name: changes-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: changes
-        tx.version: 2.0.0
-        tx.name: changes-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Changes"
+  site.title: "Changes between snapshots"
+  site.body: |
+    What moved between each consecutive worldview snapshot — confidence
+    shifts, new evidence, retired theses.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
 
 sources-aggregate:
-  type: site.AggregateView
-  site.outputPath: sources/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: sources-network
-    tx.version: 1.0.0
-    tx.name: sources-network-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: sources-network
-        tx.version: 1.0.0
-        tx.name: sources-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Sources"
+  site.title: "Evidence sources"
+  site.body: |
+    The underlying sources that every thesis depends on, grouped by
+    publication.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
 
 regime-aggregate:
-  type: site.AggregateView
-  site.outputPath: regime/index.html
-  site.scopeClass: wv.WorldviewSnapshot
-  site.scopeSources:
-    - worldview.genval.ai/snapshot@*
-  site.transformation:
-    tx.publisher: worldview.genval.ai
-    tx.package: regime
-    tx.version: 1.0.0
-    tx.name: regime-transformation
-  derivation.derivations:
-    - derivation.format: formats.stylesheet
-      derivation.variant: derivation.default
-      derivation.transformation:
-        tx.publisher: worldview.genval.ai
-        tx.package: regime
-        tx.version: 1.0.0
-        tx.name: regime-stylesheet
+  type: site.StaticPage
+  rdfs.label: "Regime"
+  site.title: "Market regime"
+  site.body: |
+    The structural read on the current market regime, threaded across
+    all published snapshots.
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: site.title
+      - type: look.Markdown
+        look.source: site.body
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
