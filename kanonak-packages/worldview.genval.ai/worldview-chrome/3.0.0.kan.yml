@@ -1296,11 +1296,9 @@ evidence-type-svg-renderer:
 
 wv.WorldviewSnapshot:
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.svg
+    - derivation.format: formats.svg
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
         tx.version: 3.0.0
@@ -1308,11 +1306,9 @@ wv.WorldviewSnapshot:
 
 wv.WorldviewThesis:
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.svg
+    - derivation.format: formats.svg
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
         tx.version: 3.0.0
@@ -1320,11 +1316,9 @@ wv.WorldviewThesis:
 
 wv.EvidenceStrength:
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.svg
+    - derivation.format: formats.svg
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: worldview-chrome
         tx.version: 3.0.0

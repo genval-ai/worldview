@@ -1075,20 +1075,16 @@ worldview-viz-js-fragment:
 
 wv.WorldviewSnapshot:
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.html
+    - derivation.format: formats.html
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
         tx.version: 2.1.0
         tx.name: snapshot-to-html-transformation
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: snapshot-to-html
         tx.version: 2.1.0
@@ -1120,17 +1116,14 @@ snapshots-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: landing-page
     tx.version: 2.1.0
     tx.name: landing-page-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: landing-page
         tx.version: 2.1.0
@@ -1143,17 +1136,14 @@ timeline-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: timeline
     tx.version: 2.1.0
     tx.name: timeline-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: timeline
         tx.version: 2.1.0
@@ -1166,17 +1156,14 @@ horizon-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: horizon
     tx.version: 2.0.0
     tx.name: horizon-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: horizon
         tx.version: 2.0.0
@@ -1189,17 +1176,14 @@ changes-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: changes
     tx.version: 2.0.0
     tx.name: changes-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: changes
         tx.version: 2.0.0
@@ -1212,17 +1196,14 @@ sources-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: sources-network
     tx.version: 1.0.0
     tx.name: sources-network-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: sources-network
         tx.version: 1.0.0
@@ -1235,17 +1216,14 @@ regime-aggregate:
   site.scopeSources:
     - worldview.genval.ai/snapshot@*
   site.transformation:
-    type: tx.TransformationReference
     tx.publisher: worldview.genval.ai
     tx.package: regime
     tx.version: 1.0.0
     tx.name: regime-transformation
   derivation.derivations:
-    - type: derivation.Derivation
-      derivation.format: formats.stylesheet
+    - derivation.format: formats.stylesheet
       derivation.variant: derivation.default
       derivation.transformation:
-        type: tx.TransformationReference
         tx.publisher: worldview.genval.ai
         tx.package: regime
         tx.version: 1.0.0
