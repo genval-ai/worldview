@@ -31,6 +31,10 @@ worldview-look:
           match: ^
           version: 1.0.0
           alias: tok
+        - package: look-styles
+          match: ^
+          version: 1.0.0
+          alias: look-styles
         - package: site
           match: ^
           version: 1.0.0
