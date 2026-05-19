@@ -45,6 +45,10 @@ worldview-look:
           match: ^
           version: 2.0.0
           alias: wv
+        - package: snapshot
+          match: ^
+          version: 2.1.4
+          alias: snap
         - package: sources
           match: ^
           version: 1.0.0
@@ -199,3 +203,14 @@ wv.WorldviewSnapshot:
         look.source: wv.narrative
       - type: look.ResourceGrid
         look.source: wv.hasThesis
+
+snap.snapshot:
+  derivation.look:
+    type: look.PackageView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+      - type: look.Markdown
+        look.source: rdfs.comment
+      - type: look.ResourceGrid
+        look.source: wv.WorldviewSnapshot
