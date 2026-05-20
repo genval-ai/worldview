@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.9.0
+          version: 1.10.0
           alias: look
         - package: look-tokens
           match: ^
@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.8.0
+          version: 1.9.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -144,24 +144,21 @@ wv.WorldviewThesis:
         look.hueBy: "vis.thesisTheme/vis.themeHue"
       - type: look.Markdown
         look.source: wv.thesisStatement
-      - type: look.StatRow
-        look.stats:
-          - look.statLabel: "μ"
-            look.statPath: "wv.confidence/est.estimateMean"
-          - look.statLabel: "±σ"
-            look.statPath: "wv.confidence/est.estimateStdDev"
-          - look.statLabel: "95% CI low"
-            look.statPath: "wv.confidence/est.estimateLower95"
-          - look.statLabel: "95% CI high"
-            look.statPath: "wv.confidence/est.estimateUpper95"
-          - look.statLabel: "Beta α"
-            look.statPath: "wv.confidence/est.betaAlpha"
-          - look.statLabel: "Beta β"
-            look.statPath: "wv.confidence/est.betaBeta"
+      - type: look.SectionHeading
+        look.heading: "What changed"
+        look.note: "Confidence shift from the previous snapshot, and the reasoning behind it."
+      - type: look.VersionDelta
+        look.metricPath: "wv.confidence/est.estimateMean"
       - type: look.Markdown
         look.source: wv.confidenceRationale
+      - type: look.SectionHeading
+        look.heading: "What would invalidate this"
+        look.note: "The machine-evaluable conditions that would falsify the thesis."
       - type: look.Horizon
         look.source: wv.invalidationCondition
+      - type: look.SectionHeading
+        look.heading: "Supporting evidence"
+        look.note: "Typed, citation-backed observations behind the confidence."
       - type: look.ReferenceList
         look.entries:
           - wv.supportingEvidence
