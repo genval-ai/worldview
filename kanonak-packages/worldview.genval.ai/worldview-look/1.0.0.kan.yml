@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.7.0
+          version: 1.8.0
           alias: look
         - package: look-tokens
           match: ^
@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.6.0
+          version: 1.7.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -57,6 +57,23 @@ worldview-look:
           match: ^
           version: 1.0.0
           alias: reg
+
+index:
+  type: rdfs.Resource
+  rdfs.label: worldview.genval.ai
+  rdfs.comment: >-
+    A continuously-updated probabilistic macro worldview — versioned
+    snapshots of theses, confidence, evidence, and the conditions that
+    would break them.
+  derivation.look:
+    type: look.PublisherView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.subtitle: rdfs.comment
+      - type: look.FeaturedResource
+        look.source: snap.view
+      - type: look.PublisherPackages
 
 rdfs.Resource:
   derivation.tokens:
