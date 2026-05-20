@@ -103,40 +103,45 @@ rdfs.Resource:
 wv.WorldviewThesis:
   look.semanticSvg:
     look.tierChip: |
-      <rect x="0" y="0" width="400" height="400" rx="88" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
-      <text x="200" y="305" text-anchor="middle" font-size="300" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
+      <rect x="0" y="0" width="400" height="400" rx="88" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/>
+      <circle cx="200" cy="200" r="150" fill="#0a0e1a" opacity="0.22"/>
+      <text x="200" y="298" text-anchor="middle" font-size="260" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
     look.tierIcon: |
-      <rect x="0" y="0" width="400" height="400" rx="48" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
-      <text x="200" y="215" text-anchor="middle" font-size="200" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
-      <text x="200" y="330" text-anchor="middle" font-size="84" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-mono)">{{delta:wv.confidence/est.estimateMean}}</text>
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/>
+      <circle cx="200" cy="165" r="120" fill="#0a0e1a" opacity="0.22"/>
+      <text x="200" y="225" text-anchor="middle" font-size="170" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
+      <text x="200" y="338" text-anchor="middle" font-size="76" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-mono)">{{delta:wv.confidence/est.estimateMean}}</text>
     look.tierCard: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="80" rx="14" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
-      <rect x="0" y="60" width="400" height="20" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
-      <text x="40" y="50" font-size="22" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
-      <text x="40" y="145" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CHANGE</text>
-      <text x="40" y="210" font-size="68" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
-      <text x="40" y="285" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
-      <text x="40" y="325" font-size="34" font-weight="600" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+      <rect x="0" y="0" width="400" height="84" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/>
+      <rect x="0" y="64" width="400" height="20" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/>
+      <text x="36" y="34" font-size="12" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">THESIS</text>
+      <text x="36" y="64" font-size="21" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
+      <rect x="36" y="128" width="216" height="58" rx="29" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="144" y="167" text-anchor="middle" font-size="30" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
+      <text x="36" y="250" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
+      <text x="36" y="300" font-size="46" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
     look.tierFull: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="90" rx="14" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
-      <text x="24" y="32" font-size="11" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.8">THESIS</text>
-      <text x="24" y="62" font-size="20" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
-      <text x="24" y="130" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CHANGE VS PREVIOUS</text>
-      <text x="24" y="188" font-size="56" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
-      <text x="24" y="238" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
-      <text x="24" y="268" font-size="30" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
-      <rect x="24" y="290" width="352" height="6" rx="3" fill="var(--kan-border)"/>
-      <svg x="24" y="290" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="{{wv.confidence/est.estimateMean}}" height="1" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/></svg>
-      <text x="24" y="345" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
-      <text x="24" y="368" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/>
+      <text x="24" y="34" font-size="11" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">THESIS · {{vis.thesisTheme/rdfs.label}}</text>
+      <text x="24" y="64" font-size="19" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="24" y="132" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CHANGE VS PREVIOUS</text>
+      <rect x="24" y="148" width="200" height="54" rx="27" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="124" y="184" text-anchor="middle" font-size="28" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
+      <text x="24" y="252" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
+      <text x="24" y="284" font-size="32" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+      <rect x="24" y="306" width="352" height="6" rx="3" fill="var(--kan-border)"/>
+      <svg x="24" y="306" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="{{wv.confidence/est.estimateMean}}" height="1" fill="hsl({{vis.thesisTheme/vis.themeHue}},60%,52%)"/></svg>
+      <text x="24" y="350" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
+      <text x="24" y="372" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
       - type: look.Hero
         look.title: rdfs.label
-        look.eyebrow: wv.status
+        look.eyebrow: rdfs.type
+        look.badges: wv.status
       - type: look.SectionHeading
         look.heading: "What changed"
         look.note: "The headline signal — how confidence moved from the previous snapshot, and why."
@@ -170,7 +175,38 @@ wv.WorldviewThesis:
       - type: look.Horizon
         look.source: wv.invalidationCondition
 
+wv.evidence-strong:
+  vis.themeHue: 152
+wv.evidence-moderate:
+  vis.themeHue: 38
+wv.evidence-weak:
+  vis.themeHue: 215
+
 wv.Evidence:
+  look.semanticSvg:
+    look.tierChip: |
+      <rect x="0" y="0" width="400" height="400" rx="88" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+    look.tierIcon: |
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+      <text x="200" y="175" text-anchor="middle" font-size="52" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
+      <text x="200" y="270" text-anchor="middle" font-size="78" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+    look.tierCard: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="84" rx="14" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+      <rect x="0" y="64" width="400" height="20" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+      <text x="36" y="34" font-size="12" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
+      <text x="36" y="64" font-size="26" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <text x="36" y="150" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
+      <text x="36" y="182" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/rdfs.label}}</text>
+    look.tierFull: |
+      <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+      <text x="24" y="34" font-size="11" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
+      <text x="24" y="66" font-size="26" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <text x="24" y="150" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
+      <text x="24" y="182" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/rdfs.label}}</text>
+      <text x="24" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">TYPE</text>
+      <text x="24" y="268" font-size="16" font-weight="600" fill="var(--kan-text)">{{rdfs.type}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
