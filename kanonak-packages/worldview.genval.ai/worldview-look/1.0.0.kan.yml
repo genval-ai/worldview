@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.16.0
+          version: 1.17.0
           alias: look
         - package: look-tokens
           match: ^
@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.14.0
+          version: 1.15.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -292,8 +292,7 @@ sec.Sector:
         look.title: rdfs.label
         look.eyebrow: rdfs.type
         look.subtitle: rdfs.comment
-      - type: look.Figure
-        look.size: small
+        look.icon: true
       - type: look.SectionHeading
         look.heading: Securities in this sector
         look.note: Every tracked security classified into this sector.
@@ -352,9 +351,9 @@ reg.Regime:
     look.bands:
       - type: look.Hero
         look.title: rdfs.label
+        look.eyebrow: rdfs.type
         look.subtitle: rdfs.comment
-      - type: look.Figure
-        look.size: small
+        look.icon: true
       - type: look.Details
 
 sec.defense:
