@@ -57,6 +57,10 @@ worldview-look:
           match: ^
           version: 1.0.0
           alias: reg
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
 
 index:
   type: rdfs.Resource
