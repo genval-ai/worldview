@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.10.0
+          version: 1.11.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -183,6 +183,10 @@ src.Source:
         look.subtitle: rdfs.comment
 
 fin.Security:
+  look.semanticSvg:
+    look.tierChip: |
+      <rect x="0" y="0" width="400" height="400" rx="64" fill="var(--kan-accent)"/>
+      <text x="200" y="252" text-anchor="middle" font-size="120" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)">{{fin.ticker}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
