@@ -256,6 +256,7 @@ src.Source:
       - type: look.Hero
         look.title: src.sourceName
         look.eyebrow: rdfs.type
+      - type: look.Figure
       - type: look.Details
 
 fin.Security:
