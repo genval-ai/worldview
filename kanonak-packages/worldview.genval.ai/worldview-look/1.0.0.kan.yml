@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.13.0
+          version: 1.14.0
           alias: look
         - package: look-tokens
           match: ^
@@ -53,6 +53,10 @@ worldview-look:
           match: ^
           version: 3.0.0
           alias: fin
+        - package: securities
+          match: ^
+          version: 2.1.0
+          alias: sec
         - package: regimes
           match: ^
           version: 1.0.0
@@ -258,6 +262,20 @@ src.Source:
         look.eyebrow: rdfs.type
       - type: look.Figure
       - type: look.Details
+
+sec.Sector:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: rdfs.type
+        look.subtitle: rdfs.comment
+      - type: look.SectionHeading
+        look.heading: Securities in this sector
+        look.note: Every tracked security classified into this sector.
+      - type: look.ReferencedBy
+        look.via: sec.typedSector
 
 fin.Security:
   look.semanticSvg:
