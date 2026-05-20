@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.12.0
+          version: 1.13.0
           alias: look
         - package: look-tokens
           match: ^
@@ -103,39 +103,50 @@ rdfs.Resource:
 wv.WorldviewThesis:
   look.semanticSvg:
     look.tierChip: |
-      <rect x="0" y="0" width="400" height="400" rx="80" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
+      <rect x="0" y="0" width="400" height="400" rx="88" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="200" y="305" text-anchor="middle" font-size="300" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
     look.tierIcon: |
-      <rect x="0" y="0" width="400" height="400" rx="48" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
-      <text x="200" y="245" text-anchor="middle" font-size="240" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{firstLetter}}</text>
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="200" y="215" text-anchor="middle" font-size="200" font-weight="700" fill="#0a0e1a">{{deltaArrow:wv.confidence/est.estimateMean}}</text>
+      <text x="200" y="330" text-anchor="middle" font-size="84" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-mono)">{{delta:wv.confidence/est.estimateMean}}</text>
     look.tierCard: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="80" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
-      <rect x="0" y="60" width="400" height="20" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
-      <text x="40" y="50" font-size="22" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
-      <text x="40" y="140" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
-      <text x="40" y="165" font-size="16" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
-      <text x="220" y="140" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE</text>
-      <text x="220" y="165" font-size="16" font-weight="600" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+      <rect x="0" y="0" width="400" height="80" rx="14" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <rect x="0" y="60" width="400" height="20" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="40" y="50" font-size="22" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="40" y="145" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CHANGE</text>
+      <text x="40" y="210" font-size="68" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
+      <text x="40" y="285" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
+      <text x="40" y="325" font-size="34" font-weight="600" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
     look.tierFull: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="90" rx="14" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/>
-      <text x="24" y="32" font-size="11" fill="var(--kan-bg-card)" font-family="var(--kan-font-mono)" opacity="0.8">THESIS</text>
-      <text x="24" y="62" font-size="20" font-weight="700" fill="var(--kan-bg-card)" font-family="var(--kan-font-display)">{{label}}</text>
-      <text x="24" y="120" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE</text>
-      <text x="200" y="160" text-anchor="middle" font-size="48" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
-      <rect x="24" y="190" width="352" height="6" rx="3" fill="var(--kan-border)"/>
-      <svg x="24" y="190" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="{{wv.confidence/est.estimateMean}}" height="1" fill="hsl({{vis.thesisTheme/vis.themeHue}},65%,55%)"/></svg>
-      <text x="24" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
-      <text x="24" y="262" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
-      <text x="200" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">THEME</text>
-      <text x="200" y="262" font-size="14" font-weight="600" fill="var(--kan-text)">{{vis.thesisTheme/rdfs.label}}</text>
-      <text x="24" y="370" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">{{uri}}</text>
+      <rect x="0" y="0" width="400" height="90" rx="14" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/>
+      <text x="24" y="32" font-size="11" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.8">THESIS</text>
+      <text x="24" y="62" font-size="20" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{label}}</text>
+      <text x="24" y="130" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CHANGE VS PREVIOUS</text>
+      <text x="24" y="188" font-size="56" font-weight="700" fill="{{deltaColor:wv.confidence/est.estimateMean}}">{{deltaArrow:wv.confidence/est.estimateMean}} {{delta:wv.confidence/est.estimateMean}}</text>
+      <text x="24" y="238" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">CONFIDENCE μ</text>
+      <text x="24" y="268" font-size="30" font-weight="700" fill="var(--kan-text)">{{wv.confidence/est.estimateMean}}</text>
+      <rect x="24" y="290" width="352" height="6" rx="3" fill="var(--kan-border)"/>
+      <svg x="24" y="290" width="352" height="6" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="{{wv.confidence/est.estimateMean}}" height="1" fill="{{deltaColor:wv.confidence/est.estimateMean}}"/></svg>
+      <text x="24" y="345" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">STATUS</text>
+      <text x="24" y="368" font-size="14" font-weight="600" fill="var(--kan-text)">{{wv.status/rdfs.label}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
       - type: look.Hero
         look.title: rdfs.label
         look.eyebrow: wv.status
+      - type: look.SectionHeading
+        look.heading: "What changed"
+        look.note: "The headline signal — how confidence moved from the previous snapshot, and why."
+      - type: look.VersionDelta
+        look.metricPath: "wv.confidence/est.estimateMean"
+      - type: look.Markdown
+        look.source: wv.confidenceRationale
+      - type: look.SectionHeading
+        look.heading: "The thesis"
+        look.note: "The claim and where confidence stands now."
       - type: look.Distribution
         look.alphaPath: "wv.confidence/est.betaAlpha"
         look.betaPath: "wv.confidence/est.betaBeta"
@@ -145,13 +156,6 @@ wv.WorldviewThesis:
         look.hueBy: "vis.thesisTheme/vis.themeHue"
       - type: look.Markdown
         look.source: wv.thesisStatement
-      - type: look.SectionHeading
-        look.heading: "What changed"
-        look.note: "Confidence shift from the previous snapshot, and the reasoning behind it."
-      - type: look.VersionDelta
-        look.metricPath: "wv.confidence/est.estimateMean"
-      - type: look.Markdown
-        look.source: wv.confidenceRationale
       - type: look.SectionHeading
         look.heading: "Supporting evidence"
         look.note: "Typed, citation-backed observations across time, grouped by strength. Hover a point for the claim."
@@ -175,6 +179,8 @@ wv.Evidence:
         look.eyebrow: rdfs.type
         look.badges: wv.evidenceStrength
       - type: look.Details
+        look.skip:
+          - wv.evidenceStatement
 
 src.Source:
   derivation.look:
@@ -183,6 +189,7 @@ src.Source:
       - type: look.Hero
         look.title: rdfs.label
         look.subtitle: rdfs.comment
+      - type: look.Details
 
 fin.Security:
   look.semanticSvg:
@@ -195,9 +202,7 @@ fin.Security:
       - type: look.Hero
         look.title: rdfs.label
         look.eyebrow: fin.ticker
-      - type: look.ChipRow
-        look.chips:
-          - fin.assetClass
+      - type: look.Details
 
 reg.Regime:
   derivation.look:
@@ -206,6 +211,7 @@ reg.Regime:
       - type: look.Hero
         look.title: rdfs.label
         look.subtitle: rdfs.comment
+      - type: look.Details
 
 wv.WorldviewSnapshot:
   look.semanticSvg:
