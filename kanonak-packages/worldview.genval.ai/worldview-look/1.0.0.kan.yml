@@ -277,6 +277,20 @@ sec.Sector:
       - type: look.ReferencedBy
         look.via: sec.typedSector
 
+sec.AssetClass:
+  derivation.look:
+    type: look.ResourceView
+    look.bands:
+      - type: look.Hero
+        look.title: rdfs.label
+        look.eyebrow: rdfs.type
+        look.subtitle: rdfs.comment
+      - type: look.SectionHeading
+        look.heading: Securities in this asset class
+        look.note: Every tracked security classified under this asset class.
+      - type: look.ReferencedBy
+        look.via: sec.typedAssetClass
+
 fin.Security:
   look.semanticSvg:
     look.tierChip: |
