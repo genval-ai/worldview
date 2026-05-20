@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.8.0
+          version: 1.9.0
           alias: look
         - package: look-tokens
           match: ^
@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.7.0
+          version: 1.8.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -135,7 +135,13 @@ wv.WorldviewThesis:
       - type: look.Hero
         look.title: rdfs.label
         look.eyebrow: wv.status
-      - type: look.Figure
+      - type: look.Distribution
+        look.alphaPath: "wv.confidence/est.betaAlpha"
+        look.betaPath: "wv.confidence/est.betaBeta"
+        look.metricPath: "wv.confidence/est.estimateMean"
+        look.lowerPath: "wv.confidence/est.estimateLower95"
+        look.upperPath: "wv.confidence/est.estimateUpper95"
+        look.hueBy: "vis.thesisTheme/vis.themeHue"
       - type: look.Markdown
         look.source: wv.thesisStatement
       - type: look.StatRow
