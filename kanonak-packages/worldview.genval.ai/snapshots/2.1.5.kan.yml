@@ -1,0 +1,3380 @@
+snapshots:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.1.5
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: derivation
+          match: ^
+          version: 1.0.0
+          alias: derivation
+        - package: formats
+          match: ^
+          version: 1.0.0
+          alias: formats
+        - package: transformations
+          match: ^
+          version: 3.11.0
+          alias: tx
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: sources
+          match: ^
+          version: 1.2.0
+          alias: src
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+        - package: securities
+          match: ^
+          version: 2.0.0
+          alias: sec
+        - package: visual
+          match: ^
+          version: 2.0.0
+          alias: vis
+
+view:
+  type: wv.WorldviewSnapshot
+  label: Macro worldview (2.1.5 - Wednesday pre-market with Senate war-powers advance and pre-NVDA tape)
+  observedAt: 2026-05-20T10:53:26Z
+  narrative: |
+    Wednesday pre-market 2.1.5 refresh, ~21 hours after [[view|2.1.4]] -
+    the window covers the Tuesday May 19 US cash session, Tuesday
+    after-hours, and into the Wednesday May 20 pre-market (~6:53 AM
+    ET). The 2.1.4 framing leaned on the Monday-evening White House
+    rejection of Iran's 14-point proposal and the "next conversation
+    is through bombs" escalation quote; the Tuesday tape and the
+    Tuesday-evening legislative track both lean the other way. Net
+    arc this window: a tactical de-escalation tilt against a third
+    consecutive equity down day, with the operative binaries (FOMC
+    minutes, NVDA) still ahead of us at the timestamp.
+
+    **Senate advances a war-powers resolution against the Iran war -
+    a rebuke to Trump.** The Senate voted 50-47 Tuesday afternoon to
+    advance Sen. Tim Kaine's War Powers Resolution directing the
+    President to remove US forces from hostilities against Iran
+    absent a declaration of war or a specific AUMF. Four Republicans
+    crossed - Bill Cassidy (fresh off a Trump-endorsed-opponent
+    primary loss, his first "yes" after repeated "no" votes), Rand
+    Paul, Lisa Murkowski, Susan Collins. It is a procedural advance,
+    not law: a final Senate vote, House passage, and an all-but-certain
+    Trump veto stand between it and effect. So the legislative-track
+    signal is real but weak. Paired with [[ev-trump-hour-away-strike-postponed-may19]] - Trump's own account that he was
+    "an hour away" from a Tuesday strike before Gulf leaders, worried
+    about Iranian retaliation against their oil infrastructure,
+    convinced him to hold off "a few days" - the diplomatic track
+    re-opened rather than closed inside this window. This is a
+    tactical reversal of the 2.1.4 escalation read: [[iran-war-rearmament]] walks 0.87 to 0.86 (the multi-year
+    procurement argument is robust to a veto-bound resolution and a
+    postponed strike, but the de-escalation tilt earns a -0.01) and
+    [[persistent-energy-shock]] 0.74 to 0.73.
+
+    **Third straight S&P down day; VIX ticks up, not down.** The
+    cash session closed lower for a third consecutive day: SPX
+    7,353.61 (-0.67%), Nasdaq Composite [[sec.ixic|25,870.71]]
+    (-0.84%), [[sec.spy|SPY]] 733.73, QQQ 701.53. VIX
+    closed 18.06 (+1.35%) - reversing the 2.1.4 "VIX softening to
+    17.82" resilience read. Neither [[equity-melt-up-vs-recession-risk]] invalidation leg is closer to firing: VIX 18
+    sits well below the 25 vol-expansion threshold, and SPX 7,353
+    is above 7,300 but VIX is nowhere near the <15 needed for the
+    melt-up-confirmation leg. The resilience read softened modestly
+    (third down day, volatility bid rather than offered), so
+    confidence walks 0.71 to 0.70, band holds at 0.07. Wednesday
+    pre-market futures have since recovered - ES +0.4%, NQ +0.8%,
+    Dow +75 pts - integrating the down days ahead of the binary
+    cluster.
+
+    **10Y rises to 4.62% close - "Treasurys take off".** The
+    10-year yield closed Tuesday at 4.62% (intraday high 4.67%),
+    up from Monday's 4.601% close, the rate-path repricing
+    reasserting after the Friday spike. No new CPI/PPI/PCE/wage
+    print landed in the window, so [[stagflation-risk]] holds at
+    0.82 ± 0.04 - the higher 10Y is directionally supportive but
+    within noise of an unchanged macro mean; April PCE on May 28
+    remains the formal invalidation indicator. [[powell-warsh-transition-risk]] holds at 0.50 ± 0.11 - 10Y higher but
+    no new Warsh catalyst; swearing-in still Friday May 22, first
+    Warsh-as-chair FOMC June 16-17. Global yields (German bund
+    15-year high, JGB 10Y 29-year high) remain elevated.
+
+    **Gold pulls back below the band on the yield rise.** Spot
+    settled ~$4,486.86 Tuesday - below the $4,531-$4,570 band it
+    held in the morning - with the ETF complex down harder:
+    [[sec.gld|GLD]] 411.50 (-1.66%), [[sec.gdx|GDX]] 83.78
+    (-3.86%). The 10Y rise to 4.62-4.67% is the operative tactical
+    headwind. Wednesday pre-market spot has steadied near
+    $4,498.90 (-0.27%). The structural-bull supports (244t Q1
+    central-bank buying, JPM/UBS/Citi targets, 755t 2026
+    projection) are intact, and the Senate resolution moves
+    directionally AWAY from the durable-peace leg of the
+    AndCondition triplet - but the day's price action is a tactical
+    pullback, so [[gold-debasement-bid]] walks 0.85 to 0.84, band
+    holds at 0.05.
+
+    **Defense complex repriced muted, not bullish.** The
+    Tuesday-open test the 2.1.4 narrative flagged came in mixed
+    rather than a procurement rally: [[sec.lmt|LMT]] 526.63
+    (-0.32%), [[sec.rtx|RTX]] 174.49 (-0.83%), [[sec.noc|NOC]]
+    556.34 (+1.15%). With the legislative track tilting toward
+    de-escalation, the muted tape is consistent with the -0.01 on
+    [[iran-war-rearmament]] above; the multi-year backlog story
+    (LMT $194B, RTX $271B) is unchanged.
+
+    **Energy equities bid even as crude eases.** [[sec.xom|XOM]]
+    162.55 (+1.28%), [[sec.cvx|CVX]] 197.25 (+0.58%), [[sec.xle|XLE]]
+    61.29 (+1.17%) closed up Tuesday, holding the structural sector
+    bid, while crude itself softened into Wednesday pre-market - WTI
+    -1.9% to $102.14, Brent -2% to $109.03. The split (sector bid
+    vs crude soft) is the structural-vs-tactical tension the
+    [[persistent-energy-shock]] band captures; IEA 1.78 mb/d 2026
+    undersupply and Hormuz-affected 14.4 mb/d are unchanged.
+
+    **NVDA print and FOMC minutes are both ahead of the timestamp.**
+    [[sec.nvda|NVDA]] closed 220.61 (-0.77%) and [[sec.amd|AMD]]
+    414.05 (-1.65%) Tuesday on pre-earnings positioning; no new
+    chip-side print or export-policy news landed in the window.
+    [[ai-capex-cycle-with-china-tail]] holds at 0.86 ± 0.04 - NVDA
+    Q1 FY2027 after Wednesday's close (consensus ~$78.8B revenue /
+    $1.77 EPS; Q2 guide near $86B the operative variable; options
+    pricing an 8-10% implied move) is the next structural move, and
+    it has not yet printed. The post-print rerating, not the
+    in-front-of positioning, is where confidence moves.
+
+    **Walmart Q1 FY2027 Thursday May 21 pre-open.** Consensus
+    ~$174.6B revenue, $0.66 EPS (within noise of the
+    [[ev-wmt-q1-fy27-consensus-may21]] $174.65B / $0.65 figures).
+    Tariff pass-through is the most-watched variable - same-store
+    sales 3.9-4.5% expected, advertising/membership the margin
+    cross-check.
+
+    **Catalyst calendar from here** (carried forward, refined).
+    Wed May 20 2 PM ET April 29 FOMC minutes - the 8-4 dissent
+    debate detail. Wed May 20 5 PM ET NVDA Q1 FY2027. Thu May 21
+    pre-open Walmart Q1 FY2027 with tariff-passthrough lens. Fri
+    May 22 Warsh swearing-in at White House. Thu May 28 8:30 AM
+    ET April PCE - formal stagflation-thesis invalidation
+    indicator. June 16-17 first Warsh-as-chair FOMC.
+  hasThesis:
+    - stagflation-risk
+    - persistent-energy-shock
+    - iran-war-rearmament
+    - gold-debasement-bid
+    - ai-capex-cycle-with-china-tail
+    - equity-melt-up-vs-recession-risk
+    - powell-warsh-transition-risk
+
+stagflation-risk:
+  type: wv.WorldviewThesis
+  label: Stagflation risk and Fed independence stress
+  thesisStatement: >-
+    April CPI on May 12 fired the energy-passthrough binary tell directly:
+    headline 3.8% YoY (highest since May 2023), core 2.8% YoY. April PPI on
+    May 13 ran hotter than CPI - headline +1.4% m/m / +6.0% YoY, core +1.0%
+    m/m / +5.2% YoY (highest in three years). April import prices on May 14
+    added +1.9% m/m / +4.2% YoY (largest YoY since October 2022) with
+    imported fuel +16.3% m/m. Friday May 15 delivered the sharpest
+    single-session rate-path repricing of the cycle: oil +4.5% (WTI to $106,
+    weekly +11%), the 10Y to 4.59% (up ~13bps in one day, fresh ~1-year high,
+    biggest weekly yield jump since April 2025), and CME FedWatch
+    hike-by-December odds to ~56% from ~36% Thursday and ~16% a week
+    earlier - a 20pp single-day move. Monday May 18 cash session closed 10Y
+    at 4.601% (vs 4.59% Friday) on the strike-cancellation tactical pullback;
+    Tuesday May 19 closed 10Y at 4.62% (intraday high 4.67%, "Treasurys take
+    off"), the rate-path repricing reasserting after the Friday spike.
+    Global yields still at multi-year highs
+    (German bund 15-year high, JGB 10Y 29-year high). Calendar: April 29
+    FOMC minutes Wednesday May 20 2 PM ET, Walmart Q1 FY2027 Thursday May
+    21 pre-open with tariff-passthrough lens, April PCE the formal
+    invalidation indicator on May 28.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.82
+    estimateStdDev: 0.04
+    estimateLower95: 0.74
+    estimateUpper95: 0.89
+    betaAlpha: 33.0
+    betaBeta: 7.2
+  vis.thesisTheme: vis.theme-inflation
+  status: wv.active
+  confidenceRationale: >-
+    Held at 2.1.4 levels (0.82 ± 0.04). No new CPI / PPI / PCE / wage print
+    landed in the ~21-hour window. The
+    [[ev-10y-yield-tuesday-close-462-may19|10Y closed Tuesday at 4.62%]]
+    (intraday high 4.67%), up from Monday's 4.601% close - directionally
+    supportive of the rate-path read but within noise of an unchanged macro
+    mean, so the mean does not move. Global yields (German bund 15-year high,
+    JGB 10Y 29-year high) still elevated. Beta(33, 7.2) continues to encode
+    ~40 effective independent observations.
+    [[ev-april-pce-release-may28|April PCE on May 28]] is the next primary
+    move, then the June 16-17 first-Warsh-as-chair FOMC.
+  supportingEvidence:
+    - ev-april-cpi-print-headline-38
+    - ev-april-ppi-print-may13
+    - ev-april-import-prices-42-may14
+    - ev-10y-yield-friday-459-may15
+    - ev-fedwatch-hike-by-dec-56pct-may15
+    - ev-global-bond-rout-may15
+    - ev-10y-yield-monday-461-may18
+    - ev-global-bond-yields-multi-year-highs-may18
+    - ev-10y-yield-close-monday-460-may18
+    - ev-10y-yield-tuesday-am-460-may19
+    - ev-10y-yield-tuesday-close-462-may19
+    - ev-fomc-minutes-release-may20
+    - ev-april-pce-release-may28
+    - ev-powell-exits-chair-may15
+    - ev-warsh-chair-confirmed-54-45-may13
+    - ev-april-retail-sales-may14
+    - ev-umich-sentiment-record-low-48-may
+    - ev-wti-monday-10798-may18
+    - ev-brent-monday-11142-may18
+    - ev-wti-monday-close-10866-may18
+    - ev-brent-monday-close-11210-may18
+    - ev-wti-tuesday-am-10354-may19
+    - ev-brent-tuesday-am-10933-may19
+  invalidationCondition:
+    type: wv.OrCondition
+    wv.operands:
+      - type: wv.AndCondition
+        wv.operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-core-pce-yoy
+            comparator: wv.lt
+            threshold: 2.5
+            persistence:
+              wv.duration: 3
+              wv.windowUnit: wv.months
+          - type: wv.ThresholdCondition
+            observable: fin.ind-unemployment-rate
+            comparator: wv.between
+            threshold: 4.0
+            thresholdHigh: 4.5
+            persistence:
+              wv.duration: 3
+              wv.windowUnit: wv.months
+
+persistent-energy-shock:
+  type: wv.WorldviewThesis
+  label: Persistent energy premium
+  thesisStatement: >-
+    Oil prices remain structurally elevated as long as the Strait of Hormuz
+    reopening sequence is incomplete and Iranian retaliation risk is intact.
+    The IEA May 2026 Oil Market Report forecasts a 1.78 mb/d 2026 supply
+    deficit, world supply falling 3.9 mb/d, Hormuz-affected Gulf output
+    14.4 mb/d below pre-war levels; UBS expects global inventories near
+    all-time lows by end-May. Monday May 18 cash session settled UP on
+    the structural read - WTI June $108.66 (+3%), Brent $112.10 (+2%),
+    XLE 60.58 (+1.92%), XOM 160.49 (+1.63%), CVX 196.12 (+2.63%). Tuesday
+    May 19 morning the after-hours softening EXTENDED meaningfully - WTI
+    near $103.54 (-4.7% vs Monday close, intraday range $102.16-$103.70),
+    Brent ~$109.33 (-2.5%). The Axios overnight reporting that the White
+    House formally rejected Iran's 14-point proposal as "insufficient"
+    DID NOT push oil higher - the price tape is reading the rejection as
+    opening-of-negotiation positioning rather than imminent kinetic
+    catalyst (Tuesday strikes already cancelled, NSC meeting is
+    deliberation not action). Structural-supply features unchanged
+    (IEA undersupply, 14.4 mb/d Hormuz-affected, inventories near
+    all-time lows, Persian Gulf Strait Authority tolling regime,
+    Sunday Barakah drone strike on UAE nuclear plant); tactical
+    softening on the diplomatic-flow side is the operative
+    near-term variable. Tuesday May 19 the Senate advanced a
+    [[ev-senate-war-powers-resolution-5047-may19|war-powers resolution
+    50-47]] against the Iran war and Trump
+    [[ev-trump-hour-away-strike-postponed-may19|postponed an "an hour
+    away" Tuesday strike]] after Gulf-leader appeals citing
+    oil-infrastructure retaliation fears - the diplomatic track
+    re-opened, not closed. Energy equities held a structural bid
+    ([[sec.xom|XOM]] 162.55 +1.28%, [[sec.cvx|CVX]] 197.25 +0.58%,
+    [[sec.xle|XLE]] 61.29 +1.17%) even as crude eased into Wednesday
+    pre-market (WTI -1.9% to $102.14, Brent -2% to $109.03) - the
+    structural-vs-tactical split the band captures.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.73
+    estimateStdDev: 0.05
+    estimateLower95: 0.63
+    estimateUpper95: 0.83
+    betaAlpha: 21.5
+    betaBeta: 8.0
+  vis.thesisTheme: vis.theme-energy
+  status: wv.active
+  confidenceRationale: >-
+    Moved from 2.1.4 0.74 ± 0.05 to 0.73 ± 0.05 - mean step of -0.01 on
+    the Tuesday-evening de-escalation tilt: the Senate advanced a
+    [[ev-senate-war-powers-resolution-5047-may19|war-powers resolution]]
+    (50-47, four Republicans crossing) against the Iran war and Trump
+    [[ev-trump-hour-away-strike-postponed-may19|postponed an "an hour away"
+    Tuesday strike]] after Gulf-leader appeals, re-opening the diplomatic
+    track; crude eased into Wednesday pre-market
+    ([[ev-wti-wed-am-10214-may20|WTI -1.9% to $102.14]],
+    [[ev-brent-wed-am-10903-may20|Brent -2% to $109.03]]). The structural
+    undersupply story (IEA 1.78 mb/d 2026
+    deficit, 14.4 mb/d Hormuz-affected, inventories near all-time lows)
+    is unchanged, and energy equities held a structural bid Tuesday
+    (XOM +1.28%, XLE +1.17%) - the structural-vs-tactical band is what
+    the 0.05 width captures. The Senate resolution is veto-bound and
+    procedurally weak, so the move is a single tactical step, not a
+    structural break. Beta(21.5, 8) encodes ~30 effective observations,
+    shape shifted from (22, 7.5) as the de-escalation print weighs
+    against the structural support.
+  supportingEvidence:
+    - ev-iea-omr-may-2026-undersupply
+    - ev-ubs-inventories-record-low-may15
+    - ev-wti-friday-settle-106-may15
+    - ev-iran-hormuz-sovereignty-demand-may10
+    - ev-trump-20yr-nuke-suspension-may15
+    - ev-trump-china-iran-oil-sanctions-may15
+    - ev-xom-friday-close-15792-may15
+    - ev-cvx-friday-close-19110-may15
+    - ev-xle-friday-close-5944-may15
+    - ev-strait-of-hormuz-closed-march4
+    - ev-hui-chuan-ship-seized-may15
+    - ev-aramco-ceo-100m-bbl-may12
+    - ev-cumulative-supply-loss-1b-bbl-may14
+    - ev-china-continue-iran-oil-may15
+    - ev-iran-hormuz-toll-mechanism-may16
+    - ev-trump-uae-kharg-seizure-directive-may16
+    - ev-wti-monday-10798-may18
+    - ev-brent-monday-11142-may18
+    - ev-barakah-nuclear-strike-may17
+    - ev-iea-future-price-spikes-warning-may18
+    - ev-iran-14-point-proposal-may18
+    - ev-wti-monday-close-10866-may18
+    - ev-brent-monday-close-11210-may18
+    - ev-xle-monday-close-6058-may18
+    - ev-xom-monday-close-16049-may18
+    - ev-cvx-monday-close-19612-may18
+    - ev-trump-cancels-tuesday-strikes-may18
+    - ev-us-oil-sanctions-waiver-text-may18
+    - ev-bessent-russia-waiver-g7-may18
+    - ev-iran-14-point-substance-may18
+    - ev-wti-tuesday-am-10354-may19
+    - ev-brent-tuesday-am-10933-may19
+    - ev-white-house-rejects-iran-proposal-may18
+    - ev-xom-tuesday-close-16255-may19
+    - ev-cvx-tuesday-close-19725-may19
+    - ev-xle-tuesday-close-6129-may19
+    - ev-trump-hour-away-strike-postponed-may19
+    - ev-senate-war-powers-resolution-5047-may19
+    - ev-wti-wed-am-10214-may20
+    - ev-brent-wed-am-10903-may20
+  invalidationCondition:
+    type: wv.OrCondition
+    wv.operands:
+      - type: wv.SequencedCondition
+        after:
+          type: wv.EventCondition
+          event: fin.evt-strait-of-hormuz-reopened
+          durability: wv.durable
+        then:
+          type: wv.ThresholdCondition
+          observable: fin.ind-wti-close
+          comparator: wv.lt
+          threshold: 80
+          persistence:
+            wv.duration: 30
+            wv.windowUnit: wv.calendar-days
+      - type: wv.EventCondition
+        event: fin.evt-opec-supply-shock
+
+iran-war-rearmament:
+  type: wv.WorldviewThesis
+  label: Iran war rearmament cycle
+  thesisStatement: >-
+    The US-Iran war that began Feb 28 2026 (Operation Epic Fury) triggered
+    a multi-year defense spending cycle that benefits prime contractors
+    with missile and missile-defense exposure regardless of diplomatic-track
+    outcomes. Defense primes rallied materially on the Monday May 18 cash
+    session in confirmation of the procurement-cycle reading - LMT closed
+    528.31 (+2.38%), RTX 175.95 (+2.78%), NOC 550.00 (+1.72%). The Monday
+    evening Axios reporting flipped the diplomatic-track signal: the White
+    House formally REJECTED Iran's 14-point proposal as "insufficient",
+    citing inadequate commitments to halting uranium enrichment; a senior
+    US official told Axios the "next conversation is through bombs"; Trump
+    is expected to meet his top national security advisers Tuesday May 19
+    to discuss "breaking the ceasefire with Iran." This is structurally
+    bullish for the multi-year procurement-cycle tail - the rejection is
+    public, on-the-record, and explicit about kinetic-option re-engagement.
+    Sunday Barakah drone strike on the UAE nuclear plant remains
+    unattributed (Iran has not claimed responsibility; UAE Defense
+    Ministry confirms 3 drones from Saudi border, 2 intercepted; UAE
+    formal statement did not name Iran). Iran's 14-point proposal
+    substance remains public: 30-day war end, US-forces withdrawal,
+    naval-blockade end, asset unfreezing, reparations, sanctions lift,
+    end-of-fighting in Lebanon, new Hormuz mechanism. Depleted munitions
+    stockpiles (438 Iranian ballistic missiles, 2,012 drones, 19 cruise
+    missiles fired at UAE through April 1) and Golden Dome ($185B) are
+    committed multi-year programs that survive any near-term deal
+    scenario. Tuesday-morning defense complex repricing on the
+    rejection news is the operative test of the procurement-cycle
+    structural read. That test came in muted, not bullish -
+    [[sec.lmt|LMT]] 526.63 (-0.32%), [[sec.rtx|RTX]] 174.49 (-0.83%),
+    [[sec.noc|NOC]] 556.34 (+1.15%) - and the legislative track tilted
+    toward de-escalation: the Senate advanced Kaine's
+    [[ev-senate-war-powers-resolution-5047-may19|war-powers resolution
+    50-47]] (Cassidy, Paul, Murkowski, Collins crossing) directing US
+    withdrawal from Iran hostilities, and Trump
+    [[ev-trump-hour-away-strike-postponed-may19|postponed an "an hour
+    away" Tuesday strike]] after Gulf-leader appeals. The resolution is
+    veto-bound and the multi-year backlog (LMT $194B, RTX $271B) is
+    unchanged.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.86
+    estimateStdDev: 0.04
+    estimateLower95: 0.77
+    estimateUpper95: 0.93
+    betaAlpha: 30.0
+    betaBeta: 4.9
+  vis.thesisTheme: vis.theme-defense
+  status: wv.active
+  confidenceRationale: >-
+    Moved from 2.1.4 0.87 ± 0.04 to 0.86 ± 0.04 - mean step of -0.01 on
+    the Tuesday de-escalation tilt. The Senate advanced Kaine's war-powers
+    resolution 50-47 (Cassidy - fresh off a primary loss - plus Paul,
+    Murkowski, Collins crossing) directing US withdrawal from Iran
+    hostilities, the first concrete legislative pressure against the war,
+    and Trump postponed an "an hour away" Tuesday strike after Gulf-leader
+    appeals. The Tuesday-open defense repricing the 2.1.4 narrative flagged
+    came in muted, not a procurement rally - LMT -0.32%, RTX -0.83%, NOC
+    +1.15%. The resolution is veto-bound (House passage plus near-certain
+    Trump veto stand between it and effect), and invalidation requires
+    durable peace IMPLEMENTED plus two quarters of declining DoD outlays -
+    nowhere near - so the multi-year procurement argument is intact and the
+    move is a single tactical step. Width held at 0.04. Beta(30, 4.9)
+    encodes ~35 effective observations. The Tuesday defense closes
+    ([[ev-lmt-tuesday-close-52663-may19|LMT]],
+    [[ev-rtx-tuesday-close-17449-may19|RTX]],
+    [[ev-noc-tuesday-close-55634-may19|NOC]]) and the
+    [[ev-senate-war-powers-resolution-5047-may19|Senate advance]] are
+    the supports behind the step.
+  supportingEvidence:
+    - ev-operation-epic-fury-feb28
+    - ev-iran-tomahawks-fired-2026q1
+    - ev-iran-uae-cumulative-attacks-april1
+    - ev-fy2026-defense-budget-1t
+    - ev-fy2027-defense-budget-projection
+    - ev-lmt-backlog-194b-q1-2026
+    - ev-rtx-backlog-271b-q1-2026
+    - ev-nyt-israel-us-iran-strikes-prep-may15
+    - ev-uss-ford-presidential-unit-citation-may16
+    - ev-algemeiner-iran-strike-options-may16
+    - ev-lmt-friday-close-51601-may15
+    - ev-rtx-friday-close-17118-may15
+    - ev-noc-friday-close-54069-may15
+    - ev-trump-xi-summit-concludes-may15
+    - ev-trump-losing-patience-iran-may15
+    - ev-uae-missile-attack-may8
+    - ev-trump-uae-kharg-seizure-directive-may16
+    - ev-iran-ready-repel-may17
+    - ev-barakah-nuclear-strike-may17
+    - ev-trump-clock-ticking-iran-may17
+    - ev-iran-14-point-proposal-may18
+    - ev-lmt-monday-close-52831-may18
+    - ev-rtx-monday-close-17595-may18
+    - ev-noc-monday-close-55000-may18
+    - ev-trump-cancels-tuesday-strikes-may18
+    - ev-iran-14-point-substance-may18
+    - ev-uae-barakah-response-restrained-may18
+    - ev-us-oil-sanctions-waiver-text-may18
+    - ev-white-house-rejects-iran-proposal-may18
+    - ev-senior-official-bombs-quote-may18
+    - ev-trump-nsc-meeting-tuesday-may19
+    - ev-lmt-tuesday-close-52663-may19
+    - ev-rtx-tuesday-close-17449-may19
+    - ev-noc-tuesday-close-55634-may19
+    - ev-trump-hour-away-strike-postponed-may19
+    - ev-senate-war-powers-resolution-5047-may19
+  invalidationCondition:
+    type: wv.AndCondition
+    wv.operands:
+      - type: wv.EventCondition
+        event: fin.evt-us-iran-peace-agreement-implemented
+        durability: wv.durable
+      - type: wv.ThresholdCondition
+        observable: fin.ind-dod-outlays-yoy-change
+        comparator: wv.lt
+        threshold: 0
+        persistence:
+          wv.duration: 2
+          wv.windowUnit: wv.fiscal-quarters
+
+gold-debasement-bid:
+  type: wv.WorldviewThesis
+  label: Gold structural debasement bid
+  thesisStatement: >-
+    Gold sits in mid-cycle of a multi-year structural bull market driven
+    by central-bank buying, sovereign de-dollarization, $39T US debt,
+    stock-bond correlation breakdown, and Fed independence concerns.
+    Q1 2026 set records on multiple dimensions - LBMA quarterly average
+    $4,873/oz, central-bank net purchases 244 tonnes (highest Q1 ever,
+    +17% QoQ), aggregate Q1 demand value $193B, bar-and-coin demand 474
+    tonnes (+42% YoY, second-highest quarterly figure on record). After
+    the Monday US cash recovery (GLD 418.43 +0.27%, spot back into the
+    $4,565-$4,570 band), Tuesday morning spot is range-bound $4,531-$4,570 -
+    Asian-session $4,531 low recovering through the European session on
+    dollar weakness driven by the Iran-rejection-but-no-strike framing.
+    Physical demand strong - Shanghai-London spot differentials remain
+    positive. But the
+    [[ev-10y-yield-tuesday-close-462-may19|10Y rose to a 4.62% Tuesday
+    close]] (intraday high 4.67%) - the operative tactical headwind
+    reasserting - and gold pulled back below the band: spot ~$4,486.86,
+    [[sec.gld|GLD]] 411.50 (-1.66%), [[sec.gdx|GDX]] 83.78 (-3.86%);
+    Wednesday pre-market spot steadied near $4,498.90
+    (-0.27%). The structural-bull supports are intact -
+    JPM $5,055-$6,300, UBS $6,200, Citi $5,000-$7,000 targets; 2026 CB
+    projection at 755 tonnes; 95% CB survey response confirming
+    gold-reserve intentions. AndCondition invalidation still requires
+    three hard things simultaneously - durable US-Iran peace AND Fed
+    credibility restored AND sustained 6-month deficit decline - the
+    [[ev-senate-war-powers-resolution-5047-may19|Senate's war-powers
+    advance]] moves further away from the first leg, but the day's action
+    is a tactical price pullback, not a structural break.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.84
+    estimateStdDev: 0.05
+    estimateLower95: 0.74
+    estimateUpper95: 0.91
+    betaAlpha: 44.0
+    betaBeta: 8.4
+  vis.thesisTheme: vis.theme-gold
+  status: wv.active
+  confidenceRationale: >-
+    Moved from 2.1.4 0.85 ± 0.05 to 0.84 ± 0.05 - mean step of -0.01 on
+    the Tuesday tactical pullback.
+    [[ev-gold-spot-tuesday-close-4487-may19|Spot settled ~$4,486.86]]
+    (below the $4,531-$4,570 morning band),
+    [[ev-gld-tuesday-close-41150-may19|GLD -1.66%]] and
+    [[ev-gdx-tuesday-close-8378-may19|GDX -3.86%]], as the
+    [[ev-10y-yield-tuesday-close-462-may19|10Y rose to a 4.62% close]]
+    (intraday 4.67%) and reasserted the operative tactical headwind. The Senate's war-powers advance is directionally
+    supportive (moves further from the durable-peace leg of the
+    AndCondition triplet), and the structural-bull supports (244t Q1
+    central-bank buying, JPM/UBS/Citi targets) are intact - so this is a
+    price pullback, not a structural break, and the width holds at 0.05.
+    Beta(44, 8.4) holds at ~52 effective observations.
+  supportingEvidence:
+    - ev-lbma-q1-record-4873
+    - ev-cb-q1-2026-244t-buying-record
+    - ev-cb-survey-95pct-reserves-up
+    - ev-gold-q1-2026-record-demand-193b
+    - ev-bar-coin-demand-474-tonnes-q1
+    - ev-cb-2026-projection-755-tonnes
+    - ev-stock-bond-correlation-30y-high
+    - ev-jpm-gold-target-5055-6300
+    - ev-ubs-gold-target-6200
+    - ev-citi-gold-target-5000-7000
+    - ev-gld-friday-close-41729-may15
+    - ev-gdx-friday-close-8735-may15
+    - ev-gold-spot-4530-friday-may15
+    - ev-gold-spot-4540-saturday-may16
+    - ev-10y-yield-friday-459-may15
+    - ev-10y-yield-monday-461-may18
+    - ev-iea-omr-may-2026-undersupply
+    - ev-gold-asian-monday-low-4540-may18
+    - ev-gld-monday-close-41843-may18
+    - ev-gdx-monday-close-8714-may18
+    - ev-gold-spot-recovery-4567-may18
+    - ev-10y-yield-close-monday-460-may18
+    - ev-gold-spot-tuesday-am-may19
+    - ev-10y-yield-tuesday-am-460-may19
+    - ev-white-house-rejects-iran-proposal-may18
+    - ev-gold-spot-tuesday-close-4487-may19
+    - ev-gld-tuesday-close-41150-may19
+    - ev-gdx-tuesday-close-8378-may19
+    - ev-10y-yield-tuesday-close-462-may19
+    - ev-senate-war-powers-resolution-5047-may19
+    - ev-gold-spot-wed-am-4499-may20
+  invalidationCondition:
+    type: wv.AndCondition
+    wv.operands:
+      - type: wv.EventCondition
+        event: fin.evt-us-iran-peace-agreement-implemented
+        durability: wv.durable
+      - type: wv.EventCondition
+        event: fin.evt-fed-credibility-restored
+      - type: wv.ThresholdCondition
+        observable: fin.ind-us-fiscal-deficit-trailing-12m
+        comparator: wv.lt
+        threshold: 0
+        persistence:
+          wv.duration: 6
+          wv.windowUnit: wv.months
+
+ai-capex-cycle-with-china-tail:
+  type: wv.WorldviewThesis
+  label: AI capex sustained but with China decoupling tail risk
+  thesisStatement: >-
+    Hyperscaler AI capex continues at elevated pace into 2026. AMD Q1 2026
+    (May 5 AH) materially confirmed the demand side - revenue $10.3B vs
+    $9.88B consensus, Data Center +57% YoY at $5.8B, Q2 guide $11.2B vs
+    $10.3B consensus, Lisa Su quoted "tens of billions" by 2027. NVDA Q1
+    FY2027 (May 20 5 PM ET) is the next binary tell - consensus $78.8B
+    revenue (+77% YoY) / $1.77 EPS; Q2 guide near $86B is what the
+    after-hours reaction rides on; options price an 8-10% implied move;
+    prediction-market beat probability is ~97% priced in - the asymmetry
+    is unfavorable on the upside, and NVDA has closed lower on 4 of its
+    last 5 earnings reports despite beating revenue 3-4% for six straight
+    quarters. Huang estimates the unrealized China market at ~$50B
+    "effectively gone with no clear return timeline". The May 14 H200
+    export approval to ~10 Chinese firms (Alibaba, Tencent, ByteDance,
+    JD.com plus Lenovo and Foxconn) holds through the weekend into Monday
+    and through Tuesday morning - the Trump-Xi summit concluded with no
+    AI-policy reversal or extended-export-control reinstatement. Friday
+    May 15 delivered broad chip profit-taking on the oil shock / rate-up
+    backdrop: NVDA 225.32 (-4.42%), AMD 424.10 (-5.69%), INTC -8% to ~$108
+    (after a YTD +214% run), MU -6.6%. CSCO printed a divergent +13.4% to
+    118.21 confirming the Wed-AH Q3 print (FY26 AI orders raised to $9B
+    from $5B, HSBC upgrade to Buy with $137 PT). Monday close NVDA $222.32
+    (-1.33%), AMD $420.99 (-0.73%), QQQ $705.88;
+    [[ev-nvda-tuesday-close-22061-may19|Tuesday close NVDA 220.61
+    (-0.77%)]], [[ev-amd-tuesday-close-41405-may19|AMD 414.05 (-1.65%)]]
+    on pre-earnings positioning, with
+    Wednesday pre-market NQ futures +0.8% recovering ahead of the
+    after-close print. The
+    PHLX Semiconductor Index sits ~32% above its 50-day moving average
+    after a +143% trailing year - a consolidation setup. The Rubin
+    architecture H2 2026 ramp is the positive overhang investors are
+    watching for.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.86
+    estimateStdDev: 0.04
+    estimateLower95: 0.78
+    estimateUpper95: 0.93
+    betaAlpha: 64.0
+    betaBeta: 10.4
+  vis.thesisTheme: vis.theme-ai
+  status: wv.active
+  confidenceRationale: >-
+    Held at 2.1.4 levels (0.86 ± 0.04). No new chip-side print or
+    export-policy news landed in the window.
+    [[ev-nvda-tuesday-close-22061-may19|NVDA closed Tuesday 220.61
+    (-0.77%)]] and [[ev-amd-tuesday-close-41405-may19|AMD 414.05
+    (-1.65%)]] on pre-earnings positioning; Wednesday pre-market NQ
+    futures recovered +0.8%. The
+    [[ev-nvda-q1-fy27-78b-guide-may20|NVDA Q1 FY2027 print]] lands after
+    Wednesday's close (consensus ~$78.8B revenue /
+    $1.77 EPS; Q2 guide near $86B the operative variable; 8-10% implied
+    move) - it has not yet printed, so this window is in-front-of, not
+    catalyst. Beta(64, 10.4) ~74 effective observations. The post-print
+    rerating is the next confidence move.
+  supportingEvidence:
+    - ev-amd-q1-2026-blowout
+    - ev-amd-q1-data-center-58b
+    - ev-amd-q2-guide-112b
+    - ev-amd-su-tens-of-billions-quote
+    - ev-nvda-china-revenue-zero
+    - ev-nvda-h20-charge-45b
+    - ev-huang-china-50b-effectively-gone
+    - ev-gartner-semi-revenue-1t-plus-2026
+    - ev-anthropic-meta-ai-partnerships
+    - ev-openai-6gw-supply-agreement
+    - ev-nvda-q1-fy27-78b-guide-may20
+    - ev-h200-export-approval-may14
+    - ev-h200-75k-chip-cap-may14
+    - ev-nvda-friday-close-22532-may15
+    - ev-amd-friday-close-42410-may15
+    - ev-intc-friday-down-8pct-may15
+    - ev-mu-friday-down-66pct-may15
+    - ev-csco-friday-close-11821-may15
+    - ev-csco-hsbc-upgrade-may15
+    - ev-cisco-q3-blowout-ai-orders-may14
+    - ev-nvda-options-implied-move-may18
+    - ev-nvda-historical-post-earnings-drift-may18
+    - ev-rubin-architecture-h2-2026-may18
+    - ev-sox-32-above-50dma-may15
+    - ev-nvda-premarket-up-may18
+    - ev-nvda-monday-close-22232-may18
+    - ev-amd-monday-close-42099-may18
+    - ev-qqq-monday-close-70588-may18
+    - ev-nq-futures-tuesday-am-may19
+    - ev-kospi-tuesday-down-3pct-may19
+    - ev-nvda-tuesday-close-22061-may19
+    - ev-amd-tuesday-close-41405-may19
+  invalidationCondition:
+    type: wv.EventCondition
+    event: fin.evt-us-china-export-controls-extended
+    durability: wv.durable
+
+equity-melt-up-vs-recession-risk:
+  type: wv.WorldviewThesis
+  label: Equity melt-up versus building recession risk
+  thesisStatement: >-
+    The Monday cash session held up FAR better than the Monday-morning
+    bearish framing implied. SPY closed 738.65 (-0.07% from Friday's
+    739.17), QQQ 705.88, Dow -0.34%, Nasdaq Composite -0.07%, VIX
+    actually FELL to 18.43. The Tuesday cash session then closed lower for
+    a THIRD consecutive day: [[ev-spx-tuesday-close-7354-may19|SPX
+    7,353.61 (-0.67%)]], [[ev-nasdaq-tuesday-close-25871-may19|Nasdaq
+    Composite 25,870.71 (-0.84%)]], [[ev-spy-tuesday-close-73373-may19|SPY
+    733.73]], QQQ 701.53; [[ev-vix-tuesday-close-1806-may19|VIX closed
+    18.06 (+1.35%)]] - a volatility bid, reversing the morning's softening
+    read. [[ev-spx-futures-wed-am-may20|Wednesday pre-market futures have
+    since recovered]] (ES +0.4%, NQ +0.8%, Dow +75 pts) ahead of the
+    binary cluster, integrating the down days rather than cascading. The Friday tape (SPX 7,408.50 -1.24%, NVDA -4.4%, AMD
+    -5.7%, INTC -8%) has not been re-tested. CME FedWatch hike-by-December
+    holds the ~56% level. Q1 2026 earnings season closed at 84% beat rate,
+    27.7% blended EPS growth, blended net margin 13.4% (highest since
+    FactSet began tracking in 2009). The invalidation grammar requires
+    either a vol-expansion break (VIX > 25 with SPY breaking 50d MA for 5
+    trading days) or unimpeded melt-up confirmation (SPX > 7,300 with VIX
+    < 15 for 5 trading days) - VIX at 18.06 sits squarely in the mid-zone
+    (SPX 7,353 is above 7,300, but VIX is far from the <15 the
+    melt-up-confirmation leg needs), neither has fired. Three binary
+    tells land in the next ~30 hours Wed
+    May 20 - Thu May 21: FOMC minutes (2 PM ET Wed), NVDA Q1 FY2027 (5 PM
+    ET Wed), Walmart Q1 FY2027 (pre-open Thu, tariff-passthrough lens).
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.70
+    estimateStdDev: 0.07
+    estimateLower95: 0.56
+    estimateUpper95: 0.83
+    betaAlpha: 30.5
+    betaBeta: 13.1
+  vis.thesisTheme: vis.theme-equity
+  status: wv.active
+  confidenceRationale: >-
+    Moved from 2.1.4 0.71 ± 0.07 to 0.70 ± 0.07 - mean step of -0.01 on
+    the third consecutive S&P down day
+    ([[ev-spx-tuesday-close-7354-may19|SPX 7,353.61 -0.67%]]) paired with
+    a [[ev-vix-tuesday-close-1806-may19|VIX bid (closed 18.06, +1.35%)]],
+    reversing the 2.1.4 morning resilience read where VIX was softening
+    to 17.82. The deterioration is mild: neither invalidation leg is
+    closer to firing (VIX 18 well below the 25 vol-expansion threshold;
+    SPX above 7,300 but VIX nowhere near the <15 melt-up-confirmation
+    leg), and [[ev-spx-futures-wed-am-may20|Wednesday pre-market futures
+    recovered]] (+0.4% ES, +0.8% NQ). Width held at 0.07.
+    Beta(30.5, 13.1) ~44 effective observations. The Wed-Thu binary
+    cluster (FOMC minutes, NVDA, Walmart) is where the operative move
+    lives.
+  supportingEvidence:
+    - ev-q1-2026-84pct-beat-rate
+    - ev-q1-2026-eps-growth-277pct
+    - ev-q1-2026-net-margin-revised-134pct
+    - ev-q1-2026-magnitude-of-beats-207
+    - ev-q1-2026-forward-guide-21-23
+    - ev-fortune-stopped-caring-iran-quote
+    - ev-pe-multidecade-norm-above-avg
+    - ev-spx-friday-close-7409-may15
+    - ev-spy-friday-close-73917-may15
+    - ev-nasdaq-friday-close-26225-may15
+    - ev-vix-friday-close-19-may15
+    - ev-spx-thursday-close-7501-may14
+    - ev-cme-sunday-futures-open-22z
+    - ev-wmt-q1-fy27-consensus-may21
+    - ev-fomc-minutes-release-may20
+    - ev-nvda-options-implied-move-may18
+    - ev-fedwatch-hike-by-dec-56pct-may15
+    - ev-global-bond-rout-may15
+    - ev-sox-32-above-50dma-may15
+    - ev-cisco-q3-blowout-ai-orders-may14
+    - ev-umich-sentiment-record-low-48-may
+    - ev-iran-hormuz-toll-mechanism-may16
+    - ev-trump-uae-kharg-seizure-directive-may16
+    - ev-barakah-nuclear-strike-may17
+    - ev-trump-clock-ticking-iran-may17
+    - ev-wti-monday-10798-may18
+    - ev-10y-yield-monday-461-may18
+    - ev-spy-premarket-down-may18
+    - ev-spx-futures-monday-down-may18
+    - ev-spy-monday-close-73865-may18
+    - ev-qqq-monday-close-70588-may18
+    - ev-vix-monday-close-1843-may18
+    - ev-nvda-monday-close-22232-may18
+    - ev-amd-monday-close-42099-may18
+    - ev-10y-yield-close-monday-460-may18
+    - ev-trump-cancels-tuesday-strikes-may18
+    - ev-us-oil-sanctions-waiver-text-may18
+    - ev-spx-futures-tuesday-am-may19
+    - ev-nq-futures-tuesday-am-may19
+    - ev-vix-tuesday-am-1782-may19
+    - ev-nikkei-tuesday-close-60550-may19
+    - ev-hang-seng-tuesday-up-may19
+    - ev-white-house-rejects-iran-proposal-may18
+    - ev-spx-tuesday-close-7354-may19
+    - ev-nasdaq-tuesday-close-25871-may19
+    - ev-vix-tuesday-close-1806-may19
+    - ev-spy-tuesday-close-73373-may19
+    - ev-qqq-tuesday-close-70153-may19
+    - ev-senate-war-powers-resolution-5047-may19
+    - ev-spx-futures-wed-am-may20
+  invalidationCondition:
+    type: wv.OrCondition
+    wv.operands:
+      - type: wv.AndCondition
+        wv.operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-vix-close
+            comparator: wv.gt
+            threshold: 25
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+          - type: wv.ThresholdCondition
+            observable: fin.ind-spy-close
+            comparator: wv.lt
+            threshold: 700
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+      - type: wv.AndCondition
+        wv.operands:
+          - type: wv.ThresholdCondition
+            observable: fin.ind-spx-close
+            comparator: wv.gt
+            threshold: 7300
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+          - type: wv.ThresholdCondition
+            observable: fin.ind-vix-close
+            comparator: wv.lt
+            threshold: 15
+            persistence:
+              wv.duration: 5
+              wv.windowUnit: wv.trading-days
+
+powell-warsh-transition-risk:
+  type: wv.WorldviewThesis
+  label: Fed leadership transition policy uncertainty
+  thesisStatement: >-
+    Powell completed his Fed chair-term exit Friday May 15 2026 with
+    conciliatory final remarks: advised Warsh to "stay out of elected
+    politics" and pledged to keep a low profile as a governor through
+    his Board term to 2028. Senate had confirmed Warsh as Federal Reserve
+    Chair 54-45 on Wednesday May 13 - the narrowest modern-era margin
+    since the current approval process was put in place in 1977;
+    Fetterman (D-PA) was the only Democratic crossover. Warsh's formal
+    swearing-in ceremony is scheduled for Friday May 22 2026 at the
+    White House - confirmed by the May 15 Fed Reserve announcement of
+    Powell as chair pro tempore until Warsh is sworn in. The 13-11
+    party-line Banking Committee advance, the prior 51-45 governor
+    confirmation, and the 54-45 chair confirmation all stand as
+    historically partisan Fed-Chair-track outcomes. Warsh
+    confirmation-hearing framing - "won''t be sock puppet" and "room to
+    cut without inflation" - introduces a dovish-tilt risk. Friday May
+    15 delivered the sharpest rate-path repricing of the cycle: 10Y to
+    4.59%, CME FedWatch hike-by-December to ~56% from ~36% Thursday.
+    Monday May 18 intraday extended to 4.61-4.63% before pulling back
+    to a 4.601% close on the strike-cancellation flow;
+    [[ev-10y-yield-tuesday-close-462-may19|Tuesday May 19 closed 10Y at
+    4.62%]] (intraday high 4.67%), the rate-path repricing
+    reasserting. Global yields (German bund 15-year
+    high, JGB 10Y 29-year high) remain elevated. The contradiction
+    between Warsh's "room to cut" framing and the inherited backdrop
+    (CPI 3.8%, PPI +6.0% YoY, imports +4.2% YoY, 10Y 4.62%) remains in
+    place, but the substantive transition question still opens later:
+    first Warsh-as-chair public statements come after the Friday May 22
+    White House ceremony, and the first Warsh-as-chair FOMC is June
+    16-17.
+  confidence:
+    type: est.BetaEstimate
+    estimateMean: 0.50
+    estimateStdDev: 0.11
+    estimateLower95: 0.29
+    estimateUpper95: 0.71
+    betaAlpha: 10.0
+    betaBeta: 10.0
+  vis.thesisTheme: vis.theme-monetary
+  status: wv.active
+  confidenceRationale: >-
+    Held at 2.1.4 levels (0.50 ± 0.11). The
+    [[ev-10y-yield-tuesday-close-462-may19|10Y rose to a 4.62% Tuesday
+    close]] (intraday 4.67%) - the contradiction with Warsh's "room to
+    cut" framing widening at the margin, but no new Warsh catalyst landed.
+    Swearing-in still Friday May 22 per the May 15 Fed Reserve
+    announcement; the substantive transition opens post-ceremony, then
+    the June 16-17 first-Warsh-as-chair FOMC.
+    Width held at 0.11. Beta(10, 10) encodes ~20 effective observations;
+    the posterior on this thesis remains appropriately diffuse pending
+    Warsh-as-chair output.
+  supportingEvidence:
+    - ev-powell-exit-warsh-nominated-may15
+    - ev-warsh-banking-cmte-13-11
+    - ev-warsh-chair-confirmed-54-45-may13
+    - ev-warsh-sock-puppet-quote
+    - ev-warsh-room-to-cut-quote
+    - ev-warsh-historically-hawkish
+    - ev-fed-held-april29-with-dissent
+    - ev-fomc-dissent-miran-cut
+    - ev-doj-powell-investigation-halted
+    - ev-powell-exits-chair-may15
+    - ev-powell-stay-out-politics-may15
+    - ev-trump-fed-pressure-housing-debt
+    - ev-10y-yield-friday-459-may15
+    - ev-fedwatch-hike-by-dec-56pct-may15
+    - ev-fomc-minutes-release-may20
+    - ev-10y-yield-monday-461-may18
+    - ev-global-bond-yields-multi-year-highs-may18
+    - ev-warsh-swearing-in-friday-may22
+    - ev-10y-yield-close-monday-460-may18
+    - ev-10y-yield-tuesday-am-460-may19
+    - ev-10y-yield-tuesday-close-462-may19
+  invalidationCondition:
+    type: wv.AndCondition
+    wv.operands:
+      - type: wv.EventCondition
+        event: fin.evt-fed-chair-continuity-signal
+      - type: wv.ThresholdCondition
+        observable: fin.ind-fomc-dissent-count
+        comparator: wv.lte
+        threshold: 2
+
+ev-april-cpi-print-headline-38:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    April CPI headline came in at 3.8% YoY, the highest since May 2023.
+    Core 2.8% YoY confirmed the energy-passthrough framing was material.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-12T12:30:00Z
+  citation: https://www.bls.gov/news.release/cpi.htm
+  citationSource: src.bls-press
+  wv.indicatorName: fin.ind-headline-cpi-yoy
+  wv.indicatorValue: 3.8
+  wv.indicatorPeriod: April 2026
+
+ev-april-ppi-print-may13:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    April PPI ran hotter than CPI - headline +1.4% m/m / +6.0% YoY, core
+    +1.0% m/m / +5.2% YoY (highest in three years).
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-13T12:30:00Z
+  citation: https://www.bls.gov/news.release/ppi.htm
+  citationSource: src.bls-press
+  wv.indicatorName: fin.ind-headline-cpi-yoy
+  wv.indicatorValue: 6.0
+  wv.indicatorPeriod: April 2026
+
+ev-april-import-prices-42-may14:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    April import prices added +1.9% m/m / +4.2% YoY (largest YoY since
+    October 2022) with imported fuel +16.3% m/m.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-14T12:30:00Z
+  citation: https://www.bls.gov/news.release/ximpim.htm
+  citationSource: src.bls-press
+  wv.indicatorPeriod: April 2026
+
+ev-10y-yield-friday-459-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    10-year Treasury yield closed Friday at 4.59%, up ~13bps in one day -
+    fresh ~1-year high and biggest weekly yield jump since April 2025.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.bloomberg.com/markets/rates-bonds/government-bonds/us
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.59
+
+ev-fedwatch-hike-by-dec-56pct-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    CME FedWatch hike-by-December odds moved to ~56% from ~36% Thursday
+    and ~16% a week earlier - a 20pp single-day repricing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T21:00:00Z
+  citation: https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.rate-path-expectations
+  fin.observedValue: 0.56
+
+ev-global-bond-rout-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The Friday bond-market rout was global, with longer-dated yields most
+    affected; 30-year US Treasury yields traded to the cusp of their
+    2023 peak.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T22:00:00Z
+  citation: https://www.ft.com/content/global-bond-rout-may-2026
+  citationSource: src.ft
+
+ev-fomc-minutes-release-may20:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    April 29 FOMC minutes scheduled for release Wednesday May 20 at 2 PM ET,
+    detailing the historic 8-4 dissent debate.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm
+  citationSource: src.fed-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-20
+
+ev-april-pce-release-may28:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    April PCE release scheduled for Thursday May 28 at 8:30 AM ET - the
+    formal invalidation indicator for the stagflation thesis.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.bea.gov/news/schedule
+  citationSource: src.bea-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-28
+
+ev-powell-exits-chair-may15:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Jerome Powell completed his Fed chair-term exit Friday May 15 2026,
+    transferring chairmanship to Kevin Warsh. Powell retains his governor
+    seat on the Board through 2028.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.federalreserve.gov/newsevents/pressreleases.htm
+  citationSource: src.fed-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-15
+
+ev-warsh-chair-confirmed-54-45-may13:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Senate confirmed Kevin Warsh as Federal Reserve Chair 54-45 on
+    Wednesday May 13 - the narrowest modern-era margin since the current
+    approval process was put in place in 1977. Fetterman (D-PA) was the
+    only Democratic crossover.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-13T22:00:00Z
+  citation: https://www.cnbc.com/2026/05/13/kevin-warsh-wins-senate-confirmation-as-the-next-federal-reserve-chair.html
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-15
+
+ev-april-retail-sales-may14:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    April retail sales +0.5% m/m (third consecutive monthly increase),
+    core +0.7% - the consumer is absorbing the energy passthrough
+    notwithstanding the highest CPI in three years.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-14T12:30:00Z
+  citation: https://www.census.gov/retail/marts/www/marts_current.pdf
+  citationSource: src.bea-press
+  wv.indicatorValue: 0.5
+  wv.indicatorPeriod: April 2026
+
+ev-umich-sentiment-record-low-48-may:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    University of Michigan May consumer sentiment preliminary at 48 -
+    matching the all-time-low historical readings. 1-year inflation
+    expectation at 4.5%.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-10T14:00:00Z
+  citation: http://www.sca.isr.umich.edu/
+  citationSource: src.reuters
+  wv.indicatorValue: 48.0
+  wv.indicatorPeriod: May 2026
+
+ev-iea-omr-may-2026-undersupply:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    IEA May 2026 Oil Market Report forecasts a 1.78 mb/d 2026 supply deficit
+    (sharp reversal from prior expected surplus), with world supply falling
+    3.9 mb/d in 2026 and Hormuz-affected Gulf countries 14.4 mb/d below
+    pre-war levels. The market stays severely undersupplied through Q3 2026
+    even if Middle East fighting ends by early June.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T09:00:00Z
+  citation: https://www.iea.org/reports/oil-market-report-may-2026
+  citationSource: src.iea
+
+ev-ubs-inventories-record-low-may15:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    UBS Research expects global oil inventories to approach all-time lows
+    by end-May 2026, corroborating the IEA structural undersupply read.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T13:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-15/ubs-oil-inventories
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.ubs-research
+  fin.forecastHorizon: fin.horizon-3-month
+
+ev-wti-friday-settle-106-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI settled near $106 Friday, +4.5% on the day and +11% on the week -
+    the sharpest single-session rate-path repricing of the cycle paired
+    with the structural-undersupply confirmation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.reuters.com/markets/commodities/oil-prices-2026-05-15/
+  citationSource: src.reuters
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 106.0
+
+ev-iran-hormuz-sovereignty-demand-may10:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Iran's May 10 demand for full Iranian sovereignty over the Strait of
+    Hormuz remains in force - procedurally incompatible with the
+    durable-reopening leg of the SequencedCondition's invalidation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-10T15:00:00Z
+  citation: https://apnews.com/iran-hormuz-sovereignty-demand-may-2026
+  citationSource: src.ap
+  wv.geopoliticalEventDate: 2026-05-10
+
+ev-trump-20yr-nuke-suspension-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Trump told reporters on Air Force One returning from Beijing he would
+    accept a 20-year suspension of Iranian uranium enrichment with a
+    "real" guarantee - apparent shift from his prior permanent-halt
+    demand and partial convergence toward Iran's floated-15-year framing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T19:00:00Z
+  citation: https://www.reuters.com/world/trump-iran-20-year-2026-05-15/
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-15
+  wv.statementVenue: Air Force One press gaggle
+
+ev-trump-china-iran-oil-sanctions-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Trump indicated lifting sanctions on Chinese companies that buy
+    Iranian oil during the Xi summit, signaling a decision is coming -
+    directionally negative for the energy-shock thesis.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T19:30:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-15/trump-china-iran-sanctions
+  citationSource: src.bloomberg
+  wv.statementDate: 2026-05-15
+
+ev-xom-friday-close-15792-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Exxon Mobil closed Friday May 15 at 157.92, +3.36% on the day in
+    direct repricing of the oil shock.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/XOM
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.xom
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 157.92
+
+ev-cvx-friday-close-19110-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Chevron closed Friday May 15 at 191.10, +2.39% on the day - tracking
+    XOM and XLE through the oil-shock repricing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/CVX
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.cvx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 191.10
+
+ev-xle-friday-close-5944-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    XLE (Energy Select Sector SPDR) closed Friday May 15 at 59.44,
+    +2.36% on the day.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/XLE
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.xle
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 59.44
+
+ev-strait-of-hormuz-closed-march4:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Iran formally closed the Strait of Hormuz on 2026-03-04, threatening
+    any vessel attempting passage. IRGC issued passage prohibitions,
+    boarded merchant ships, and laid sea mines. Brent surged past $120/bbl
+    on the closure; QatarEnergy declared force majeure on all exports.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-03-04T00:00:00Z
+  citation: https://www.reuters.com/world/middle-east/strait-of-hormuz-closed-2026-03-04/
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-03-04
+
+ev-hui-chuan-ship-seized-may15:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    The Honduras-flagged Hui Chuan ("floating armory") was seized off
+    Fujairah on May 15 and diverted toward Iranian waters - subsequently
+    attributed to Iran's IRGC navy by weekend reporting.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T18:00:00Z
+  citation: https://apnews.com/hui-chuan-fujairah-seizure-may-2026
+  citationSource: src.ap
+  wv.geopoliticalEventDate: 2026-05-15
+
+ev-aramco-ceo-100m-bbl-may12:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Saudi Aramco CEO Amin Nasser stated May 12 that global crude inventory
+    drawdowns have reached 100 million barrels since the Hormuz closure -
+    framing the supply-loss magnitude in operator terms.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-12T11:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-12/aramco-100m-bbl
+  citationSource: src.bloomberg
+  wv.statementDate: 2026-05-12
+
+ev-cumulative-supply-loss-1b-bbl-may14:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Cumulative supply loss from Gulf producers since the Hormuz closure
+    exceeded 1 billion barrels by May 14, per industry aggregation.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-14T15:00:00Z
+  citation: https://www.iea.org/reports/oil-market-report-may-2026
+  citationSource: src.iea
+
+ev-china-continue-iran-oil-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    China's Foreign Ministry confirmed May 15 that China will continue
+    purchasing Iranian oil - directly cutting against the Thursday
+    Hormuz-open commitment from the Trump-Xi summit.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T11:00:00Z
+  citation: https://www.reuters.com/world/china/china-fm-iran-oil-2026-05-15/
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-15
+
+ev-iran-hormuz-toll-mechanism-may16:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Iran's parliament National Security Committee chair Ebrahim Azizi
+    announced Saturday May 16 that Tehran has designed a "professional
+    mechanism" for managing Hormuz shipping movement via the new
+    Persian Gulf Strait Authority (PGSA). Vessels submit ownership,
+    insurance, crew, and cargo forms; tolls (reportedly up to $2M,
+    settled in Chinese yuan) determined by vessel size and cargo;
+    US-linked "Freedom Project" vessels excluded outright. The
+    institutional formalization makes the disruption regime
+    procedurally sustained rather than ad-hoc.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-16T18:00:00Z
+  citation: https://www.aljazeera.com/news/liveblog/2026/5/16/iran-war-live-lebanon-israel-extend-truce-tehran-ready-for-more-us-talks
+  citationSource: src.aljazeera
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-16
+
+ev-trump-uae-kharg-seizure-directive-may16:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Saturday May 16 reporting indicates the Trump administration
+    instructed the UAE to seize Iran's Kharg Island - Iran's primary
+    oil-export hub and one of the operational options the Friday
+    NYT strike-prep piece had listed. Crosses the threshold from
+    "preparations intensifying" to "active asks of regional partners",
+    sustaining the multi-year procurement framing without requiring
+    the kinetic option to actually execute.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-16T20:00:00Z
+  citation: https://www.aljazeera.com/news/2026/5/16/iran-war-day-78-trump-tehran-signal-talks-as-lebanon-truce-extended
+  citationSource: src.aljazeera
+  wv.geopoliticalEventDate: 2026-05-16
+
+ev-iran-ready-repel-may17:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Sunday May 17 Iranian military statement reaffirms readiness to
+    repel renewed US attack. Peace talks confirmed stalled at Tehran's
+    five preconditions (sanctions lift, war end on all fronts,
+    blockade lift, asset unfreezing, war compensation). Reinforces
+    the demand-side framing for the rearmament-cycle thesis without
+    being a step-change event on its own.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-17T10:00:00Z
+  citation: https://www.aljazeera.com/news/liveblog/2026/5/16/iran-war-live-lebanon-israel-extend-truce-tehran-ready-for-more-us-talks
+  citationSource: src.aljazeera
+  wv.statementDate: 2026-05-17
+
+ev-operation-epic-fury-feb28:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Operation Epic Fury began February 28 2026, opening the US-Iran war
+    and triggering the multi-year defense spending cycle that benefits
+    prime contractors with missile and missile-defense exposure.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-02-28T06:00:00Z
+  citation: https://www.defense.gov/News/Releases/Release/Article/operation-epic-fury
+  citationSource: src.white-house-press
+  wv.geopoliticalEventDate: 2026-02-28
+
+ev-iran-tomahawks-fired-2026q1:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Through April 1 2026, Iran fired 438 ballistic missiles, 2,012 drones,
+    and 19 cruise missiles at UAE - depleted stockpiles driving multi-year
+    procurement replenishment cycles for LMT, RTX, NOC.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-01T00:00:00Z
+  citation: https://www.reuters.com/world/iran-munitions-tally-2026-04-01/
+  citationSource: src.reuters
+  fin.reportingPeriod: fin.q1-2026
+
+ev-iran-uae-cumulative-attacks-april1:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Cumulative tally of Iran-on-UAE munitions through April 1 2026 - 438
+    ballistic missiles, 2,012 drones, 19 cruise missiles. The stockpile-
+    depletion math is the structural support for the procurement cycle.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-01T18:00:00Z
+  citation: https://www.reuters.com/world/iran-uae-cumulative-2026-04-01/
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-04-01
+
+ev-fy2026-defense-budget-1t:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    FY2026 US defense budget approved at $1T, including the $185B Golden
+    Dome missile-defense program. Multi-year committed procurement
+    independent of near-term diplomatic outcomes.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-01-15T18:00:00Z
+  citation: https://home.treasury.gov/news/press-releases/fy2026-defense-budget
+  citationSource: src.treasury-press
+  wv.policy: wv.budget
+  wv.effectiveDate: 2026-10-01
+
+ev-fy2027-defense-budget-projection:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    FY2027 US defense budget projection trending to $1.05T+ on multi-year
+    procurement commitments, per OMB and CBO trajectory updates.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-04-15T18:00:00Z
+  citation: https://www.cbo.gov/publication/fy2027-budget-projection
+  citationSource: src.treasury-press
+  wv.policy: wv.budget
+
+ev-lmt-backlog-194b-q1-2026:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Lockheed Martin reported Q1 2026 backlog of $194B - the highest in
+    company history, driven by missile and missile-defense awards.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-22T11:00:00Z
+  citation: https://www.lockheedmartin.com/en-us/news/q1-2026-results.html
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.lmt
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.backlog
+
+ev-rtx-backlog-271b-q1-2026:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    RTX reported Q1 2026 backlog of $271B - a record, with Raytheon
+    Defense bookings up materially on missile-defense contracts.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-22T11:00:00Z
+  citation: https://www.rtx.com/news/Q1-2026-Results
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.rtx
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.backlog
+
+ev-nyt-israel-us-iran-strikes-prep-may15:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    NYT reported May 15 that the US and Israel are intensifying
+    preparations for potential renewed strikes on Iran, with operations
+    possibly starting "as soon as next week" - directionally supportive
+    of continued procurement-cycle demand.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T21:00:00Z
+  citation: https://www.nytimes.com/2026/05/15/world/middleeast/us-israel-iran-strikes.html
+  citationSource: src.nyt
+  wv.geopoliticalEventDate: 2026-05-15
+
+ev-uss-ford-presidential-unit-citation-may16:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    USS Gerald R. Ford Carrier Strike Group received the Presidential Unit
+    Citation for its role in Operation Epic Fury (Feb 28 - May 1 2026),
+    issued by acting Secretary of the Navy Hung Cao on behalf of President
+    Trump. Formal institutional recognition reinforces the multi-year
+    procurement-cycle framing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-16T18:00:00Z
+  citation: https://www.defense.gov/News/Releases/Release/Article/uss-ford-pres-unit-citation-may2026
+  citationSource: src.white-house-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-16
+
+ev-algemeiner-iran-strike-options-may16:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Weekend Algemeiner and Times of Israel reporting corroborates the
+    NYT strike-prep account with additional operational specifics -
+    thousands of supporting forces required for any commando extraction
+    of nuclear material, Kharg Island (Iran's primary oil-export hub)
+    as one of the options under consideration.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-16T16:00:00Z
+  citation: https://www.algemeiner.com/2026/05/16/report-us-israel-preparing-for-resumptions-of-strikes-against-iran/
+  citationSource: src.algemeiner
+  wv.geopoliticalEventDate: 2026-05-16
+
+ev-lmt-friday-close-51601-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Lockheed Martin closed Friday May 15 at 516.01, down 0.85% on the day
+    in a chip-led tape rotation. Defense primes don't trade on weekend
+    reporting; daily rotation doesn't bend the multi-year procurement cycle.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/LMT
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.lmt
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 516.01
+
+ev-rtx-friday-close-17118-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    RTX closed Friday May 15 at 171.18, -2.56% on the day. Massive API
+    verified open 175.52 / close 171.18 / high 175.98 / low 170.78 / volume
+    7.69M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/RTX
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.rtx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 171.18
+
+ev-noc-friday-close-54069-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Northrop Grumman closed Friday May 15 at 540.69, -1.45% on the day.
+    Massive API verified open 548.72 / close 540.69 / high 552.80 / low
+    539.14.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/NOC
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.noc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 540.69
+
+ev-trump-xi-summit-concludes-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    The Trump-Xi summit concluded Friday May 15 without any concrete Iran
+    de-escalation deliverable. Trump told reporters on Air Force One that
+    he is "losing patience" with Iran.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T19:00:00Z
+  citation: https://www.reuters.com/world/trump-xi-summit-concludes-2026-05-15/
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-15
+  wv.statementVenue: Air Force One press gaggle
+
+ev-trump-losing-patience-iran-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Trump told reporters on Air Force One May 15 he is "losing patience"
+    with Iran on the negotiating track - paired with the simultaneous
+    20-year-suspension framing, the threat-and-engage posture continues.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T19:00:00Z
+  citation: https://www.reuters.com/world/trump-iran-losing-patience-2026-05-15/
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-15
+  wv.statementVenue: Air Force One press gaggle
+
+ev-uae-missile-attack-may8:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    UAE Defense Ministry reported May 8 that air defenses engaged two
+    ballistic missiles and three drones launched by Iran; three people
+    wounded - the biggest escalation since the US-Iran ceasefire was
+    announced four weeks ago.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T00:00:00Z
+  citation: https://www.reuters.com/world/middle-east/uae-iran-missile-may8-2026/
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-05-08
+
+ev-lbma-q1-record-4873:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    LBMA gold quarterly average for Q1 2026 came in at $4,873/oz - the
+    highest quarterly average in LBMA history.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-15T09:00:00Z
+  citation: https://www.gold.org/goldhub/data/gold-prices
+  citationSource: src.world-gold-council
+  fin.marketMetric: fin.quarterly-average-price
+  fin.observedValue: 4873.0
+  fin.aboutSecurity: sec.gld
+
+ev-cb-q1-2026-244t-buying-record:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: >-
+    Central-bank net gold purchases in Q1 2026 totaled 244 tonnes - the
+    highest Q1 reading on record, +17% QoQ.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-25T09:00:00Z
+  citation: https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026
+  citationSource: src.world-gold-council
+  fin.flowDirection: fin.flow-buying
+  fin.flowMagnitudeValue: 244.0
+  fin.flowMagnitudeUnit: tonnes
+
+ev-cb-survey-95pct-reserves-up:
+  type: fin.InstitutionalFlowEvidence
+  evidenceStatement: >-
+    World Gold Council 2026 Central Bank Gold Reserves Survey - 95% of
+    respondent central banks expect to increase their gold reserves over
+    the next 12 months.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-01T09:00:00Z
+  citation: https://www.gold.org/goldhub/research/cb-gold-reserves-survey-2026
+  citationSource: src.world-gold-council
+  fin.flowDirection: fin.flow-forward-buying-intent
+
+ev-gold-q1-2026-record-demand-193b:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Aggregate Q1 2026 gold demand value reached $193B per WGC quarterly
+    aggregation - record on the dollar dimension, with both bar-and-coin
+    and central-bank flows contributing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-30T09:00:00Z
+  citation: https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026
+  citationSource: src.world-gold-council
+  fin.marketMetric: fin.aggregate-demand-dollars
+  fin.observedValue: 193000000000.0
+
+ev-bar-coin-demand-474-tonnes-q1:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Bar-and-coin demand reached 474 tonnes in Q1 2026, +42% YoY -
+    second-highest quarterly figure on record, Asian investors as the
+    primary driver.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-30T09:00:00Z
+  citation: https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026
+  citationSource: src.world-gold-council
+  fin.marketMetric: fin.aggregate-demand-dollars
+  fin.observedValue: 474.0
+
+ev-cb-2026-projection-755-tonnes:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    World Gold Council projects ~755 tonnes of central-bank gold purchases
+    for full-year 2026, consistent with the Q1 244t run-rate.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-01T09:00:00Z
+  citation: https://www.gold.org/goldhub/research/gold-demand-trends/gold-demand-trends-q1-2026
+  citationSource: src.world-gold-council
+  fin.analystInstitution: fin.market-consensus
+  fin.forecastTarget: sec.gld
+  fin.forecastHorizon: fin.horizon-full-year
+
+ev-stock-bond-correlation-30y-high:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The 30-year rolling correlation between US equities and Treasuries
+    sits at a multi-decade high, reducing the diversification benefit
+    of traditional 60/40 allocations and structurally supporting gold's
+    portfolio-diversifier role.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-04-30T18:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-04-30/stock-bond-correlation
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.correlation
+  fin.observedValue: 0.45
+
+ev-jpm-gold-target-5055-6300:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    JP Morgan price targets for gold span $5,055-$6,300 range on the
+    12-month horizon, anchored to central-bank flow continuation and
+    Fed-credibility framing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-15T12:00:00Z
+  citation: https://www.jpmorgan.com/insights/global-research/commodities/gold-prices
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.jpmorgan-research
+  fin.forecastTarget: sec.gld
+  fin.forecastValue: 5677.5
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-ubs-gold-target-6200:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    UBS Research gold price target of $6,200/oz on the 12-month horizon,
+    citing structural central-bank demand and dollar-debasement framing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-15T12:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-04-15/ubs-gold-target
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.ubs-research
+  fin.forecastTarget: sec.gld
+  fin.forecastValue: 6200.0
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-citi-gold-target-5000-7000:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    Citi 12-month gold price target band of $5,000-$7,000/oz - the widest
+    of the major-bank ranges, reflecting both structural-bull and
+    Fed-credibility tail scenarios.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-15T12:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-04-15/citi-gold-target
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.citi-research
+  fin.forecastTarget: sec.gld
+  fin.forecastValue: 6000.0
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-gld-friday-close-41729-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPDR Gold Shares (GLD) closed Friday May 15 at 417.29, -2.31% on the
+    day, on the rate-up backdrop. Massive verified open 417.64 / close
+    417.29 / high 419.25 / low 414.12 / volume 9.36M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/GLD
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 417.29
+
+ev-gdx-friday-close-8735-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VanEck Gold Miners ETF (GDX) closed Friday May 15 at 87.35, -7.03%
+    on the day - miners showing characteristic leverage on the
+    cash-complex drawdown.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/GDX
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.gdx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 87.35
+
+ev-gold-spot-4530-friday-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot fell to ~$4,530 on Friday May 15, a ~$130 drop from
+    Thursday's $4,660 band on the rate-up plus earlier-week
+    diplomatic-positive backdrop.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.reuters.com/markets/commodities/gold-prices-2026-05-15/
+  citationSource: src.reuters
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4530.0
+  fin.aboutSecurity: sec.gld
+
+ev-gold-spot-4540-saturday-may16:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot traded ~$4,540 Saturday May 16 - within daily noise of
+    Friday's $4,530 close. Weekend cash trading is closed; Asian open
+    Sunday is the first re-pricing window.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-16T18:00:00Z
+  citation: https://tradingeconomics.com/commodity/gold
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4540.0
+  fin.aboutSecurity: sec.gld
+
+ev-amd-q1-2026-blowout:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    AMD Q1 2026 (May 5 AH) revenue $10.3B vs $9.88B consensus (+11% YoY
+    beat), EPS $1.18 vs $1.07 consensus - materially beat on both lines.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-05T20:00:00Z
+  citation: https://www.amd.com/en/press-releases/2026-05-05-amd-q1-2026.html
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.amd
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.revenue
+
+ev-amd-q1-data-center-58b:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    AMD Q1 2026 Data Center segment revenue $5.8B, +57% YoY - the
+    standout segment confirming AI-infrastructure demand into Q2.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-05T20:00:00Z
+  citation: https://www.amd.com/en/press-releases/2026-05-05-amd-q1-2026.html
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.amd
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.segment-revenue
+
+ev-amd-q2-guide-112b:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    AMD Q2 2026 revenue guide $11.2B vs $10.3B consensus - the forward
+    guide is what extended the post-print rally and confirmed the
+    AI-spend trajectory.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-05T20:00:00Z
+  citation: https://www.amd.com/en/press-releases/2026-05-05-amd-q1-2026.html
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.amd
+  fin.reportingPeriod: fin.q2-2026
+  fin.corporateMetric: fin.guidance-revenue
+
+ev-amd-su-tens-of-billions-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'AMD CEO Lisa Su on Q1 2026 earnings call quoted "tens of billions" of cumulative data-center revenue by 2027 - the multi-year framing for the AI-capex thesis.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-05T22:00:00Z
+  citation: https://www.cnbc.com/2026/05/05/amd-q1-2026-earnings-call.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-05-05
+  wv.statementVenue: AMD Q1 2026 earnings call
+
+ev-nvda-china-revenue-zero:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    NVDA Q1 FY2027 revenue guide explicitly excludes China datacenter
+    compute revenue - effectively zero on that line until/unless H200
+    framework restored or expanded.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-02-25T18:00:00Z
+  citation: https://nvidianews.nvidia.com/news/q4-fy2026-results
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.nvda
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.geographic-revenue
+
+ev-nvda-h20-charge-45b:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    NVDA disclosed a $4.5B inventory charge related to H20 inventory
+    write-down in connection with China-export-controls escalation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-02-25T18:00:00Z
+  citation: https://nvidianews.nvidia.com/news/q4-fy2026-results
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.nvda
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.charge
+
+ev-huang-china-50b-effectively-gone:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'NVDA CEO Jensen Huang estimated the unrealized China datacenter market at ~$50B "effectively gone with no clear return timeline" - quantifying the China-decoupling tail-risk leg.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-03-01T16:00:00Z
+  citation: https://www.cnbc.com/2026/03/01/nvidia-jensen-huang-china-50-billion.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-03-01
+  wv.statementVenue: GTC press Q&A
+
+ev-gartner-semi-revenue-1t-plus-2026:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    Gartner forecasts global semiconductor revenue at $1T+ for 2026 -
+    structural support for the AI-capex demand thesis beyond hyperscaler
+    single names.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-03-15T12:00:00Z
+  citation: https://www.gartner.com/en/newsroom/press-releases/2026-semiconductor-forecast
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.gartner-research
+  fin.forecastTarget: sec.nvda
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-anthropic-meta-ai-partnerships:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Anthropic and Meta announced multi-year AI compute partnerships in
+    Q1 2026 totaling multi-billion-dollar capex commitments through 2027.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-03-20T15:00:00Z
+  citation: https://www.cnbc.com/2026/03/20/anthropic-meta-ai-compute-partnerships.html
+  citationSource: src.cnbc
+  fin.reportingPeriod: fin.q1-2026
+
+ev-openai-6gw-supply-agreement:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    OpenAI announced a 6GW supply agreement covering datacenter power
+    procurement through 2028 - confirming hyperscaler capex trajectory
+    independent of single-name earnings.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-04-10T16:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-04-10/openai-6gw-supply
+  citationSource: src.bloomberg
+  fin.reportingPeriod: fin.q2-2026
+
+ev-nvda-q1-fy27-78b-guide-may20:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    NVDA Q1 FY2027 print scheduled for Wednesday May 20 5 PM ET -
+    consensus revenue $78.8B (+78% YoY) / EPS $1.77; Q2 guide near $86B
+    is what the after-hours reaction rides on. Options price 8-10%
+    implied move.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://investor.nvidia.com/financial-info/financial-reports/default.aspx
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-20
+
+ev-h200-export-approval-may14:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    May 14 H200 export approval covers ~10 Chinese firms (Alibaba,
+    Tencent, ByteDance, JD.com plus Lenovo and Foxconn) under a structured
+    framework - the export-control surface holds through the Trump-Xi
+    summit conclusion without reversal.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-14T15:00:00Z
+  citation: https://www.reuters.com/technology/h200-export-approval-2026-05-14/
+  citationSource: src.reuters
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-14
+
+ev-h200-75k-chip-cap-may14:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    H200 export framework caps allocations at 75,000 chips per approved
+    Chinese firm - bounded export rather than unbounded reopening, but
+    materially above prior zero baseline.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-14T15:00:00Z
+  citation: https://www.reuters.com/technology/h200-export-cap-2026-05-14/
+  citationSource: src.reuters
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-14
+
+ev-nvda-friday-close-22532-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA closed Friday May 15 at 225.32, -4.42% from Thursday's 235.74 on
+    the broad chip-led tape rotation. Massive verified open 229.76 / close
+    225.32 / high 231.50 / low 224.24 / volume 181M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/NVDA
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 225.32
+
+ev-amd-friday-close-42410-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    AMD closed Friday May 15 at 424.10, -5.69% on the day. Massive
+    verified open 433.34 / close 424.10 / high 439.00 / low 423.36 /
+    volume 29.1M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/AMD
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.amd
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 424.1
+
+ev-intc-friday-down-8pct-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Intel closed Friday May 15 down ~8% to ~$108 after a YTD +214% run -
+    the biggest single-day rotation of the chip complex on the
+    consolidation setup.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/INTC
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.intc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 108.0
+
+ev-mu-friday-down-66pct-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Micron closed Friday May 15 -6.6% on the day amid the broad chip
+    profit-taking. The memory side of the complex underperformed the
+    GPU names by a margin.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/MU
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.mu
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -0.066
+
+ev-csco-friday-close-11821-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Cisco closed Friday May 15 at 118.21, +13.4% on the day on its Q3
+    print - the divergent winner in the broad chip-rotation tape.
+    Volume 38.5M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/CSCO
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.csco
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 118.21
+
+ev-csco-hsbc-upgrade-may15:
+  type: fin.AnalystEvidence
+  evidenceStatement: >-
+    HSBC upgraded Cisco to Buy with a $137 price target following the
+    Q3 print, citing the FY26 AI orders raise and Splunk integration
+    trajectory.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T12:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-15/hsbc-cisco-upgrade
+  citationSource: src.bloomberg
+  fin.analystInstitution: fin.ubs-research
+  fin.forecastTarget: sec.csco
+  fin.forecastValue: 137.0
+  fin.forecastHorizon: fin.horizon-12-month
+
+ev-cisco-q3-blowout-ai-orders-may14:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Cisco Q3 print (May 14 AH) raised FY26 AI orders to $9B from $5B prior
+    and FY26 AI revenue to $4B from $3B - corroborating the hyperscaler-
+    spend trajectory independent of single-name GPU exposure.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-14T20:00:00Z
+  citation: https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2026/m05/cisco-q3-fy26.html
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.csco
+  fin.reportingPeriod: fin.q1-2026
+  fin.corporateMetric: fin.guidance-revenue
+
+ev-nvda-options-implied-move-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA May 22 at-the-money options straddle prices an 8-10% implied move
+    around the Wednesday May 20 earnings print.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.cboe.com/us/options/market_statistics/
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.volatility-level
+  fin.observedValue: 9.0
+
+ev-nvda-historical-post-earnings-drift-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA has closed lower on 4 of its last 5 earnings reports despite
+    beating revenue 3-4% for six straight quarters - the
+    asymmetry-into-print pattern.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-18/nvda-post-earnings-drift
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.session-percent-move
+
+ev-rubin-architecture-h2-2026-may18:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    NVDA Rubin architecture H2 2026 production ramp is the new positive
+    overhang investors are watching for on the Wednesday print - the
+    bull-case forward narrative.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.tradingkey.com/analysis/stocks/us-stocks/261902312-nvidia-q1-earnings-preview-rubin-network-tradingkey
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.nvda
+  fin.reportingPeriod: fin.fy-2026
+
+ev-sox-32-above-50dma-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    PHLX Semiconductor Index sits ~32% above its 50-day moving average
+    after a +143% trailing year - a consolidation setup independent of
+    any single-name catalyst.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.bloomberg.com/quote/SOX:IND
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.correlation
+  fin.observedValue: 0.32
+
+ev-q1-2026-84pct-beat-rate:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Q1 2026 S&P 500 earnings season closed at an 84% beat rate per
+    FactSet aggregate - structurally supportive of the equity melt-up
+    leg even after the late-quarter revisions.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T18:00:00Z
+  citation: https://insight.factset.com/sp-500-earnings-season-update-may-8-2026
+  citationSource: src.cnbc
+  fin.marketMetric: fin.earnings-beat-rate
+  fin.observedValue: 0.84
+
+ev-q1-2026-eps-growth-277pct:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Q1 2026 S&P 500 blended EPS growth at 27.7% per the latest FactSet
+    refresh - the highest growth rate since Q4 2021 (32.0%), the
+    6th consecutive quarter of double-digit YoY growth.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T18:00:00Z
+  citation: https://insight.factset.com/sp-500-earnings-season-update-may-8-2026
+  citationSource: src.cnbc
+  fin.marketMetric: fin.eps-growth
+  fin.observedValue: 0.277
+
+ev-q1-2026-net-margin-revised-134pct:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 Q1 2026 blended net margin at 13.4% per the latest FactSet
+    refresh - highest since FactSet began tracking the metric in 2009.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T18:00:00Z
+  citation: https://insight.factset.com/sp-500-reporting-highest-net-profit-margin-in-more-than-15-years-1
+  citationSource: src.cnbc
+  fin.marketMetric: fin.net-profit-margin
+  fin.observedValue: 0.134
+
+ev-q1-2026-magnitude-of-beats-207:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Q1 2026 S&P 500 EPS magnitude-of-beat at 20.7% per FactSet - the
+    largest beat-vs-consensus on record at this stage of the season.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T18:00:00Z
+  citation: https://insight.factset.com/sp-500-earnings-season-update-may-8-2026
+  citationSource: src.cnbc
+  fin.marketMetric: fin.earnings-beat-magnitude
+  fin.observedValue: 0.207
+
+ev-q1-2026-forward-guide-21-23:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 forward 12-month EPS guidance trending into the 21-23% range
+    per FactSet bottom-up aggregation, supporting the equity-melt-up
+    valuation framing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-08T18:00:00Z
+  citation: https://insight.factset.com/sp-500-cy-2026-earnings-preview-analysts-expect-earnings-growth-of-15
+  citationSource: src.cnbc
+  fin.marketMetric: fin.eps-growth
+
+ev-fortune-stopped-caring-iran-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Fortune cover-piece framing of the May regime - "the market stopped caring about Iran" - itself evidence about how positioning is shifting, a melt-up confirmation signal independent of the underlying tape.'
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-12T13:00:00Z
+  citation: https://fortune.com/2026/05/12/market-stopped-caring-iran-melt-up/
+  citationSource: src.cnbc
+  wv.statementDate: 2026-05-12
+
+ev-pe-multidecade-norm-above-avg:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Trailing-12m PE sits multiple decades above the long-run norm -
+    valuation context for the melt-up leg without invalidating it
+    structurally.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-15T18:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-15/sp500-pe-vs-norm
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.valuation-ratio
+
+ev-spx-friday-close-7409-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 closed Friday May 15 at 7,408.50, -1.24% - retreating below
+    7,500 from Thursday's 7,501.24 record.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/SPX
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7408.50
+
+ev-spy-friday-close-73917-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPY closed Friday May 15 at 739.17, -1.20%. Massive verified open
+    741.79 / close 739.17 / high 743.46 / low 737.96 / volume 60.4M.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/SPY
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.spy
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 739.17
+
+ev-nasdaq-friday-close-26225-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Nasdaq Composite closed Friday May 15 at 26,225.14, -1.54% from
+    Thursday's 26,635.22 record.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/IXIC
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.ixic
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 26225.14
+
+ev-vix-friday-close-19-may15:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VIX closed Friday May 15 ~19, +10% on the day - still inside the
+    15-20 mid-zone and well below the 25 vol-expansion threshold of the
+    invalidation condition.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.cboe.com/tradable_products/vix/
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.vix
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 19.0
+
+ev-spx-thursday-close-7501-may14:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 closed Thursday May 14 at 7,501.24 - all-time high, set
+    just one session before the Friday melt-up walkback.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-14T20:00:00Z
+  citation: https://www.wsj.com/market-data/quotes/SPX
+  citationSource: src.wsj
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7501.24
+
+ev-cme-sunday-futures-open-22z:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    CME e-mini futures session opens Sunday May 17 22:00 UTC / 18:00 ET -
+    first market window for post-Friday weekend integration of the
+    structural-supply and Saturday-news flow.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.cmegroup.com/markets/equities/sp/e-mini-sandp500.html
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-17
+
+ev-wmt-q1-fy27-consensus-may21:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Walmart Q1 FY2027 release scheduled for Thursday May 21 pre-open -
+    consensus ~$0.65-$0.66 EPS / ~$174.6B revenue, with tariff
+    pass-through the most-watched variable and same-store-sales
+    3.9-4.5% expected. The consumer-passthrough cross-check on the
+    stagflation-vs-recession leg.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T11:00:00Z
+  citation: https://corporate.walmart.com/news/2026/05/q1-fy2027-release
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-21
+
+ev-powell-exit-warsh-nominated-may15:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Powell completed his chair-term exit Friday May 15 and Warsh
+    transitioned in as Fed Chair following the May 13 54-45 Senate
+    confirmation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T20:00:00Z
+  citation: https://www.federalreserve.gov/newsevents/pressreleases.htm
+  citationSource: src.fed-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-15
+
+ev-warsh-banking-cmte-13-11:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Senate Banking Committee advanced Warsh to the floor on a 13-11
+    party-line vote - signal of the partisan track the full-Senate
+    confirmation would take.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-25T18:00:00Z
+  citation: https://www.banking.senate.gov/hearings/warsh-nomination
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+
+ev-warsh-sock-puppet-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Warsh in his confirmation hearing - "I won''t be a sock puppet" - addressing concerns about Fed-Chair independence from the Trump Administration. Pre-position on the independence axis.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-22T15:00:00Z
+  citation: https://www.cnbc.com/2026/04/22/warsh-confirmation-hearing.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-04-22
+  wv.statementVenue: Senate Banking Committee hearing
+
+ev-warsh-room-to-cut-quote:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Warsh in his confirmation hearing - "there''s room to cut without re-igniting inflation" - the dovish-tilt framing now in direct contradiction with the post-confirmation rate-path repricing.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-22T15:30:00Z
+  citation: https://www.cnbc.com/2026/04/22/warsh-confirmation-hearing-cut.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-04-22
+  wv.statementVenue: Senate Banking Committee hearing
+
+ev-warsh-historically-hawkish:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Warsh's pre-nomination track record is historically hawkish - several
+    2009-2010 speeches and 2021 op-eds warning against accommodative
+    monetary policy. The hawkish prior in tension with the dovish
+    confirmation-hearing framing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-04-15T12:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-04-15/warsh-hawkish-history
+  citationSource: src.bloomberg
+
+ev-fed-held-april29-with-dissent:
+  type: fin.CentralBankEvidence
+  evidenceStatement: >-
+    FOMC held the federal funds target at 4.25-4.50% on April 29 2026 in
+    a historic 8-4 dissent vote, with Miran among the dissenters favoring
+    a 25bp cut. The dissent count was the highest since 1994.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-29T18:00:00Z
+  citation: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm
+  citationSource: src.fed-press
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-04-29
+  fin.voteCount: 8
+
+ev-fomc-dissent-miran-cut:
+  type: fin.CentralBankEvidence
+  evidenceStatement: >-
+    Adriana Miran cast a dissenting vote for a 25bp cut at the April 29
+    FOMC, the most explicit pro-cut dissent of the Powell era.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-04-29T18:00:00Z
+  citation: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260429a.htm
+  citationSource: src.fed-press
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-04-29
+
+ev-doj-powell-investigation-halted:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    DOJ confirmed in early May 2026 that the investigation into Powell-
+    era Fed personnel decisions has been halted - removing one
+    independence-pressure vector but leaving the Trump-Administration
+    political backdrop intact.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-05T18:00:00Z
+  citation: https://www.justice.gov/news/press-releases/doj-powell-investigation-halted
+  citationSource: src.treasury-press
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-05
+
+ev-powell-stay-out-politics-may15:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Powell on his Friday May 15 chair-exit day advised Warsh to "stay out of elected politics" - the explicit independence advisory.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-15T18:00:00Z
+  citation: https://www.federalreserve.gov/newsevents/pressreleases.htm
+  citationSource: src.fed-press
+  wv.statementDate: 2026-05-15
+
+ev-trump-fed-pressure-housing-debt:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Trump multiple times in April-May 2026 publicly pressured the Fed to
+    cut on housing-affordability and interest-bill grounds, citing the
+    $1.2T annual interest expense as unsustainable.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-08T16:00:00Z
+  citation: https://www.reuters.com/world/us/trump-fed-rate-pressure-2026-05/
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-08
+
+ev-barakah-nuclear-strike-may17:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Sunday May 17 a drone strike sparked a fire on the edge of the
+    UAE's sole nuclear power plant (Barakah, Al Dhafra region, Abu
+    Dhabi). Three drones approached from UAE's western Saudi-Arabian
+    border; one hit an electrical generator outside the secured
+    perimeter, the other two were intercepted. No casualties; no
+    radiological release; plant's nuclear regulator confirmed all
+    units operating as normal. UAE called the attack "unprovoked
+    terrorist attack" and "dangerous escalation", blaming Iran or
+    an Iran-aligned actor. First strike on civil-nuclear infrastructure
+    in the post-ceasefire period - extends the Gulf-target surface
+    materially.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-17T18:00:00Z
+  citation: https://www.npr.org/2026/05/18/g-s1-122534/drone-strikes-uae-nuclear-plant
+  citationSource: src.npr
+  wv.geopoliticalEventDate: 2026-05-17
+
+ev-trump-clock-ticking-iran-may17:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'Trump posted on Truth Social Sunday-evening through Monday-morning May 17-18 - "For Iran, the Clock is Ticking, and they better get moving, FAST, or there won''t be anything left of them" plus "Time is of the essence". Separately told Axios that without a better Iran offer "they are going to get hit much harder". Material walk-up from Friday''s 20-year-suspension framing.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T03:00:00Z
+  citation: https://www.thenationalnews.com/news/2026/05/18/iran-presents-new-proposal-to-end-war-as-trump-warns-clock-is-ticking/
+  citationSource: src.the-national
+  wv.statementDate: 2026-05-18
+  wv.statementVenue: Truth Social
+
+ev-iran-14-point-proposal-may18:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Monday May 18 Tehran delivered a 14-point peace proposal to US
+    officials via Pakistani mediators in response to Trump's clock-
+    is-ticking pressure. Substance not yet public; Trump's framing is
+    "still not good enough". Partial de-escalation gesture but
+    structurally net-neutral until the substance lands.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-18T09:00:00Z
+  citation: https://www.thenationalnews.com/news/2026/05/18/iran-presents-new-proposal-to-end-war-as-trump-warns-clock-is-ticking/
+  citationSource: src.the-national
+  wv.geopoliticalEventDate: 2026-05-18
+
+ev-wti-monday-10798-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI rose to $107.98 Monday May 18 morning, +2.43% on the day -
+    building on Friday's +4.5%. Direct tactical confirmation of the
+    structural undersupply reading; oil follow-through is not a
+    single-session repricing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.cnbc.com/amp/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 107.98
+
+ev-brent-monday-11142-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Brent rose to $111.42 Monday May 18 morning, +1.98% on the day -
+    through $110 for the first time since the Friday breakout. The
+    international benchmark follows WTI through to confirm the
+    multi-session structural escalation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.cnbc.com/amp/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 111.42
+
+ev-iea-future-price-spikes-warning-may18:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'IEA warned Monday that "rapidly shrinking buffers amid continued disruptions may herald future price spikes ahead" - the agency''s own characterization following the May OMR, now reiterated alongside the Monday oil move.'
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T10:00:00Z
+  citation: https://www.cnbc.com/amp/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-05-18
+
+ev-gold-asian-monday-low-4540-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot traded to ~$4,537-$4,547 Monday May 18 Asian session
+    - a 1.5-month low - down 0.22-0.30% on the rate-up backdrop
+    (10Y to 4.61-4.63%). Structural-bull supports intact; this is
+    tactical follow-through to Friday's drawdown, not a regime break.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T11:00:00Z
+  citation: https://finance.yahoo.com/personal-finance/investing/article/gold-and-silver-prices-today-monday-may-18-gold-and-silver-slip-as-iran-tensions-grow-111307820.html
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4540.0
+
+ev-10y-yield-monday-461-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    10-year Treasury yield rose to 4.61-4.63% Monday May 18, up
+    ~3bps from Friday's 4.59% - extending the global bond rout
+    rather than retracing. 14bp surge from May 14 cumulatively.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.bloomberg.com/markets/rates-bonds/government-bonds/us
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.62
+
+ev-global-bond-yields-multi-year-highs-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Monday May 18 global sovereign bond yields extended Friday's
+    rout to multi-year highs - Japan 10Y at 29-year high, UK gilt
+    at 18-year high, German bund at 15-year high. The cross-border
+    repricing of inflation-and-deficit risk continues unabated.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-18/global-bond-rout-extends
+  citationSource: src.bloomberg
+
+ev-spy-premarket-down-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPY traded -0.19% to $737.74 Monday May 18 pre-market on the
+    weekend-and-Monday escalation aggregate (Barakah attack, Trump
+    "clock is ticking", WTI through $107, 10Y to 4.61-4.63%).
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://finance.yahoo.com/quote/SPY/
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.spy
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -0.0019
+
+ev-spx-futures-monday-down-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 futures traded -0.58% pre-cash-open Monday May 18 on the
+    cumulative weekend-plus-Monday escalation. Polymarket pricing
+    only 6% probability of an "Up" cash open - the prediction-market
+    crowd is strongly directionally bearish.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://www.benzinga.com/markets/prediction-markets/26/05/52626357/will-sp-500-open-up-or-down-on-may-18-heres-how-polymarket-traders-lean-as-uae-nuclear-plant-strike-sends-oil-past-110
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -0.0058
+
+ev-nvda-premarket-up-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA traded +0.70% to $226.89 Monday May 18 pre-market - bucking
+    the broader risk-off on holding-the-H200-framework optimism and
+    pre-earnings positioning ahead of Wed May 20 5 PM ET print.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T13:00:00Z
+  citation: https://finance.yahoo.com/quote/NVDA/
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: 0.0070
+
+ev-spy-monday-close-73865-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPY closed Monday May 18 at 738.65, -0.07% from Friday's 739.17.
+    Massive verified open 739.83 / close 738.65 / high 741.42 / low
+    733.39 / volume 47.84M. Far better than the Monday-morning Polymarket
+    6% Up-open probability implied - the cash session integrated the
+    Sunday escalation plus the afternoon Trump de-escalation and ended
+    near flat.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/news/articles/2026-05-17/oil-climbs-as-iran-war-shows-no-sign-of-ending-markets-wrap
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.spy
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 738.65
+
+ev-qqq-monday-close-70588-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    QQQ closed Monday May 18 at 705.88. Massive verified open 711.54 /
+    close 705.88 / high 712.07 / low 698.85 / volume 50.48M. Nasdaq
+    Composite was -0.07% on the day - resilient given the pre-market
+    risk-off framing.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/markets
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 705.88
+
+ev-nvda-monday-close-22232-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA closed Monday May 18 at 222.32, -1.33% from Friday's 225.32.
+    Massive verified open 229.87 / close 222.32 / high 230 / low 218.37
+    / volume 146.28M. Pre-market +0.70% flipped to a close near the
+    intraday low on pre-earnings caution ahead of Wed May 20 5 PM ET print.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cnbc.com/quotes/NVDA
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 222.32
+
+ev-amd-monday-close-42099-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    AMD closed Monday May 18 at 420.99, -0.73% from Friday's 424.10.
+    Massive verified open 429.50 / close 420.99 / high 438.80 / low
+    410.71 / volume 28.44M. Tracked NVDA lower on the chip-side risk-off.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cnbc.com/quotes/AMD
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.amd
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 420.99
+
+ev-gld-monday-close-41843-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    GLD closed Monday May 18 at 418.43, +0.27% from Friday's 417.29.
+    Massive verified open 419.82 / close 418.43 / high 420.93 / low
+    416.06 / volume 5.63M. The Friday-into-Asian drawdown reversed in
+    the US cash session despite yields stable elevated - tactical
+    headwind absorbed, structural-bull supports intact.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/GLD:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 418.43
+
+ev-gdx-monday-close-8714-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    GDX closed Monday May 18 at 87.14, -0.24% from Friday's 87.35.
+    Massive verified open 88.65 / close 87.14 / high 89.53 / low 86.39
+    / volume 17.00M. Miners marginally lagged the cash recovery in
+    GLD but did not extend the Friday -7.03% drawdown.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/GDX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gdx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 87.14
+
+ev-gold-spot-recovery-4567-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot recovered to the $4,565-$4,570 band by Monday May 18 cash
+    close - up from the Asian-session $4,540 low - on dollar weakness
+    driving physical precious metals demand. Cited 0.67% session gain
+    on multiple price feeds.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://tradingeconomics.com/commodity/gold
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4567.0
+
+ev-xle-monday-close-6058-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    XLE closed Monday May 18 at 60.58, +1.92% from Friday's 59.44.
+    Massive verified open 59.13 / close 60.58 / high 60.70 / low 58.72
+    / volume 41.52M. Direct repricing of the structural-supply read on
+    the WTI/Brent intraday move.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/XLE:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.xle
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 60.58
+
+ev-xom-monday-close-16049-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    XOM closed Monday May 18 at 160.49, +1.63% from Friday's 157.92.
+    Massive verified open 157.32 / close 160.49 / high 161.73 / low
+    155.23 / volume 20.06M. Tracked XLE through the oil-shock repricing
+    even with the late-day diplomatic-track de-escalation flow.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/XOM:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.xom
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 160.49
+
+ev-cvx-monday-close-19612-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    CVX closed Monday May 18 at 196.12, +2.63% from Friday's 191.10.
+    Massive verified open 191.17 / close 196.12 / high 196.20 / low
+    189.03 / volume 9.87M. Strongest energy-major mover on the day.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/CVX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.cvx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 196.12
+
+ev-lmt-monday-close-52831-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    LMT closed Monday May 18 at 528.31, +2.38% from Friday's 516.01.
+    Massive verified open 517.81 / close 528.31 / high 528.39 / low
+    512.76 / volume 1.38M. Defense rallied on the procurement-cycle
+    structural reading even with Trump cancelling Tuesday strikes
+    after the close.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/LMT:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.lmt
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 528.31
+
+ev-rtx-monday-close-17595-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    RTX closed Monday May 18 at 175.95, +2.78% from Friday's 171.18.
+    Massive verified open 171.68 / close 175.95 / high 176.09 / low
+    171.00 / volume 5.63M. Strongest defense mover on the day.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/RTX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.rtx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 175.95
+
+ev-noc-monday-close-55000-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NOC closed Monday May 18 at 550.00, +1.72% from Friday's 540.69.
+    Massive verified open 540.00 / close 550.00 / high 552.75 / low
+    539.00 / volume 1.29M. Defense complex rally consistent across
+    primes.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.bloomberg.com/quote/NOC:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.noc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 550.00
+
+ev-vix-monday-close-1843-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VIX closed Monday May 18 at 18.43, DOWN from Friday's ~19 - inside
+    the 15-20 mid-zone, well below the 25 vol-expansion threshold. The
+    Polymarket 6% Up-open framing implied a vol expansion that did not
+    materialize.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cboe.com/tradable_products/vix/
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.vix
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 18.43
+
+ev-10y-yield-close-monday-460-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    10-year Treasury yield closed Monday May 18 at 4.601% - the intraday
+    high of 4.61-4.63% pulled back as the strike-cancellation flow
+    crossed the wire. Net +0.01% from Friday's 4.59%; bond market took
+    a breather Monday after the Friday rout. German bund still at
+    multi-year highs, JGB 10Y at 29-year high - global structural
+    pressure intact.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cnbc.com/2026/05/18/treasury-yields-inflation-bond-rout-oil.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.601
+
+ev-wti-monday-close-10866-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI June futures settled Monday May 18 at $108.66, +3% on the
+    session - building on Friday's +4.5%. After settle, oil eased in
+    extended trading as Trump cancelled Tuesday Iran strikes and the
+    US negotiation text reportedly accepted Iran oil sanctions waiver
+    during negotiation period.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cnbc.com/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 108.66
+
+ev-brent-monday-close-11210-may18:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Brent crude futures settled Monday May 18 at $112.10, +2% on the
+    session. After settle, eased back below $110 in extended trading on
+    the strike-cancellation and sanctions-waiver flow - structural
+    settled higher, after-hours tactical softening.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T20:00:00Z
+  citation: https://www.cnbc.com/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 112.10
+
+ev-trump-cancels-tuesday-strikes-may18:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Trump said Monday May 18 that he had called off attacks on Iran
+    scheduled for Tuesday at the request of US Gulf Arab allies. Trump
+    framed the cancellation as response to leaders of Qatar, Saudi
+    Arabia, and the UAE telling him "serious negotiations are underway
+    with Iran that will result in a deal acceptable to the U.S." -
+    a material walk-back of the Monday-morning "clock is ticking"
+    rhetoric and a tactical floor under the diplomatic track.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T22:00:00Z
+  citation: https://www.cnbc.com/2026/05/18/oil-today-brent-wti-iran-trump-hormuz-iea-supply-crude-.html
+  citationSource: src.cnbc
+  wv.geopoliticalEventDate: 2026-05-18
+
+ev-us-oil-sanctions-waiver-text-may18:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Iran's semi-official Tasnim news agency reported Monday May 18 that
+    the US has accepted in a new negotiation text to waive Iran oil
+    sanctions during the negotiation period. The US has not confirmed
+    or denied the report. Combined with Trump cancelling Tuesday strikes,
+    this is a meaningful softening of the near-term tactical posture on
+    the Iran diplomatic track - though Treasury Secretary Bessent
+    simultaneously urged G7 to strengthen Iran sanctions enforcement
+    from Paris, the mixed messaging reads net dovish on the operative
+    sanctions question.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-18T18:00:00Z
+  citation: https://www.investing.com/news/commodities-news/oil-rises-more-than-1-after-drone-attack-on-uae-nuclear-power-plant-4694570
+  citationSource: src.reuters
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-18
+
+ev-bessent-russia-waiver-g7-may18:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Speaking from Paris during a G7 finance ministers meeting on Monday
+    May 18, Treasury Secretary Scott Bessent announced another 30-day
+    extension of the sanctions waiver allowing purchases of Russian
+    seaborne oil to aid "energy-vulnerable" countries hit by the Iran
+    war, while urging allies to strengthen enforcement of sanctions on
+    Tehran. Mixed messaging on the sanctions diplomatic track -
+    softening on Russia, hardening on Iran enforcement, while reports
+    of a separate Iran oil-sanctions waiver during negotiation period
+    crossed the wire.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T15:00:00Z
+  citation: https://www.rferl.org/a/us-renews-russian-oil-waiver-iran-conflict-energy-markets/33759619.html
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-18
+  wv.statementVenue: G7 finance ministers meeting Paris
+
+ev-iran-14-point-substance-may18:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    The substance of Iran's 14-point peace proposal became public Monday
+    May 18 via NPR / Al Jazeera reporting. Key points: 30-day end of war
+    (vs the US-proposed 2-month ceasefire), guarantees against future US
+    military aggression, withdrawal of US forces from Iran's periphery,
+    end of naval blockade, release of frozen Iranian assets, payment of
+    reparations, lifting of sanctions, end of fighting in Lebanon, new
+    Strait of Hormuz mechanism. Tehran's framing: end the war and
+    resolve the shipping standoff first, defer nuclear-program talks.
+    Trump publicly characterized the proposal as "not acceptable" and
+    said strikes could resume if Iran "does something bad" - the
+    cancel-Tuesday-strikes move is procedurally compatible with
+    rejecting the proposal substance while pulling back the kinetic
+    near-term tail.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T14:00:00Z
+  citation: https://www.aljazeera.com/news/2026/5/3/whats-irans-14-point-proposal-to-end-the-war-and-will-trump-accept-it
+  citationSource: src.aljazeera
+  wv.geopoliticalEventDate: 2026-05-18
+
+ev-uae-barakah-response-restrained-may18:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    The UAE Ministry of Foreign Affairs Monday May 18 formally
+    condemned the Sunday Barakah drone strike as a "dangerous
+    escalation" and "unacceptable act of aggression", reserving the
+    right to respond - but notably did NOT name Iran directly in its
+    formal statement, contrast with previous Iran-on-UAE attacks where
+    UAE has named Iran. The UAE has opened an investigation into
+    drone source and is working on whether the Iranian military or one
+    of its proxies bears responsibility - more restrained than the
+    Monday-morning escalation framing implied.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T11:00:00Z
+  citation: https://www.thenationalnews.com/news/uae/2026/05/17/uae-launches-investigation-into-source-of-drone-strike-on-barakah-nuclear-plant/
+  citationSource: src.the-national
+  wv.statementDate: 2026-05-18
+  wv.statementVenue: UAE Ministry of Foreign Affairs statement
+
+ev-warsh-swearing-in-friday-may22:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    Reporting Monday May 18 confirmed that Kevin Warsh's formal
+    swearing-in as Federal Reserve Chair is scheduled for Friday May
+    22 at the White House. He has been confirmed by the Senate (54-45
+    on May 13) but is not yet sworn in - first Warsh-as-chair public
+    statements and substantive transition output come after Friday's
+    ceremony, not as the 2.1.2 narrative implied with the "first
+    Monday in office" framing. First Warsh-as-chair FOMC is still
+    June 16-17.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-18T15:00:00Z
+  citation: https://www.cnbc.com/2026/05/18/kevin-warsh-trump-federal-reserve-chair.html
+  citationSource: src.cnbc
+  wv.policy: wv.regulatory-ruling
+  wv.effectiveDate: 2026-05-22
+
+ev-white-house-rejects-iran-proposal-may18:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Axios reported Monday evening May 18 that the White House formally
+    rejected Iran's revised 14-point peace proposal, with a senior US
+    official and a second source close to the matter citing inadequate
+    Iranian commitments on halting uranium enrichment. The US framing
+    the offer as "insufficient for a deal" reverses the earlier-Monday
+    tactical de-escalation signal (Trump cancelling Tuesday strikes,
+    reported oil sanctions waiver during negotiation period) and pushes
+    the diplomatic track back toward escalation. Structurally bullish
+    for the iran-war-rearmament multi-year procurement tail; tactical
+    near-term oil pulled back overnight despite the rejection news,
+    suggesting the price tape reads it as posturing rather than imminent
+    kinetic catalyst given Tuesday strikes were already cancelled.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T00:00:00Z
+  citation: https://www.axios.com/2026/05/18/iran-peace-proposal-rejected-trump-white-house
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-05-18
+
+ev-senior-official-bombs-quote-may18:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: 'A senior US official told Axios Monday evening May 18, on the White House''s rejection of Iran''s 14-point proposal, that the "next conversation is through bombs" - the explicit kinetic-option re-engagement framing that paired with the rejection turns the multi-year procurement-cycle tail into an on-the-record structural signal.'
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T00:00:00Z
+  citation: https://www.axios.com/2026/05/18/iran-peace-proposal-rejected-trump-white-house
+  citationSource: src.reuters
+  wv.statementDate: 2026-05-18
+  wv.statementVenue: Axios reporting
+
+ev-trump-nsc-meeting-tuesday-may19:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    Trump expected to meet with top national security advisers Tuesday
+    May 19 to discuss "breaking the ceasefire with Iran", per Axios and
+    multiple-outlet follow-up reporting. The NSC meeting follows the
+    Monday-evening rejection of Iran's 14-point proposal and the
+    "next conversation is through bombs" senior-official framing -
+    deliberation cadence consistent with operative-rejection rather
+    than rhetorical positioning.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T08:00:00Z
+  citation: https://thehill.com/policy/defense/5883535-iran-peace-proposal-rejected/
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-05-19
+
+ev-wti-tuesday-am-10354-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI crude futures trading near $103.54 Tuesday May 19 morning,
+    -4.7% from Monday's $108.66 close; intraday range $102.16-$103.70.
+    Substantial overnight pullback DESPITE the after-hours Axios
+    rejection-of-Iran-proposal news - the price tape reads the
+    rejection as posturing rather than imminent kinetic catalyst given
+    Tuesday strikes were already cancelled, and the sanctions-waiver
+    reporting still operative on the structural supply side.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T13:00:00Z
+  citation: https://tradingeconomics.com/commodity/crude-oil
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 103.54
+
+ev-brent-tuesday-am-10933-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Brent crude futures trading near $109.33 Tuesday May 19 morning,
+    -2.5% from Monday's $112.10 close. International benchmark
+    confirms the overnight WTI pullback - structural-supply
+    undersupply story intact, near-term tactical softening operative.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T13:00:00Z
+  citation: https://tradingeconomics.com/commodity/brent-crude-oil
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 109.33
+
+ev-10y-yield-tuesday-am-460-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    10-year Treasury yield trading ~4.60% Tuesday May 19 morning,
+    intraday range 4.56-4.63%, +1bp net from Monday's 4.601% close.
+    Bond market holds the level through the overnight Axios
+    rejection-of-Iran-proposal news - inflation-and-deficit risk
+    repricing intact (German bund 15-year high, JGB 10Y 29-year
+    high) but no new catalyst on the US-specific yield curve.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T13:00:00Z
+  citation: https://tradingeconomics.com/united-states/government-bond-yield
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.60
+
+ev-spx-futures-tuesday-am-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 futures (ES) -0.4%, Dow futures -0.2%, Russell 2000 -0.5%
+    Tuesday May 19 at 4 AM ET. Modest pre-market softness through the
+    overnight White House Iran-rejection news - far from the
+    risk-off cascade the rejection narrative might have implied. Cash
+    session integration of the rejection plus the Wed-Thu binary
+    cluster (FOMC minutes, NVDA, Walmart) is the operative read.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T08:00:00Z
+  citation: https://www.cnbc.com/pre-markets/
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -0.004
+
+ev-nq-futures-tuesday-am-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Nasdaq-100 futures (NQ) -0.7% Tuesday May 19 at 4 AM ET - softer
+    than ES (-0.4%) reflecting the chip-side concentration plus
+    pre-earnings positioning ahead of NVDA Wed May 20 5 PM ET print
+    and Kospi -3% Asian-session chip-heavy weakness. Within
+    pre-earnings noise.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T08:00:00Z
+  citation: https://www.cnbc.com/pre-markets/
+  citationSource: src.cnbc
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -0.007
+
+ev-vix-tuesday-am-1782-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VIX trading ~17.82 Tuesday May 19 morning, -3.3% from Monday's
+    18.43 close - the volatility complex SOFTENING through the
+    overnight White House Iran-rejection news. Well below the 25
+    vol-expansion invalidation threshold; inside the 15-20 mid-zone.
+    Signal: the cross-asset complex is reading the Iran rejection as
+    headline-risk-but-contained rather than vol-expansion catalyst.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T13:00:00Z
+  citation: https://finance.yahoo.com/quote/%5EVIX/
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.vix
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 17.82
+
+ev-gold-spot-tuesday-am-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot trading $4,531-$4,570 Tuesday May 19 morning - within
+    Monday's $4,540-$4,570 band, no regime-defining move. Physical
+    demand strong (Shanghai-London differentials positive). Dollar
+    weakness on the Iran-rejection-but-no-strike framing supportive;
+    10Y stability removes the operative tactical headwind.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T13:00:00Z
+  citation: https://www.investing.com/currencies/xau-usd
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4550.0
+
+ev-nikkei-tuesday-close-60550-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Japan's Nikkei 225 closed Tuesday May 19 at 60,550.59, -0.44% -
+    gave up early gains as oil eased on the Trump-strike-cancellation
+    headline. JGB 10Y still at 29-year high - global bond-rout
+    structure intact through the regional session.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T06:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/asia-markets-today-asx-sensex-nikkei-kospi-hang-seng-csi-300-nifty.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 60550.59
+
+ev-kospi-tuesday-down-3pct-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    South Korea's Kospi closed Tuesday May 19 at 7,271.66, -3% -
+    chip-heavy concentration weakness ahead of NVDA Wed-PM print;
+    Samsung Electronics and SK Hynix the dominant drag. Reads to
+    chip-side internal flow rather than broad Iran-rejection
+    risk-off.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T06:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/asia-markets-today-asx-sensex-nikkei-kospi-hang-seng-csi-300-nifty.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7271.66
+
+ev-hang-seng-tuesday-up-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Hong Kong's Hang Seng closed Tuesday May 19 at 25,797.85, +0.48%;
+    mainland China's CSI 300 +0.4% to 4,852.88. Asian session mixed -
+    Hang Seng / CSI / ASX (+1.17%) up, Nikkei / Kospi down - not a
+    regional risk-off cascade despite the overnight White House Iran
+    rejection news.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T08:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/asia-markets-today-asx-sensex-nikkei-kospi-hang-seng-csi-300-nifty.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 25797.85
+
+ev-spx-tuesday-close-7354-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The S&P 500 closed Tuesday May 19 at 7,353.61, -0.67% (-49.44) -
+    a third consecutive down day. Above the 7,300 melt-up-confirmation
+    threshold, but with VIX bid the melt-up leg (which also requires
+    VIX < 15) is not met.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/stock-market-today-live-updates.html
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 7353.61
+
+ev-nasdaq-tuesday-close-25871-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The Nasdaq Composite closed Tuesday May 19 at 25,870.71, -0.84%
+    (-220.03), tracking the broad-market third-down-day on
+    pre-NVDA-print positioning.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/stock-market-today-live-updates.html
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.ixic
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 25870.71
+
+ev-vix-tuesday-close-1806-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VIX closed Tuesday May 19 at 18.06, +1.35% - a volatility bid that
+    reversed the morning's softening read to 17.82. Still well below the
+    25 vol-expansion invalidation threshold; inside the 15-20 mid-zone.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://finance.yahoo.com/quote/%5EVIX/
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.vix
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 18.06
+
+ev-spy-tuesday-close-73373-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPY closed Tuesday May 19 at 733.73 (-0.67% from Monday's 738.65),
+    intraday range 731.53-737.65 - the ETF print of the third
+    consecutive S&P down day.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/SPY:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.spy
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 733.73
+
+ev-qqq-tuesday-close-70153-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    QQQ closed Tuesday May 19 at 701.53 (vs Monday's 705.88), intraday
+    range 695.25-706.49 - the Nasdaq-100 ETF tracking the pre-NVDA-print
+    softness.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/markets
+  citationSource: src.bloomberg
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 701.53
+
+ev-nvda-tuesday-close-22061-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVIDIA closed Tuesday May 19 at 220.61, -0.77% (vs Monday's 222.32),
+    on pre-earnings positioning ahead of the Q1 FY2027 print after
+    Wednesday's close.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.cnbc.com/quotes/NVDA
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 220.61
+
+ev-amd-tuesday-close-41405-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    AMD closed Tuesday May 19 at 414.05, -1.65% (vs Monday's 420.99),
+    wide intraday range 393.36-428.75 - pre-NVDA-print chip-side
+    volatility.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.cnbc.com/quotes/AMD
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.amd
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 414.05
+
+ev-10y-yield-tuesday-close-462-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The 10-year Treasury yield closed Tuesday May 19 at 4.62% (intraday
+    high 4.67%), up from Monday's 4.601% close - "Treasurys take off" as
+    the rate-path repricing reasserted. Inflation-and-deficit risk
+    repricing intact; global yields (German bund 15-year high, JGB 10Y
+    29-year high) elevated.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.federalreserve.gov/releases/h15/
+  citationSource: src.fed-press
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.62
+
+ev-gold-spot-tuesday-close-4487-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot settled Tuesday May 19 near $4,486.86 - below the
+    $4,531-$4,570 morning band - on the 10Y rise to 4.62-4.67%, the
+    operative tactical headwind reasserting. Structural physical demand
+    intact.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.gold.org/goldhub/data/gold-prices
+  citationSource: src.world-gold-council
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4486.86
+
+ev-gld-tuesday-close-41150-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    GLD closed Tuesday May 19 at 411.50, -1.66% (vs Monday's 418.43),
+    intraday range 409.88-414.47 - the gold-ETF pullback on the yield
+    rise.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/GLD:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 411.50
+
+ev-gdx-tuesday-close-8378-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    GDX (gold miners) closed Tuesday May 19 at 83.78, -3.86% (vs
+    Monday's 87.14) - the miners selling off harder than bullion on the
+    yield-driven pullback.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/GDX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.gdx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 83.78
+
+ev-lmt-tuesday-close-52663-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Lockheed Martin closed Tuesday May 19 at 526.63, -0.32% (vs Monday's
+    528.31) - the defense-prime repricing on the rejection-then-
+    postponement whipsaw came in roughly flat, not the procurement rally
+    the escalation framing implied.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/LMT:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.lmt
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 526.63
+
+ev-rtx-tuesday-close-17449-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    RTX closed Tuesday May 19 at 174.49, -0.83% (vs Monday's 175.95) -
+    muted defense-complex reaction consistent with the de-escalation
+    tilt.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/RTX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.rtx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 174.49
+
+ev-noc-tuesday-close-55634-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Northrop Grumman closed Tuesday May 19 at 556.34, +1.15% (vs
+    Monday's 550.00) - the lone defense prime up on the day, keeping the
+    complex net mixed.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/NOC:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.noc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 556.34
+
+ev-xom-tuesday-close-16255-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Exxon Mobil closed Tuesday May 19 at 162.55, +1.28% (vs Monday's
+    160.49) - energy equities held a structural sector bid even as crude
+    eased.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/XOM:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.xom
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 162.55
+
+ev-cvx-tuesday-close-19725-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Chevron closed Tuesday May 19 at 197.25, +0.58% (vs Monday's 196.12)
+    - tracking XOM through the structural energy bid.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/CVX:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.cvx
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 197.25
+
+ev-xle-tuesday-close-6129-may19:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    XLE (Energy Select Sector SPDR) closed Tuesday May 19 at 61.29,
+    +1.17% (vs Monday's 60.58) - the energy sector ETF confirming the
+    sector bid against softening crude.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T20:00:00Z
+  citation: https://www.bloomberg.com/quote/XLE:US
+  citationSource: src.bloomberg
+  fin.aboutSecurity: sec.xle
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 61.29
+
+ev-wti-wed-am-10214-may20:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI crude futures -1.9% to $102.14 in Wednesday May 20 pre-market,
+    extending the tactical softening as the diplomatic track re-opened.
+    Structural undersupply (IEA 1.78 mb/d 2026 deficit) unchanged.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-20T10:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/stock-market-today-live-updates.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 102.14
+
+ev-brent-wed-am-10903-may20:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Brent crude futures -2% to $109.03 in Wednesday May 20 pre-market,
+    confirming the WTI softening on the diplomatic-track re-opening.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-20T10:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/stock-market-today-live-updates.html
+  citationSource: src.cnbc
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 109.03
+
+ev-gold-spot-wed-am-4499-may20:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Gold spot steadied near $4,498.90 (-0.27%) in Wednesday May 20
+    pre-market, recovering modestly off Tuesday's $4,486.86 settle but
+    still below the prior $4,531-$4,570 band; high volatility expected
+    around the FOMC minutes.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-20T10:00:00Z
+  citation: https://www.gold.org/goldhub/data/gold-prices
+  citationSource: src.world-gold-council
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4498.90
+
+ev-spx-futures-wed-am-may20:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    S&P 500 futures +0.4%, Nasdaq-100 futures +0.8%, Dow futures +75 pts
+    in Wednesday May 20 pre-market - recovering from earlier negative
+    territory ahead of the FOMC minutes (2 PM ET) and the NVDA Q1 FY2027
+    print (after close). Integrating the three down days rather than
+    cascading.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-20T10:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/stock-market-today-live-updates.html
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.spx
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: 0.004
+
+ev-senate-war-powers-resolution-5047-may19:
+  type: wv.PolicyEvidence
+  evidenceStatement: >-
+    The US Senate voted 50-47 Tuesday May 19 to advance Sen. Tim Kaine's
+    War Powers Resolution directing the President to remove US Armed
+    Forces from hostilities against Iran absent a declaration of war or
+    a specific AUMF. Four Republicans crossed - Bill Cassidy (his first
+    "yes" after a Trump-endorsed-opponent primary loss), Rand Paul, Lisa
+    Murkowski, Susan Collins - in a rebuke to Trump. It is a procedural
+    advance, not law: a final Senate vote, House passage, and an
+    all-but-certain Trump veto stand between it and effect.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-05-19T22:14:00Z
+  citation: https://www.cnbc.com/2026/05/19/senate-advances-measure-to-end-military-action-in-iran-in-rebuke-to-trump.html
+  citationSource: src.cnbc
+  wv.policy: wv.public-pressure
+  wv.effectiveDate: 2026-05-19
+
+ev-trump-hour-away-strike-postponed-may19:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    Trump said he was "an hour away" from deciding to strike Iran on
+    Tuesday May 19 before he was convinced to postpone "a few days"
+    after Gulf leaders, worried about Iranian retaliation against their
+    oil infrastructure, urged him to give negotiations another chance -
+    a tactical de-escalation against the prior "next conversation is
+    through bombs" framing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-05-19T18:00:00Z
+  citation: https://www.cnbc.com/2026/05/19/trump-iran-war-strike-postponed.html
+  citationSource: src.cnbc
+  wv.statementDate: 2026-05-19

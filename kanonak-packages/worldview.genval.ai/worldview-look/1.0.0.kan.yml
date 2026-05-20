@@ -33,7 +33,7 @@ worldview-look:
           alias: tok
         - package: look-styles
           match: ^
-          version: 1.11.0
+          version: 1.12.0
           alias: look-styles
     - publisher: worldview.genval.ai
       packages:
@@ -152,11 +152,6 @@ wv.WorldviewThesis:
       - type: look.Markdown
         look.source: wv.confidenceRationale
       - type: look.SectionHeading
-        look.heading: "What would invalidate this"
-        look.note: "The machine-evaluable conditions that would falsify the thesis."
-      - type: look.Horizon
-        look.source: wv.invalidationCondition
-      - type: look.SectionHeading
         look.heading: "Supporting evidence"
         look.note: "Typed, citation-backed observations across time, grouped by strength. Hover a point for the claim."
       - type: look.TimePlot
@@ -164,6 +159,11 @@ wv.WorldviewThesis:
         look.orderBy: wv.evidenceObservedAt
         look.laneBy: "wv.evidenceStrength"
         look.labelPath: "wv.evidenceStatement"
+      - type: look.SectionHeading
+        look.heading: "What would invalidate this"
+        look.note: "The machine-evaluable conditions that would falsify the thesis."
+      - type: look.Horizon
+        look.source: wv.invalidationCondition
 
 wv.Evidence:
   derivation.look:
@@ -173,6 +173,24 @@ wv.Evidence:
         look.title: wv.evidenceStatement
         look.eyebrow: rdfs.type
         look.badges: wv.evidenceStrength
+      - type: look.ChipRow
+        look.chips:
+          - wv.evidenceObservedAt
+          - wv.citationSource
+          - wv.indicatorName
+          - wv.indicatorValue
+          - wv.indicatorPeriod
+          - fin.marketMetric
+          - fin.observedValue
+          - fin.aboutSecurity
+          - wv.policy
+          - wv.effectiveDate
+          - wv.geopoliticalEventDate
+          - wv.statementDate
+          - wv.statementVenue
+          - fin.analystInstitution
+          - fin.forecastHorizon
+          - wv.citation
 
 src.Source:
   derivation.look:
