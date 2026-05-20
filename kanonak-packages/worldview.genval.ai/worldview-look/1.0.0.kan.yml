@@ -179,38 +179,34 @@ wv.WorldviewThesis:
       - type: look.Horizon
         look.source: wv.invalidationCondition
 
-wv.evidence-strong:
-  vis.themeHue: 152
-wv.evidence-moderate:
-  vis.themeHue: 38
-wv.evidence-weak:
-  vis.themeHue: 215
-
 wv.Evidence:
   look.semanticSvg:
     look.tierChip: |
-      <rect x="0" y="0" width="400" height="400" rx="88" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
+      <rect x="0" y="0" width="400" height="400" rx="88" fill="var(--kan-bg-elev)" stroke="var(--kan-border)" stroke-width="8"/>
+      <svg x="84" y="84" width="232" height="232" viewBox="0 0 24 24" color="var(--kan-accent)">{{svg:wv.evidenceStrength/wv.iconGlyph}}</svg>
     look.tierIcon: |
-      <rect x="0" y="0" width="400" height="400" rx="48" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
-      <text x="200" y="175" text-anchor="middle" font-size="52" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
-      <text x="200" y="270" text-anchor="middle" font-size="78" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <rect x="0" y="0" width="400" height="400" rx="48" fill="var(--kan-bg-elev)" stroke="var(--kan-border)" stroke-width="4"/>
+      <svg x="124" y="64" width="152" height="152" viewBox="0 0 24 24" color="var(--kan-accent)">{{svg:wv.evidenceStrength/wv.iconGlyph}}</svg>
+      <text x="200" y="296" text-anchor="middle" font-size="58" font-weight="700" fill="var(--kan-text)" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <text x="200" y="344" text-anchor="middle" font-size="28" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">EVIDENCE</text>
     look.tierCard: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="84" rx="14" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
-      <rect x="0" y="64" width="400" height="20" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
-      <text x="36" y="34" font-size="12" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
-      <text x="36" y="64" font-size="26" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
-      <text x="36" y="150" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
-      <text x="36" y="182" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/rdfs.label}}</text>
+      <text x="36" y="52" font-size="12" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">EVIDENCE</text>
+      <svg x="36" y="68" width="116" height="116" viewBox="0 0 24 24" color="var(--kan-accent)">{{svg:wv.evidenceStrength/wv.iconGlyph}}</svg>
+      <text x="172" y="132" font-size="40" font-weight="700" fill="var(--kan-text)" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <text x="172" y="166" font-size="15" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SIGNAL STRENGTH</text>
+      <text x="36" y="266" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
+      <text x="36" y="298" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/src.sourceName}}</text>
     look.tierFull: |
       <rect x="0" y="0" width="400" height="400" rx="14" fill="var(--kan-bg-card)" stroke="var(--kan-border)" stroke-width="2"/>
-      <rect x="0" y="0" width="400" height="90" rx="14" fill="hsl({{wv.evidenceStrength/vis.themeHue}},55%,50%)"/>
-      <text x="24" y="34" font-size="11" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.85">EVIDENCE</text>
-      <text x="24" y="66" font-size="26" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
-      <text x="24" y="150" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
-      <text x="24" y="182" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/rdfs.label}}</text>
-      <text x="24" y="240" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">TYPE</text>
-      <text x="24" y="268" font-size="16" font-weight="600" fill="var(--kan-text)">{{rdfs.type}}</text>
+      <text x="24" y="44" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">EVIDENCE</text>
+      <svg x="24" y="60" width="108" height="108" viewBox="0 0 24 24" color="var(--kan-accent)">{{svg:wv.evidenceStrength/wv.iconGlyph}}</svg>
+      <text x="150" y="118" font-size="36" font-weight="700" fill="var(--kan-text)" font-family="var(--kan-font-display)">{{wv.evidenceStrength/rdfs.label}}</text>
+      <text x="150" y="150" font-size="14" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SIGNAL STRENGTH</text>
+      <text x="24" y="226" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">SOURCE</text>
+      <text x="24" y="258" font-size="20" font-weight="600" fill="var(--kan-text)">{{wv.citationSource/src.sourceName}}</text>
+      <text x="24" y="318" font-size="11" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">TYPE</text>
+      <text x="24" y="346" font-size="16" font-weight="600" fill="var(--kan-text)">{{rdfs.type}}</text>
   derivation.look:
     type: look.ResourceView
     look.bands:
