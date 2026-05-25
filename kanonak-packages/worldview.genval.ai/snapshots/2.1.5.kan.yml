@@ -43,13 +43,16 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
-
+        - package: snapshots
+          match: =
+          version: 2.1.4
+          alias: v214
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.5 - Wednesday pre-market with Senate war-powers advance and pre-NVDA tape)
   observedAt: 2026-05-20T10:53:26Z
   narrative: |
-    Wednesday pre-market 2.1.5 refresh, ~21 hours after [[view|2.1.4]] -
+    Wednesday pre-market 2.1.5 refresh, ~21 hours after [[v214.view|2.1.4]] -
     the window covers the Tuesday May 19 US cash session, Tuesday
     after-hours, and into the Wednesday May 20 pre-market (~6:53 AM
     ET). The 2.1.4 framing leaned on the Monday-evening White House

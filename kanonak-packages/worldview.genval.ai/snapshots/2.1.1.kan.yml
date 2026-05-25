@@ -49,7 +49,7 @@ view:
   label: Macro worldview (2.1.1 - Sunday-morning weekend integration)
   observedAt: 2026-05-17T17:12:05Z
   narrative: |
-    Sunday-morning 2.1.1 refresh, ~14.5 hours after [[view|2.1.0]] -
+    Sunday-morning 2.1.1 refresh, ~14.5 hours after `2.1.0` -
     the operational window covers Saturday-evening through Sunday-noon
     weekend developments. US cash markets are closed; CME e-mini
     futures do not open until Sun May 17 22:00 UTC (~5 hours from

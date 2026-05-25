@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.5
+          alias: v215
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.6 - Wednesday-evening post-FOMC-minutes, post-NVDA tape with broad risk-on rally and Iran de-escalation)
   observedAt: 2026-05-21T02:35:14Z
   narrative: |
-    Wednesday-evening 2.1.6 refresh, ~16 hours after [[view|2.1.5]] - the
+    Wednesday-evening 2.1.6 refresh, ~16 hours after [[v215.view|2.1.5]] - the
     window covers the full Wednesday May 20 US cash session, the 2 PM ET
     release of the April 29 FOMC minutes, and the after-close NVDA Q1
     FY2027 print, through ~10:35 PM ET. The 2.1.5 framing was a third

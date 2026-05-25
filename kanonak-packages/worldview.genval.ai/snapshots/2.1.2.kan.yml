@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.1
+          alias: v211
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.2 - Monday-morning weekend-integration follow-through)
   observedAt: 2026-05-18T13:42:56Z
   narrative: |
-    Monday-morning 2.1.2 refresh, ~20.5 hours after [[view|2.1.1]] -
+    Monday-morning 2.1.2 refresh, ~20.5 hours after [[v211.view|2.1.1]] -
     the window covers Sunday-afternoon through Monday cash-open
     (US cash opened ~13 minutes before this observedAt). CME e-mini
     futures opened Sun 22:00 UTC and traded the weekend headlines

@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.6
+          alias: v216
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.7 - Thursday-midday post-Walmart, full-NVDA-figures tape - a beat-and-raise shrugged off, oil reclaims $100, yields rebound)
   observedAt: 2026-05-21T19:31:50Z
   narrative: |
-    Thursday-midday 2.1.7 refresh, ~17 hours after [[view|2.1.6]] - the
+    Thursday-midday 2.1.7 refresh, ~17 hours after [[v216.view|2.1.6]] - the
     window runs from the Wednesday after-close through ~3:31 PM ET Thursday
     May 21, ahead of the Thursday cash close. It covers the full release of
     NVDA's Q1 FY2027 figures (2.1.6 had only the after-hours wrap), the

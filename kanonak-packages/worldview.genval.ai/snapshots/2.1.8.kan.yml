@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.7
+          alias: v217
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.8 - Friday-morning post-Warsh-swearing-in, risk-on rebound - Warsh sworn in at the White House, leaked US-Iran draft ceasefire revives peace hopes, oil eases below $100, yields ease, Dow clinches a record high, Thursday closes filled in)
   observedAt: 2026-05-22T14:36:14Z
   narrative: |
-    Friday-morning 2.1.8 refresh, ~19 hours after [[view|2.1.7]] - the
+    Friday-morning 2.1.8 refresh, ~19 hours after [[v217.view|2.1.7]] - the
     window runs from the Thursday intraday timestamp through ~10:36 AM ET
     Friday May 22. It captures the Thursday May 21 cash close (2.1.7 was an
     intraday read with most closes "not yet set"), the headline Friday

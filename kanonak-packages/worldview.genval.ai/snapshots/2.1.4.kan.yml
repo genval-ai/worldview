@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.3
+          alias: v213
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.4 - Tuesday pre-market with White House rejecting Iran proposal)
   observedAt: 2026-05-19T13:36:34Z
   narrative: |
-    Tuesday pre-market 2.1.4 refresh, ~12.5 hours after [[view|2.1.3]] -
+    Tuesday pre-market 2.1.4 refresh, ~12.5 hours after [[v213.view|2.1.3]] -
     the window covers Monday May 18 after-hours through Tuesday May 19
     early-morning US session (~9:36 AM ET). The 2.1.3 framing centered
     on Trump's tactical de-escalation (strike-cancel, sanctions-waiver

@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.8
+          alias: v218
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.9 - Memorial Day weekend refresh - Friday May 22 cash closes filled in (equities firm, defense firms, gold eases, NVDA fades while AMD rips), the leaked US-Iran draft ceasefire does not convert to a formal announcement over the holiday weekend, and weekend coverage reinforces structurally elevated oil)
   observedAt: 2026-05-25T16:23:55Z
   narrative: |
-    Memorial Day 2.1.9 refresh, ~3 days after [[view|2.1.8]] - the window
+    Memorial Day 2.1.9 refresh, ~3 days after [[v218.view|2.1.8]] - the window
     runs from the Friday-morning timestamp through ~12:23 PM ET Monday May
     25, a US market holiday with no cash session. It fills in the Friday May
     22 cash closes the 2.1.8 morning read left unset and integrates a quiet

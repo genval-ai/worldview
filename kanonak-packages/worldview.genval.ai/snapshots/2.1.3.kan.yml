@@ -43,13 +43,17 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: snapshots
+          match: =
+          version: 2.1.2
+          alias: v212
 
 view:
   type: wv.WorldviewSnapshot
   label: Macro worldview (2.1.3 - Monday-cash-close integration with Trump tactical de-escalation)
   observedAt: 2026-05-19T01:07:59Z
   narrative: |
-    Monday-cash-close 2.1.3 refresh, ~11.4 hours after [[view|2.1.2]] -
+    Monday-cash-close 2.1.3 refresh, ~11.4 hours after [[v212.view|2.1.2]] -
     the window covers the full Monday May 18 US cash session through
     early Tuesday Asia. The opening framing (Sunday Barakah attack
     plus Trump "clock is ticking" Truth Social posts) was the peak-
