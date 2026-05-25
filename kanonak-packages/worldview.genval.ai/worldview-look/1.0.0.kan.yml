@@ -19,6 +19,10 @@ worldview-look:
           match: ^
           version: 1.0.0
           alias: xsd
+        - package: core-kanonak
+          match: ^
+          version: 2.0.0
+          alias: ck
         - package: derivation
           match: ^
           version: 1.1.0
@@ -67,7 +71,7 @@ worldview-look:
           alias: vis
 
 index:
-  type: rdfs.Resource
+  type: ck.Publisher
   rdfs.label: worldview.genval.ai
   rdfs.comment: >-
     A continuously-updated probabilistic macro worldview — versioned
@@ -487,18 +491,20 @@ wv.WorldviewSnapshot:
       - type: look.Hero
         look.title: rdfs.label
         look.eyebrow: wv.observedAt
-      - type: look.Markdown
-        look.source: wv.narrative
       - type: look.Diagram
         look.figureTitle: "Theses in this snapshot, edge weight = confidence"
+        look.placement: floatRight
+        look.width: "40%"
         look.facets:
           - look.relation: wv.hasThesis
             look.encode: look.connector
-            look.nodeTier: icon
-            look.edgeLabel: "thesis"
+            look.nodeTier: chip
+            look.edgeValue: "rdfs.label"
             look.channels:
               - look.mapPath: "wv.confidence/est.estimateMean"
                 look.to: thickness
+      - type: look.Markdown
+        look.source: wv.narrative
       - type: look.ResourceGrid
         look.source: wv.hasThesis
 
