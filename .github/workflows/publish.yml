@@ -28,12 +28,6 @@ jobs:
       - name: Install kanonak CLI
         run: npm install -g @kanonak-protocol/cli
 
-      - name: Cache kanonak package cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.kanonak
-          key: kanonak-v2-${{ runner.os }}-${{ hashFiles('kanonak-packages/**/*.kan.yml') }}
-
       - name: Validate packages
         run: |
           set -euo pipefail
@@ -46,25 +40,20 @@ jobs:
             --workspace kanonak-packages/worldview.genval.ai \
             --out _site
 
-      - name: Stage publisher manifest + package mirror
+      - name: Add GitHub Pages host specifics
+        # `kanonak publish` already emits the publisher endpoints —
+        # index.txt, .well-known/kanonak.json, and the raw
+        # {package}/{version}.kan.yml sources that HTTP import resolution
+        # and `kanonak install` fetch. Only the GitHub-Pages host
+        # specifics remain: the custom domain, and .nojekyll so Pages
+        # serves the tree verbatim (preserving .well-known/ and any
+        # underscore paths rather than running Jekyll over them).
         run: |
-          set -e
-          mkdir -p _site/.well-known
-          cp .well-known/kanonak.json _site/.well-known/kanonak.json
           echo "worldview.genval.ai" > _site/CNAME
-          : > _site/index.txt.unsorted
-          for pkg_dir in kanonak-packages/worldview.genval.ai/*/; do
-            name=$(basename "$pkg_dir")
-            mkdir -p "_site/${name}"
-            for pkg_file in "$pkg_dir"*.kan.yml; do
-              [ -f "$pkg_file" ] || continue
-              version=$(basename "$pkg_file" .kan.yml)
-              cp "$pkg_file" "_site/${name}/${version}.kan.yml"
-              echo "${name}/${version}" >> _site/index.txt.unsorted
-            done
-          done
-          sort -V _site/index.txt.unsorted > _site/index.txt
-          rm _site/index.txt.unsorted
+          touch _site/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -80,4 +69,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

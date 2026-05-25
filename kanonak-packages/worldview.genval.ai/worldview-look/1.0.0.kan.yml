@@ -25,7 +25,7 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.17.0
+          version: 1.20.0
           alias: look
         - package: look-tokens
           match: ^
@@ -219,6 +219,16 @@ wv.Evidence:
         look.title: wv.evidenceStatement
         look.eyebrow: rdfs.type
         look.badges: wv.evidenceStrength
+      - type: look.Diagram
+        look.figureTitle: "Provenance — node opacity = source trust"
+        look.facets:
+          - look.relation: wv.citationSource
+            look.encode: look.connector
+            look.nodeTier: card
+            look.edgeLabel: "published by"
+            look.channels:
+              - look.mapPath: "src.trustEstimate/est.estimateMean"
+                look.to: opacity
       - type: look.Details
         look.skip:
           - wv.evidenceStatement
@@ -324,6 +334,17 @@ fin.Security:
       - type: look.Hero
         look.title: rdfs.label
         look.eyebrow: fin.ticker
+      - type: look.Diagram
+        look.figureTitle: "Classification"
+        look.placement: floatRight
+        look.width: "38%"
+        look.facets:
+          - look.relation: sec.typedSector
+            look.encode: look.cluster
+            look.nodeTier: card
+          - look.relation: sec.typedAssetClass
+            look.encode: look.cluster
+            look.nodeTier: card
       - type: look.Details
 
 reg.Regime:
@@ -468,6 +489,16 @@ wv.WorldviewSnapshot:
         look.eyebrow: wv.observedAt
       - type: look.Markdown
         look.source: wv.narrative
+      - type: look.Diagram
+        look.figureTitle: "Theses in this snapshot, edge weight = confidence"
+        look.facets:
+          - look.relation: wv.hasThesis
+            look.encode: look.connector
+            look.nodeTier: icon
+            look.edgeLabel: "thesis"
+            look.channels:
+              - look.mapPath: "wv.confidence/est.estimateMean"
+                look.to: thickness
       - type: look.ResourceGrid
         look.source: wv.hasThesis
 
