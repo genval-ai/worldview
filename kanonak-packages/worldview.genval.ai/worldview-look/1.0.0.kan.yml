@@ -85,7 +85,6 @@ index:
         look.subtitle: rdfs.comment
       - type: look.FeaturedResource
         look.source: snap.view
-      - type: look.PublisherPackages
 
 rdfs.Resource:
   derivation.tokens:
