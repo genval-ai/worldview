@@ -43,6 +43,14 @@ snapshots:
           match: ^
           version: 2.0.0
           alias: vis
+        - package: factors
+          match: ^
+          version: 1.0.0
+          alias: fac
+        - package: drivers
+          match: ^
+          version: 1.0.0
+          alias: drv
         - package: snapshots
           match: =
           version: 2.1.10
@@ -156,6 +164,39 @@ stagflation-risk:
     betaAlpha: 38.0
     betaBeta: 7.58
   vis.thesisTheme: vis.theme-inflation
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.inflation-debasement
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.85
+        estimateStdDev: 0.05
+        betaAlpha: 42.50
+        betaBeta: 7.50
+      fac.loadingRationale: >-
+        The core is a persistent-inflation call (CPI 3.8% YoY, hot PPI,
+        tariff/energy passthrough), so inflation-debasement is the dominant
+        driver.
+    - fac.loadingDriver: drv.rate-path
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.80
+        estimateStdDev: 0.05
+        betaAlpha: 50.40
+        betaBeta: 12.60
+      fac.loadingRationale: >-
+        The higher-for-longer rate-path repricing (10Y ~4.5%, rising
+        hike-by-December odds) is the co-equal pillar; April PCE is the formal
+        invalidation tell.
+    - fac.loadingDriver: drv.monetary-credibility
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.45
+        estimateStdDev: 0.10
+        betaAlpha: 10.69
+        betaBeta: 13.06
+      fac.loadingRationale: >-
+        "Fed independence stress" is a secondary but explicit component - the
+        Warsh transition and political pressure on policy.
   status: wv.active
   confidenceRationale: >-
     Held at 0.83 ± 0.04 (from 2.1.10). The first post-holiday cash close added no
@@ -322,6 +363,37 @@ persistent-energy-shock:
     betaAlpha: 20.0
     betaBeta: 7.62
   vis.thesisTheme: vis.theme-energy
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.energy-supply
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.90
+        estimateStdDev: 0.04
+        betaAlpha: 49.72
+        betaBeta: 5.52
+      fac.loadingRationale: >-
+        The thesis IS physical energy-supply tightness - the IEA 2026
+        undersupply, the Hormuz chokepoint, inventories near all-time lows.
+    - fac.loadingDriver: drv.geopolitical-conflict
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.55
+        estimateStdDev: 0.08
+        betaAlpha: 20.72
+        betaBeta: 16.95
+      fac.loadingRationale: >-
+        The premium is driven by Iran / Hormuz conflict risk; absent the
+        conflict the supply read softens materially.
+    - fac.loadingDriver: drv.inflation-debasement
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.30
+        estimateStdDev: 0.10
+        betaAlpha: 6.00
+        betaBeta: 14.00
+      fac.loadingRationale: >-
+        Energy passthrough is a real but secondary inflation channel; the thesis
+        is about the energy premium itself, not inflation.
   status: wv.active
   confidenceRationale: >-
     Held at 0.72 ± 0.06 (from 2.1.10). Still two-sided on the first post-holiday
@@ -521,6 +593,18 @@ iran-war-rearmament:
     betaAlpha: 31.5
     betaBeta: 4.92
   vis.thesisTheme: vis.theme-defense
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.geopolitical-conflict
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.92
+        estimateStdDev: 0.04
+        betaAlpha: 41.40
+        betaBeta: 3.60
+      fac.loadingRationale: >-
+        A pure conflict-driven defense-procurement cycle - geopolitical-conflict
+        is essentially the sole driver, and the multi-year backlogs make it
+        robust to near-term diplomacy.
   status: wv.active
   confidenceRationale: >-
     Held at 0.87 ± 0.04 (from 2.1.10). Two offsetting forces on the day: the
@@ -683,6 +767,27 @@ gold-debasement-bid:
     betaAlpha: 49.0
     betaBeta: 8.47
   vis.thesisTheme: vis.theme-gold
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.inflation-debasement
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.88
+        estimateStdDev: 0.04
+        betaAlpha: 57.20
+        betaBeta: 7.80
+      fac.loadingRationale: >-
+        Currency debasement, sovereign de-dollarization, and the real-asset bid
+        are the thesis's spine.
+    - fac.loadingDriver: drv.monetary-credibility
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.50
+        estimateStdDev: 0.10
+        betaAlpha: 12.00
+        betaBeta: 12.00
+      fac.loadingRationale: >-
+        Fed-independence concerns and eroding faith in fiat institutions are a
+        strong secondary driver of the structural gold bid.
   status: wv.active
   confidenceRationale: >-
     Held at 0.85 ± 0.05 (from 2.1.10). Gold gave Monday's pop back on the first
@@ -837,6 +942,27 @@ ai-capex-cycle-with-china-tail:
     betaAlpha: 64.0
     betaBeta: 10.4
   vis.thesisTheme: vis.theme-ai
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.ai-capex-cycle
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.90
+        estimateStdDev: 0.04
+        betaAlpha: 49.72
+        betaBeta: 5.52
+      fac.loadingRationale: >-
+        The secular hyperscaler AI-infrastructure build-out and the
+        semiconductor demand it drives is the thesis.
+    - fac.loadingDriver: drv.geopolitical-conflict
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.30
+        estimateStdDev: 0.12
+        betaAlpha: 4.08
+        betaBeta: 9.51
+      fac.loadingRationale: >-
+        The China export-control / decoupling tail is a secondary, uncertain
+        driver mapped to the sanctions / conflict force.
   status: wv.active
   confidenceRationale: >-
     Held at 0.86 ± 0.04 (from 2.1.10). The first post-holiday cash close brought no
@@ -978,6 +1104,26 @@ equity-melt-up-vs-recession-risk:
     betaAlpha: 36.5
     betaBeta: 13.5
   vis.thesisTheme: vis.theme-equity
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.equity-risk-appetite
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.90
+        estimateStdDev: 0.05
+        betaAlpha: 31.50
+        betaBeta: 3.50
+      fac.loadingRationale: >-
+        Broad risk-on melt-up appetite is the directional core of the thesis.
+    - fac.loadingDriver: drv.volatility-regime
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.45
+        estimateStdDev: 0.10
+        betaAlpha: 10.69
+        betaBeta: 13.06
+      fac.loadingRationale: >-
+        The recession-risk / vol-expansion invalidation leg makes the
+        volatility regime a real secondary driver and the hedge mechanism.
   status: wv.active
   confidenceRationale: >-
     Moved from 2.1.10 0.72 ± 0.07 to 0.73 ± 0.07 - mean step of +0.01 as the first
@@ -1175,6 +1321,37 @@ powell-warsh-transition-risk:
     betaAlpha: 13.5
     betaBeta: 12.97
   vis.thesisTheme: vis.theme-monetary
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.monetary-credibility
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.85
+        estimateStdDev: 0.05
+        betaAlpha: 42.50
+        betaBeta: 7.50
+      fac.loadingRationale: >-
+        A Fed leadership-transition and independence thesis - monetary-credibility
+        is the core driver.
+    - fac.loadingDriver: drv.rate-path
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.50
+        estimateStdDev: 0.08
+        betaAlpha: 19.03
+        betaBeta: 19.03
+      fac.loadingRationale: >-
+        The "room to cut versus higher-for-longer" contradiction makes the rate
+        path a strong secondary driver.
+    - fac.loadingDriver: drv.volatility-regime
+      fac.loadingStrength:
+        type: est.BetaEstimate
+        estimateMean: 0.40
+        estimateStdDev: 0.12
+        betaAlpha: 6.27
+        betaBeta: 9.40
+      fac.loadingRationale: >-
+        Policy-transition uncertainty expresses largely through volatility, the
+        thesis's primary vehicle.
   status: wv.active
   confidenceRationale: >-
     Held at 0.51 ± 0.09 (from 2.1.10). No new Warsh-as-chair policy substance

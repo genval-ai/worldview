@@ -1,0 +1,91 @@
+drivers:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Macro Drivers
+  comment: >-
+    The current set of macro Driver instances - the persistent latent forces that
+    worldview theses load onto. The Driver class and the loading ontology
+    (DriverLoading, hasDriverLoading, ...) live in worldview.genval.ai/factors;
+    this package holds only the instances, so it can be version-bumped as new
+    drivers are recognized without touching the schema. Drivers are coarser and
+    many-to-many relative to the visual themes, and a regime is effectively a
+    configuration of driver intensities.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+    - publisher: worldview.genval.ai
+      packages:
+        - package: factors
+          match: ^
+          version: 1.0.0
+          alias: fac
+
+inflation-debasement:
+  type: fac.Driver
+  label: Inflation / debasement
+  comment: >-
+    Persistent above-target inflation and the erosion of fiat purchasing power -
+    CPI/PPI/PCE pressure, sovereign-debt and de-dollarization concerns, and the
+    resulting structural bid for real assets. Expressed by stagflation and
+    gold / real-asset theses.
+
+rate-path:
+  type: fac.Driver
+  label: Rate path
+  comment: >-
+    The direction and level of policy and long-end interest rates - the
+    higher-for-longer-versus-easing trajectory and its repricing. Drives
+    duration, rate-sensitive equities, and the bond complex.
+
+monetary-credibility:
+  type: fac.Driver
+  label: Monetary credibility
+  comment: >-
+    Central-bank independence and credibility - leadership transitions, political
+    pressure on policy, and the market's confidence that the inflation mandate
+    will be defended. Distinct from the rate path: it is about trust in the
+    institution, not the level of rates.
+
+geopolitical-conflict:
+  type: fac.Driver
+  label: Geopolitical conflict
+  comment: >-
+    War, military escalation, sanctions, and conflict-driven disruption - the
+    force behind defense procurement cycles and conflict risk premia, and a
+    common cause of energy and supply-chain shocks.
+
+energy-supply:
+  type: fac.Driver
+  label: Energy supply
+  comment: >-
+    Physical oil and gas supply tightness and chokepoint risk (e.g. the Strait of
+    Hormuz) - structural under/oversupply, inventories, and the energy premium.
+    Often coupled with geopolitical-conflict and feeds inflation-debasement.
+
+ai-capex-cycle:
+  type: fac.Driver
+  label: AI capex cycle
+  comment: >-
+    The secular hyperscaler investment cycle in AI compute and infrastructure -
+    data-center build-out and the semiconductor demand it drives, with an
+    export-control / decoupling tail.
+
+equity-risk-appetite:
+  type: fac.Driver
+  label: Equity risk appetite
+  comment: >-
+    Broad risk-on versus risk-off positioning - the melt-up-versus-recession-risk
+    tension, breadth, and the market's willingness to pay up for equity beta.
+
+volatility-regime:
+  type: fac.Driver
+  label: Volatility regime
+  comment: >-
+    Expansion versus compression of market volatility - the vol environment
+    itself, independent of direction. Rises on policy-transition and event
+    uncertainty; the force a long-vol hedge expresses.

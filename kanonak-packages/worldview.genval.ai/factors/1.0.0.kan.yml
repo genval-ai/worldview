@@ -1,0 +1,104 @@
+factors:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Macro Factor Ontology
+  comment: >-
+    The ontology for macro drivers and how worldview theses load onto them.
+    Defines the Driver class (a persistent latent force), the reified
+    DriverLoading (a thesis's distributional loading on a driver), and the
+    hasDriverLoading / loadingDriver / loadingStrength / loadingRationale
+    properties. The concrete Driver INSTANCES live in the separate
+    worldview.genval.ai/drivers package, so the driver set can be version-bumped
+    (drivers added) without touching this stable schema - the same split as
+    finance (schema) versus securities (instances).
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-prose
+          match: ^
+          version: 1.1.0
+          alias: prose
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+
+Driver:
+  type: rdfs.Class
+  label: Driver
+  comment: >-
+    A persistent underlying force that drives macro and market outcomes - e.g.
+    inflation/debasement, the rate path, geopolitical conflict. Drivers are
+    structural and reused across snapshots; their intensity changes but they are
+    not falsifiable claims. WorldviewThesis instances express their driver(s) via
+    hasDriverLoading - a distributional DriverLoading per driver - and securities
+    may later declare factor loadings onto them. The concrete instances live in
+    worldview.genval.ai/drivers; add one there when a genuinely new structural
+    force emerges, not one per thesis.
+
+DriverLoading:
+  type: rdfs.Class
+  label: Driver Loading
+  comment: >-
+    One reified thesis-to-driver edge: how strongly, and how confidently, a given
+    Driver drives a WorldviewThesis. Embedded as a list entry of hasDriverLoading.
+    Carries loadingDriver (the force), loadingStrength (a distributional estimate -
+    mean = how much this driver explains the thesis, stdDev = confidence in the
+    mapping), and a loadingRationale. Multiple theses loading on the same Driver,
+    weighted by their loadingStrength, is the quantitative basis for counting a
+    shared force once when deduplicating overlapping exposure downstream - the same
+    tagged-by-type distributional pattern as alignmentStrength on an AlignedSecurity.
+
+hasDriverLoading:
+  type: owl.ObjectProperty
+  label: has driver loading
+  comment: >-
+    Links a WorldviewThesis to the Drivers it expresses, each as a reified
+    DriverLoading carrying a distributional strength. Authored as a list at thesis
+    formation in the snapshot - typically one to three loadings per thesis.
+  domain: wv.WorldviewThesis
+  range: DriverLoading
+
+loadingDriver:
+  type: owl.ObjectProperty
+  label: loading driver
+  comment: The Driver this loading is about. References a Driver instance from worldview.genval.ai/drivers.
+  domain: DriverLoading
+  range: Driver
+
+loadingStrength:
+  type: owl.ObjectProperty
+  label: loading strength
+  comment: >-
+    Distributional strength of this driver's loading on the thesis. Embedded as
+    { type est.BetaEstimate, estimateMean ..., estimateStdDev ... }. Mean in
+    [0, 1]: 0 = this driver does not drive the thesis, 1 = the thesis IS this
+    driver. StdDev expresses confidence in the mapping. Range is the abstract
+    DistributionEstimate so the embed must narrow to a concrete subclass per the
+    embedded-type-must-narrow-range rule.
+  domain: DriverLoading
+  range: est.DistributionEstimate
+
+loadingRationale:
+  type: owl.DatatypeProperty
+  label: loading rationale
+  comment: >-
+    Markdown prose explaining why this driver drives the thesis and the chosen
+    mean / width. Supports embedded [[reference]] placeholders.
+  domain: DriverLoading
+  range: prose.Markdown
