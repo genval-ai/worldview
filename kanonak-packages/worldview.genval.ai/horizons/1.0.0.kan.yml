@@ -1,0 +1,66 @@
+horizons:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Thesis Horizon Ontology
+  comment: >-
+    The time dimension of a worldview thesis: how long until the thesis
+    resolves (confirms or invalidates), expressed as a distributional
+    duration. A thesis carries WHAT we believe (thesisStatement), HOW
+    confident we are (confidence), WHICH forces drive it (hasDriverLoading),
+    and WHEN it plays out (thesisHorizon). The horizon is the missing anchor
+    that a static confidence cannot supply - confidence is P(thesis is true),
+    horizon is when it resolves, and the two are independent. Downstream the
+    horizon picks an option expiration (expiry >= horizon + theta buffer)
+    while a separate price cone - the underlying's volatility widening with
+    sqrt(time), drifted by conviction - picks the strike. This package defines
+    only the schema (one property); the horizon VALUES are authored on each
+    thesis in the snapshot, the same way driver loadings are. Mirrors the
+    factors (schema) / drivers (instances) split, except a horizon is a single
+    distributional value per thesis rather than a reified list, so no wrapper
+    class is needed - the range is the existing est.DistributionEstimate.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+
+thesisHorizon:
+  type: owl.ObjectProperty
+  label: thesis horizon
+  comment: >-
+    The expected duration, in MONTHS measured from the snapshot's observedAt,
+    until this thesis resolves - either confirms (the structural call is
+    realized) or trips its invalidationCondition. Authored as an embedded
+    distributional estimate; TriangularEstimate is the natural family
+    ("soonest / most-likely / latest resolution"): estimateMode = the
+    most-likely months to resolution, estimateLower95 / estimateUpper95 = the
+    soonest / latest envelope, estimateMean = the moment for renderers. Range
+    is the abstract DistributionEstimate, so the embed must narrow to a
+    concrete subclass per the embedded-type-must-narrow-range rule. Horizon is
+    INDEPENDENT of confidence - a high-confidence thesis is not necessarily a
+    fast one - and independent of strength: it answers only "for how long do
+    we hold this view." It is the time anchor a downstream option-expression
+    needs to choose an expiration; the strike comes from a separate price cone
+    (underlying volatility x sqrt(time), drifted by conviction), not from the
+    horizon. A target resolution DATE is derivable as observedAt + horizon, so
+    storing a snapshot-relative duration keeps the value reusable as the
+    snapshot rolls forward.
+  domain: wv.WorldviewThesis
+  range: est.DistributionEstimate

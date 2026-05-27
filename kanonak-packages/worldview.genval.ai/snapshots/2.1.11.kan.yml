@@ -51,6 +51,10 @@ snapshots:
           match: ^
           version: 1.0.0
           alias: drv
+        - package: horizons
+          match: ^
+          version: 1.0.0
+          alias: hz
         - package: snapshots
           match: =
           version: 2.1.10
@@ -164,6 +168,12 @@ stagflation-risk:
     betaAlpha: 38.0
     betaBeta: 7.58
   vis.thesisTheme: vis.theme-inflation
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 10.33
+    estimateMode: 9.0
+    estimateLower95: 4.0
+    estimateUpper95: 18.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.inflation-debasement
       fac.loadingStrength:
@@ -363,6 +373,12 @@ persistent-energy-shock:
     betaAlpha: 20.0
     betaBeta: 7.62
   vis.thesisTheme: vis.theme-energy
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 9.67
+    estimateMode: 8.0
+    estimateLower95: 3.0
+    estimateUpper95: 18.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.energy-supply
       fac.loadingStrength:
@@ -593,6 +609,12 @@ iran-war-rearmament:
     betaAlpha: 31.5
     betaBeta: 4.92
   vis.thesisTheme: vis.theme-defense
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 21.0
+    estimateMode: 18.0
+    estimateLower95: 9.0
+    estimateUpper95: 36.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.geopolitical-conflict
       fac.loadingStrength:
@@ -767,6 +789,12 @@ gold-debasement-bid:
     betaAlpha: 49.0
     betaBeta: 8.47
   vis.thesisTheme: vis.theme-gold
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 16.0
+    estimateMode: 12.0
+    estimateLower95: 6.0
+    estimateUpper95: 30.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.inflation-debasement
       fac.loadingStrength:
@@ -942,6 +970,12 @@ ai-capex-cycle-with-china-tail:
     betaAlpha: 64.0
     betaBeta: 10.4
   vis.thesisTheme: vis.theme-ai
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 12.67
+    estimateMode: 10.0
+    estimateLower95: 4.0
+    estimateUpper95: 24.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.ai-capex-cycle
       fac.loadingStrength:
@@ -1104,6 +1138,12 @@ equity-melt-up-vs-recession-risk:
     betaAlpha: 36.5
     betaBeta: 13.5
   vis.thesisTheme: vis.theme-equity
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 6.67
+    estimateMode: 6.0
+    estimateLower95: 2.0
+    estimateUpper95: 12.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.equity-risk-appetite
       fac.loadingStrength:
@@ -1321,6 +1361,12 @@ powell-warsh-transition-risk:
     betaAlpha: 13.5
     betaBeta: 12.97
   vis.thesisTheme: vis.theme-monetary
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 8.67
+    estimateMode: 8.0
+    estimateLower95: 4.0
+    estimateUpper95: 14.0
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.monetary-credibility
       fac.loadingStrength:
