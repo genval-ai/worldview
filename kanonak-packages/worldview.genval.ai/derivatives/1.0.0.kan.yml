@@ -1,0 +1,119 @@
+derivatives:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Derivatives Ontology
+  comment: >-
+    Option (and later, other derivative) instrument types layered on the
+    finance Security schema. The OptionContract is identified the OCC-universal
+    way - underlying + right + strike + expiration (+ multiplier) - with NO
+    broker-specific contract id, because those five fields plus the underlying
+    ticker are all any execution venue needs (IBKR's DES import takes exactly
+    DES,<underlying>,OPT,<route>,<YYYYMMDD>,<strike>,<Call|Put>,<multiplier>,, ).
+    This is the schema that lets a no-margin sleeve (IRA / Roth) express a
+    fund's short leg as a long put: the thesis horizon picks the expiration, a
+    price cone picks the strike, delta-equivalent sizing picks the quantity.
+    Schema only - OptionContract INSTANCES are minted on demand by the
+    expression that needs them and are NOT added to the securities baseline
+    (chains churn daily; minting per-contract instances there would pollute the
+    stable instrument inventory).
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+    - publisher: worldview.genval.ai
+      packages:
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+
+OptionContract:
+  type: rdfs.Class
+  subClassOf: fin.Security
+  label: Option Contract
+  comment: >-
+    A listed option on an underlying Security. Subclass of fin.Security so an
+    OptionContract is substitutable anywhere a Security is referenced (e.g. a
+    Holding's heldSecurity) and inherits ticker / assetClass (set assetClass to
+    "option"). Identified by underlyingSecurity + optionRight + strikePrice +
+    expirationDate (+ contractMultiplier) - the OCC-universal identity, no
+    broker contract id. Instances are minted ON DEMAND (e.g. the sleeve
+    projection choosing a put to stand in for a short leg), NOT carried in the
+    securities baseline. Naming convention for an instance:
+    opt-<underlying>-<yyyy>-<mm>-<dd>-<p|c><strike>, e.g. opt-tlt-2026-07-17-p82.
+
+underlyingSecurity:
+  type: owl.ObjectProperty
+  label: underlying security
+  comment: >-
+    The Security the option is written on (e.g. sec.tlt); its price drives the
+    option's value. Every OptionContract has exactly one underlying.
+  domain: OptionContract
+  range: fin.Security
+
+optionRight:
+  type: owl.ObjectProperty
+  label: option right
+  comment: Call or Put. References an OptionRight instance.
+  domain: OptionContract
+  range: OptionRight
+
+strikePrice:
+  type: owl.DatatypeProperty
+  label: strike price
+  comment: Strike price in the underlying's quote currency.
+  domain: OptionContract
+  range: xsd.decimal
+
+expirationDate:
+  type: owl.DatatypeProperty
+  label: expiration date
+  comment: >-
+    Contract expiration as an ISO date (yyyy-mm-dd). For IBKR's DES row the
+    same date is formatted YYYYMMDD. Must be an actually-listed expiration -
+    snap a desired horizon-derived date to the nearest listed expiry from the
+    chain (see the massive skill's option-chain fetch).
+  domain: OptionContract
+  range: xsd.date
+
+contractMultiplier:
+  type: owl.DatatypeProperty
+  label: contract multiplier
+  comment: >-
+    Shares of the underlying per contract - 100 for standard US equity / ETF
+    options. Default 100; state explicitly for non-standard (mini, or
+    corporate-action-adjusted) contracts. Load-bearing for delta-equivalent
+    sizing: one contract controls multiplier x delta shares of the underlying.
+  domain: OptionContract
+  range: xsd.decimal
+
+OptionRight:
+  type: rdfs.Class
+  label: Option Right
+  comment: Closed enumeration - the two option rights.
+
+right-call:
+  type: OptionRight
+  label: Call
+  comment: >-
+    Right to BUY the underlying at the strike. Long calls express upside /
+    leveraged-long views.
+
+right-put:
+  type: OptionRight
+  label: Put
+  comment: >-
+    Right to SELL the underlying at the strike. Long puts express downside
+    views - the no-margin (IRA / Roth) substitute for a short leg.
