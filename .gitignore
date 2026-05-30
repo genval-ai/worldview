@@ -9,6 +9,7 @@ kanonak.lock
 
 # Local working notes / scratch (issues, drafts, fetched specs)
 research/
+_scratch/
 
 # Node
 node_modules/
