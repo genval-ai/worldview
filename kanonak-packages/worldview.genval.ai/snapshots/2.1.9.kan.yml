@@ -180,7 +180,6 @@ stagflation-risk:
     tactical-disinflation pulse, leaving the higher-for-longer read intact
     ahead of the May 28 PCE.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.83
     estimateStdDev: 0.04
     estimateLower95: 0.75
@@ -319,7 +318,6 @@ persistent-energy-shock:
     [[ev-cvx-fri-close-19143-may22|CVX 191.43]],
     [[ev-xle-fri-close-5949-may22|XLE 59.49]]).
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.06
     estimateLower95: 0.60
@@ -487,7 +485,6 @@ iran-war-rearmament:
     capacity in Alabama]] - the multi-year backlog (LMT $194B, RTX $271B) and
     Golden Dome ($185B) unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.77
@@ -633,7 +630,6 @@ gold-debasement-bid:
     pullback, with the structural-bull supports unchanged over a quiet
     holiday weekend.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.85
     estimateStdDev: 0.05
     estimateLower95: 0.75
@@ -774,7 +770,6 @@ ai-capex-cycle-with-china-tail:
     memory-supply tailwind - positioning and valuation, not demand. The China
     export-control tail is unchanged over the quiet holiday weekend.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -901,7 +896,6 @@ equity-melt-up-vs-recession-risk:
     and nowhere near the <15 melt-up-confirmation leg, and there is no
     vol-expansion break.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.71
     estimateStdDev: 0.07
     estimateLower95: 0.57
@@ -1075,7 +1069,6 @@ powell-warsh-transition-risk:
     cut" framing and the inherited higher-for-longer backdrop unresolved
     ahead of his first public remarks and the June 16-17 FOMC.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.51
     estimateStdDev: 0.10
     estimateLower95: 0.31
@@ -2466,7 +2459,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

@@ -176,7 +176,6 @@ stagflation-risk:
     [[ev-treasury-yields-rebound-thu-may21|Treasury yields rebounded]]
     Thursday, reversing Wednesday's intraday easing.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.84
     estimateStdDev: 0.04
     estimateLower95: 0.76
@@ -299,7 +298,6 @@ persistent-energy-shock:
     agreement]], with the Hormuz-transit and talks-final-stages momentum
     stalling and the IEA structural-deficit read unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.06
     estimateLower95: 0.60
@@ -441,7 +439,6 @@ iran-war-rearmament:
     faded]] and [[ev-oil-reclaims-100-may21|crude reclaimed $100]] - firming
     the multi-year procurement-cycle tail.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.77
@@ -563,7 +560,6 @@ gold-debasement-bid:
     optimism faded]] (safe-haven tailwind) - leaving the structural-bull
     read intact.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.85
     estimateStdDev: 0.05
     estimateLower95: 0.75
@@ -685,7 +681,6 @@ ai-capex-cycle-with-china-tail:
     $5.3T cap. The named tell printed bullish for a capex-sustained thesis;
     the soft tape is a valuation/positioning reaction, not a demand signal.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -799,7 +794,6 @@ equity-melt-up-vs-recession-risk:
     overbought with breadth concentrated in mega-cap AI]]. Neither
     invalidation leg moved closer.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.70
     estimateStdDev: 0.07
     estimateLower95: 0.56
@@ -958,7 +952,6 @@ powell-warsh-transition-risk:
     but the substantive transition still opens only after the Friday May 22
     swearing-in.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.50
     estimateStdDev: 0.11
     estimateLower95: 0.29
@@ -2346,7 +2339,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

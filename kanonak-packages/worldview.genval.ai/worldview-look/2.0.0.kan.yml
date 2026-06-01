@@ -1,20 +1,20 @@
 worldview-look:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.2.0
+  version: 2.0.0
   label: Worldview Look
   comment: >-
     Declarative visual presentation for worldview.genval.ai classes.
     Sets publisher brand tokens on rdfs.Resource and declares
     derivation.look bands for WorldviewThesis, Evidence, Source,
-    fin.Security, and reg.Regime. 1.2.0 migrates every look.semanticSvg
-    tier from {{...}} string templates to typed tx.Expression trees
-    (look@1.21.0 declares the tier properties as range tx.Expression), so
-    each property reference resolves through the object model and is
-    validated at author time. The change-vs-previous "delta" glyph helpers
-    have no typed cross-version equivalent, so the thesis and snapshot
-    glyphs now show confidence μ directly; the change story stays on the
-    page via the VersionDelta band.
+    fin.Security, and reg.Regime. 2.0.0 migrates to look@2.0.0: every
+    band path carrier (metricPath, alphaPath, betaPath, lowerPath,
+    upperPath, hueBy, laneBy, labelPath, mapPath, edgeValue) is now a
+    typed tx.Expression instead of a /-separated path string — embedded
+    estimate fields read via nested tx.PropertyRead, reference steps via
+    tx.Traverse — so every step resolves through the object model and is
+    validated at author time. The look-styles import is dropped; the
+    look@2.0.0 chain styles via look-tokens only.
   imports:
     - publisher: kanonak.org
       packages:
@@ -36,16 +36,12 @@ worldview-look:
           alias: derivation
         - package: look
           match: ^
-          version: 1.20.0
+          version: 2.0.0
           alias: look
         - package: look-tokens
           match: ^
           version: 1.0.0
           alias: tok
-        - package: look-styles
-          match: ^
-          version: 1.15.0
-          alias: look-styles
         - package: transformations
           match: ^
           version: 3.14.0
@@ -58,7 +54,7 @@ worldview-look:
           alias: wv
         - package: snapshots
           match: ^
-          version: 2.1.4
+          version: 2.1.13
           alias: snap
         - package: sources
           match: ^
@@ -325,19 +321,62 @@ wv.WorldviewThesis:
         look.heading: "What changed"
         look.note: "The headline signal — how confidence moved from the previous snapshot, and why."
       - type: look.VersionDelta
-        look.metricPath: "wv.confidence/est.estimateMean"
+        look.metricPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateMean
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
       - type: look.Markdown
         look.source: wv.confidenceRationale
       - type: look.SectionHeading
         look.heading: "The thesis"
         look.note: "The claim and where confidence stands now."
       - type: look.Distribution
-        look.alphaPath: "wv.confidence/est.betaAlpha"
-        look.betaPath: "wv.confidence/est.betaBeta"
-        look.metricPath: "wv.confidence/est.estimateMean"
-        look.lowerPath: "wv.confidence/est.estimateLower95"
-        look.upperPath: "wv.confidence/est.estimateUpper95"
-        look.hueBy: "vis.thesisTheme/vis.themeHue"
+        look.alphaPath:
+          type: tx.PropertyRead
+          tx.readProp: est.betaAlpha
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.betaPath:
+          type: tx.PropertyRead
+          tx.readProp: est.betaBeta
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.metricPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateMean
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.lowerPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateLower95
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.upperPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateUpper95
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.hueBy:
+          type: tx.Traverse
+          tx.traverseSource: { type: tx.VarRef, tx.varName: input }
+          tx.through: vis.thesisTheme
+          tx.step:
+            type: tx.PropertyRead
+            tx.readProp: vis.themeHue
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
       - type: look.Markdown
         look.source: wv.thesisStatement
       - type: look.SectionHeading
@@ -351,8 +390,18 @@ wv.WorldviewThesis:
       - type: look.TimePlot
         look.source: wv.supportingEvidence
         look.orderBy: wv.evidenceObservedAt
-        look.laneBy: "wv.evidenceStrength"
-        look.labelPath: "wv.evidenceStatement"
+        look.laneBy:
+          type: tx.Traverse
+          tx.traverseSource: { type: tx.VarRef, tx.varName: input }
+          tx.through: wv.evidenceStrength
+          tx.step:
+            type: tx.PropertyRead
+            tx.readProp: rdfs.label
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.labelPath:
+          type: tx.PropertyRead
+          tx.readProp: wv.evidenceStatement
+          tx.readSource: { type: tx.VarRef, tx.varName: input }
       - type: look.SectionHeading
         look.heading: "What would invalidate this"
         look.note: "The machine-evaluable conditions that would falsify the thesis."
@@ -366,9 +415,27 @@ fac.DriverLoading:
       - type: look.Hero
         look.title: fac.loadingDriver
       - type: look.Distribution
-        look.alphaPath: "fac.loadingStrength/est.betaAlpha"
-        look.betaPath: "fac.loadingStrength/est.betaBeta"
-        look.metricPath: "fac.loadingStrength/est.estimateMean"
+        look.alphaPath:
+          type: tx.PropertyRead
+          tx.readProp: est.betaAlpha
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: fac.loadingStrength
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.betaPath:
+          type: tx.PropertyRead
+          tx.readProp: est.betaBeta
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: fac.loadingStrength
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.metricPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateMean
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: fac.loadingStrength
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
       - type: look.Markdown
         look.source: fac.loadingRationale
 
@@ -553,7 +620,13 @@ wv.Evidence:
             look.nodeTier: card
             look.edgeLabel: "published by"
             look.channels:
-              - look.mapPath: "src.trustEstimate/est.estimateMean"
+              - look.mapPath:
+                  type: tx.PropertyRead
+                  tx.readProp: est.estimateMean
+                  tx.readSource:
+                    type: tx.PropertyRead
+                    tx.readProp: src.trustEstimate
+                    tx.readSource: { type: tx.VarRef, tx.varName: input }
                 look.to: opacity
       - type: look.Details
         look.skip:
@@ -991,9 +1064,18 @@ wv.WorldviewSnapshot:
           - look.relation: wv.hasThesis
             look.encode: look.connector
             look.nodeTier: chip
-            look.edgeValue: "rdfs.label"
+            look.edgeValue:
+              type: tx.PropertyRead
+              tx.readProp: rdfs.label
+              tx.readSource: { type: tx.VarRef, tx.varName: input }
             look.channels:
-              - look.mapPath: "wv.confidence/est.estimateMean"
+              - look.mapPath:
+                  type: tx.PropertyRead
+                  tx.readProp: est.estimateMean
+                  tx.readSource:
+                    type: tx.PropertyRead
+                    tx.readProp: wv.confidence
+                    tx.readSource: { type: tx.VarRef, tx.varName: input }
                 look.to: thickness
       - type: look.Markdown
         look.source: wv.narrative
@@ -1010,16 +1092,54 @@ snap.snapshots:
         look.source: wv.WorldviewSnapshot
         look.orderBy: wv.observedAt
         look.track: wv.hasThesis
-        look.metricPath: "wv.confidence/est.estimateMean"
-        look.hueBy: "vis.thesisTheme/vis.themeHue"
+        look.metricPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateMean
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.hueBy:
+          type: tx.Traverse
+          tx.traverseSource: { type: tx.VarRef, tx.varName: input }
+          tx.through: vis.thesisTheme
+          tx.step:
+            type: tx.PropertyRead
+            tx.readProp: vis.themeHue
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
         look.valueLabel: "μ"
         look.axisMin: 0
         look.axisMax: 1
-        look.lowerPath: "wv.confidence/est.estimateLower95"
-        look.upperPath: "wv.confidence/est.estimateUpper95"
+        look.lowerPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateLower95
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.upperPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateUpper95
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
       - type: look.VersionDiff
         look.source: wv.WorldviewSnapshot
         look.orderBy: wv.observedAt
         look.track: wv.hasThesis
-        look.metricPath: "wv.confidence/est.estimateMean"
-        look.hueBy: "vis.thesisTheme/vis.themeHue"
+        look.metricPath:
+          type: tx.PropertyRead
+          tx.readProp: est.estimateMean
+          tx.readSource:
+            type: tx.PropertyRead
+            tx.readProp: wv.confidence
+            tx.readSource: { type: tx.VarRef, tx.varName: input }
+        look.hueBy:
+          type: tx.Traverse
+          tx.traverseSource: { type: tx.VarRef, tx.varName: input }
+          tx.through: vis.thesisTheme
+          tx.step:
+            type: tx.PropertyRead
+            tx.readProp: vis.themeHue
+            tx.readSource: { type: tx.VarRef, tx.varName: input }

@@ -200,7 +200,6 @@ stagflation-risk:
     21 pre-open with tariff-passthrough lens, April PCE the formal
     invalidation indicator on May 28.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.82
     estimateStdDev: 0.04
     estimateLower95: 0.74
@@ -301,7 +300,6 @@ persistent-energy-shock:
     pre-market (WTI -1.9% to $102.14, Brent -2% to $109.03) - the
     structural-vs-tactical split the band captures.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.73
     estimateStdDev: 0.05
     estimateLower95: 0.63
@@ -431,7 +429,6 @@ iran-war-rearmament:
     veto-bound and the multi-year backlog (LMT $194B, RTX $271B) is
     unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.77
@@ -543,7 +540,6 @@ gold-debasement-bid:
     advance]] moves further away from the first leg, but the day's action
     is a tactical price pullback, not a structural break.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.84
     estimateStdDev: 0.05
     estimateLower95: 0.74
@@ -650,7 +646,6 @@ ai-capex-cycle-with-china-tail:
     architecture H2 2026 ramp is the positive overhang investors are
     watching for.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -739,7 +734,6 @@ equity-melt-up-vs-recession-risk:
     May 20 - Thu May 21: FOMC minutes (2 PM ET Wed), NVDA Q1 FY2027 (5 PM
     ET Wed), Walmart Q1 FY2027 (pre-open Thu, tariff-passthrough lens).
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.70
     estimateStdDev: 0.07
     estimateLower95: 0.56
@@ -883,7 +877,6 @@ powell-warsh-transition-risk:
     White House ceremony, and the first Warsh-as-chair FOMC is June
     16-17.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.50
     estimateStdDev: 0.11
     estimateLower95: 0.29
@@ -2269,7 +2262,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

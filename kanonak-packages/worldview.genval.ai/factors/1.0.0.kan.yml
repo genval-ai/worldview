@@ -86,13 +86,14 @@ loadingStrength:
   label: loading strength
   comment: >-
     Distributional strength of this driver's loading on the thesis. Embedded as
-    { type est.BetaEstimate, estimateMean ..., estimateStdDev ... }. Mean in
-    [0, 1]: 0 = this driver does not drive the thesis, 1 = the thesis IS this
-    driver. StdDev expresses confidence in the mapping. Range is the abstract
-    DistributionEstimate so the embed must narrow to a concrete subclass per the
-    embedded-type-must-narrow-range rule.
+    { estimateMean ..., estimateStdDev ... }. Mean in [0, 1]: 0 = this driver
+    does not drive the thesis, 1 = the thesis IS this driver. StdDev expresses
+    confidence in the mapping. Range is est.BetaEstimate - the beta family is
+    the natural fit for a bounded [0, 1] loading, and the concrete range lets
+    typed look band expressions read betaAlpha / betaBeta statically; the
+    implicit-embedded-type rule means `type:` is omitted on the embed.
   domain: DriverLoading
-  range: est.DistributionEstimate
+  range: est.BetaEstimate
 
 loadingRationale:
   type: owl.DatatypeProperty

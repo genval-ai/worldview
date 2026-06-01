@@ -137,7 +137,6 @@ stagflation-risk:
     [[ev-april-pce-consensus-38-33-may28|April PCE print at 8:30 AM ET]] (consensus
     3.8% headline / 3.3% core) is the operative tell nine minutes after observedAt.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.83
     estimateStdDev: 0.04
     estimateLower95: 0.75
@@ -320,7 +319,6 @@ persistent-energy-shock:
     the IEA structural-deficit / summer "red-zone" read is intact, so the
     SequencedCondition is no closer.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.06
     estimateLower95: 0.60
@@ -534,7 +532,6 @@ iran-war-rearmament:
     backlog (LMT $194B, RTX $271B) plus Golden Dome ($185B) plus the $1.5T FY2027
     budget proposal are unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.87
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -706,7 +703,6 @@ gold-debasement-bid:
     pullback. Structural supports (244t Q1 central-bank buying, JPM/UBS/Citi
     targets, 755t 2026 projection) are unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.85
     estimateStdDev: 0.05
     estimateLower95: 0.75
@@ -872,7 +868,6 @@ ai-capex-cycle-with-china-tail:
     Tuesday's rip - positioning rather than demand, with the China export-control
     tail unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -1026,7 +1021,6 @@ equity-melt-up-vs-recession-risk:
     [[ev-may28-premarket-futures-lower-may28|Thursday pre-market futures are lower
     with a Polymarket 55% lower-open probability]] ahead of the April PCE print.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.74
     estimateStdDev: 0.07
     estimateLower95: 0.61
@@ -1241,7 +1235,6 @@ powell-warsh-transition-risk:
     core]] is the imminent inflation read - the Warsh / room-to-cut contradiction
     is unchanged ahead of the June 16-17 FOMC.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.51
     estimateStdDev: 0.09
     estimateLower95: 0.33
@@ -2635,7 +2628,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

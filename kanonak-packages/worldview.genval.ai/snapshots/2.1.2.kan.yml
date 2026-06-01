@@ -176,7 +176,6 @@ stagflation-risk:
     minutes Wednesday May 20 2 PM ET, Walmart Q1 FY2027 Thursday May 21
     pre-open, April PCE the formal invalidation indicator on May 28.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.82
     estimateStdDev: 0.04
     estimateLower95: 0.74
@@ -262,7 +261,6 @@ persistent-energy-shock:
     but face an Iran institutionalizing the chokepoint AND a Gulf-target
     set now extending to civil nuclear.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.75
     estimateStdDev: 0.05
     estimateLower95: 0.65
@@ -358,7 +356,6 @@ iran-war-rearmament:
     is muted ahead of US cash open - daily rotation does not bend the
     multi-year procurement cycle.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.87
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -441,7 +438,6 @@ gold-debasement-bid:
     simultaneously - durable US-Iran peace AND Fed credibility restored
     AND sustained 6-month deficit decline - none of which moved.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.84
     estimateStdDev: 0.05
     estimateLower95: 0.73
@@ -526,7 +522,6 @@ ai-capex-cycle-with-china-tail:
     a consolidation setup. The Rubin architecture H2 2026 ramp is the
     positive overhang investors are watching for.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -604,7 +599,6 @@ equity-melt-up-vs-recession-risk:
     hours Wed May 20 - Thu May 21: FOMC minutes, NVDA Q1 FY2027, Walmart
     Q1 FY2027.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.66
     estimateStdDev: 0.08
     estimateLower95: 0.50
@@ -718,7 +712,6 @@ powell-warsh-transition-risk:
     statement yet on his first official Monday in office; substantive
     policy-content question opens at the June 16-17 FOMC.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.52
     estimateStdDev: 0.11
     estimateLower95: 0.30
@@ -2098,7 +2091,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

@@ -146,7 +146,6 @@ stagflation-risk:
     US strikes on Iran]] kept a passthrough-risk offset in place - leaving the
     higher-for-longer read intact into the May 28 PCE.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.83
     estimateStdDev: 0.04
     estimateLower95: 0.75
@@ -297,7 +296,6 @@ persistent-energy-shock:
     unimplemented, and [[ev-trump-great-deal-or-battlefront-may25|Trump's
     battlefront threat]] keeps the two-sided risk live.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.06
     estimateLower95: 0.60
@@ -479,7 +477,6 @@ iran-war-rearmament:
     emerged; the framework is unimplemented and the multi-year backlog (LMT
     $194B, RTX $271B) plus Golden Dome ($185B) are unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.87
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -630,7 +627,6 @@ gold-debasement-bid:
     [[ev-10y-yield-tuesday-am-451-may26|the 10Y easing to ~4.51%]] a tailwind -
     recovering the Friday give-back on unchanged structural supports.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.85
     estimateStdDev: 0.05
     estimateLower95: 0.75
@@ -777,7 +773,6 @@ ai-capex-cycle-with-china-tail:
     Tuesday pre-market; the beat-and-raise and the China export-control tail are
     unchanged.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -905,7 +900,6 @@ equity-melt-up-vs-recession-risk:
     US strikes on Iran]] are a two-sided risk; these are futures, not a close,
     and neither invalidation leg moved.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.72
     estimateStdDev: 0.07
     estimateLower95: 0.58
@@ -1091,7 +1085,6 @@ powell-warsh-transition-risk:
     room-to-cut-versus-higher-for-longer contradiction; the June 16-17 FOMC is
     the first substantive policy test.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.51
     estimateStdDev: 0.09
     estimateLower95: 0.33
@@ -2486,7 +2479,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

@@ -196,7 +196,6 @@ stagflation-risk:
     21 pre-open with tariff-passthrough lens, April PCE the formal
     invalidation indicator on May 28.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.82
     estimateStdDev: 0.04
     estimateLower95: 0.74
@@ -285,7 +284,6 @@ persistent-energy-shock:
     softening on the diplomatic-flow side is the operative
     near-term variable.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.74
     estimateStdDev: 0.05
     estimateLower95: 0.64
@@ -393,7 +391,6 @@ iran-war-rearmament:
     rejection news is the operative test of the procurement-cycle
     structural read.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.87
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -489,7 +486,6 @@ gold-debasement-bid:
     White House's rejection of Iran's proposal actively moves AWAY from
     the first leg.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.85
     estimateStdDev: 0.05
     estimateLower95: 0.75
@@ -581,7 +577,6 @@ ai-capex-cycle-with-china-tail:
     architecture H2 2026 ramp is the positive overhang investors are
     watching for.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.86
     estimateStdDev: 0.04
     estimateLower95: 0.78
@@ -661,7 +656,6 @@ equity-melt-up-vs-recession-risk:
     May 20 - Thu May 21: FOMC minutes (2 PM ET Wed), NVDA Q1 FY2027 (5 PM
     ET Wed), Walmart Q1 FY2027 (pre-open Thu, tariff-passthrough lens).
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.71
     estimateStdDev: 0.07
     estimateLower95: 0.57
@@ -795,7 +789,6 @@ powell-warsh-transition-risk:
     White House ceremony, and the first Warsh-as-chair FOMC is June
     16-17.
   confidence:
-    type: est.BetaEstimate
     estimateMean: 0.50
     estimateStdDev: 0.11
     estimateLower95: 0.29
@@ -2179,7 +2172,9 @@ ev-fed-held-april29-with-dissent:
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-04-29
-  fin.voteCount: 8
+  fin.voteCount:
+    fin.yeaCount: 8
+    fin.nayCount: 4
 
 ev-fomc-dissent-miran-cut:
   type: fin.CentralBankEvidence

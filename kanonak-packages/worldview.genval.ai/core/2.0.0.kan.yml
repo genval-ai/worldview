@@ -246,19 +246,19 @@ invalidationCondition:
 confidence:
   type: owl.ObjectProperty
   domain: WorldviewThesis
-  range: est.DistributionEstimate
+  range: est.BetaEstimate
   label: Confidence
   comment: >
     Distributional estimate of the author's conviction in the thesis.
     Embedded shorthand - { estimateMean: 0.82, estimateStdDev: 0.04,
-    estimateDistribution: est.beta } - is the common case; the
+    betaAlpha: 39.4, betaBeta: 8.64 } - is the common case; the
     implicit-embedded-type rule means `type:` is omitted on the embed.
     Mean MUST be in 0.0-1.0. estimateStdDev MAY be omitted, in which case
     renderers treat the confidence as a point and draw a vertical tick at
-    the mean (the prior 1.x visual behavior). The beta family is the
-    natural choice for bounded 0..1 beliefs - declare
-    `estimateDistribution: est.beta` and renderers will draw the
-    corresponding density curve. The Bayesian frame for beta is that
+    the mean (the prior 1.x visual behavior). The range is est.BetaEstimate
+    because the beta family is the natural choice for bounded 0..1 beliefs,
+    and the concrete range lets typed look band expressions read
+    betaAlpha / betaBeta statically. The Bayesian frame for beta is that
     alpha (estimateValue derived from mean) corresponds to "supporting
     evidence weight" and beta to "weakening evidence weight"; thus a
     Beta(33, 7) confidence (mean 0.825) reads as 33 supports vs 7
