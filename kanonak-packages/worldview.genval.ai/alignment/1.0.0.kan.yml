@@ -1,0 +1,240 @@
+alignment:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Thesis-Alignment Ontology
+  comment: >-
+    The ontology that bridges a worldview snapshot to concrete securities. An
+    Alignment is a point-in-time mapping from each active WorldviewThesis to a
+    ranked set of Securities most aligned with that thesis - the layer between
+    "which theses we believe and why" (worldview.genval.ai/core + /snapshots)
+    and "which tickers express each belief". Defines Alignment (the package
+    sentinel), ThesisAlignment (one per active thesis), AlignedSecurity (one
+    ranked candidate, scored with a distributional alignmentStrength), and the
+    SecurityRole / AllocationDirection closed taxonomies. The concrete alignment
+    INSTANCES live in the separate worldview.genval.ai/alignments package - the
+    same schema-versus-instances split as finance versus securities.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: core-prose
+          match: ^
+          version: 1.1.0
+          alias: prose
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+
+# ============================================================================
+# THESIS-ALIGNMENT ONTOLOGY
+#
+# An Alignment is a point-in-time mapping from each active WorldviewThesis to a
+# ranked set of Securities most aligned with that thesis. The mapping is the
+# bridge between a worldview snapshot (which theses we believe and why) and
+# concrete portfolio construction (which tickers express each belief).
+#
+# Each Alignment is derived from one specific WorldviewSnapshot version - the
+# derivedFromSnapshot pointer makes that audit-traceable. Each ThesisAlignment
+# scores its candidate Securities with a distributional alignmentStrength
+# (mean + stdDev via est.BetaEstimate) expressing "given the thesis fully plays
+# out, how strongly is this security positioned to participate."
+#
+# alignmentStrength is INDEPENDENT of thesis confidence - downstream consumers
+# do their own joint math (belief_in_thesis * alignment_strength) rather than
+# the alignment skill pre-multiplying. Keeps the responsibility split clean:
+# alignment owns "structural fit"; consumer owns "size given joint belief."
+#
+# Each AlignedSecurity carries a securityRole (primary-vehicle / alternate-
+# vehicle / high-beta-proxy / hedge / inverse-expression) describing WHY it's in
+# the candidate list and an allocationDirection (long / short / neutral)
+# describing the sign of the position.
+# ============================================================================
+
+Alignment:
+  type: rdfs.Class
+  label: Alignment
+  comment: Sentinel class for a complete alignment package. Exactly one Alignment instance per package version, named view (mirroring the snapshot sentinel convention). Carries the observedAt timestamp, a derivedFromSnapshot pointer identifying the exact WorldviewSnapshot version this alignment was built against, an alignmentNarrative summarizing the regime read, and a hasAlignment list linking to all ThesisAlignment instances in the package. Each package version is self-contained - alignment is freshly derived from the source snapshot every refresh, NOT carried forward from prior versions. Historical alignment lives in older package versions; current alignment reflects current evidence.
+
+ThesisAlignment:
+  type: rdfs.Class
+  label: Thesis Alignment
+  comment: A ranked set of Securities most aligned with a single WorldviewThesis. One ThesisAlignment per wv.active thesis in the source snapshot - retired and invalidated theses are skipped (history lives in older alignment versions). Carries an alignmentConfidence expressing the skill's overall conviction in the thesis-to-securities mapping, an alignmentRationale paragraph explaining the picks, and a hasAlignedSecurity list of up to 5 AlignedSecurity entries in rank order. The forThesis property points at the WorldviewThesis URI from the source snapshot.
+
+AlignedSecurity:
+  type: rdfs.Class
+  label: Aligned Security
+  comment: One candidate Security within a ThesisAlignment, scored with a distributional alignmentStrength, tagged with a securityRole (why it's a candidate) and an allocationDirection (long / short / neutral), and explained with a per-security securityRationale. Embedded as a list entry of ThesisAlignment.hasAlignedSecurity; the order of the list IS the rank order, highest alignmentStrength first.
+
+SecurityRole:
+  type: rdfs.Class
+  label: Security Role
+  comment: Closed taxonomy of roles a Security can play in a ThesisAlignment. The role explains WHY this security is in the candidate list - is it the canonical primary vehicle for the thesis, an alternate vehicle with similar exposure, a higher-beta proxy, an inverse-direction hedge, or an inverse expression of the thesis. Drives sizing intuition and execution choice downstream.
+
+AllocationDirection:
+  type: rdfs.Class
+  label: Allocation Direction
+  comment: Closed taxonomy of the directional sign of an AlignedSecurity's position. Long = thesis playing out is bullish for the security, short = thesis playing out is bearish for the security, neutral = the security tracks the thesis but with no clean directional bias (e.g., a vol-expansion thesis where VIX is an information vehicle rather than a position vehicle).
+
+# --- Properties for Alignment -----------------------------------------------
+
+alignmentObservedAt:
+  type: owl.DatatypeProperty
+  label: alignment observed at
+  comment: ISO-8601 timestamp (UTC) at which this alignment was generated. Distinct from the source snapshot's observedAt - the alignment may be generated some time after the snapshot was published.
+  domain: Alignment
+  range: xsd.dateTime
+
+derivedFromSnapshot:
+  type: owl.ObjectProperty
+  label: derived from snapshot
+  comment: Pointer to the WorldviewSnapshot instance this alignment was derived from. References the snapshot's sentinel instance (typically snap.view). Makes the audit trail explicit - any consumer can resolve this URI to see exactly which theses, evidence, and confidences the alignment was built against.
+  domain: Alignment
+  range: wv.WorldviewSnapshot
+
+alignmentNarrative:
+  type: owl.DatatypeProperty
+  label: alignment narrative
+  comment: Markdown prose summarizing the alignment - what regime the snapshot describes, why specific securities were elevated or demoted this refresh, any cross-thesis observations. The package-level analog to a thesis's alignmentRationale. Supports embedded [[reference]] placeholders (e.g. [[gold-debasement-bid]], [[sec.gld]], [[sec.gld|the canonical gold ETF]]) that resolve through the package's import closure.
+  domain: Alignment
+  range: prose.Markdown
+
+hasAlignment:
+  type: owl.ObjectProperty
+  label: has alignment
+  comment: Links the Alignment sentinel to a ThesisAlignment it contains. One per active thesis in the source snapshot.
+  domain: Alignment
+  range: ThesisAlignment
+
+# --- Properties for ThesisAlignment -----------------------------------------
+
+forThesis:
+  type: owl.ObjectProperty
+  label: for thesis
+  comment: The WorldviewThesis this alignment maps to securities. References the thesis URI in the source snapshot - the derivedFromSnapshot import resolves the reference.
+  domain: ThesisAlignment
+  range: wv.WorldviewThesis
+
+alignmentConfidence:
+  type: owl.ObjectProperty
+  label: alignment confidence
+  comment: Distributional confidence in the overall thesis-to-securities mapping. Embedded as { type est.BetaEstimate, estimateMean ..., estimateStdDev ... }. Independent of the source thesis's own confidence - this measures the alignment skill's certainty in its picks, not the analyst's certainty in the thesis. Range is est.BetaEstimate - the beta family is the natural fit for a bounded [0, 1] estimate; the embed omits the redundant type per the implicit-embedded-type rule.
+  domain: ThesisAlignment
+  range: est.BetaEstimate
+
+alignmentRationale:
+  type: owl.DatatypeProperty
+  label: alignment rationale
+  comment: Markdown prose explaining the rank order and why specific candidates were elevated or demoted. The thesis-level analog to a per-security securityRationale. Supports embedded [[reference]] placeholders that resolve through the package's import closure - useful for linking to the source thesis, the specific evidence instances driving the rank, or alternate securities considered and excluded.
+  domain: ThesisAlignment
+  range: prose.Markdown
+
+hasAlignedSecurity:
+  type: owl.ObjectProperty
+  label: has aligned security
+  comment: Links a ThesisAlignment to its candidate AlignedSecurity entries. Authored as an ordered YAML list - the order IS the rank order, highest alignmentStrength first. Capped at 5 candidates per thesis to force ranking discipline.
+  domain: ThesisAlignment
+  range: AlignedSecurity
+
+# --- Properties for AlignedSecurity -----------------------------------------
+
+alignedSecurity:
+  type: owl.ObjectProperty
+  label: aligned security
+  comment: The Security this entry is about. Typically a sec.<ticker> reference resolved through the worldview.genval.ai/securities import.
+  domain: AlignedSecurity
+  range: fin.Security
+
+securityRole:
+  type: owl.ObjectProperty
+  label: security role
+  comment: The role this security plays in the candidate list. References a SecurityRole instance (role-primary-vehicle / role-alternate-vehicle / role-high-beta-proxy / role-hedge / role-inverse-expression).
+  domain: AlignedSecurity
+  range: SecurityRole
+
+allocationDirection:
+  type: owl.ObjectProperty
+  label: allocation direction
+  comment: The directional sign of the position this security represents for the thesis. References an AllocationDirection instance (direction-long / direction-short / direction-neutral).
+  domain: AlignedSecurity
+  range: AllocationDirection
+
+alignmentStrength:
+  type: owl.ObjectProperty
+  label: alignment strength
+  comment: Distributional strength of THIS security's alignment with the parent thesis. Embedded as { type est.BetaEstimate, estimateMean ..., estimateStdDev ... }. Mean in [0, 1] expressing "given the thesis fully plays out as stated, how strongly is this security positioned to participate." 1.0 = perfect expression; 0.5 = partial / indirect; 0.0 = no alignment. StdDev expresses the skill's confidence in this specific alignment judgment - narrower when multiple corroborating evidence mentions, wider when sector-only or skill-originated. Range is est.BetaEstimate - the beta family is the natural fit for a bounded [0, 1] estimate; the embed omits the redundant type per the implicit-embedded-type rule.
+  domain: AlignedSecurity
+  range: est.BetaEstimate
+
+securityRationale:
+  type: owl.DatatypeProperty
+  label: security rationale
+  comment: Markdown prose explaining WHY this specific security earned its alignmentStrength and rank position. Should cite which evidence mentions support it (or note when it is sector-only / skill-originated). Supports embedded [[reference]] placeholders - linking [[sec.<ticker>]] for cross-security comparisons or [[ev-<evidence-name>]] for direct attribution to evidence in the source snapshot.
+  domain: AlignedSecurity
+  range: prose.Markdown
+
+# --- SecurityRole instances -------------------------------------------------
+
+role-primary-vehicle:
+  type: SecurityRole
+  label: Primary Vehicle
+  comment: The canonical, most-liquid, most-direct expression of the thesis. Typically rank 1 in the hasAlignedSecurity list. Examples - GLD as primary vehicle for a gold thesis, XLE as primary vehicle for a broad energy thesis, LMT as primary vehicle for a defense procurement thesis.
+
+role-alternate-vehicle:
+  type: SecurityRole
+  label: Alternate Vehicle
+  comment: A substitute for the primary vehicle with similar exposure - lower expense ratio, different issuer, slightly different tracking. Same direction, same broad exposure, different wrapper. Examples - IAU as alternate to GLD, VTI as alternate to SPY.
+
+role-high-beta-proxy:
+  type: SecurityRole
+  label: High-Beta Proxy
+  comment: A higher-beta variant of the primary exposure - miners on a commodity thesis, single-name leverage on an ETF thesis, leveraged ETFs. Same direction but amplified payoff with amplified risk. Examples - GDX (gold miners) as high-beta proxy for gold, NVDA as high-beta proxy for a broader semiconductor thesis.
+
+role-hedge:
+  type: SecurityRole
+  label: Hedge
+  comment: A position that profits if the thesis's downside case plays out. Inverse correlation to the thesis-out scenario. Examples - UVIX as hedge against an equity-melt-up thesis, long puts on the primary vehicle, short single-names against a long sector view.
+
+role-inverse-expression:
+  type: SecurityRole
+  label: Inverse Expression
+  comment: A security that benefits from the thesis playing out via short direction. Distinct from a hedge - a hedge protects against the thesis being WRONG; an inverse expression IS the thesis but on the short side. Examples - short TLT on a stagflation / rate-up thesis (rates rise, bonds fall), short XOM if the thesis is "oil collapses on demand destruction".
+
+# --- AllocationDirection instances ------------------------------------------
+
+direction-long:
+  type: AllocationDirection
+  label: Long
+  comment: Thesis playing out drives the security UP. Take a long position to express the thesis. The most common direction for primary-vehicle and alternate-vehicle roles.
+
+direction-short:
+  type: AllocationDirection
+  label: Short
+  comment: Thesis playing out drives the security DOWN. Take a short position to express the thesis. Common for inverse-expression and hedge roles where the security's natural direction is opposite the thesis-out scenario.
+
+direction-neutral:
+  type: AllocationDirection
+  label: Neutral
+  comment: The security tracks the thesis but with no clean directional bias - it is an information vehicle rather than a position vehicle, or it benefits from realized volatility rather than direction. Examples - long-vol structures on a vol-expansion thesis where the position is non-directional on the underlying, pair trades where the position is the spread rather than the leg.

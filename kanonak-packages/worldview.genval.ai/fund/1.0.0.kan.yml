@@ -1,0 +1,228 @@
+fund:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.0
+  label: Fund Ontology
+  comment: >-
+    The ontology for a target portfolio - a single named basket of securities
+    with signed target weights, synthesised from an Alignment and the
+    WorldviewSnapshot it was derived against. Defines Fund (the package
+    sentinel), Holding (one signed security position), and the
+    FundWeightingMethod taxonomy recording how the weights were derived. Sits
+    one layer below worldview.genval.ai/alignment: an Alignment says which
+    securities express each thesis; a Fund commits to signed weights across
+    them. The concrete fund INSTANCES live in the separate
+    worldview.genval.ai/funds package - the same schema-versus-instances split
+    as finance versus securities.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-owl
+          match: ^
+          version: 2.1.0
+          alias: owl
+        - package: core-xsd
+          match: ^
+          version: 1.0.0
+          alias: xsd
+        - package: core-prose
+          match: ^
+          version: 1.1.0
+          alias: prose
+    - publisher: worldview.genval.ai
+      packages:
+        - package: core
+          match: ^
+          version: 2.0.0
+          alias: wv
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: finance
+          match: ^
+          version: 3.0.0
+          alias: fin
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+
+# ============================================================================
+# FUND ONTOLOGY
+#
+# A Fund is a point-in-time target portfolio - a single named basket of
+# securities with signed target weights, synthesised from an Alignment and the
+# WorldviewSnapshot it was derived against. The Fund is account-agnostic: shorts
+# are expressed as shorts (negative weights), and the projection onto a specific
+# account's constraints (e.g. rewriting shorts as puts for a no-margin sleeve)
+# is a separate, downstream concern.
+# ============================================================================
+
+Fund:
+  type: rdfs.Class
+  label: Fund
+  comment: Sentinel class for a point-in-time target portfolio - a single named basket of securities with signed target weights, synthesised from an Alignment and the WorldviewSnapshot it was derived against. One Fund instance per package version (the genval-worldview-fund identity); each reweight emits a new immutable version, so the sequence of versions IS the rebalance history. Carries fundObservedAt, derivedFromSnapshot, derivedFromAlignment, a weightingMethod tag, the grossExposure / netExposure / cashWeight summary, a fundNarrative, and an ordered hasHolding list. The Fund is the security-level target book, account-agnostic - shorts stay shorts.
+
+Holding:
+  type: rdfs.Class
+  label: Holding
+  comment: One security position within a Fund. Carries a signed targetWeight (fraction of NAV; negative = short), a holdingDirection (long / short / neutral), the dominant holdingRole inherited from the alignment, a servesThesis list naming every WorldviewThesis whose alignment contributed weight to this holding, and a holdingRationale. Authored as a top-level instance referenced from Fund.hasHolding so it is independently addressable. The optional weightEstimate carries a distributional weight when the weighting method produces one; point-weight funds omit it and rely on targetWeight.
+
+FundWeightingMethod:
+  type: rdfs.Class
+  label: Fund Weighting Method
+  comment: Taxonomy of the method used to derive a Fund's target weights from its source alignment. The method is recorded on the Fund so a reader can reproduce or critique the weights. The hierarchy is open to new methods as the weighting layer matures.
+
+# --- Properties for Fund ----------------------------------------------------
+
+fundObservedAt:
+  type: owl.DatatypeProperty
+  label: fund observed at
+  comment: ISO-8601 timestamp (UTC) at which this Fund version was constructed. Distinct from the source snapshot's and alignment's observedAt - the fund may be built some time after either was published.
+  domain: Fund
+  range: xsd.dateTime
+
+derivedFromSnapshot:
+  type: owl.ObjectProperty
+  label: derived from snapshot
+  comment: Pointer to the WorldviewSnapshot instance this Fund was synthesised against (typically the snap.view sentinel of a pinned snapshots version). Together with derivedFromAlignment it makes the full audit chain explicit - worldview snapshot to thesis alignment to fund weights.
+  domain: Fund
+  range: wv.WorldviewSnapshot
+
+derivedFromAlignment:
+  type: owl.ObjectProperty
+  label: derived from alignment
+  comment: Pointer to the Alignment instance this Fund was synthesised from (typically the alignments sentinel of a pinned alignments version). Together with derivedFromSnapshot it makes the full audit chain explicit - worldview snapshot to thesis alignment to fund weights.
+  domain: Fund
+  range: align.Alignment
+
+weightingMethod:
+  type: owl.ObjectProperty
+  label: weighting method
+  comment: The method used to derive this Fund's target weights from its source alignment. References a FundWeightingMethod instance (method-conviction-weighted / method-equal-weight-tiered / method-mean-variance / method-driver-union). Recorded so the weights are reproducible and auditable.
+  domain: Fund
+  range: FundWeightingMethod
+
+grossExposure:
+  type: owl.DatatypeProperty
+  label: gross exposure
+  comment: Sum of the absolute target weights across all holdings (Sigma absolute targetWeight), as a fraction of NAV. 1.00 = fully invested with no leverage; greater than 1.00 = levered.
+  domain: Fund
+  range: xsd.decimal
+
+netExposure:
+  type: owl.DatatypeProperty
+  label: net exposure
+  comment: Signed sum of target weights across all holdings (Sigma targetWeight), as a fraction of NAV. The net long (positive) or net short (negative) tilt of the book after offsetting shorts against longs.
+  domain: Fund
+  range: xsd.decimal
+
+cashWeight:
+  type: owl.DatatypeProperty
+  label: cash weight
+  comment: The residual fraction of NAV not deployed in long holdings (1 minus the sum of long target weights). Short proceeds finance part of the book, so cashWeight plus net long exposure reconciles to the long book.
+  domain: Fund
+  range: xsd.decimal
+
+fundNarrative:
+  type: owl.DatatypeProperty
+  label: fund narrative
+  comment: Markdown prose summarising the fund - the weighting method, the gross / net / cash exposure picture, the dominant themes and what drives the largest weights, and what changed since the prior fund version. Supports embedded [[reference]] placeholders that resolve through the package's import closure (e.g. [[gold-debasement-bid]], [[sec.gld]], [[alignments]]).
+  domain: Fund
+  range: prose.Markdown
+
+hasHolding:
+  type: owl.ObjectProperty
+  label: has holding
+  comment: Links the Fund sentinel to a Holding it contains. Authored as an ordered YAML list - conventionally descending by absolute target weight, largest position first.
+  domain: Fund
+  range: Holding
+
+# --- Properties for Holding --------------------------------------------------
+
+heldSecurity:
+  type: owl.ObjectProperty
+  label: held security
+  comment: The Security this holding is a position in. Typically a sec.<ticker> reference resolved through the worldview.genval.ai/securities import.
+  domain: Holding
+  range: fin.Security
+
+targetWeight:
+  type: owl.DatatypeProperty
+  label: target weight
+  comment: Signed target weight of this holding as a fraction of NAV. Positive = long, negative = short. The headline allocation figure - the sum of absolute values across holdings is the Fund's grossExposure, the signed sum is its netExposure.
+  domain: Holding
+  range: xsd.decimal
+
+holdingDirection:
+  type: owl.ObjectProperty
+  label: holding direction
+  comment: The directional sign of this holding. References an AllocationDirection instance (direction-long / direction-short / direction-neutral). Redundant with the sign of targetWeight but carried explicitly for queryability and to mirror the alignment's allocationDirection.
+  domain: Holding
+  range: align.AllocationDirection
+
+holdingRole:
+  type: owl.ObjectProperty
+  label: holding role
+  comment: The dominant role this security plays in the fund, inherited from the highest-contributing ThesisAlignment's securityRole. References a SecurityRole instance. When a security serves multiple theses the role of the largest-weight contribution is used.
+  domain: Holding
+  range: align.SecurityRole
+
+servesThesis:
+  type: owl.ObjectProperty
+  label: serves thesis
+  comment: A WorldviewThesis whose alignment contributed target weight to this holding. Authored as a list - a single security can express multiple theses (e.g. GLD serving both gold-debasement-bid and stagflation-risk) and the weight accumulates across them. References thesis URIs in the source snapshot.
+  domain: Holding
+  range: wv.WorldviewThesis
+
+weightEstimate:
+  type: owl.ObjectProperty
+  label: weight estimate
+  comment: Optional distributional target weight, embedded as a concrete DistributionEstimate subclass (typically a NormalEstimate for a signed weight). Used when the weighting method produces a distribution rather than a point estimate; point-weight funds omit it and rely on targetWeight. Range is the abstract DistributionEstimate so the embed must narrow per the embedded-type-must-narrow-range rule.
+  domain: Holding
+  range: est.DistributionEstimate
+
+holdingRationale:
+  type: owl.DatatypeProperty
+  label: holding rationale
+  comment: Markdown prose explaining this holding's weight, direction, and role - which theses contributed, why the weight landed where it did, and any cross-holding context. Supports embedded [[reference]] placeholders linking to the contributing theses ([[<thesis>]]) or the security ([[sec.<ticker>]]).
+  domain: Holding
+  range: prose.Markdown
+
+# --- FundWeightingMethod instances -------------------------------------------
+
+method-conviction-weighted:
+  type: FundWeightingMethod
+  label: Conviction Weighted
+  comment: Raw weight per security = sum over contributing theses of (thesis confidence mean x alignmentStrength mean x direction sign), normalised by the sum of absolute raw weights to the gross-exposure budget. Securities serving multiple theses accumulate. Transparent, deterministic, and fully reproducible from the source snapshot and alignment graph.
+
+method-equal-weight-tiered:
+  type: FundWeightingMethod
+  label: Equal Weight (Tiered)
+  comment: Securities bucketed into conviction tiers by their emphasis score (confidence x strength), then equal-weighted within each tier against tier-level budgets. Less sensitive to estimate noise than conviction weighting; coarser - ignores magnitude differences within a tier.
+
+method-mean-variance:
+  type: FundWeightingMethod
+  label: Mean-Variance Optimised
+  comment: Markowitz-style optimisation maximising expected return minus a risk penalty on portfolio variance. Requires expected-return and covariance inputs not present in the current graph - reserved for a future weighting layer with a data-fetch and estimation stage.
+
+method-driver-union:
+  type: FundWeightingMethod
+  label: Driver Union
+  comment: >-
+    Counts each underlying macro DRIVER once instead of summing overlapping
+    theses. For each security: per contributing thesis, distribute conviction
+    (thesis confidence x alignmentStrength) across the thesis's drivers by their
+    NORMALISED hasDriverLoading shares; combine across theses WITHIN each driver
+    by MAX (the shared force counted once, at its strongest channel); sum across
+    DISTINCT drivers (the unique forces); apply the position sign and normalise
+    to the gross budget. Deduplicates theses that are really the same bet (e.g. a
+    gold thesis and a stagflation thesis both loading inflation-debasement) using
+    the actual driver loadings from worldview.genval.ai/factors + /drivers, not a
+    structural proxy. Single-driver / single-thesis securities are unchanged
+    versus conviction-weighted; multi-thesis names sharing a driver are trimmed.
