@@ -1,0 +1,687 @@
+alignments:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.1
+  label: Alignment data - patch refresh against snapshot 2.2.3
+  comment: >-
+    Patch refresh of the public alignment data, re-derived against worldview
+    snapshot 2.2.3 (Saturday June 6, integrating the full Friday June 5 session -
+    a hot May jobs report, a yield spike, and a $1.3T semiconductor rout). Same
+    seven wv.active theses as 1.0.0; baskets, ranks, roles, directions, and
+    alignmentStrength parameters unchanged (no new ticker entered the snapshot
+    and no candidate's structural fit shifted). Rationale prose refreshed to the
+    2.2.3 regime. Superseded by the next operator refresh.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+    - publisher: worldview.genval.ai
+      packages:
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: securities
+          match: ^
+          version: 2.2.0
+          alias: sec
+        - package: snapshots
+          match: '='
+          version: 2.2.3
+          alias: ws
+
+view:
+  type: align.Alignment
+  label: Thesis alignments (1.0.1 - patch refresh against snapshot 2.2.3, the Saturday June 6 moment integrating the full Friday June 5 session - the May jobs report ran hot (NFP +172k vs ~80k consensus, unemployment 4.3%), driving the 10Y to 4.55% and CME hike-by-December odds to ~70% and detonating a ~$1.3T semiconductor rout (SOX -10.3%, worst since March 2020; S&P -2.64%, Nasdaq -4.18%); defense caught a haven bid, gold took the yield hit; same seven theses, baskets and ranks unchanged, snapshot confidences stagflation 0.85 / ai-capex 0.87 / equity 0.78 the only moves)
+  alignmentObservedAt: 2026-06-06T06:07:26Z
+  derivedFromSnapshot: ws.view
+  alignmentNarrative: |
+    Patch refresh against [[ws.view|worldview snapshot 2.2.3]] (observedAt 2026-06-06T05:46:05Z, the Saturday-morning moment integrating the full Friday June 5 cash session). Same seven `wv.active` theses as 1.0.0, so this is a patch, not a minor - no `ThesisAlignment` added or dropped. The candidate baskets, rank order, roles, directions, and `alignmentStrength` distributional parameters are unchanged: the Friday evidence (the hot May jobs report, the yield spike, the semiconductor rout, the energy and gold pullbacks, the defense bid) added no new ticker and shifted no candidate's structural participation. What moved is the rationale prose, refreshed to the 2.2.3 regime, plus the thesis-confidence figures cited in prose - structural fit is independent of the thesis-confidence drift captured in the snapshot (stagflation 0.84 to 0.85, ai-capex 0.88 to 0.87, equity 0.80 to 0.78; energy 0.75, defense 0.87, gold 0.85, Warsh 0.51 held).
+
+    **The Friday macro event and what it did to the basket.** A single coherent shock drove the whole session: [[ws.ev-may-jobs-report-actual-172k-jun5|nonfarm payrolls rose 172k versus an ~80k consensus, unemployment steady at 4.3%, prior months revised up +93k]], a resilient-labor print that pushed [[ws.ev-10y-yield-fri-455-jun5|the 10Y to 4.55%]] and [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|hike-by-December odds to ~70%]], and that rate spike lit the fuse on [[ws.ev-sox-rout-103pct-fri-jun5|a ~10.3% Philadelphia Semiconductor Index plunge, the worst since March 2020, erasing well over $1T]]. None of this introduced a new tradable vehicle, so every basket below is structurally identical to 1.0.0 - the rate-up theme reinforces the short-[[sec.tlt]] / short-[[sec.ief]] legs, the chip rout is a positioning move on names already in the AI basket, and the energy and gold pullbacks are tactical drawdowns on vehicles already held.
+
+    **Energy and defense remain the structurally overweight themes.** [[ws.persistent-energy-shock]] holds at 0.75: [[ws.ev-wti-fri-ease-93-jun5|WTI eased to ~$93]] and [[ws.ev-energy-complex-eases-fri-jun5|the complex gave back a little (XOM -1.7%, CVX -0.9%, XLE -1.7%)]] in sympathy with the broad risk-off, but $93 sits far above the < $80-for-30-days threshold and the [[ws.ev-iea-omr-may-2026-undersupply|IEA deficit read]] is intact, so the long [[sec.xle]] / [[sec.xom]] / [[sec.cvx]] stack is unchanged. [[ws.iran-war-rearmament]] holds at 0.87 and defense actually OUTPERFORMED on the risk-off day ([[ws.ev-defense-bid-fri-jun5|LMT +0.7%, RTX +1.0%, NOC firm]]) on the [[ws.ev-trump-defense-budget-15t-2027-may26|$1.5T FY2027 budget]] bid and the record Q1 backlogs - the [[sec.lmt]] / [[sec.rtx]] / [[sec.noc]] basket is unchanged.
+
+    **Gold takes a tactical yield hit; the structural stack holds.** [[ws.gold-debasement-bid]] holds at 0.85: gold fell with the yield spike ([[ws.ev-gold-spot-fri-close-4327-jun5|spot ~$4,327]], [[ws.ev-gdx-fri-close-7884-jun5|GDX -5.9%]]), but a yield-driven drawdown trips none of the `AndCondition` invalidation triplet and the [[ws.ev-lbma-q1-record-4873|LBMA record]] / central-bank-buying / [[ws.ev-jpm-gold-target-5055-6300|analyst-target]] supports stand - the [[sec.gld]] / [[sec.iau]] / [[sec.gdx]] stack is unchanged.
+
+    **AI capex - the cleanest illustration of the basket's positioning tail.** [[ws.ai-capex-cycle-with-china-tail]] stepped 0.88 to 0.87 (band wider) as the [[ws.ev-sox-rout-103pct-fri-jun5|$1.3T chip rout]] hit [[sec.nvda]] ([[ws.ev-nvda-fri-close-20510-jun5|-6.2%]]) and [[sec.amd]] ([[ws.ev-amd-fri-close-46638-jun5|-6.6%]]) on intact fundamentals - the demand leg held ([[ws.ev-avgo-q2-fy26-blowout-jun3|Broadcom's Q3 AI guide +200% YoY]]) while the China-and-positioning tail fired. This is a thesis-confidence move, not a structural one: the [[sec.nvda]] / [[sec.amd]] / [[sec.csco]] / [[sec.intc]] / [[sec.mu]] basket and its rank order are unchanged because the securities' participation in the thesis is the same; the snapshot's lower mean and wider band flow through downstream as `thesis_confidence x alignment_strength`, not as a re-rank here.
+
+    **The two macro-policy theses and the equity case.** [[ws.stagflation-risk]] stepped to 0.85 on the rate-path corroboration ([[ws.ev-10y-yield-fri-455-jun5|10Y 4.55%]], [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|~70% hike odds]]) - still a Tier-3 macro framework with no direct ticker evidence, so the long-[[sec.gld]] / long-[[sec.xle]] / short-[[sec.tlt]] basket is built from baseline tickers and `alignmentConfidence` stays modest. [[ws.powell-warsh-transition-risk]] holds at 0.51 - the hot jobs print sharpens the room-to-cut-versus-higher-for-longer contradiction the new chair inherits but no Warsh-as-chair substance landed, so the long-[[sec.uvix]] / managed-futures / short-[[sec.tlt]] uncertainty basket is unchanged ahead of the June 16-17 FOMC. [[ws.equity-melt-up-vs-recession-risk]] stepped 0.80 to 0.78 as [[ws.ev-triple-index-selloff-fri-jun5|the worst equity day since April 2025]] decisively ended the melt-up-confirmation leg while [[ws.ev-may-jobs-report-actual-172k-jun5|the hot jobs print]] kept the recession leg quiet - the long-[[sec.spy]] / [[sec.vti]] core plus the [[sec.uvix]] vol-expansion hedge is exactly the bi-directional structure for a tape that is neither melting up nor breaking down, so the basket holds.
+
+    **What this patch changed.** Rank order, roles, directions, and `alignmentStrength` parameters are unchanged from 1.0.0 - no new evidence named a new ticker and no candidate's structural fit shifted. The rationale prose was refreshed to the 2.2.3 regime and the thesis-confidence figures cited in prose were updated to 2.2.3 levels. No Tier-3 (out-of-baseline) ticker additions were required, so no companion `worldview.genval.ai/securities` bump accompanies this file.
+  hasAlignment:
+    - stagflation-risk-alignment
+    - persistent-energy-shock-alignment
+    - iran-war-rearmament-alignment
+    - gold-debasement-bid-alignment
+    - ai-capex-cycle-with-china-tail-alignment
+    - equity-melt-up-vs-recession-risk-alignment
+    - powell-warsh-transition-risk-alignment
+
+stagflation-risk-alignment:
+  type: align.ThesisAlignment
+  label: Stagflation risk alignment
+  forThesis: ws.stagflation-risk
+  alignmentConfidence:
+    estimateMean: 0.55
+    estimateStdDev: 0.10
+    betaAlpha: 12.0
+    betaBeta: 10.0
+  alignmentRationale: |
+    No `fin.aboutSecurity` or `fin.forecastTarget` references appear in
+    [[ws.stagflation-risk]]'s `supportingEvidence` and no `sec.<ticker>` names
+    appear in the `thesisStatement` - the thesis is a macro framework
+    (CPI/PPI/PCE + rate-path + energy-passthrough) rather than a single-name
+    argument. Tier 1 and Tier 2 are empty; the basket below is **Tier-3 skill
+    judgment** using baseline tickers only, so per the indirect-reasoning
+    calibration the per-security means are capped around 0.65.
+
+    Four mechanisms drive the picks: **rates up = bonds down** (short
+    [[sec.tlt]] inverse-expression, short [[sec.ief]] lower-beta alternate);
+    **inflation + debasement hedge** (long [[sec.gld]]); **energy-passthrough as
+    the operative inflation channel** (long [[sec.xle]]); and **trend-regime
+    capture** (long [[sec.dbmf]]). The thesis stepped to 0.85 in 2.2.3 as the
+    rate-path pillar firmed - [[ws.ev-may-jobs-report-actual-172k-jun5|the hot May jobs report]] drove [[ws.ev-10y-yield-fri-455-jun5|the 10Y to 4.55%]]
+    and [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|hike-by-December odds to ~70%]],
+    reinforcing the short-bond legs directly, while the inflation channel behind
+    long [[sec.gld]] / long [[sec.xle]] holds on the [[ws.ev-ism-services-prices-paid-713-may-jun3|ISM Services prices-paid 71.3%]] and the
+    [[ws.ev-walmart-cfo-tariff-price-warning-may21|Walmart tariff-passthrough warning]]. Basket and rank order unchanged. `alignmentConfidence` is held
+    modest (0.55 +/- 0.10) precisely because the thesis lacks direct ticker
+    evidence.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.tlt
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.65
+        estimateStdDev: 0.10
+        betaAlpha: 14.0
+        betaBeta: 7.5
+      securityRationale: |
+        Short [[sec.tlt]] is the cleanest single-ticker expression of the
+        rate-up component named throughout [[ws.stagflation-risk]] - the move to
+        4.55% is the latest print ([[ws.ev-10y-yield-fri-455-jun5]]), extending
+        the [[ws.ev-10y-yield-monday-461-may18|May rate-path repricing]], and
+        [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|hike-by-December odds at ~70%]]
+        corroborate. Long-duration Treasuries fall most under the named rate
+        move; **inverse-expression** (short) is the mechanism. Mean at the
+        indirect-reasoning cap of 0.65 because the thesis does not name
+        [[sec.tlt|TLT]] directly even though the mechanism is unambiguous.
+    - alignedSecurity: sec.gld
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.62
+        estimateStdDev: 0.10
+        betaAlpha: 13.0
+        betaBeta: 8.0
+      securityRationale: |
+        Long [[sec.gld]] is the classic stagflation hedge - precious metals
+        carry the debasement-and-inflation premium. The thesis names rising
+        inflation (CPI 3.8% via [[ws.ev-april-cpi-print-headline-38]], PPI +6.0%
+        YoY via [[ws.ev-april-ppi-print-may13]]) and the
+        [[ws.gold-debasement-bid|gold-debasement-bid thesis]] runs in parallel;
+        this alignment captures the inflation side of stagflation. Mean below
+        0.65 because [[sec.gld|GLD]] is not named in this thesis's evidence
+        directly (see [[gold-debasement-bid-alignment]]).
+    - alignedSecurity: sec.xle
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.60
+        estimateStdDev: 0.10
+        betaAlpha: 12.0
+        betaBeta: 8.0
+      securityRationale: |
+        Long [[sec.xle]] captures the energy-passthrough mechanism named
+        explicitly in [[ws.stagflation-risk]]'s thesisStatement. Crude eased to
+        [[ws.ev-wti-fri-ease-93-jun5|~$93 Friday]] but remains a live passthrough
+        tailwind well above the invalidation threshold. Mean modest because the
+        [[persistent-energy-shock-alignment|persistent-energy-shock alignment]]
+        already carries this ticker with higher conviction.
+    - alignedSecurity: sec.dbmf
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.55
+        estimateStdDev: 0.12
+        betaAlpha: 9.0
+        betaBeta: 7.4
+      securityRationale: |
+        Long [[sec.dbmf]] captures the trend-following premium that
+        managed-futures strategies extract from regime shifts like the current
+        rates / commodities / FX repricing. The thesisStatement documents the
+        sharpest rate-path repricing of the cycle - exactly the environment in
+        which managed-futures vehicles structurally outperform. Mean modest
+        because the mechanism is one step removed from the thesis text.
+    - alignedSecurity: sec.ief
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.53
+        estimateStdDev: 0.10
+        betaAlpha: 11.0
+        betaBeta: 9.8
+      securityRationale: |
+        Short [[sec.ief]] is the lower-duration alternate to short
+        [[sec.tlt|TLT]] - same inverse-expression sign on the rate-up component
+        but smaller single-trade vol. Useful as a sleeve-level diversifier of the
+        short-bond expression. Mean lowest in the stack because the primary
+        inverse-expression slot is already filled by [[sec.tlt|TLT]].
+
+persistent-energy-shock-alignment:
+  type: align.ThesisAlignment
+  label: Persistent energy shock alignment
+  forThesis: ws.persistent-energy-shock
+  alignmentConfidence:
+    estimateMean: 0.88
+    estimateStdDev: 0.04
+    betaAlpha: 22.0
+    betaBeta: 3.0
+  alignmentRationale: |
+    Three **Tier-1 candidates** with strong direct evidence support and clean
+    rank order. [[sec.xle]], [[sec.xom]], and [[sec.cvx]] are all named in
+    [[ws.persistent-energy-shock]]'s thesisStatement and each has dedicated
+    `fin.MarketDataEvidence`. [[sec.xle|XLE]] leads as the sector ETF (broadest,
+    most-liquid expression); [[sec.xom|XOM]] and [[sec.cvx|CVX]] provide
+    single-name exposure to the integrated majors that capture the largest
+    absolute beta to a sustained oil-price regime.
+
+    No hedge or inverse-expression candidate is in scope - the thesis is
+    structurally directional on energy prices staying elevated. The alignment
+    rests on the structural-supply read ([[ws.ev-iea-omr-may-2026-undersupply|IEA 1.78 mb/d 2026 deficit]]), which is not contingent on the diplomatic track.
+    The thesis holds at 0.75 in 2.2.3: [[ws.ev-wti-fri-ease-93-jun5|WTI eased to ~$93 Friday]] and [[ws.ev-energy-complex-eases-fri-jun5|the complex gave back a little (XOM -1.7%, CVX -0.9%, XLE -1.7%)]] in sympathy with the broad
+    risk-off, but $93 sits far above the < $80-for-30-days threshold and the
+    [[ws.ev-wti-mon-spike-92-jun1|Hormuz-blockade spike risk]] remains live with
+    the memorandum unsigned - a tactical pullback, so the structural fit and rank
+    order hold.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.xle
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.91
+        estimateStdDev: 0.03
+        betaAlpha: 30.0
+        betaBeta: 3.0
+      securityRationale: |
+        Long [[sec.xle]] is the canonical sector-ETF expression of the energy
+        thesis - named in thesisStatement, with the latest print
+        [[ws.ev-energy-complex-eases-fri-jun5|57.67 Friday (-1.7%)]]. Broad
+        diversified exposure across integrated majors, refiners, and services -
+        matches the structural-supply read that does not single out any one
+        operator. Tight band because the sector-ETF expression has the cleanest
+        argument and the lowest idiosyncratic risk in the stack.
+    - alignedSecurity: sec.xom
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.85
+        estimateStdDev: 0.05
+        betaAlpha: 17.0
+        betaBeta: 3.0
+      securityRationale: |
+        Long [[sec.xom]] is the largest-integrated-major single-name alternate to
+        [[sec.xle|XLE]] - same broad upstream-plus-downstream exposure, slightly
+        more concentrated on the company's specific reserves and operating
+        leverage ([[ws.ev-energy-complex-eases-fri-jun5|149.92 Friday]]). Modest
+        band reflects the single-name concentration premium relative to the ETF
+        expression.
+    - alignedSecurity: sec.cvx
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.83
+        estimateStdDev: 0.05
+        betaAlpha: 16.0
+        betaBeta: 3.3
+      securityRationale: |
+        Long [[sec.cvx]] is the second-integrated-major single-name alternate -
+        similar shape to [[sec.xom|XOM]] with a different production mix and more
+        chemicals exposure ([[ws.ev-energy-complex-eases-fri-jun5|187.31 Friday]]). Marginally lower mean than [[sec.xom|XOM]] only because
+        [[sec.xom|XOM]] has higher upstream leverage to the named oil-price move.
+
+iran-war-rearmament-alignment:
+  type: align.ThesisAlignment
+  label: Iran war rearmament alignment
+  forThesis: ws.iran-war-rearmament
+  alignmentConfidence:
+    estimateMean: 0.86
+    estimateStdDev: 0.04
+    betaAlpha: 24.0
+    betaBeta: 3.9
+  alignmentRationale: |
+    Three **Tier-1 candidates** with strong direct evidence support. [[sec.lmt]]
+    and [[sec.rtx]] each appear multiple times in [[ws.iran-war-rearmament]]'s
+    `supportingEvidence` (Q1 2026 record-backlog `fin.CorporateEvidence` via
+    [[ws.ev-lmt-backlog-194b-q1-2026]] and [[ws.ev-rtx-backlog-271b-q1-2026]]);
+    [[sec.noc]] appears with less direct missile-defense exposure. All three are
+    named in the thesisStatement.
+
+    Rank order is driven by the depth of missile-and-missile-defense exposure -
+    [[sec.lmt|LMT]] and [[sec.rtx|RTX]] lead with comparable record backlogs
+    ($194B and $271B), [[sec.noc|NOC]] ranks below on more stealth/strategic
+    concentration. On the Friday June 5 risk-off day the defense tape
+    OUTPERFORMED ([[ws.ev-defense-bid-fri-jun5|LMT +0.7% to 523.76, RTX +1.0% to 180.99, NOC firm at 544.40]]) on the [[ws.ev-trump-defense-budget-15t-2027-may26|$1.5T FY2027 budget]] bid - a haven bid
+    that reinforces the multi-year-procurement-cycle premise, and the thesis
+    holds at 0.87. The procurement-cycle argument survives near-term diplomatic
+    outcomes (the multi-year backlogs plus the [[ws.ev-fy2026-defense-budget-1t|$1T FY2026 base]] outlast any framework short of
+    implementation), so no hedge candidate is in scope and rank order holds.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.lmt
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.89
+        estimateStdDev: 0.04
+        betaAlpha: 27.0
+        betaBeta: 3.3
+      securityRationale: |
+        Long [[sec.lmt]] is the canonical missile-and-missile-defense prime
+        expression - record Q1 2026 backlog of $194B
+        ([[ws.ev-lmt-backlog-194b-q1-2026]]) plus the Friday haven bid
+        ([[ws.ev-defense-bid-fri-jun5|+0.7% to 523.76]]); named in
+        thesisStatement. Direct beneficiary of the multi-year defense-spending
+        cycle ([[ws.ev-fy2026-defense-budget-1t|FY2026 $1T base]]). **Primary
+        vehicle** earned by the density of evidence support.
+    - alignedSecurity: sec.rtx
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.88
+        estimateStdDev: 0.04
+        betaAlpha: 26.0
+        betaBeta: 3.5
+      securityRationale: |
+        Long [[sec.rtx]] is the second-prime alternate - similar
+        missile-and-missile-defense exposure to [[sec.lmt|LMT]] with the largest
+        record backlog ($271B via [[ws.ev-rtx-backlog-271b-q1-2026]]) and
+        explicit thesisStatement mention; it also caught the Friday haven bid
+        ([[ws.ev-defense-bid-fri-jun5|+1.0% to 180.99]]). **Alternate-vehicle**
+        rather than co-primary because [[sec.lmt|LMT]]'s missile-defense
+        concentration is the more pure-play expression. Mean essentially tied.
+    - alignedSecurity: sec.noc
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.83
+        estimateStdDev: 0.06
+        betaAlpha: 19.0
+        betaBeta: 3.9
+      securityRationale: |
+        Long [[sec.noc]] is the third-prime alternate - stealth/strategic systems
+        exposure that complements [[sec.lmt|LMT]] and [[sec.rtx|RTX]]'s
+        missile-defense concentration ([[ws.ev-defense-bid-fri-jun5|firm at 544.40 Friday]]). Slightly wider band because the procurement-cycle beneficiary
+        argument applies less directly to NOC's portfolio than to the two
+        missile-defense leaders.
+
+gold-debasement-bid-alignment:
+  type: align.ThesisAlignment
+  label: Gold debasement bid alignment
+  forThesis: ws.gold-debasement-bid
+  alignmentConfidence:
+    estimateMean: 0.88
+    estimateStdDev: 0.04
+    betaAlpha: 24.0
+    betaBeta: 3.3
+  alignmentRationale: |
+    Three precious-metals candidates with clean rank order. [[sec.gld]] is the
+    canonical liquid vehicle with deep evidence support including
+    [[ws.ev-lbma-q1-record-4873|the LBMA Q1 record $4,873/oz]] and
+    [[ws.ev-jpm-gold-target-5055-6300|JPM]] / [[ws.ev-ubs-gold-target-6200|UBS]] /
+    [[ws.ev-citi-gold-target-5000-7000|Citi]] forecast targets; directly named in
+    the thesisStatement. [[sec.iau]] is the same-sector **Tier-2 alternate** with
+    no direct evidence mentions but a materially lower expense ratio and
+    structurally equivalent tracking. [[sec.gdx]] is the **high-beta-proxy** via
+    gold miners.
+
+    No hedge candidate is in scope - the thesis is structurally directional and
+    holds at 0.85 in 2.2.3. Gold took a yield-driven tactical hit Friday
+    ([[ws.ev-gold-spot-fri-close-4327-jun5|spot ~$4,327, -2.9%]],
+    [[ws.ev-gld-fri-close-39624-jun5|GLD to 396.24]],
+    [[ws.ev-gdx-fri-close-7884-jun5|GDX -5.9%]]) as the jobs print pushed the 10Y
+    up, but a yield-driven drawdown trips none of the `AndCondition` invalidation
+    triplet and the structural-bull supports (central-bank buying, the LBMA
+    record, the analyst targets) are unchanged - so the stack and rank order
+    hold.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.gld
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.92
+        estimateStdDev: 0.03
+        betaAlpha: 36.0
+        betaBeta: 3.1
+      securityRationale: |
+        Long [[sec.gld]] is the canonical primary vehicle - named in
+        thesisStatement with deep evidence support including
+        [[ws.ev-lbma-q1-record-4873|the LBMA Q1 record]] and JPM/UBS/Citi targets
+        pointing materially higher; Friday's [[ws.ev-gld-fri-close-39624-jun5|396.24 close]] is a yield-driven dip, not a structural break. Deep liquidity,
+        tight tracking. **Tight band** because corroborating evidence density is
+        the highest in this package.
+    - alignedSecurity: sec.iau
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.86
+        estimateStdDev: 0.06
+        betaAlpha: 16.0
+        betaBeta: 2.6
+      securityRationale: |
+        Long [[sec.iau]] is the same-sector **Tier-2 alternate** to [[sec.gld|GLD]]
+        - no direct evidence mentions but structurally equivalent gold-exposure
+        tracking with a materially lower expense ratio. Preferred when cost basis
+        matters more than incremental liquidity. Modest band because the
+        alternate-vehicle argument is sector-mechanical rather than
+        evidence-driven.
+    - alignedSecurity: sec.gdx
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.76
+        estimateStdDev: 0.07
+        betaAlpha: 12.0
+        betaBeta: 3.8
+      securityRationale: |
+        Long [[sec.gdx]] is the **high-beta-proxy** via gold miners - named in
+        thesisStatement; Friday's [[ws.ev-gdx-fri-close-7884-jun5|-5.9% session]]
+        is the characteristic miner beta amplifying spot's yield-driven decline.
+        Miner leverage amplifies the upside of a sustained gold regime but
+        introduces idiosyncratic operating risk, so the band is wider than the
+        ETF candidates [[sec.gld]] / [[sec.iau]].
+
+ai-capex-cycle-with-china-tail-alignment:
+  type: align.ThesisAlignment
+  label: AI capex cycle alignment
+  forThesis: ws.ai-capex-cycle-with-china-tail
+  alignmentConfidence:
+    estimateMean: 0.84
+    estimateStdDev: 0.05
+    betaAlpha: 17.0
+    betaBeta: 3.2
+  alignmentRationale: |
+    Five **Tier-1 candidates** fill the cap exactly - [[sec.nvda]], [[sec.amd]],
+    [[sec.csco]], [[sec.intc]], [[sec.mu]]. All five appear in
+    [[ws.ai-capex-cycle-with-china-tail]]'s `supportingEvidence` via
+    `fin.aboutSecurity` or `fin.forecastTarget`; all five are named in the
+    thesisStatement.
+
+    [[sec.nvda|NVDA]] and [[sec.amd|AMD]] lead on direct AI-infrastructure
+    exposure with the densest evidence support (the
+    [[ws.ev-nvda-q1-fy27-full-figures-may21|NVDA Q1 FY2027 beat-and-raise]]; the
+    [[ws.ev-amd-q1-2026-blowout|AMD Q1 blowout]] + [[ws.ev-amd-q2-guide-112b|Q2 $11.2B guide]] + [[ws.ev-amd-su-tens-of-billions-quote|Lisa Su "tens of billions" quote]]). [[sec.csco|CSCO]] ranks third on tech-hardware exposure
+    via its [[ws.ev-cisco-q3-blowout-ai-orders-may14|Q3 print]] and
+    [[ws.ev-csco-hsbc-upgrade-may15|HSBC upgrade]]; [[sec.intc|INTC]] and
+    [[sec.mu|MU]] rank lowest as mechanical **high-beta proxies**.
+
+    The thesis stepped 0.88 to 0.87 (band wider) in 2.2.3 as
+    [[ws.ev-sox-rout-103pct-fri-jun5|a ~10.3% semiconductor rout]] hit
+    [[ws.ev-nvda-fri-close-20510-jun5|NVDA -6.2%]] and
+    [[ws.ev-amd-fri-close-46638-jun5|AMD -6.6%]] on intact fundamentals
+    ([[ws.ev-avgo-q2-fy26-blowout-jun3|Broadcom's Q3 AI guide +200% YoY]]) - the
+    China-and-positioning tail firing while the demand leg held. This is a
+    thesis-confidence move, not a structural one: the [[ws.ev-h200-export-approval-may14|H200 export approval]] holding remains the
+    operative China-tail mitigant, the five securities' participation is
+    unchanged, and rank order holds. No inverse-expression captures the China
+    tail cleanly within baseline (a TSM short or KWEB hedge would require Tier-3
+    additions not yet justified).
+  hasAlignedSecurity:
+    - alignedSecurity: sec.nvda
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.92
+        estimateStdDev: 0.03
+        betaAlpha: 36.0
+        betaBeta: 3.1
+      securityRationale: |
+        Long [[sec.nvda]] is the canonical AI-capex **primary vehicle** - the
+        densest evidence support in the stack, anchored by the
+        [[ws.ev-nvda-q1-fy27-full-figures-may21|record Q1 FY2027 beat-and-raise]]
+        and backed structurally by the [[ws.ev-h200-export-approval-may14|H200 export approval]]. Friday's [[ws.ev-nvda-fri-close-20510-jun5|-6.2% session]] is a positioning de-rating, not a capex signal - the forward
+        demand leg is intact. **Tight band** because evidence density is highest
+        in the stack.
+    - alignedSecurity: sec.amd
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.88
+        estimateStdDev: 0.04
+        betaAlpha: 26.0
+        betaBeta: 3.5
+      securityRationale: |
+        Long [[sec.amd]] is the second-GPU-vendor **alternate** - strong evidence
+        including the [[ws.ev-amd-q1-2026-blowout|Q1 2026 blowout]], the
+        [[ws.ev-amd-q1-data-center-58b|Data Center +57% YoY]], and the
+        [[ws.ev-amd-q2-guide-112b|Q2 $11.2B guide]]. Friday's
+        [[ws.ev-amd-fri-close-46638-jun5|-6.6% session]] is the same positioning
+        move. Modest band reflects the second-vendor position relative to
+        [[sec.nvda|NVDA]]'s GPU concentration.
+    - alignedSecurity: sec.csco
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.81
+        estimateStdDev: 0.05
+        betaAlpha: 15.0
+        betaBeta: 3.5
+      securityRationale: |
+        Long [[sec.csco]] is the tech-hardware **alternate** covering the
+        networking-and-systems angle of AI capex - the
+        [[ws.ev-cisco-q3-blowout-ai-orders-may14|Q3 print (FY26 AI orders raised to $9B)]] and the [[ws.ev-csco-hsbc-upgrade-may15|HSBC upgrade-to-Buy]].
+        Named in thesisStatement as the divergent winner confirming hyperscaler
+        spend independent of GPU single names.
+    - alignedSecurity: sec.intc
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.65
+        estimateStdDev: 0.08
+        betaAlpha: 9.0
+        betaBeta: 4.8
+      securityRationale: |
+        Long [[sec.intc]] is the **high-beta-proxy** capturing chip-complex
+        leverage to AI capex - one evidence mention
+        ([[ws.ev-intc-friday-down-8pct-may15]], a drawdown rather than a
+        thesis-confirming move), so the rank reflects the mechanical AI-exposure
+        argument more than evidence weight. Wider band reflects the
+        consolidation-setup risk underscored by Friday's
+        [[ws.ev-sox-rout-103pct-fri-jun5|sector rout]].
+    - alignedSecurity: sec.mu
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.65
+        estimateStdDev: 0.08
+        betaAlpha: 9.0
+        betaBeta: 4.8
+      securityRationale: |
+        Long [[sec.mu]] is the memory-cycle **high-beta-proxy** on the AI
+        build-out - one evidence mention ([[ws.ev-mu-friday-down-66pct-may15]], a
+        drawdown print). Similar to [[sec.intc|INTC]], the mechanical AI-exposure
+        argument drives the rank; the [[ws.ev-sox-rout-103pct-fri-jun5|Friday rout]] widens the band for the same consolidation-setup reasoning.
+
+equity-melt-up-vs-recession-risk-alignment:
+  type: align.ThesisAlignment
+  label: Equity melt-up vs recession risk alignment
+  forThesis: ws.equity-melt-up-vs-recession-risk
+  alignmentConfidence:
+    estimateMean: 0.72
+    estimateStdDev: 0.08
+    betaAlpha: 14.0
+    betaBeta: 5.5
+  alignmentRationale: |
+    Three tradable candidates after filtering out the non-tradable indexes
+    ([[sec.spx|SPX]], [[sec.vix|VIX]] appear in
+    [[ws.equity-melt-up-vs-recession-risk]]'s evidence but are not directly
+    held). [[sec.spy]] is the canonical melt-up **primary-vehicle** with direct
+    evidence support ([[ws.ev-spy-friday-close-73917-may15]],
+    [[ws.ev-spy-fri-close-73755-jun5]]); [[sec.vti]] is the broader-market
+    **Tier-2 alternate**; [[sec.uvix]] is the vol-expansion **hedge** against the
+    recession-risk side firing.
+
+    The bi-directional thesis shape is the alignment challenge - a pure
+    long-equity stack underweights the downside, a pure hedge stack overweights
+    the recession scenario - so the primary + alternate + hedge structure tracks
+    the snapshot's own framing. The thesis stepped 0.80 to 0.78 in 2.2.3 as
+    [[ws.ev-triple-index-selloff-fri-jun5|the worst equity day since April 2025]]
+    decisively ended the melt-up-confirmation leg while
+    [[ws.ev-may-jobs-report-actual-172k-jun5|the hot jobs print]] kept the
+    recession leg quiet - a rate-and-positioning repricing, neither melt-up nor
+    recession. The long-core-plus-vol-hedge structure is exactly right for that
+    two-sided tape, so the basket and the UVIX hedge slot hold unchanged.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.spy
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.85
+        estimateStdDev: 0.05
+        betaAlpha: 17.0
+        betaBeta: 3.0
+      securityRationale: |
+        Long [[sec.spy]] is the canonical S&P 500 exposure - the melt-up side of
+        the thesis is the directional bet. Direct evidence including Friday's
+        [[ws.ev-spy-fri-close-73755-jun5|737.55 close (-2.0%)]], part of the
+        broad de-risking rather than a thesis-breaking move. **Primary liquid
+        vehicle** for broad equity beta.
+    - alignedSecurity: sec.vti
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.78
+        estimateStdDev: 0.07
+        betaAlpha: 11.0
+        betaBeta: 3.1
+      securityRationale: |
+        Long [[sec.vti]] is the broader-market **Tier-2 alternate** (total stock
+        market vs S&P 500 cap-weighted) - similar shape to [[sec.spy|SPY]] with
+        mid- and small-cap participation that adds a different risk profile. No
+        direct evidence mentions but a `typedSector` (broad-market) match with
+        [[sec.spy|SPY]] puts it cleanly in the alternate-vehicle slot; lower
+        expense ratio is the reason to substitute or complement.
+    - alignedSecurity: sec.uvix
+      securityRole: align.role-hedge
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.70
+        estimateStdDev: 0.10
+        betaAlpha: 10.0
+        betaBeta: 4.3
+      securityRationale: |
+        Long [[sec.uvix]] is the vol-expansion **hedge** against the
+        recession-risk side firing. The thesis names the vol-expansion
+        invalidation pathway (VIX > 25 with SPY breaking its 50d MA for 5
+        sessions), so a long-vol position is the directly-mechanically-aligned
+        hedge. Friday's sharp equity drop nudged the tape toward the
+        vol-expansion side, but UVIX carries decay cost when vol does not sustain
+        an expansion, which keeps the band on this judgment wide.
+
+powell-warsh-transition-risk-alignment:
+  type: align.ThesisAlignment
+  label: Powell-Warsh transition risk alignment
+  forThesis: ws.powell-warsh-transition-risk
+  alignmentConfidence:
+    estimateMean: 0.50
+    estimateStdDev: 0.12
+    betaAlpha: 8.0
+    betaBeta: 8.0
+  alignmentRationale: |
+    No `fin.aboutSecurity` or `fin.forecastTarget` references appear in
+    [[ws.powell-warsh-transition-risk]]'s `supportingEvidence` and no
+    `sec.<ticker>` names appear in the thesisStatement - all evidence is
+    policy/economic with yield-and-rate-path observations. Tier 1 and Tier 2 are
+    empty; the basket below is **Tier-3 skill judgment** using baseline tickers
+    only, so per the indirect-reasoning calibration the per-security means are
+    capped around 0.65.
+
+    The thesis's structural ambiguity (0.51 confidence, near-50/50 on the
+    transition outcome) shapes the alignment toward uncertainty-and-vol-capturing
+    expressions rather than directional bets: long [[sec.uvix]] vol-expansion
+    primary, long [[sec.dbmf]] and long [[sec.kmlm]] managed-futures
+    trend-capture, short [[sec.tlt]] inverse-expression for the rate-up
+    trajectory. No new Warsh-as-chair substance landed in 2.2.3, but
+    [[ws.ev-may-jobs-report-actual-172k-jun5|the hot jobs print]] and
+    [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|~70% hike-by-December pricing]] harden
+    the room-to-cut-versus-higher-for-longer contradiction
+    ([[ws.ev-warsh-room-to-cut-quote|Warsh's "room to cut"]] vs
+    [[ws.ev-warsh-historically-hawkish|his hawkish record]]) the new chair
+    inherits - so the contradiction is unresolved, the thesis holds at 0.51, and
+    the uncertainty basket is unchanged ahead of the June 16-17 FOMC.
+
+    `alignmentConfidence` is held at 0.50 +/- 0.12 - the lowest in this package -
+    reflecting both the thesis's own low confidence and the significant Tier-3
+    expansion required to build any basket.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.uvix
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.65
+        estimateStdDev: 0.10
+        betaAlpha: 14.0
+        betaBeta: 7.5
+      securityRationale: |
+        Long [[sec.uvix]] is the cleanest single-ticker expression of
+        Fed-transition uncertainty - vol-expansion is the most direct mechanism
+        by which "policy uncertainty" gets priced. The bi-directional structure
+        ([[ws.ev-warsh-room-to-cut-quote|"room to cut"]] vs
+        [[ws.ev-warsh-historically-hawkish|hawkish record]]) is exactly the
+        asymmetric-outcome shape long-vol benefits from. Mean at the
+        indirect-reasoning cap of 0.65; band wider because UVIX decay cost is
+        meaningful if the June 16-17 FOMC fails to produce a vol-generating move.
+    - alignedSecurity: sec.dbmf
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.60
+        estimateStdDev: 0.10
+        betaAlpha: 11.0
+        betaBeta: 7.3
+      securityRationale: |
+        Long [[sec.dbmf]] captures the trend-regime premium managed-futures
+        vehicles extract from a Fed-transition rate-path repricing. The named
+        rate move ([[ws.ev-10y-yield-fri-455-jun5|10Y to 4.55%]] with
+        [[ws.ev-global-bond-yields-multi-year-highs-may18|global yields at multi-year highs]]) is exactly the multi-asset trend [[sec.dbmf|DBMF]]'s
+        strategy rides. Modest mean because the mechanism is one step removed from
+        the explicit thesis text.
+    - alignedSecurity: sec.tlt
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.58
+        estimateStdDev: 0.10
+        betaAlpha: 10.0
+        betaBeta: 7.2
+      securityRationale: |
+        Short [[sec.tlt]] captures the current rate-up trajectory if the
+        Warsh-as-chair backdrop sustains the bond-market repricing (the latest
+        leg is [[ws.ev-10y-yield-fri-455-jun5|the 10Y to 4.55%]] on the jobs
+        print). **Inverse-expression** because the thesis playing out on the
+        hawkish-backdrop side drives long-duration Treasuries lower.
+        Direction-short carries reversal risk if Warsh delivers a dovish surprise
+        at the June 16-17 FOMC, which is precisely what keeps
+        `alignmentConfidence` on this thesis modest.
+    - alignedSecurity: sec.kmlm
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.55
+        estimateStdDev: 0.10
+        betaAlpha: 9.0
+        betaBeta: 7.4
+      securityRationale: |
+        Long [[sec.kmlm]] is the second-managed-futures alternate to
+        [[sec.dbmf|DBMF]], with a different strategy implementation (KFA Mount
+        Lucas vs DBi). Including both diversifies the managed-futures sleeve
+        across implementations - useful given the low alignment confidence on
+        this thesis and the uncertainty over the right managed-futures mix. Mean
+        lowest in the stack as a result.

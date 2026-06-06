@@ -1,0 +1,412 @@
+funds:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.0.1
+  label: Fund data - driver-union reweight against snapshot 2.2.3 + alignments 1.0.1
+  comment: >-
+    Patch reweight of the public fund data, re-derived by the driver-union method
+    from alignments 1.0.1 against worldview snapshot 2.2.3 (Saturday June 6,
+    integrating the full Friday June 5 session). Same 21 holdings and same method
+    as 1.0.0; weights move on the refreshed thesis confidences AND - for the first
+    time in the public series - on the snapshot's REAL published fac.hasDriverLoading
+    rather than the implicit loadings 1.0.0 replayed. Superseded by the next
+    operator refresh.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+    - publisher: worldview.genval.ai
+      packages:
+        - package: fund
+          match: ^
+          version: 1.0.0
+          alias: fund
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+        - package: alignments
+          match: '='
+          version: 1.0.1
+          alias: ca
+        - package: securities
+          match: ^
+          version: 2.2.0
+          alias: sec
+        - package: snapshots
+          match: '='
+          version: 2.2.3
+          alias: ws
+genval-worldview-fund:
+  type: fund.Fund
+  label: "Genval Worldview Fund (1.0.1 - driver-union reweight against snapshot 2.2.3 + alignments 1.0.1; the FIRST public fund computed from the snapshot's real published fac.hasDriverLoading (1.0.0 replayed implicit loadings); refreshed confidences lift the energy legs (energy 0.68 -> 0.75 since the 2.1.13 basis) so XLE 7.44% extends its lead as top weight, GLD 6.83% second; same 21 holdings, same driver-union method, gross 100%, net +85% long, ~7.5% short via rates TLT/IEF)"
+  fundObservedAt: 2026-06-06T06:15:21Z
+  fund.derivedFromSnapshot: ws.view
+  derivedFromAlignment: ca.view
+  weightingMethod: fund.method-driver-union
+  grossExposure: 1.00
+  netExposure: 0.85
+  cashWeight: 0.075
+  fundNarrative: |
+    **Genval Worldview Fund - driver-union reweight (1.0.1).** Re-derived from [[ca.view|thesis-alignments 1.0.1]] against [[ws.view|snapshot 2.2.3]] by the **driver-union** method (each contributing thesis's signed conviction `confidence x alignmentStrength x sign(direction)` is distributed across its macro drivers by its normalised `fac.hasDriverLoading` shares, MAX-combined within each shared driver, summed across distinct drivers, then normalised to a 100% gross budget). Same 21 holdings, same `weightingMethod`.
+
+    **First fund from the published loadings.** This is the first public fund version whose dedup is computed from the snapshot's REAL `fac.hasDriverLoading` tags rather than the implicit loadings 1.0.0 had to replay - [[ws.view|snapshot 2.2.3]] carries explicit driver loadings on every active thesis, so the union is now reproducible from the published graph alone and the 1.0.0 "snapshot caveat" is resolved. The shared-driver structure the loadings encode: [[ws.gold-debasement-bid]] + [[ws.stagflation-risk]] share `inflation-debasement` and `monetary-credibility`; [[ws.persistent-energy-shock]] + [[ws.stagflation-risk]] share `inflation-debasement`; [[ws.stagflation-risk]] + [[ws.powell-warsh-transition-risk]] share `rate-path` and `monetary-credibility`; [[ws.equity-melt-up-vs-recession-risk]] + [[ws.powell-warsh-transition-risk]] share `volatility-regime`.
+
+    **What drives the top of the book.** [[sec.xle]] (**7.44%**) is the top weight: it serves [[ws.persistent-energy-shock]] (the dominant thesis, confidence 0.75) and [[ws.stagflation-risk]], but its `energy-supply` and `geopolitical-conflict` drivers are distinct forces that ADD while only the shared `inflation-debasement` channel MAX-dedupes to the (dominant) energy thesis - and energy confidence has firmed to 0.75, extending XLE's lead. [[sec.gld]] (**6.83%**) is second: served by [[ws.gold-debasement-bid]] (0.85) and [[ws.stagflation-risk]], but both load `inflation-debasement` and `monetary-credibility`, so those channels are counted once (MAX to gold) rather than stacked - the union trims what a naive SUM would double-count. [[sec.uvix]] (**5.67%**) holds the third slot, its `volatility-regime` channel MAX-bound to [[ws.equity-melt-up-vs-recession-risk]] (0.78 x 0.70 = 0.546) over [[ws.powell-warsh-transition-risk]] (0.51 x 0.65 = 0.332), with the two theses' distinct drivers adding on top. [[sec.nvda]] (**5.57%**), [[sec.lmt]] (**5.39%**), and the defense / AI single-thesis names follow, sized by their lone driver bundles.
+
+    **The dedup names.** Five holdings serve more than one thesis and therefore dedupe: [[sec.xle]] and [[sec.gld]] (energy/gold vs stagflation), [[sec.uvix]] and the rates short [[sec.tlt]] (-4.41%) and [[sec.dbmf]] (stagflation vs powell-warsh). Each is sized by the DISTINCT macro forces behind it, not by the number of theses that happen to name it - the single-thesis names ([[sec.lmt]] / [[sec.rtx]] / [[sec.noc]] defense, [[sec.nvda]] / [[sec.amd]] AI, [[sec.xom]] / [[sec.cvx]] energy singles) only move via renormalisation.
+
+    **Exposure.** Gross 100%, net **+85%** long, ~7.5% cash; the ~7.5% short is the rate-up inverse-expressions [[sec.tlt]] (-4.41%) and [[sec.ief]] (-3.13%), whose `rate-path` channel firmed on [[ws.ev-10y-yield-fri-455-jun5|the 10Y move to 4.55%]] and [[ws.ev-fedwatch-hike-by-dec-70pct-jun5|~70% hike-by-December pricing]].
+
+    **Theme rollup (gross):** AI ~22.7% (NVDA / AMD / CSCO / INTC / MU), gold ~16.4% (GLD / IAU / GDX), defense ~15.7% (LMT / RTX / NOC), energy ~16.2% (XLE / XOM / CVX), equity beta ~8.8% (SPY / VTI), vol hedge ~5.7% (UVIX), managed futures ~5.9% (DBMF / KMLM), rates short ~-7.5% (TLT / IEF). Energy edges back above defense this reweight on the firmer energy confidence.
+
+    **Versioning.** A patch (1.0.0 -> 1.0.1): the active thesis set (seven) and the weighting method (driver-union) are unchanged; weights moved on the refreshed thesis confidences in [[ws.view|snapshot 2.2.3]] and on the switch to the snapshot's published driver loadings. `weightingMethod` continues to record `method-driver-union`.
+  hasHolding:
+    - holding-xle
+    - holding-gld
+    - holding-uvix
+    - holding-nvda
+    - holding-lmt
+    - holding-rtx
+    - holding-amd
+    - holding-iau
+    - holding-noc
+    - holding-csco
+    - holding-spy
+    - holding-gdx
+    - holding-xom
+    - holding-tlt
+    - holding-cvx
+    - holding-vti
+    - holding-dbmf
+    - holding-intc
+    - holding-mu
+    - holding-ief
+    - holding-kmlm
+
+holding-xle:
+  type: fund.Holding
+  heldSecurity: sec.xle
+  targetWeight: 0.0744
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+    - ws.stagflation-risk
+  holdingRationale: |
+    Top weight (**7.44%**) - serves [[ws.persistent-energy-shock]] as primary
+    vehicle (0.91, dominant thesis confidence 0.75) and [[ws.stagflation-risk]] as
+    the energy-passthrough leg (0.60). Stays the top weight under the driver-union
+    because `energy-supply` and `geopolitical-conflict` are XLE's own DISTINCT
+    drivers that add, while the shared `inflation-debasement` channel MAX-dedupes to
+    the dominant energy thesis. The firmer energy confidence (0.75) extends its lead.
+    Broad energy-sector ETF, the cleanest expression of the structural-deficit read.
+
+holding-gld:
+  type: fund.Holding
+  heldSecurity: sec.gld
+  targetWeight: 0.0683
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.gold-debasement-bid
+    - ws.stagflation-risk
+  holdingRationale: |
+    Second weight (**6.83%**) - served by [[ws.gold-debasement-bid]] as primary
+    vehicle (0.92) and [[ws.stagflation-risk]] as the inflation/debasement hedge
+    (0.62), but both theses load the same `inflation-debasement` and
+    `monetary-credibility` drivers, so the union counts those channels once (MAX,
+    bound to the dominant gold-debasement thesis) rather than adding them. The yield
+    hit to gold Friday ([[ws.ev-gold-spot-fri-close-4327-jun5|spot ~$4,327]]) was
+    tactical and left the thesis confidence at 0.85. Canonical liquid gold ETF.
+
+holding-uvix:
+  type: fund.Holding
+  heldSecurity: sec.uvix
+  targetWeight: 0.0567
+  holdingDirection: align.direction-long
+  holdingRole: align.role-hedge
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+    - ws.powell-warsh-transition-risk
+  holdingRationale: |
+    Long-vol position (**5.67%**) serving the [[ws.equity-melt-up-vs-recession-risk]]
+    hedge (0.70) and the [[ws.powell-warsh-transition-risk]] uncertainty primary
+    (0.65). The two theses share `volatility-regime`, which MAX-binds to the
+    equity-melt-up thesis (0.78 x 0.70 = 0.546 > 0.51 x 0.65 = 0.332), while their
+    distinct drivers (`equity-risk-appetite`, `ai-capex-cycle` from equity;
+    `monetary-credibility`, `rate-path` from powell-warsh) add on top. Role inherited
+    from the dominant equity-melt-up thesis (hedge).
+
+holding-nvda:
+  type: fund.Holding
+  heldSecurity: sec.nvda
+  targetWeight: 0.0557
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    AI-capex primary vehicle (**5.57%**), single-thesis - serves
+    [[ws.ai-capex-cycle-with-china-tail]] at the highest alignmentStrength in its
+    basket (0.92). Sized by the thesis's `ai-capex-cycle` (dominant) plus
+    `geopolitical-conflict` (China-tail) drivers. Friday's
+    [[ws.ev-nvda-fri-close-20510-jun5|-6.2% session]] was a positioning de-rating,
+    not a capex signal - the thesis confidence stepped only to 0.87.
+
+holding-lmt:
+  type: fund.Holding
+  heldSecurity: sec.lmt
+  targetWeight: 0.0539
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    Defense primary vehicle (**5.39%**), single-thesis - serves
+    [[ws.iran-war-rearmament]] at the top of its basket (0.89) on the record Q1
+    backlog ([[ws.ev-lmt-backlog-194b-q1-2026]]). The thesis loads a single driver
+    (`geopolitical-conflict`), so its full conviction (0.87) flows through undeduped.
+    Caught a haven bid Friday ([[ws.ev-defense-bid-fri-jun5|+0.7%]]).
+
+holding-rtx:
+  type: fund.Holding
+  heldSecurity: sec.rtx
+  targetWeight: 0.0532
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    Defense alternate vehicle (**5.32%**), single-thesis - serves
+    [[ws.iran-war-rearmament]] (0.88) on the largest record backlog
+    ([[ws.ev-rtx-backlog-271b-q1-2026]]). Same single `geopolitical-conflict` driver
+    as the defense basket; essentially tied with [[sec.lmt]] on alignmentStrength.
+
+holding-amd:
+  type: fund.Holding
+  heldSecurity: sec.amd
+  targetWeight: 0.0532
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    AI-capex alternate vehicle (**5.32%**), single-thesis - serves
+    [[ws.ai-capex-cycle-with-china-tail]] as the second GPU vendor (0.88) on the
+    [[ws.ev-amd-q1-2026-blowout|Q1 blowout]] and [[ws.ev-amd-q2-guide-112b|Q2 guide]].
+    Same `ai-capex-cycle` + `geopolitical-conflict` driver pair as the AI basket.
+    Sold off Friday ([[ws.ev-amd-fri-close-46638-jun5|-6.6%]]) on positioning.
+
+holding-iau:
+  type: fund.Holding
+  heldSecurity: sec.iau
+  targetWeight: 0.0508
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    Gold alternate vehicle (**5.08%**), single-thesis - serves
+    [[ws.gold-debasement-bid]] (0.86) as the lower-expense-ratio substitute for
+    [[sec.gld]]. Same gold driver bundle (`inflation-debasement`,
+    `monetary-credibility`, `geopolitical-conflict`); structurally equivalent
+    exposure to GLD.
+
+holding-noc:
+  type: fund.Holding
+  heldSecurity: sec.noc
+  targetWeight: 0.0502
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    Defense alternate vehicle (**5.02%**), single-thesis - serves
+    [[ws.iran-war-rearmament]] (0.83) on stealth/strategic-systems exposure
+    complementing the missile-defense leaders. Same single `geopolitical-conflict`
+    driver as the defense basket.
+
+holding-csco:
+  type: fund.Holding
+  heldSecurity: sec.csco
+  targetWeight: 0.0490
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    AI-capex alternate vehicle (**4.90%**), single-thesis - serves
+    [[ws.ai-capex-cycle-with-china-tail]] (0.81) on the networking/systems angle
+    ([[ws.ev-cisco-q3-blowout-ai-orders-may14|Q3 AI orders raised to $9B]]). Same AI
+    driver pair; the divergent winner confirming hyperscaler spend independent of
+    GPU single names.
+
+holding-spy:
+  type: fund.Holding
+  heldSecurity: sec.spy
+  targetWeight: 0.0461
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    Equity-beta primary vehicle (**4.61%**), single-thesis - serves
+    [[ws.equity-melt-up-vs-recession-risk]] (0.85) as the canonical S&P 500 exposure.
+    Sized by the thesis's `equity-risk-appetite` (dominant), `volatility-regime`, and
+    `ai-capex-cycle` drivers. Friday's [[ws.ev-spy-fri-close-73755-jun5|-2.0% session]]
+    was the broad de-risking, with thesis confidence stepping to 0.78.
+
+holding-gdx:
+  type: fund.Holding
+  heldSecurity: sec.gdx
+  targetWeight: 0.0449
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    Gold high-beta-proxy (**4.49%**), single-thesis - serves
+    [[ws.gold-debasement-bid]] (0.76) via gold miners. Same gold driver bundle;
+    miner leverage amplifies the up-move but carries idiosyncratic operating risk.
+    Friday's [[ws.ev-gdx-fri-close-7884-jun5|-5.9% session]] is the characteristic
+    miner beta on the yield-driven gold dip.
+
+holding-xom:
+  type: fund.Holding
+  heldSecurity: sec.xom
+  targetWeight: 0.0443
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    Energy alternate vehicle (**4.43%**), single-thesis - serves
+    [[ws.persistent-energy-shock]] (0.85) as the largest integrated major. Same
+    energy driver bundle (`energy-supply`, `geopolitical-conflict`,
+    `inflation-debasement`) as [[sec.xle]] but single-name concentrated. Eased
+    modestly Friday ([[ws.ev-energy-complex-eases-fri-jun5|-1.7%]]).
+
+holding-tlt:
+  type: fund.Holding
+  heldSecurity: sec.tlt
+  targetWeight: -0.0441
+  holdingDirection: align.direction-short
+  holdingRole: align.role-inverse-expression
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.powell-warsh-transition-risk
+  holdingRationale: |
+    Largest short (**-4.41%**) - the rate-up inverse-expression serving
+    [[ws.stagflation-risk]] (short 0.65, the dominant thesis) and
+    [[ws.powell-warsh-transition-risk]] (short 0.58). The two theses share `rate-path`
+    and `monetary-credibility`, both MAX-bound to the dominant stagflation thesis, so
+    the short is sized once per shared force; stagflation's `inflation-debasement` and
+    powell-warsh's `volatility-regime` add as distinct drivers. The `rate-path`
+    channel firmed on [[ws.ev-10y-yield-fri-455-jun5|the 10Y to 4.55%]].
+
+holding-cvx:
+  type: fund.Holding
+  heldSecurity: sec.cvx
+  targetWeight: 0.0433
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    Energy alternate vehicle (**4.33%**), single-thesis - serves
+    [[ws.persistent-energy-shock]] (0.83) as the second integrated major. Same energy
+    driver bundle as [[sec.xle]] / [[sec.xom]]; marginally below XOM on lower upstream
+    leverage. Eased modestly Friday ([[ws.ev-energy-complex-eases-fri-jun5|-0.9%]]).
+
+holding-vti:
+  type: fund.Holding
+  heldSecurity: sec.vti
+  targetWeight: 0.0423
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    Equity-beta alternate vehicle (**4.23%**), single-thesis - serves
+    [[ws.equity-melt-up-vs-recession-risk]] (0.78) as the broader total-market
+    substitute for [[sec.spy]] with mid- and small-cap participation. Same equity
+    driver bundle; lower expense ratio is the reason to substitute or complement.
+
+holding-dbmf:
+  type: fund.Holding
+  heldSecurity: sec.dbmf
+  targetWeight: 0.0399
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.powell-warsh-transition-risk
+  holdingRationale: |
+    Managed-futures leg (**3.99%**) - serves [[ws.stagflation-risk]] (0.55, dominant)
+    and [[ws.powell-warsh-transition-risk]] (0.60) as the trend-regime capture. The
+    two theses share `rate-path` and `monetary-credibility` (MAX-bound to
+    stagflation), so the trend premium is counted once per shared force while
+    stagflation's `inflation-debasement` and powell-warsh's `volatility-regime` add
+    distinctly. Role inherited from the dominant stagflation thesis.
+
+holding-intc:
+  type: fund.Holding
+  heldSecurity: sec.intc
+  targetWeight: 0.0393
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    AI-capex high-beta-proxy (**3.93%**), single-thesis - serves
+    [[ws.ai-capex-cycle-with-china-tail]] (0.65) as chip-complex leverage. Same AI
+    driver pair; the mechanical AI-exposure argument drives the rank, and Friday's
+    [[ws.ev-sox-rout-103pct-fri-jun5|sector rout]] underscores the consolidation risk.
+
+holding-mu:
+  type: fund.Holding
+  heldSecurity: sec.mu
+  targetWeight: 0.0393
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    AI-capex high-beta-proxy (**3.93%**), single-thesis - serves
+    [[ws.ai-capex-cycle-with-china-tail]] (0.65) as memory-cycle leverage on the AI
+    build-out. Same AI driver pair as [[sec.intc]]; tied on alignmentStrength and
+    swept up in Friday's [[ws.ev-sox-rout-103pct-fri-jun5|semiconductor rout]].
+
+holding-ief:
+  type: fund.Holding
+  heldSecurity: sec.ief
+  targetWeight: -0.0313
+  holdingDirection: align.direction-short
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+  holdingRationale: |
+    Second short (**-3.13%**), single-thesis - the lower-duration rate-up alternate
+    to [[sec.tlt]], serving [[ws.stagflation-risk]] (short 0.53). Same stagflation
+    driver bundle (`inflation-debasement`, `rate-path`, `monetary-credibility`);
+    smaller single-trade vol than TLT, a sleeve-level diversifier of the short-bond
+    expression.
+
+holding-kmlm:
+  type: fund.Holding
+  heldSecurity: sec.kmlm
+  targetWeight: 0.0195
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.powell-warsh-transition-risk
+  holdingRationale: |
+    Smallest weight (**1.95%**), single-thesis - the second managed-futures alternate
+    serving [[ws.powell-warsh-transition-risk]] (0.55), a different strategy
+    implementation from [[sec.dbmf]]. Sized lowest by the powell-warsh thesis's modest
+    confidence (0.51) and its lowest alignmentStrength; diversifies the
+    managed-futures sleeve across implementations.
