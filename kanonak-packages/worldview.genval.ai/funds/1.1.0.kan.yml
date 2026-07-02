@@ -1,0 +1,302 @@
+funds:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.1.0
+  label: Fund data - driver-union reweight against snapshot 3.0.0 + alignments 1.1.0
+  comment: >-
+    Minor reweight of the public fund data, re-derived by the driver-union method
+    from alignments 1.1.0 against worldview snapshot 3.0.0 (Thursday June 18
+    post-FOMC regime reframe - Warsh set a hawkish higher-for-longer regime, the
+    Iran war turned toward a negotiated end with WTI collapsing ~18% to ~$75, and
+    gold made a fresh ATH). MINOR, not patch: the active thesis set changed -
+    powell-warsh-transition-risk RETIRED, hawkish-warsh-regime ADDED - so holdings
+    turn over (IEF short and KMLM enter via the new rate-path thesis). The energy
+    confidence cut to 0.50 collapses the energy legs' conviction (XLE 6.49%, down
+    from 7.49%), while the gold step-up to 0.88 lifts GLD to the top (7.33%). Still
+    21 holdings, gross ~100%, net +82.7% long. Superseded by the next refresh.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+    - publisher: worldview.genval.ai
+      packages:
+        - package: fund
+          match: ^
+          version: 1.0.0
+          alias: fund
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+        - package: alignments
+          match: '='
+          version: 1.1.0
+          alias: ca
+        - package: securities
+          match: ^
+          version: 2.3.0
+          alias: sec
+        - package: snapshots
+          match: '='
+          version: 3.0.0
+          alias: ws
+genval-worldview-fund:
+  type: fund.Fund
+  label: "Genval Worldview Fund (1.1.0 - driver-union reweight against snapshot 3.0.0 + alignments 1.1.0; the Fed transition resolved into a hawkish regime so powell-warsh retires and a hawkish-Warsh rate-path thesis enters (short IEF and long KMLM join the book, the TLT short and DBMF reinforce); the Iran war turning toward an end cuts energy conviction (XLE 6.49%, down from the 7.49% top weight) while gold's fresh-ATH structural confirmation lifts GLD to the top (7.33%); 21 holdings, gross 0.9998, net +82.7% long, cash 8.6%)"
+  fundObservedAt: 2026-06-18T18:55:00Z
+  fund.derivedFromSnapshot: ws.view
+  derivedFromAlignment: ca.view
+  weightingMethod: fund.method-driver-union
+  grossExposure: 0.9998
+  netExposure: 0.8274
+  cashWeight: 0.0864
+  fundNarrative: |
+    **Genval Worldview Fund - driver-union reweight (1.1.0).** Re-derived from [[ca.view|thesis-alignments 1.1.0]] against [[ws.view|snapshot 3.0.0]] by the **driver-union** method - each contributing thesis's signed conviction (`confidence x alignmentStrength x sign(direction)`) is distributed across its macro drivers by its normalised `fac.hasDriverLoading` shares, MAX-combined within each shared driver, summed across distinct drivers, then normalised to a 100% gross budget. This is a **MINOR** reweight: the active thesis set changed.
+
+    **What changed at the thesis level.** [[ws.powell-warsh-transition-risk]] RETIRED (the Fed transition resolved) and [[ws.hawkish-warsh-regime]] ADDED in its place - so the book turns over: [[sec.ief]] (short) and [[sec.kmlm]] (long) ENTER via the new rate-path thesis, and the [[sec.tlt]] short plus [[sec.dbmf]] reinforce as that thesis shares the `rate-path` driver with [[ws.stagflation-risk]]. Confidence flow-through into conviction: gold 0.84 to 0.88, stagflation 0.86 to 0.88, AI 0.87 to 0.88, equity 0.75 to 0.76, defense 0.88 to 0.84, and the decisive one - [[ws.persistent-energy-shock]] cut 0.78 to 0.50 as [[ws.ev-wti-jun18-7482|WTI collapsed ~18% to ~$75]] on [[ws.ev-us-iran-end-war-deal-jun14|the June 14 end-of-war deal]].
+
+    **What drives the top of the book.** [[sec.gld]] (**7.33%**) takes the top weight: it serves [[ws.gold-debasement-bid]] (0.88, stepped up on [[ws.ev-gold-ath-jun16-4353|the fresh ATH into the de-escalation]]) and [[ws.stagflation-risk]], with the shared `inflation-debasement` / `monetary-credibility` channels MAX-counted once and the distinct channels summed. [[sec.xle]] (**6.49%**) falls from its former top spot as the energy thesis's conviction halved (0.50) - same vehicle, far less weight, the clearest expression of the regime change. The AI sleeve ([[sec.nvda]], [[sec.amd]], [[sec.avgo]], [[sec.orcl]], [[sec.intc]]) and the defense sleeve ([[sec.lmt]], [[sec.rtx]], [[sec.noc]]) follow.
+
+    **The rates short block.** [[sec.tlt]] (**-4.59%**, short) and [[sec.ief]] (**-4.03%**, short) are the inverse-expression rate legs, now driven by BOTH [[ws.stagflation-risk]] and [[ws.hawkish-warsh-regime]] sharing the `rate-path` driver - MAX-deduped so the higher-for-longer force is counted once at its strongest channel, not double-stacked. [[sec.dbmf]] and [[sec.kmlm]] add the managed-futures rate-trend capture.
+
+    **Exposure.** Gross 0.9998 (sum of absolute weights), net +0.8274 long, cash 0.0864 (short proceeds from the TLT/IEF legs finance the balance). 21 holdings; 2 short (the two rate legs), 19 long.
+  hasHolding:
+    - holding-gld
+    - holding-xle
+    - holding-nvda
+    - holding-amd
+    - holding-iau
+    - holding-avgo
+    - holding-lmt
+    - holding-rtx
+    - holding-orcl
+    - holding-noc
+    - holding-gdx
+    - holding-spy
+    - holding-tlt
+    - holding-intc
+    - holding-vti
+    - holding-ief
+    - holding-uvix
+    - holding-dbmf
+    - holding-xom
+    - holding-cvx
+    - holding-kmlm
+holding-gld:
+  type: fund.Holding
+  heldSecurity: sec.gld
+  targetWeight: 0.0733
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    **7.33%** (long, primary vehicle) serving [[ws.stagflation-risk]] and [[ws.gold-debasement-bid]]. Multi-thesis: shared macro drivers are MAX-deduped and distinct drivers summed under the driver-union, so the weight reflects the DISTINCT forces behind GLD, not the count of theses naming it.
+holding-xle:
+  type: fund.Holding
+  heldSecurity: sec.xle
+  targetWeight: 0.0649
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    **6.49%** (long, alternate vehicle) serving [[ws.stagflation-risk]] and [[ws.persistent-energy-shock]]. Multi-thesis: shared macro drivers are MAX-deduped and distinct drivers summed under the driver-union, so the weight reflects the DISTINCT forces behind XLE, not the count of theses naming it.
+holding-nvda:
+  type: fund.Holding
+  heldSecurity: sec.nvda
+  targetWeight: 0.0583
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    **5.83%** (long, primary vehicle) serving [[ws.ai-capex-cycle-with-china-tail]].
+holding-amd:
+  type: fund.Holding
+  heldSecurity: sec.amd
+  targetWeight: 0.0558
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    **5.58%** (long, alternate vehicle) serving [[ws.ai-capex-cycle-with-china-tail]].
+holding-iau:
+  type: fund.Holding
+  heldSecurity: sec.iau
+  targetWeight: 0.0545
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    **5.45%** (long, alternate vehicle) serving [[ws.gold-debasement-bid]].
+holding-avgo:
+  type: fund.Holding
+  heldSecurity: sec.avgo
+  targetWeight: 0.0545
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    **5.45%** (long, alternate vehicle) serving [[ws.ai-capex-cycle-with-china-tail]].
+holding-lmt:
+  type: fund.Holding
+  heldSecurity: sec.lmt
+  targetWeight: 0.0539
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    **5.39%** (long, primary vehicle) serving [[ws.iran-war-rearmament]].
+holding-rtx:
+  type: fund.Holding
+  heldSecurity: sec.rtx
+  targetWeight: 0.0532
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    **5.32%** (long, alternate vehicle) serving [[ws.iran-war-rearmament]].
+holding-orcl:
+  type: fund.Holding
+  heldSecurity: sec.orcl
+  targetWeight: 0.0507
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    **5.07%** (long, alternate vehicle) serving [[ws.ai-capex-cycle-with-china-tail]].
+holding-noc:
+  type: fund.Holding
+  heldSecurity: sec.noc
+  targetWeight: 0.0502
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    **5.02%** (long, alternate vehicle) serving [[ws.iran-war-rearmament]].
+holding-gdx:
+  type: fund.Holding
+  heldSecurity: sec.gdx
+  targetWeight: 0.0482
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    **4.82%** (long, high beta proxy) serving [[ws.gold-debasement-bid]].
+holding-spy:
+  type: fund.Holding
+  heldSecurity: sec.spy
+  targetWeight: 0.0465
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    **4.65%** (long, primary vehicle) serving [[ws.equity-melt-up-vs-recession-risk]].
+holding-tlt:
+  type: fund.Holding
+  heldSecurity: sec.tlt
+  targetWeight: -0.0459
+  holdingDirection: align.direction-short
+  holdingRole: align.role-inverse-expression
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    **-4.59%** (short, inverse expression) serving [[ws.stagflation-risk]] and [[ws.hawkish-warsh-regime]]. Multi-thesis: shared macro drivers are MAX-deduped and distinct drivers summed under the driver-union, so the weight reflects the DISTINCT forces behind TLT, not the count of theses naming it.
+holding-intc:
+  type: fund.Holding
+  heldSecurity: sec.intc
+  targetWeight: 0.0431
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    **4.31%** (long, high beta proxy) serving [[ws.ai-capex-cycle-with-china-tail]].
+holding-vti:
+  type: fund.Holding
+  heldSecurity: sec.vti
+  targetWeight: 0.0427
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    **4.27%** (long, alternate vehicle) serving [[ws.equity-melt-up-vs-recession-risk]].
+holding-ief:
+  type: fund.Holding
+  heldSecurity: sec.ief
+  targetWeight: -0.0403
+  holdingDirection: align.direction-short
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    **-4.03%** (short, alternate vehicle) serving [[ws.stagflation-risk]] and [[ws.hawkish-warsh-regime]]. Multi-thesis: shared macro drivers are MAX-deduped and distinct drivers summed under the driver-union, so the weight reflects the DISTINCT forces behind IEF, not the count of theses naming it.
+holding-uvix:
+  type: fund.Holding
+  heldSecurity: sec.uvix
+  targetWeight: 0.0394
+  holdingDirection: align.direction-long
+  holdingRole: align.role-hedge
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    **3.94%** (long, hedge) serving [[ws.equity-melt-up-vs-recession-risk]].
+holding-dbmf:
+  type: fund.Holding
+  heldSecurity: sec.dbmf
+  targetWeight: 0.0380
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    **3.80%** (long, alternate vehicle) serving [[ws.stagflation-risk]] and [[ws.hawkish-warsh-regime]]. Multi-thesis: shared macro drivers are MAX-deduped and distinct drivers summed under the driver-union, so the weight reflects the DISTINCT forces behind DBMF, not the count of theses naming it.
+holding-xom:
+  type: fund.Holding
+  heldSecurity: sec.xom
+  targetWeight: 0.0306
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    **3.06%** (long, alternate vehicle) serving [[ws.persistent-energy-shock]].
+holding-cvx:
+  type: fund.Holding
+  heldSecurity: sec.cvx
+  targetWeight: 0.0299
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    **2.99%** (long, alternate vehicle) serving [[ws.persistent-energy-shock]].
+holding-kmlm:
+  type: fund.Holding
+  heldSecurity: sec.kmlm
+  targetWeight: 0.0259
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    **2.59%** (long, alternate vehicle) serving [[ws.hawkish-warsh-regime]].
