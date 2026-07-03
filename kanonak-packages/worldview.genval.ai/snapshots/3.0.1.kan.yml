@@ -1,7 +1,7 @@
 snapshots:
   type: Package
   publisher: worldview.genval.ai
-  version: 2.2.5
+  version: 3.0.1
   imports:
     - publisher: kanonak.org
       packages:
@@ -57,31 +57,31 @@ snapshots:
           alias: hz
         - package: snapshots
           match: =
-          version: 2.2.4
-          alias: v224
+          version: 3.0.0
+          alias: v300
 
 view:
   type: wv.WorldviewSnapshot
-  label: 'Macro worldview (2.2.5 - Thursday July 2 refresh integrating the June 11 to July 2 window - the two main axes repriced hard in opposite directions: the Iran-Israel war DE-ESCALATED (June 17 Islamabad MOU ceasefire plus blockade wind-down, June 22 OFAC General License X uncapping Iranian crude, June 29 halt-hostilities agreement) and WTI collapsed from ~$91 to below $69 (lowest since Feb 27, Brent -20% on the month) with energy equities unwinding the war premium; the Fed turned hawkish at Warsh first FOMC (June 16-17 held 3.50-3.75% unanimous 12-0 but the dot plot flipped to a 2026 hike, SEP core inflation 3.3%, GDP cut to 2.2%) and May PCE core ticked up to 3.4%; equities recovered (SPY 745.76, QQQ 725.17) with VIX collapsing 22.22 to ~16.5 and the S&P posting its strongest quarter since 2020; gold extended its selloff below $4,000 (low $3,943) before bouncing to ~$4,068. PATCH: no thesis added, retired, or invalidated)'
+  label: 'Macro worldview (3.0.1 - Thursday July 2 refresh integrating the June 18 to July 2 window on the post-FOMC hawkish-Warsh regime baseline - the Iran-Israel de-escalation deepened (June 22 OFAC General License X uncapping Iranian crude, June 29 US-Iran halt-hostilities) and WTI collapsed further to below $69 (lowest since Feb 27, Brent -20% on the month) with energy equities unwinding the premium; May PCE core ticked to 3.4% and Warsh reinforced the hawkish regime at Sintra (independence, price stability, no tolerance for above-2% inflation); equities recovered (SPY 745.76, QQQ 725.17), VIX collapsed to ~16.5 and the S&P posted its strongest quarter since 2020; gold sold off below $4,000 (low $3,943) before bouncing to ~$4,068. PATCH: no thesis added, retired, or invalidated)'
   observedAt: 2026-07-02T12:45:52Z
   narrative: |
-    2.2.5 refresh, taken Thursday July 2 ~8:45 AM ET - the window runs from the June 11 pre-market read ([[v224.view|2.2.4]]) through the June 16-17 FOMC, the June 25 May-PCE print, the June 17-29 ceasefire sequence, and the June 30 quarter-end into the July 2 pre-market (the June jobs report was released at 8:30 AM ET, minutes before this snapshot; its actual print had not yet propagated and is left for 2.2.6). The bump is a PATCH: no thesis was added, retired, or invalidated and no regime label flips - but the window repriced the worldview's two main axes hard and in OPPOSITE directions, so the confidence moves are larger than a typical patch. Net moves: [[stagflation-risk]] -0.01 to 0.85 (wider), [[persistent-energy-shock]] -0.10 to 0.68 (much wider), [[iran-war-rearmament]] -0.01 to 0.87, [[gold-debasement-bid]] -0.02 to 0.82 (wider), [[ai-capex-cycle-with-china-tail]] hold at 0.87 (wider band on the re-armed China tail), [[equity-melt-up-vs-recession-risk]] +0.02 to 0.77 (tighter), and [[powell-warsh-transition-risk]] -0.05 to 0.48 (tighter).
+    3.0.1 refresh, taken Thursday July 2 ~8:45 AM ET - the window runs from the June 18 post-FOMC regime reframe ([[v300.view|3.0.0]]) through the June 25 May-PCE print, the June 22-29 de-escalation sequence, and the June 30 quarter-end into the July 2 pre-market (the June jobs report was released at 8:30 AM ET, minutes before this snapshot; its actual print had not yet propagated and is left for 3.0.2). The bump is a PATCH: 3.0.0 already did the regime reframe (retiring [[powell-warsh-transition-risk]] and adding [[hawkish-warsh-regime]]), so no thesis is added, retired, or invalidated here - the window continued both trends 3.0.0 identified. Net moves: [[persistent-energy-shock]] -0.05 to 0.45 (wider), [[gold-debasement-bid]] -0.03 to 0.85 (wider), [[hawkish-warsh-regime]] +0.04 to 0.76 (tighter), [[equity-melt-up-vs-recession-risk]] +0.02 to 0.78, [[stagflation-risk]] -0.01 to 0.87, [[iran-war-rearmament]] -0.01 to 0.83, and a hold on [[ai-capex-cycle-with-china-tail]] at 0.88 (wider band).
 
-    **The war de-escalates and the energy premium collapses.** [[persistent-energy-shock]] steps 0.78 to 0.68 and the band widens to 0.09 - the largest single-window move in the worldview. The June 7-10 direct exchanges gave way to diplomacy: a [[ev-islamabad-mou-ceasefire-jun17|June 17 "Islamabad Memorandum of Understanding" - a 60-day ceasefire plus a wind-down of the Hormuz blockade, signed by Trump and Pezeshkian]], the [[ev-ofac-general-license-x-jun22|June 22 OFAC General License X uncapping worldwide purchase and transport of Iranian crude]], and a [[ev-us-iran-halt-hostilities-jun29|June 29 US-Iran agreement to halt hostilities]]. Oil unwound the entire war premium: [[ev-wti-below-69-jul1|WTI fell below $69 on July 1, its lowest since February 27, a near-25% collapse from ~$91]], [[ev-brent-74-month-down-20-jun30|Brent ~$74, down ~20% on the month]], and [[ev-energy-equities-unwound-jul1|energy equities gave back the premium (XOM 136.28, CVX 165.69, XLE 52.81)]]. The invalidation leg - WTI sustainably sub-threshold for 30+ days following a DURABLE Hormuz reopening - is now partially in motion, which is exactly why the mean drops materially. It is not fully fired: the reopening is fragile, with a [[ev-hormuz-reclosure-relapse-jun22|late-June Iranian re-closure claim and a June 26 relapse]] before transit corridors reopened, and 30 sustained days have not elapsed. The band widens because the thesis is now genuinely two-sided rather than one-way-up.
+    **The energy de-escalation deepens.** [[persistent-energy-shock]] steps 0.50 to 0.45 and the band widens to 0.13. Building on the June-17 ceasefire 3.0.0 already priced, the window added [[ev-ofac-general-license-x-jun22|the June 22 OFAC General License X uncapping Iranian crude]] and [[ev-us-iran-halt-hostilities-jun29|the June 29 halt-hostilities agreement]], driving [[ev-wti-below-69-jul1|WTI below $69 (lowest since February 27)]], [[ev-brent-74-month-down-20-jun30|Brent -20% on the month]], and [[ev-energy-equities-unwound-jul1|energy equities unwinding the premium]]. The sustained-sub-threshold-after-durable-reopening invalidation leg is genuinely in motion now - but it is not fully fired: the reopening is fragile, with a [[ev-hormuz-reclosure-relapse-jun22|June 22 Iranian re-closure claim and relapse]], and 30 sustained days have not elapsed.
 
-    **The Fed turns hawkish; core inflation sticks.** [[stagflation-risk]] steps 0.86 to 0.85 and the band widens to 0.05 - a small net move masking a two-sided window. The inflation-persistence pillar got real corroboration: [[ev-fomc-jun17-hold-hawkish-dots|the June 16-17 FOMC held 3.50-3.75% unanimously but flipped the dot plot to a 2026 hike (median end-2026 ~3.8%, 9 of 18 officials signaling higher rates), with the SEP raising 2026 inflation and cutting GDP to 2.2%]], and [[ev-may-pce-core-34-jun25|May PCE core ticked up to 3.4% YoY, its highest since October 2023]] - moving AWAY from the <2.5%-for-3-months invalidation leg. But the energy-passthrough accelerant that drove the May CPI headline has now REVERSED: with oil down ~25%, the near-term headline tailwind becomes a headwind, and [[ev-10y-yield-jun26-438|the 10Y actually eased to ~4.38-4.44% despite the hawkish Fed]] (the strong dollar did the hawkish work). The "stag" leg still is not firing - growth is solid (GDP revised up to +2.1% for Q1, ISM manufacturing and services both in expansion, retail sales +0.9% in May) - so this remains inflation-persistence more than classic stagflation. Net -0.01, wider band on the reversing energy channel.
+    **The hawkish-Warsh regime gets its first confirmation window.** [[hawkish-warsh-regime]] steps 0.72 to 0.76 and the band tightens to 0.06. [[ev-warsh-sintra-independence-jul1|At Sintra on July 1 Warsh emphasized Fed independence, rebuffed presidential calls for cuts, and pledged to deliver price stability, warning against tolerance of above-2% inflation]] - exactly the regime 3.0.0 called. Markets now price [[ev-fedwatch-dec-hike-66pct-jun|~66% odds of a December hike]] embedded in the Fed's own dots, and [[ev-may-pce-core-34-jun25|May PCE core ticked up to 3.4% YoY]] validates the higher-for-longer read. The thesis strengthens in its first full window.
 
-    **Rearmament holds as the war cools.** [[iran-war-rearmament]] steps 0.88 to 0.87. The ceasefire eased the acute conflict urgency, but the thesis rests on the STRUCTURAL procurement cycle, which firmed: the FY2027 defense request runs ~$1.5T with procurement rising toward ~$258B, RTX raised 2026 guidance, and [[ev-defense-closes-jul1|the primes held firm (LMT 521.82, RTX 191.78, NOC 519.95)]] through the de-escalation. The invalidation (durable peace IMPLEMENTED plus two quarters of declining DoD outlays) is not remotely in motion - a fragile 60-day ceasefire with a relapse is not implemented peace. Only -0.01 for the reduced acute intensity.
+    **Stagflation holds; the energy accelerant reverses.** [[stagflation-risk]] steps 0.88 to 0.87 and the band widens to 0.05. [[ev-may-pce-core-34-jun25|Core PCE at 3.4%]] keeps the inflation pillar high, but the ~25% oil collapse turns the near-term energy-passthrough tailwind into a headwind and [[ev-10y-yield-jun26-438|the 10Y eased to ~4.4%]] despite the hawkish Fed (the strong dollar did the work). Growth stays solid (Q1 GDP revised to +2.1%, ISM manufacturing and services in expansion), so the stag leg is still dormant, and the higher-for-longer rate story now lives largely in the separate [[hawkish-warsh-regime]] thesis. Small down, wider band.
 
-    **Gold extends its drawdown but the structural bid holds.** [[gold-debasement-bid]] steps 0.84 to 0.82 and the band widens to 0.07. The June 11 selloff extended: [[ev-gold-below-4000-jun30|spot broke below $4,000 for the first time since November 2025, printing a $3,942.99 low]] on the hawkish repricing, a dollar above 100, and rising real yields, [[ev-gld-gdx-jul1|GLD 370.60 / GDX 75.07]], before [[ev-gold-bounce-4068-jul2|a bounce to ~$4,068 by July 2]]. Goldman trimmed its year-end target to $4,900 (from $5,400). But the structural leg is intact: [[ev-wgc-midyear-outlook-jul1|the WGC July 1 Mid-Year Outlook centers H2 fair value near $4,100 and keeps central banks as consistent net buyers above the 600t norm, with 89% of reserve managers expecting more official buying]]. The AndCondition triplet (durable peace / Fed credibility restored / six months of deficit decline) has no leg in motion, so the mean step is small; the band widens because the near-term expression keeps losing to the yield channel.
+    **Gold sells off but the structural bid holds.** [[gold-debasement-bid]] steps 0.88 to 0.85 and the band widens to 0.06. [[ev-gold-below-4000-jun30|Gold broke below $4,000 for the first time since November 2025 (low $3,943)]] on the hawkish repricing and a firm dollar, [[ev-gld-gdx-jul1|GLD 370.60 / GDX 75.07]], before [[ev-gold-bounce-4068-jul2|bouncing to ~$4,068]]. Goldman trimmed its year-end target to $4,900. The structural leg is intact - [[ev-wgc-midyear-outlook-jul1|the WGC July 1 Mid-Year Outlook centers H2 fair value near $4,100 with central banks consistent net buyers]] - so the mean trim is modest and the band widens on the yield/dollar sensitivity.
 
-    **AI demand confirms while the China tail re-arms.** [[ai-capex-cycle-with-china-tail]] holds at 0.87 with the band widening to 0.06. Demand durability got primary-grade confirmation: [[ev-tsmc-may-rev-30pct-jun10|TSMC May revenue rose ~30% YoY on sustained AI-chip demand]], Meta stood up a gigawatt-scale "Meta Compute" build-out, and big-four 2026 capex is guided near $725B. The funding question sharpened - [[ev-oracle-40b-raise-jun|Oracle paired its $638B RPO with a plan to raise ~$40B in FY27 and -$23.7B FY26 free cash flow]] - and the tail re-armed: [[ev-china-export-control-retaliation-jun22|China added 10 US firms to its export-control list on June 22 in retaliation for the Pentagon adding ~80 Chinese firms]], out of the pre-June detente. A [[ev-semis-selloff-jul1|July 1 semis selloff (Micron -10.6%, AMD -6.9%, NVDA ~16% off its record)]] de-rated positioning even as demand held. Mean held, band widened on the re-armed tail plus the funding and power-capacity constraints.
+    **AI demand holds while the China tail re-arms.** [[ai-capex-cycle-with-china-tail]] holds at 0.88 with the band widening to 0.06. Demand durability persisted (hyperscaler capex, [[ev-orcl-q4-fy26-rpo-638b-jun10|Oracle's $638B RPO]]) while the tail re-armed: [[ev-china-export-control-retaliation-jun22|China added 10 US firms to its export-control list on June 22]] in retaliation for the Pentagon's Chinese-military-companies additions, out of the pre-June detente. A [[ev-semis-selloff-jul1|July 1 semis selloff (Micron -10.6%, AMD -6.9%, NVDA ~16% off its record)]] de-rated positioning even as demand held. Mean held, band widened on the re-armed tail.
 
-    **Equities recover; the vol-expansion scare fades.** [[equity-melt-up-vs-recession-risk]] steps 0.75 to 0.77 and the band tightens to 0.06. The June 10 break lower reversed: [[ev-spy-qqq-recover-jul1|SPY recovered to 745.76 and QQQ to 725.17]], the S&P posted its strongest quarter since 2020, and [[ev-vix-collapse-165-jul1|the VIX collapsed from 22.22 to ~16.5]] - the vol-expansion leg that approached 25 in June is now far away. The war tail is gone, the earnings backdrop supports the melt-up ([[ev-q2-earnings-est-231-jun|Q2 EPS growth estimated +23.1%, Q1 closed at +27.7% / 84% beats]]), and the recession leg stays quiet (GDP +2.1%, solid ISM), though ADP private payrolls softened to +98k and the hawkish-Fed hike path is a distinct third headwind. Net +0.02, tighter band as the June scare resolved without either leg firing.
+    **Equities recover; the vol scare fades.** [[equity-melt-up-vs-recession-risk]] steps 0.76 to 0.78. The tape recovered - [[ev-spy-qqq-recover-jul1|SPY 745.76 and QQQ 725.17]], the S&P's strongest quarter since 2020 - and [[ev-vix-collapse-165-jul1|the VIX collapsed to ~16.5]], leaving the vol-expansion leg far away. Earnings support the melt-up ([[ev-q2-earnings-est-231-jun|Q2 EPS growth estimated +23.1%]]) and the recession leg stays quiet (Q1 GDP +2.1%), though softer ADP payrolls (+98k) and the hawkish-Fed hike path are counterweights.
 
-    **The Fed transition resolves benignly.** [[powell-warsh-transition-risk]] steps 0.53 to 0.48 and the band tightens to 0.08. Warsh first meeting was clean - [[ev-fomc-jun17-hold-hawkish-dots|a unanimous 12-0 hold with a hawkish dot plot and a statement cut to ~130 words]] - and at Sintra July 1 he [[ev-warsh-sintra-independence-jul1|emphasized Fed independence, rebuffed presidential calls for cuts, and pledged to deliver price stability, warning against tolerance of above-2% inflation]]. The dovish-capture risk his confirmation framing introduced is resolving the OTHER way: an independent, hawkish chair, not a Trump instrument. [[ev-fedwatch-dec-hike-66pct-jun|Markets now price ~66% odds of a December hike]] embedded in the Fed's own dots. Residual uncertainty remains (no personal SEP dot, five new task forces, ongoing presidential pressure), so the risk abates rather than disappears: -0.05, tighter.
+    **Rearmament holds as the war cools.** [[iran-war-rearmament]] steps 0.84 to 0.83. The [[ev-us-iran-halt-hostilities-jun29|June 29 halt-hostilities agreement]] eased the acute conflict, but the structural procurement cycle firmed ([[ev-defense-closes-jul1|the primes held firm - LMT 521.82, RTX 191.78, NOC 519.95]]); a fragile 60-day ceasefire is not the implemented durable peace the invalidation requires. Only -0.01.
 
-    **Catalyst calendar from here.** The June jobs report (released 8:30 AM ET July 2, consensus ~100-115k) is the immediate read - a hot print hardens the December-hike path, a soft one revives the recession leg; its confirmed number lands in 2.2.6. June CPI on July 14 is the next inflation tell against a now-reversing energy base. Whether the fragile Iran ceasefire holds through its 60-day window or relapses into another Hormuz disruption is the swing factor for [[persistent-energy-shock]]. Q2 earnings season begins mid-July. Month-end May-to-June PCE and the July 28-29 FOMC follow.
+    **Catalyst calendar.** The June jobs report (released 8:30 AM ET July 2, consensus ~100-115k) is the immediate read; its confirmed print lands in 3.0.2. June CPI on July 14 is the next inflation tell against a now-reversing energy base. Whether the fragile Iran ceasefire holds through its 60-day window is the swing factor for [[persistent-energy-shock]]. Q2 earnings begin mid-July; the July 28-29 FOMC is the next test of the [[hawkish-warsh-regime]] read.
   hasThesis:
     - stagflation-risk
     - persistent-energy-shock
@@ -90,6 +90,7 @@ view:
     - ai-capex-cycle-with-china-tail
     - equity-melt-up-vs-recession-risk
     - powell-warsh-transition-risk
+    - hawkish-warsh-regime
 
 stagflation-risk:
   type: wv.WorldviewThesis
@@ -213,14 +214,14 @@ stagflation-risk:
     [[ev-brent-wed-93-jun10|Brent ~$93]]). Core 2.9% CPI / 3.3% PCE remains far from the
     <2.5%-for-3-months invalidation leg; the June 16-17 FOMC and month-end May PCE are the
     next reads.
-    Update July 2: the June 16-17 FOMC held 3.50-3.75% unanimously but [[ev-fomc-jun17-hold-hawkish-dots|flipped the dot plot to a 2026 hike (SEP core inflation 3.3%, GDP cut to 2.2%)]] and [[ev-may-pce-core-34-jun25|May PCE core ticked up to 3.4% YoY]] - both corroborating inflation persistence and moving further from the <2.5%-for-3-months leg - even as the ~25% oil collapse reversed the energy-passthrough accelerant and [[ev-10y-yield-jun26-438|the 10Y eased to ~4.38-4.44%]] with markets pricing [[ev-fedwatch-dec-hike-66pct-jun|~66% odds of a December hike]]. Growth stayed solid (Q1 GDP revised to +2.1%, ISM in expansion), so the stag leg is still dormant.
+    Update July 2: [[ev-may-pce-core-34-jun25|May PCE core ticked to 3.4% YoY]] corroborated inflation persistence, but the ~25% oil collapse ([[ev-wti-below-69-jul1|WTI below $69]]) turned the energy-passthrough tailwind into a headwind and [[ev-10y-yield-jun26-438|the 10Y eased to ~4.4%]]; growth stayed solid (Q1 GDP revised to +2.1%), so the stag leg is still dormant and the higher-for-longer rate story now sits largely in [[hawkish-warsh-regime]].
   confidence:
-    estimateMean: 0.85
+    estimateMean: 0.87
     estimateStdDev: 0.05
-    estimateLower95: 0.74
-    estimateUpper95: 0.92
-    betaAlpha: 42.5
-    betaBeta: 7.5
+    estimateLower95: 0.76
+    estimateUpper95: 0.95
+    betaAlpha: 38.5
+    betaBeta: 5.7
   vis.thesisTheme: vis.theme-inflation
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.inflation-debasement
@@ -255,7 +256,7 @@ stagflation-risk:
     estimateUpper95: 18.0
   status: wv.active
   confidenceRationale: >-
-    Stepped 0.86 to 0.85 (from 2.2.4), band widened 0.04 to 0.05. The window cut both ways: the hawkish dot-plot flip and the 3.3%-to-3.4% core-PCE tick corroborate the inflation-persistence and rate-path pillars, but the ~25% oil collapse turns the near-term energy-passthrough tailwind into a headwind and growth remains too firm for the stag leg. Small net down, wider band on the now-two-sided energy channel. Beta(42.5, 7.5), ~50 effective observations. Horizon anchored on the monthly PCE cadence - the invalidation leg still needs a full quarter to begin scoring.
+    Eased 0.88 to 0.87 (band 0.04 to 0.05). The sticky 3.4% core PCE keeps the inflation pillar high, but the oil collapse removes the near-term headline impulse; small down, wider on the two-sided energy channel.
   supportingEvidence:
     - ev-april-cpi-print-headline-38
     - ev-april-ppi-print-may13
@@ -326,12 +327,9 @@ stagflation-risk:
     - ev-wti-wed-91-jun10
     - ev-brent-wed-93-jun10
     - ev-iran-ballistic-missiles-israel-jun8
-    - ev-fomc-jun17-hold-hawkish-dots
     - ev-may-pce-core-34-jun25
-    - ev-10y-yield-jun26-438
-    - ev-fedwatch-dec-hike-66pct-jun
     - ev-wti-below-69-jul1
-    - ev-warsh-sintra-independence-jul1
+    - ev-10y-yield-jun26-438
   invalidationCondition:
     type: wv.OrCondition
     wv.operands:
@@ -555,15 +553,22 @@ persistent-energy-shock:
     the strike wave complete with investors framing the conflict as a "long grind"]] - oil
     pared toward $91 on resumed-talks hopes, but WTI sits far above the <$80-for-30-days
     invalidation leg and the durable-reopening clock has moved decisively further from
-    starting.
-    Update July 2: the war de-escalated and the energy premium collapsed. The [[ev-islamabad-mou-ceasefire-jun17|June 17 Islamabad MOU ceasefire plus blockade wind-down]], the [[ev-ofac-general-license-x-jun22|June 22 OFAC General License X uncapping Iranian crude]], and the [[ev-us-iran-halt-hostilities-jun29|June 29 halt-hostilities agreement]] drove [[ev-wti-below-69-jul1|WTI below $69 (lowest since Feb 27, ~25% off ~$91)]], [[ev-brent-74-month-down-20-jun30|Brent -20% on the month]], and [[ev-energy-equities-unwound-jul1|energy equities unwinding the premium]]. The sustained-sub-threshold-after-durable-reopening invalidation leg is now partially in motion, though the reopening is fragile ([[ev-hormuz-reclosure-relapse-jun22|a late-June Iranian re-closure claim and June 26 relapse]]) and 30 sustained days have not elapsed.
+    starting. Update June 18 (3.0.0): both invalidation legs are now ENGAGED -
+    [[ev-us-iran-end-war-deal-jun14|the June 14 US-Iran deal reopened the Strait of
+    Hormuz]], [[ev-hormuz-tankers-resume-jun17|Iranian crude is exporting again for the
+    first time in two months]], and [[ev-wti-jun18-7482|WTI collapsed ~18% to ~$74.82,
+    below the $80 threshold]]. The thesis is cut hard to 0.50 but stays ACTIVE rather than
+    invalidated: the 30-day durability clock only just started and
+    [[ev-trump-resume-threat-jun17|Trump warned he could resume strikes]] if the deal
+    sours, so it sits AT its invalidation leg, not past it.
+    Update July 2: the de-escalation deepened - [[ev-ofac-general-license-x-jun22|OFAC General License X uncapped Iranian crude]], the US and Iran [[ev-us-iran-halt-hostilities-jun29|agreed to halt hostilities June 29]], and [[ev-wti-below-69-jul1|WTI fell below $69]], [[ev-brent-74-month-down-20-jun30|Brent -20% on the month]], [[ev-energy-equities-unwound-jul1|energy equities unwinding the premium]]. The invalidation leg advances, though a [[ev-hormuz-reclosure-relapse-jun22|June 22 relapse]] keeps the reopening fragile.
   confidence:
-    estimateMean: 0.68
-    estimateStdDev: 0.09
-    estimateLower95: 0.5
-    estimateUpper95: 0.84
-    betaAlpha: 17.6
-    betaBeta: 8.3
+    estimateMean: 0.45
+    estimateStdDev: 0.13
+    estimateLower95: 0.21
+    estimateUpper95: 0.71
+    betaAlpha: 6.1
+    betaBeta: 7.5
   vis.thesisTheme: vis.theme-energy
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.energy-supply
@@ -597,7 +602,7 @@ persistent-energy-shock:
     estimateUpper95: 12.0
   status: wv.active
   confidenceRationale: >-
-    Stepped 0.78 to 0.68 (from 2.2.4), band widened 0.06 to 0.09 - the largest single-window move in the worldview. A genuine ceasefire framework, a concrete blockade unwind (OFAC General License X), and a ~25% oil collapse partially activate the invalidation leg for the first time, so the mean drops materially. It is not fully fired: the ceasefire is a fragile 60-day framework that already relapsed once, the reopening is not yet durable, and 30 sustained sub-threshold days have not elapsed. The wide band encodes a now genuinely two-sided thesis. Beta(17.6, 8.3), ~26 effective observations.
+    Stepped 0.50 to 0.45 (band 0.12 to 0.13). The premium keeps deflating as the ceasefire holds, the blockade unwinds, and oil breaks to the high-$60s - the invalidation leg is genuinely in motion. Not fully fired: fragile ceasefire, a relapse, 30 sustained days not elapsed. Wide band on the two-sided risk.
   supportingEvidence:
     - ev-iea-omr-may-2026-undersupply
     - ev-ubs-inventories-record-low-may15
@@ -722,10 +727,9 @@ persistent-energy-shock:
     - ev-brent-wed-93-jun10
     - ev-energy-complex-wed-jun10
     - ev-may-cpi-print-42-jun10
-    - ev-islamabad-mou-ceasefire-jun17
     - ev-ofac-general-license-x-jun22
-    - ev-hormuz-reclosure-relapse-jun22
     - ev-us-iran-halt-hostilities-jun29
+    - ev-hormuz-reclosure-relapse-jun22
     - ev-wti-below-69-jul1
     - ev-brent-74-month-down-20-jun30
     - ev-energy-equities-unwound-jul1
@@ -918,14 +922,14 @@ iran-war-rearmament:
     strength, not a break. The multi-year backlog (LMT $194B, RTX $271B), Golden Dome
     ($185B), and the $1.5T FY2027 budget proposal are unchanged, and the durable-peace
     invalidation leg has never been further away.
-    Update July 2: the acute conflict eased with the [[ev-islamabad-mou-ceasefire-jun17|June 17 ceasefire MOU]] and [[ev-us-iran-halt-hostilities-jun29|June 29 halt-hostilities agreement]], but the structural procurement cycle firmed - the FY2027 defense request runs ~$1.5T with procurement toward ~$258B, RTX raised guidance, and [[ev-defense-closes-jul1|the primes held firm (LMT 521.82, RTX 191.78, NOC 519.95)]] through the de-escalation. A fragile 60-day ceasefire with a relapse is not the implemented durable peace the invalidation requires.
+    Update July 2: the war cooled further with [[ev-us-iran-halt-hostilities-jun29|the June 29 halt-hostilities agreement]], but the structural procurement cycle held - [[ev-defense-closes-jul1|the primes stayed firm (LMT 521.82, RTX 191.78, NOC 519.95)]] with RTX up on raised guidance. A fragile ceasefire is not the implemented durable peace the invalidation requires.
   confidence:
-    estimateMean: 0.87
-    estimateStdDev: 0.05
-    estimateLower95: 0.76
-    estimateUpper95: 0.94
-    betaAlpha: 38.5
-    betaBeta: 5.7
+    estimateMean: 0.83
+    estimateStdDev: 0.06
+    estimateLower95: 0.7
+    estimateUpper95: 0.93
+    betaAlpha: 31.7
+    betaBeta: 6.5
   vis.thesisTheme: vis.theme-defense
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.geopolitical-conflict
@@ -944,7 +948,7 @@ iran-war-rearmament:
     estimateUpper95: 30.0
   status: wv.active
   confidenceRationale: >-
-    Stepped 0.88 to 0.87 (from 2.2.4). The thesis rests on the multi-year procurement cycle, not the war continuing, and that cycle firmed (FY2027 request, RTX guidance, prime relative strength). Only -0.01 for the reduced acute intensity; the invalidation (durable peace IMPLEMENTED plus two quarters of declining DoD outlays) is not in motion. Beta(38.5, 5.7), ~44 effective observations.
+    Eased 0.84 to 0.83. The acute conflict subsided but the multi-year rearmament cycle (FY2027 request, prime relative strength) is intact; only -0.01 for reduced intensity.
   supportingEvidence:
     - ev-operation-epic-fury-feb28
     - ev-iran-tomahawks-fired-2026q1
@@ -1047,9 +1051,7 @@ iran-war-rearmament:
     - ev-us-strikes-iran-wed-night-jun10
     - ev-centcom-strikes-complete-thu-jun11
     - ev-defense-closes-wed-jun10
-    - ev-islamabad-mou-ceasefire-jun17
     - ev-us-iran-halt-hostilities-jun29
-    - ev-hormuz-reclosure-relapse-jun22
     - ev-defense-closes-jul1
   invalidationCondition:
     type: wv.AndCondition
@@ -1192,13 +1194,13 @@ gold-debasement-bid:
     moved AWAY; no Fed-credibility restoration; no deficit decline) and the structural
     supports (244t Q1 central-bank buying, 755t 2026 projection, JPM/UBS/Citi targets)
     stand.
-    Update July 2: gold extended the selloff - [[ev-gold-below-4000-jun30|spot broke below $4,000 for the first time since November 2025 (low $3,942.99)]] on the hawkish repricing, a dollar above 100, and rising real yields, [[ev-gld-gdx-jul1|GLD 370.60 / GDX 75.07]], before [[ev-gold-bounce-4068-jul2|a bounce to ~$4,068]] - while the structural bid held: [[ev-wgc-midyear-outlook-jul1|the WGC July 1 Mid-Year Outlook centers H2 fair value near $4,100 with central banks consistent net buyers above the 600t norm]]. Goldman trimmed its year-end target to $4,900.
+    Update July 2: gold sold off hard - [[ev-gold-below-4000-jun30|below $4,000 for the first time since November 2025 (low $3,943)]] on the hawkish repricing and firm dollar, [[ev-gld-gdx-jul1|GLD 370.60 / GDX 75.07]] - before [[ev-gold-bounce-4068-jul2|bouncing to ~$4,068]]; the structural bid held via [[ev-wgc-midyear-outlook-jul1|the WGC mid-year outlook and continued central-bank buying]].
   confidence:
-    estimateMean: 0.82
-    estimateStdDev: 0.07
-    estimateLower95: 0.67
-    estimateUpper95: 0.93
-    betaAlpha: 23.9
+    estimateMean: 0.85
+    estimateStdDev: 0.06
+    estimateLower95: 0.72
+    estimateUpper95: 0.95
+    betaAlpha: 29.2
     betaBeta: 5.2
   vis.thesisTheme: vis.theme-gold
   fac.hasDriverLoading:
@@ -1234,7 +1236,7 @@ gold-debasement-bid:
     estimateUpper95: 24.0
   status: wv.active
   confidenceRationale: >-
-    Stepped 0.84 to 0.82 (from 2.2.4), band widened 0.06 to 0.07. A four-week price drawdown below $4,000 and an analyst target cut argue for a real but modest mean reduction, while the WGC mid-year outlook and continued central-bank buying keep the structural leg intact. The AndCondition triplet has no leg in motion. Band widens because the near-term expression keeps losing to the yield/dollar channel. Beta(23.9, 5.2), ~29 effective observations.
+    Stepped 0.88 to 0.85 (band 0.05 to 0.06). The sub-$4,000 drawdown and analyst target cuts warrant a real trim, but the WGC outlook and CB buying keep the structural leg; band widens on the yield/dollar sensitivity.
   supportingEvidence:
     - ev-lbma-q1-record-4873
     - ev-cb-q1-2026-244t-buying-record
@@ -1496,14 +1498,14 @@ ai-capex-cycle-with-china-tail:
     [[ev-chip-closes-wed-jun10|Wednesday closed NVDA 200.42, AMD 452.40, AVGO 372.10]].
     Demand keeps strengthening; positioning keeps de-rating on war-and-rates flows; no new
     China-tail development landed (the Commerce loophole closure stands as-is).
-    Update July 2: demand durability got primary-grade confirmation ([[ev-tsmc-may-rev-30pct-jun10|TSMC May revenue +30% YoY]], Meta gigawatt-scale build-out, ~$725B big-four capex) while the funding question sharpened ([[ev-oracle-40b-raise-jun|Oracle pairing its $638B RPO with a ~$40B FY27 raise and -$23.7B free cash flow]]) and the China tail re-armed ([[ev-china-export-control-retaliation-jun22|China added 10 US firms to its export-control list June 22]]). A [[ev-semis-selloff-jul1|July 1 semis selloff (Micron -10.6%, AMD -6.9%)]] de-rated positioning even as demand held.
+    Update July 2: demand held (hyperscaler capex, Oracle's [[ev-orcl-q4-fy26-rpo-638b-jun10|$638B RPO]]) while the China tail re-armed - [[ev-china-export-control-retaliation-jun22|China added 10 US firms to its export-control list June 22]] - and a [[ev-semis-selloff-jul1|July 1 semis selloff (Micron -10.6%, AMD -6.9%)]] de-rated positioning against intact demand.
   confidence:
-    estimateMean: 0.87
+    estimateMean: 0.88
     estimateStdDev: 0.06
-    estimateLower95: 0.74
-    estimateUpper95: 0.95
-    betaAlpha: 26.5
-    betaBeta: 4.0
+    estimateLower95: 0.75
+    estimateUpper95: 0.97
+    betaAlpha: 24.9
+    betaBeta: 3.4
   vis.thesisTheme: vis.theme-ai
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.ai-capex-cycle
@@ -1531,7 +1533,7 @@ ai-capex-cycle-with-china-tail:
     estimateUpper95: 18.0
   status: wv.active
   confidenceRationale: >-
-    Held at 0.87 (from 2.2.4), band widened 0.05 to 0.06. The demand leg strengthened on TSMC and hyperscaler capex, but the China-decoupling tail moved out of its pre-June detente (the June 22 retaliation) and funding/power constraints hardened - so the mean holds while the band widens to encode the re-armed tail. Beta(26.5, 4.0), ~30 effective observations.
+    Held at 0.88 (band 0.05 to 0.06). Demand durable but the China-decoupling tail moved out of detente and a positioning de-rate hit the tape; mean holds, band widens on the re-armed tail.
   supportingEvidence:
     - ev-amd-q1-2026-blowout
     - ev-amd-q1-data-center-58b
@@ -1617,8 +1619,6 @@ ai-capex-cycle-with-china-tail:
     - ev-monday-rebound-jun8
     - ev-tuesday-selloff-jun9
     - ev-chip-closes-wed-jun10
-    - ev-tsmc-may-rev-30pct-jun10
-    - ev-oracle-40b-raise-jun
     - ev-china-export-control-retaliation-jun22
     - ev-semis-selloff-jul1
   invalidationCondition:
@@ -1809,14 +1809,14 @@ equity-melt-up-vs-recession-risk:
     [[ev-thu-premarket-futures-rise-jun11|Thursday futures bounced (S&P +0.72%, Nasdaq
     +1.1%) on the strike-wave completion]]. Neither resolution leg has fired; realized
     volatility is building toward the vol-expansion one.
-    Update July 2: the June 10 break lower reversed - [[ev-spy-qqq-recover-jul1|SPY recovered to 745.76 and QQQ to 725.17]], the S&P posted its strongest quarter since 2020, and [[ev-vix-collapse-165-jul1|the VIX collapsed from 22.22 to ~16.5]], leaving the vol-expansion leg far away. The war tail is gone and earnings support the melt-up ([[ev-q2-earnings-est-231-jun|Q2 EPS growth est +23.1%]]), though [[ev-fomc-jun17-hold-hawkish-dots|the hawkish-Fed hike path]] and softer ADP payrolls (+98k) are offsetting headwinds and the recession leg stays quiet (GDP +2.1%).
+    Update July 2: the tape recovered - [[ev-spy-qqq-recover-jul1|SPY 745.76 / QQQ 725.17]], the S&P's strongest quarter since 2020, and [[ev-vix-collapse-165-jul1|VIX collapsed from ~22 to ~16.5]], leaving the vol-expansion leg far away; earnings support the melt-up ([[ev-q2-earnings-est-231-jun|Q2 EPS est +23.1%]]), with the recession leg quiet.
   confidence:
-    estimateMean: 0.77
+    estimateMean: 0.78
     estimateStdDev: 0.06
-    estimateLower95: 0.64
-    estimateUpper95: 0.87
-    betaAlpha: 37.1
-    betaBeta: 11.1
+    estimateLower95: 0.66
+    estimateUpper95: 0.88
+    betaAlpha: 36.4
+    betaBeta: 10.3
   vis.thesisTheme: vis.theme-equity
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.equity-risk-appetite
@@ -1851,7 +1851,7 @@ equity-melt-up-vs-recession-risk:
     estimateUpper95: 8.0
   status: wv.active
   confidenceRationale: >-
-    Stepped 0.75 to 0.77 (from 2.2.4), band tightened 0.07 to 0.06. The June vol scare resolved without either leg firing: equities recovered, VIX collapsed, and the war tail was removed, supporting the melt-up side; the hawkish Fed and softening ADP are the counterweights. Tighter band because the June uncertainty resolved. Beta(37.1, 11.1), ~48 effective observations.
+    Stepped 0.76 to 0.78. The war tail cleared, vol collapsed, and equities recovered - the melt-up side firmed while the recession leg stayed dormant.
   supportingEvidence:
     - ev-q1-2026-84pct-beat-rate
     - ev-q1-2026-eps-growth-277pct
@@ -1994,8 +1994,6 @@ equity-melt-up-vs-recession-risk:
     - ev-spy-qqq-recover-jul1
     - ev-vix-collapse-165-jul1
     - ev-q2-earnings-est-231-jun
-    - ev-semis-selloff-jul1
-    - ev-fomc-jun17-hold-hawkish-dots
   invalidationCondition:
     type: wv.OrCondition
     wv.operands:
@@ -2141,15 +2139,20 @@ powell-warsh-transition-risk:
     being litigated in public by the President against the market's own pricing, with
     [[ev-fomc-jun16-warsh-debut-preview|the June 16-17 FOMC - Warsh's first as chair, with
     a full SEP and dot plot - five days out]]. Still no Warsh-as-chair policy substance;
-    the dots and the presser are the first substantive test.
-    Update July 2: the transition resolved benignly. [[ev-fomc-jun17-hold-hawkish-dots|Warsh first FOMC was a clean unanimous 12-0 hold with a hawkish dot plot and a ~130-word statement]], and at Sintra July 1 he [[ev-warsh-sintra-independence-jul1|emphasized Fed independence, rebuffed calls for cuts, and pledged price stability]] - an independent, hawkish chair rather than a dovish instrument, with markets now pricing [[ev-fedwatch-dec-hike-66pct-jun|~66% odds of a December hike]] in the Fed own dots.
+    the dots and the presser are the first substantive test. Update June 18 (3.0.0): the
+    test resolved - [[ev-fomc-jun17-hold-warsh-debut|Warsh held at his first FOMC]] with
+    [[ev-fomc-jun17-hawkish-dots-hike|an explicitly hawkish dot plot that put a 2026 hike on
+    the table]] and [[ev-warsh-inflation-is-a-choice-jun17|a price-stability-first
+    message]]. The transition uncertainty this thesis tracked is RESOLVED, so it is RETIRED
+    (status wv.retired - it did not fail falsifiably); the higher-for-longer rate-path
+    channel continues in [[hawkish-warsh-regime]].
   confidence:
-    estimateMean: 0.48
-    estimateStdDev: 0.08
-    estimateLower95: 0.33
-    estimateUpper95: 0.63
-    betaAlpha: 18.2
-    betaBeta: 19.8
+    estimateMean: 0.53
+    estimateStdDev: 0.09
+    estimateLower95: 0.35
+    estimateUpper95: 0.70
+    betaAlpha: 15.8
+    betaBeta: 14.0
   vis.thesisTheme: vis.theme-monetary
   fac.hasDriverLoading:
     - fac.loadingDriver: drv.monetary-credibility
@@ -2182,9 +2185,28 @@ powell-warsh-transition-risk:
     estimateMode: 2.0
     estimateLower95: 0.5
     estimateUpper95: 6.0
-  status: wv.active
+  status: wv.retired
   confidenceRationale: >-
-    Stepped 0.53 to 0.48 (from 2.2.4), band tightened 0.09 to 0.08. Warsh clean first meeting and his explicit independence/price-stability signaling resolve the dovish-capture risk the other way, so the transition RISK abates. It does not vanish - no personal SEP dot, five new task forces, and ongoing presidential pressure keep residual uncertainty - hence -0.05 with a modestly tighter band. Beta(18.2, 19.8), ~38 effective observations.
+    3.0.0 (June 18): RETIRED. The named catalyst resolved -
+    [[ev-fomc-jun17-hold-warsh-debut|Warsh ran his first FOMC and held]] with
+    [[ev-fomc-jun17-hawkish-dots-hike|an explicitly hawkish dot plot]] and
+    [[ev-warsh-inflation-is-a-choice-jun17|a price-stability-first message]], ending the
+    transition uncertainty this thesis tracked; the higher-for-longer rate-path channel
+    continues in [[hawkish-warsh-regime]]. The thesis did not fail falsifiably (status
+    wv.retired, not invalidated); confidence is frozen at its final 0.53. Prior window
+    (2.2.4) stepped 0.51 to 0.53 on the first event that bears on the transition
+    question ITSELF rather than on the backdrop:
+    [[ev-trump-rate-increase-wrong-jun7|Trump's on-the-record "a rate increase would be
+    wrong"]] is direct presidential pressure on the new chair days before his debut FOMC -
+    the Fed-independence-stress premise of the thesis materializing, not just data the
+    chair will react to. The +0.02 is modest because the pressure is an input to the risk,
+    not yet a Warsh RESPONSE - the dovish-tilt question stays unresolved until he acts.
+    Width held at 0.09; the ~0.5 mean with the widest band in the worldview remains the
+    honest statement that this is a genuine coin-flip until the June 16-17 FOMC, now five
+    days out, with [[ev-may-cpi-print-42-jun10|a 4.2% CPI]] and a fully-priced December
+    hike on one side and the President on the other. Beta(15.8, 14.0) ~30 effective
+    observations. The horizon is the shortest in the worldview: two or three meetings
+    resolve the dovish-tilt question one way or the other.
   supportingEvidence:
     - ev-powell-exit-warsh-nominated-may15
     - ev-warsh-banking-cmte-13-11
@@ -2234,9 +2256,6 @@ powell-warsh-transition-risk:
     - ev-10y-yield-wed-454-jun10
     - ev-fedwatch-june-hold-98-jun10
     - ev-fomc-jun16-warsh-debut-preview
-    - ev-fomc-jun17-hold-hawkish-dots
-    - ev-warsh-sintra-independence-jul1
-    - ev-fedwatch-dec-hike-66pct-jun
   invalidationCondition:
     type: wv.AndCondition
     wv.operands:
@@ -8966,27 +8985,349 @@ ev-fomc-jun16-warsh-debut-preview:
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-06-16
 
-ev-fomc-jun17-hold-hawkish-dots:
+hawkish-warsh-regime:
+  type: wv.WorldviewThesis
+  label: Hawkish Warsh regime and higher-for-longer
+  thesisStatement: >-
+    Kevin Warsh used his first FOMC (June 16-17 2026) to establish an explicitly hawkish,
+    price-stability-first regime, succeeding the dovish-tilt uncertainty that the retired
+    [[powell-warsh-transition-risk]] thesis tracked. The Committee
+    [[ev-fomc-jun17-hold-warsh-debut|held the target range at 3.50-3.75% on a unanimous
+    12-0 vote]] but [[ev-fomc-jun17-hawkish-dots-hike|dropped its easing bias, sharply
+    shortened the statement, and published a dot plot that removed the prior 2026 cut and
+    put a HIKE on the table - nine of eighteen participants see at least one hike this year,
+    six see multiple, only one sees a cut]].
+    [[ev-warsh-inflation-is-a-choice-jun17|Warsh withheld his own dot, said "inflation is a
+    choice", and committed the Committee to delivering price stability]], deliberately
+    devaluing forward guidance and reorienting the Fed around inflation. The market priced
+    it immediately - [[ev-2y-yield-plus16bp-jun17|the 2-year yield jumped ~16bp on the
+    statement]], [[ev-10y-yield-jun17-449|the 10Y rose to ~4.49% and the 30Y to ~4.93%]],
+    and [[ev-spx-fed-day-selloff-jun17|equities posted the worst new-chair Fed-day reaction
+    since 1994]]. The thesis is that this is a DURABLE regime, not a one-meeting tone:
+    higher-for-longer policy with a live hike bias and no 2026 cut, a steeper-than-priced
+    rate path, and a Fed that tolerates above-target growth and energy inflation rather
+    than easing into it.
+    Update July 2: Warsh reinforced the regime - at [[ev-warsh-sintra-independence-jul1|the Sintra forum July 1 he emphasized Fed independence, rebuffed calls for cuts, and pledged to deliver price stability, warning against tolerance of above-2% inflation]] - and markets now price [[ev-fedwatch-dec-hike-66pct-jun|~66% odds of a December hike]] in the Fed's own dots, with [[ev-may-pce-core-34-jun25|core PCE at 3.4%]] validating higher-for-longer.
+  confidence:
+    estimateMean: 0.76
+    estimateStdDev: 0.06
+    estimateLower95: 0.64
+    estimateUpper95: 0.87
+    betaAlpha: 37.8
+    betaBeta: 11.9
+  vis.thesisTheme: vis.theme-monetary
+  fac.hasDriverLoading:
+    - fac.loadingDriver: drv.rate-path
+      fac.loadingStrength:
+        estimateMean: 0.90
+        estimateStdDev: 0.04
+      fac.loadingRationale: >-
+        The thesis IS a rate-path call - a hawkish, no-cut, hike-biased path - so
+        [[drv.rate-path]] is the dominant driver and this thesis is its purest current
+        expression.
+    - fac.loadingDriver: drv.monetary-credibility
+      fac.loadingStrength:
+        estimateMean: 0.75
+        estimateStdDev: 0.06
+      fac.loadingRationale: >-
+        Warsh is staking the institution's credibility on delivering price stability and on
+        a quieter, less market-dependent Fed, so [[drv.monetary-credibility]] is a strong
+        co-driver - the regime is as much about HOW the Fed commits as about the rate level.
+    - fac.loadingDriver: drv.inflation-debasement
+      fac.loadingStrength:
+        estimateMean: 0.40
+        estimateStdDev: 0.10
+      fac.loadingRationale: >-
+        The hawkish stance is a response to above-target inflation, so it loads secondarily
+        on [[drv.inflation-debasement]] - the channel it shares with [[stagflation-risk]],
+        which is what ties the two theses together.
+  hz.thesisHorizon:
+    type: est.TriangularEstimate
+    estimateMean: 10.33
+    estimateMode: 9.0
+    estimateLower95: 4.0
+    estimateUpper95: 18.0
+  status: wv.active
+  confidenceRationale: >-
+    Stepped 0.72 to 0.76 (band 0.07 to 0.06). Warsh's Sintra independence/price-stability signaling and the market pricing a hike into the dots strongly corroborate the hawkish-regime thesis in its first full window; tighter band on the accumulating confirmation.
+  supportingEvidence:
+    - ev-fomc-jun17-hold-warsh-debut
+    - ev-fomc-jun17-hawkish-dots-hike
+    - ev-warsh-inflation-is-a-choice-jun17
+    - ev-2y-yield-plus16bp-jun17
+    - ev-10y-yield-jun17-449
+    - ev-spx-fed-day-selloff-jun17
+    - ev-warsh-chair-confirmed-54-45-may13
+    - ev-warsh-sintra-independence-jul1
+    - ev-fedwatch-dec-hike-66pct-jun
+    - ev-may-pce-core-34-jun25
+  invalidationCondition:
+    type: wv.ThresholdCondition
+    observable: fin.ind-core-pce-yoy
+    comparator: wv.lt
+    threshold: 2.5
+    persistence:
+      wv.duration: 3
+      wv.windowUnit: wv.months
+
+ev-fomc-jun17-hold-warsh-debut:
   type: fin.CentralBankEvidence
   evidenceStatement: >-
-    The June 16-17 FOMC, Kevin Warsh's first meeting as chair, held the federal
-    funds target at 3.50-3.75% in a unanimous 12-0 vote, the fourth consecutive
-    hold. The statement was cut to ~130 words (from 341), calling activity
-    "expanding at a solid pace" while "inflation remains elevated relative to the
-    Committee's 2 percent goal." The dot plot flipped hawkish: the median removed
-    the prior 2026 cut and now implies a hike, with 9 of 18 officials signaling
-    higher rates this year (6 backing two increases) and only 1 a cut; the median
-    end-2026 rate rose to ~3.8% from ~3.4% in March. The SEP raised 2026 inflation
-    to 3.6% headline / 3.3% core, cut GDP to 2.2%, and held unemployment at 4.3%.
+    The June 16-17 2026 FOMC - Kevin Warsh's first meeting as chair - held the federal
+    funds target range at 3.50-3.75% on a unanimous 12-0 vote, the third consecutive hold.
+    The post-meeting statement was sharply shortened and dropped the prior easing bias.
   evidenceStrength: wv.evidence-strong
   evidenceObservedAt: 2026-06-17T18:00:00Z
   citation: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260617a.htm
   citationSource: src.fed-press
   fin.centralBank: fin.fomc
   fin.meetingDate: 2026-06-17
-  fin.voteCount:
-    fin.yeaCount: 12
-    fin.nayCount: 0
+
+ev-fomc-jun17-hawkish-dots-hike:
+  type: fin.CentralBankEvidence
+  evidenceStatement: >-
+    The June 2026 Summary of Economic Projections turned hawkish: the dot plot removed the
+    prior 2026 rate cut and put a hike on the table. Nine of eighteen participants
+    projected at least one hike this year (six of them multiple), eight projected no
+    change, and only one projected a cut - moving futures to price a possible hike as early
+    as October.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T18:00:00Z
+  citation: https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260617.htm
+  citationSource: src.fed-press
+  fin.centralBank: fin.fomc
+  fin.meetingDate: 2026-06-17
+
+ev-warsh-inflation-is-a-choice-jun17:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    At his first press conference as Fed chair, June 17 2026, Kevin Warsh said "inflation
+    is a choice - you bet it is" and committed the Committee to delivering price stability,
+    signaling a quieter, less market-dependent, inflation-focused Fed. He pointedly
+    declined to submit his own dot to the Summary of Economic Projections, devaluing
+    forward guidance while allowing colleagues to submit theirs.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T19:00:00Z
+  citation: https://fortune.com/2026/06/17/kevin-warsh-first-fed-meeting-rates-steady-forward-guidance-dropped/
+  citationSource: src.fortune
+  wv.statementVenue: FOMC press conference
+  wv.statementDate: 2026-06-17
+
+ev-2y-yield-plus16bp-jun17:
+  type: wv.EconomicDataEvidence
+  evidenceStatement: >-
+    The 2-year Treasury yield rose roughly 16 basis points following the June 17 FOMC
+    statement - the front end repricing toward a higher-for-longer path and the prospect
+    that Warsh will eventually raise rates.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://www.cnbc.com/2026/06/17/fed-interest-rate-decision-june-2026.html
+  citationSource: src.cnbc
+  wv.indicatorValue: 0.16
+  wv.indicatorPeriod: 2026-06-17
+
+ev-10y-yield-jun17-449:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The 10-year Treasury yield rose to approximately 4.49% on June 17 (from ~4.43% June 16)
+    and the 30-year to ~4.93% after the hawkish FOMC, the curve bear-flattening as the
+    front end led the move. Via WebSearch - the Massive treasury feed lags more than a day.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://www.federalreserve.gov/releases/h15/
+  citationSource: src.fed-press
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4.49
+
+ev-spx-fed-day-selloff-jun17:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The S&P 500 fell 1.21% to 7,420.10 on June 17 in reaction to the hawkish FOMC - the
+    worst "Fed day" reaction under a new chair since 1994 - as the dot plot put a hike on
+    the table. Stocks tumbled into the close.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-june-17-2026
+  citationSource: src.cnbc
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: -1.21
+
+ev-vix-jun17-1718:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    VIX fell to 17.18 on June 17 (down 1.26 points, -6.84%) EVEN on the Fed-day equity
+    selloff - volatility expectations declining as the policy uncertainty resolved into a
+    clear hawkish stance. The early-June approach toward the >25 vol-expansion leg has
+    fully unwound. Via WebSearch - the Massive index feed is plan-restricted.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:15:00Z
+  citation: https://fred.stlouisfed.org/series/VIXCLS/
+  citationSource: src.cnbc
+  fin.aboutSecurity: sec.vix
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 17.18
+
+ev-spx-jun18-recovery:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    The S&P 500 rose 1.15% on June 18, the Nasdaq +1.5% and the Dow +0.80%, recovering the
+    Fed-day selloff as oil prices slid and the US-Iran interim agreement reduced the war
+    premium. The melt-up leg proved resilient through the hawkish Fed.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-18T17:00:00Z
+  citation: https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-june-18-2026
+  citationSource: src.cnbc
+  fin.marketMetric: fin.session-percent-move
+  fin.observedValue: 1.15
+
+ev-spy-jun17-74096:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    SPY closed June 17 at 740.96 (Massive-verified: open 751.29, high 752.15, low 739.22,
+    close 740.96) - selling off ~1.4% from the open on the hawkish FOMC, yet still up from
+    June 11's 725.43 close, a net weekly recovery despite the Fed-day reaction.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://api.massive.com/v2/aggs/ticker/SPY/prev
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.spy
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 740.96
+
+ev-qqq-jun17-72251:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    QQQ closed June 17 at 722.51 (Massive-verified) - up roughly 4.2% from June 11's 693.69
+    close, the tech tape recovering the early-June macro drawdown even into the hawkish Fed.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://api.massive.com/v2/aggs/ticker/QQQ/prev
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.qqq
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 722.51
+
+ev-nvda-jun17-20465:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    NVDA closed June 17 at 204.65 (Massive-verified) - up from 200.42 on June 10, the AI
+    leadership holding firm through the FOMC with no negative demand catalyst.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://api.massive.com/v2/aggs/ticker/NVDA/prev
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.nvda
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 204.65
+
+ev-us-iran-end-war-deal-jun14:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    On June 14 2026 the US and Iran announced an agreement to end the war and reopen the
+    Strait of Hormuz; mediators announced a memorandum of understanding to be signed and a
+    path to a formal end of the conflict within 60 days. The end-of-war framework
+    superseded the early-June re-escalation.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-14T12:00:00Z
+  citation: https://www.pbs.org/newshour/world/iran-and-u-s-reach-an-initial-deal-to-extend-the-ceasefire-and-open-the-strait-of-hormuz-but-challenges-remain
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-06-14
+
+ev-hormuz-tankers-resume-jun17:
+  type: wv.GeopoliticalEvidence
+  evidenceStatement: >-
+    The first Iranian crude exports in two months left the US Navy blockade perimeter in
+    the Strait of Hormuz - at least two supertankers carrying a combined ~3.8 million
+    barrels - as the reopening began. Full restoration of flows is expected to take months
+    even if the strait fully opens.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-06-17T12:00:00Z
+  citation: https://commonslibrary.parliament.uk/research-briefings/cbp-10636/
+  citationSource: src.reuters
+  wv.geopoliticalEventDate: 2026-06-17
+
+ev-trump-resume-threat-jun17:
+  type: wv.OfficialStatementEvidence
+  evidenceStatement: >-
+    On June 17 2026 President Trump indicated that his dissatisfaction with the agreement
+    with Iran could lead the US to resume military action - underscoring the fragility of
+    the interim deal even as the memorandum of understanding moved toward signing.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-06-17T16:00:00Z
+  citation: https://www.cbsnews.com/live-updates/iran-war-us-deal-peace-israel-lebanon-hezbollah-strait-of-hormuz/
+  citationSource: src.cbs-news
+  wv.statementVenue: Press remarks
+  wv.statementDate: 2026-06-17
+
+ev-wti-jun18-7482:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    WTI crude fell to approximately $74.82 a barrel on June 18 and Brent to ~$78 - down
+    roughly 18% from the ~$91 level of June 10-11 - after the US and Iran signed their
+    interim peace agreement, raising expectations of increased supply. WTI is now BELOW the
+    <$80-for-30-days invalidation threshold of the persistent-energy-shock thesis.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-18T16:00:00Z
+  citation: https://tradingeconomics.com/commodity/crude-oil
+  citationSource: src.investing-com
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 74.82
+
+ev-xle-jun17-5467:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    XLE closed June 17 at 54.67 (Massive-verified) - down sharply from 58.25 on June 10 as
+    the energy complex repriced the collapsing war premium and the ~18% drop in crude.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://api.massive.com/v2/aggs/ticker/XLE/prev
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.xle
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 54.67
+
+ev-gold-ath-jun16-4353:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    Spot gold printed a fresh all-time high near $4,353 on June 16, eased to ~$4,330 June
+    17, and recovered above $4,300 on June 18 after the interim Iran deal. Gold rose ~6% on
+    the week even as the war turned toward peace AND the Fed turned hawkish (a real-rate
+    headwind) - the move is the structural debasement/inflation bid, not a war hedge.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T13:05:00Z
+  citation: https://fortune.com/article/current-price-of-gold-06-17-2026/
+  citationSource: src.fortune
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 4353.0
+
+ev-gld-jun17-38860:
+  type: fin.MarketDataEvidence
+  evidenceStatement: >-
+    GLD closed June 17 at 388.60 (Massive-verified: high 402.04, low 387.08) - a volatile
+    session tracking gold's record-high print and pullback, up from 374.58 on June 10.
+  evidenceStrength: wv.evidence-strong
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://api.massive.com/v2/aggs/ticker/GLD/prev
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.gld
+  fin.marketMetric: fin.close-price
+  fin.observedValue: 388.60
+
+ev-defense-wobble-ceasefire-jun17:
+  type: fin.CorporateEvidence
+  evidenceStatement: >-
+    Defense names (NOC, LMT, RTX) wobbled on the Iran ceasefire headlines - RTX the most
+    war-reactive via its Patriot restock cycle - but the structural franchise case is
+    decade-scale, not headline-scale: over $21B of prospective foreign military sales
+    involving Lockheed and RTX were approved for Middle Eastern partners in Q1 2026 alone,
+    Lockheed holds a 416-jet F-35 backlog, and multi-year Pentagon programs and
+    Russia/China-driven demand do not reset on a single ceasefire.
+  evidenceStrength: wv.evidence-moderate
+  evidenceObservedAt: 2026-06-17T20:00:00Z
+  citation: https://finance.yahoo.com/markets/stocks/articles/iran-peace-deal-does-mean-211800145.html
+  citationSource: src.yahoo-finance
+  fin.aboutSecurity: sec.lmt
+  fin.corporateMetric: fin.backlog
 
 ev-warsh-sintra-independence-jul1:
   type: wv.OfficialStatementEvidence
@@ -9004,6 +9345,7 @@ ev-warsh-sintra-independence-jul1:
   wv.statementDate: 2026-07-01
   wv.statementVenue: ECB Forum on Central Banking, Sintra
 
+
 ev-may-pce-core-34-jun25:
   type: wv.EconomicDataEvidence
   evidenceStatement: >-
@@ -9020,6 +9362,7 @@ ev-may-pce-core-34-jun25:
   wv.indicatorValue: 3.4
   wv.indicatorPeriod: May 2026
 
+
 ev-10y-yield-jun26-438:
   type: fin.MarketDataEvidence
   evidenceStatement: >-
@@ -9033,6 +9376,7 @@ ev-10y-yield-jun26-438:
   citationSource: src.fed-press
   fin.marketMetric: fin.close-price
   fin.observedValue: 4.38
+
 
 ev-fedwatch-dec-hike-66pct-jun:
   type: fin.MarketDataEvidence
@@ -9049,19 +9393,6 @@ ev-fedwatch-dec-hike-66pct-jun:
   fin.marketMetric: fin.rate-path-expectations
   fin.observedValue: 0.66
 
-ev-islamabad-mou-ceasefire-jun17:
-  type: wv.GeopoliticalEvidence
-  evidenceStatement: >-
-    On June 17 Trump and Iranian President Pezeshkian signed the "Islamabad
-    Memorandum of Understanding" - a 60-day ceasefire extension plus a wind-down
-    of the Strait of Hormuz blockade to negotiate a final deal - following a June
-    11 ceasefire-extension announcement. It marked a sharp de-escalation from the
-    June 7-10 direct Iran-Israel exchanges and US strike waves.
-  evidenceStrength: wv.evidence-strong
-  evidenceObservedAt: 2026-06-17T12:00:00Z
-  citation: https://www.reuters.com/world/middle-east/iran-war-ceasefire-2026-06-17/
-  citationSource: src.reuters
-  wv.geopoliticalEventDate: 2026-06-17
 
 ev-ofac-general-license-x-jun22:
   type: wv.PolicyEvidence
@@ -9077,6 +9408,7 @@ ev-ofac-general-license-x-jun22:
   wv.policy: wv.regulatory-ruling
   wv.effectiveDate: 2026-06-22
 
+
 ev-hormuz-reclosure-relapse-jun22:
   type: wv.GeopoliticalEvidence
   evidenceStatement: >-
@@ -9091,6 +9423,7 @@ ev-hormuz-reclosure-relapse-jun22:
   citationSource: src.cnbc
   wv.geopoliticalEventDate: 2026-06-22
 
+
 ev-us-iran-halt-hostilities-jun29:
   type: wv.GeopoliticalEvidence
   evidenceStatement: >-
@@ -9102,6 +9435,7 @@ ev-us-iran-halt-hostilities-jun29:
   citation: https://www.cnbc.com/2026/06/29/oil-prices-wti-brent-crude-us-iran-strikes-strait-hormuz-talks.html
   citationSource: src.cnbc
   wv.geopoliticalEventDate: 2026-06-29
+
 
 ev-wti-below-69-jul1:
   type: wv.EconomicDataEvidence
@@ -9118,6 +9452,7 @@ ev-wti-below-69-jul1:
   wv.indicatorValue: 68.5
   wv.indicatorPeriod: July 1 2026
 
+
 ev-brent-74-month-down-20-jun30:
   type: wv.EconomicDataEvidence
   evidenceStatement: >-
@@ -9131,6 +9466,7 @@ ev-brent-74-month-down-20-jun30:
   wv.indicatorName: fin.ind-brent-close
   wv.indicatorValue: 74.0
   wv.indicatorPeriod: June 30 2026
+
 
 ev-energy-equities-unwound-jul1:
   type: fin.MarketDataEvidence
@@ -9146,6 +9482,7 @@ ev-energy-equities-unwound-jul1:
   fin.observedValue: 52.81
   fin.aboutSecurity: sec.xle
 
+
 ev-defense-closes-jul1:
   type: fin.MarketDataEvidence
   evidenceStatement: >-
@@ -9159,6 +9496,7 @@ ev-defense-closes-jul1:
   fin.marketMetric: fin.close-price
   fin.observedValue: 521.82
   fin.aboutSecurity: sec.lmt
+
 
 ev-gold-below-4000-jun30:
   type: wv.EconomicDataEvidence
@@ -9175,6 +9513,7 @@ ev-gold-below-4000-jun30:
   wv.indicatorValue: 3942.99
   wv.indicatorPeriod: June 30 2026
 
+
 ev-gold-bounce-4068-jul2:
   type: wv.EconomicDataEvidence
   evidenceStatement: >-
@@ -9189,6 +9528,7 @@ ev-gold-bounce-4068-jul2:
   wv.indicatorValue: 4068.61
   wv.indicatorPeriod: July 2 2026
 
+
 ev-gld-gdx-jul1:
   type: fin.MarketDataEvidence
   evidenceStatement: >-
@@ -9201,6 +9541,7 @@ ev-gld-gdx-jul1:
   fin.marketMetric: fin.close-price
   fin.observedValue: 370.60
   fin.aboutSecurity: sec.gld
+
 
 ev-wgc-midyear-outlook-jul1:
   type: fin.InstitutionalFlowEvidence
@@ -9218,32 +9559,6 @@ ev-wgc-midyear-outlook-jul1:
   fin.flowMagnitudeValue: 25.0
   fin.flowMagnitudeUnit: tonnes
 
-ev-tsmc-may-rev-30pct-jun10:
-  type: fin.CorporateEvidence
-  evidenceStatement: >-
-    TSMC reported May revenue up ~30% YoY to NT$416.98B (~$13.2B) on sustained
-    AI-chip demand, with April-May combined ~+24% YoY - a primary-grade
-    demand-side confirmation of the AI-capex cycle's durability.
-  evidenceStrength: wv.evidence-strong
-  evidenceObservedAt: 2026-06-10T02:00:00Z
-  citation: https://www.bloomberg.com/news/articles/2026-06-10/tsmc-s-monthly-sales-rise-30-thanks-to-sustained-ai-chip-demand
-  citationSource: src.bloomberg
-  fin.reportingPeriod: fin.q2-2026
-
-ev-oracle-40b-raise-jun:
-  type: fin.CorporateEvidence
-  evidenceStatement: >-
-    Oracle's Q4 FY2026 print (June 10) pairing a $638B RPO (+363%) with a plan to
-    raise ~$40B in FY27 debt and equity (including ~$20B at-the-market equity),
-    FY26 free cash flow of -$23.7B, and capex up 162% to $55.7B crystallized the
-    "who funds the buildout" question - BofA estimates over half the RPO is
-    OpenAI, with ~$75B customer-supplied hardware reducing Oracle's own cash need.
-  evidenceStrength: wv.evidence-strong
-  evidenceObservedAt: 2026-06-10T21:00:00Z
-  citation: https://www.cnbc.com/2026/06/10/oracle-orcl-q4-earnings-report-2026.html
-  citationSource: src.cnbc
-  fin.reportingPeriod: fin.q4-2026
-  fin.aboutSecurity: sec.orcl
 
 ev-china-export-control-retaliation-jun22:
   type: wv.PolicyEvidence
@@ -9258,6 +9573,7 @@ ev-china-export-control-retaliation-jun22:
   citationSource: src.aljazeera
   wv.policy: wv.regulatory-ruling
   wv.effectiveDate: 2026-06-22
+
 
 ev-semis-selloff-jul1:
   type: fin.MarketDataEvidence
@@ -9274,6 +9590,7 @@ ev-semis-selloff-jul1:
   fin.observedValue: -0.069
   fin.aboutSecurity: sec.nvda
 
+
 ev-spy-qqq-recover-jul1:
   type: fin.MarketDataEvidence
   evidenceStatement: >-
@@ -9288,6 +9605,7 @@ ev-spy-qqq-recover-jul1:
   fin.observedValue: 745.76
   fin.aboutSecurity: sec.spy
 
+
 ev-vix-collapse-165-jul1:
   type: wv.EconomicDataEvidence
   evidenceStatement: >-
@@ -9301,6 +9619,7 @@ ev-vix-collapse-165-jul1:
   wv.indicatorName: fin.ind-vix-close
   wv.indicatorValue: 16.59
   wv.indicatorPeriod: July 1 2026
+
 
 ev-q2-earnings-est-231-jun:
   type: fin.MarketDataEvidence

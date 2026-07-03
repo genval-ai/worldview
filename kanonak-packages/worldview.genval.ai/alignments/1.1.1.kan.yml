@@ -1,19 +1,18 @@
 alignments:
   type: Package
   publisher: worldview.genval.ai
-  version: 1.0.3
-  label: Alignment data - patch refresh against snapshot 2.2.5
+  version: 1.1.1
+  label: Alignment data - patch refresh against snapshot 3.0.1
   comment: >-
     Patch refresh of the public alignment data, re-derived against worldview
-    snapshot 2.2.5 (Thursday July 2, integrating the June 11 to July 2 window - the
-    Iran-Israel war de-escalated to a June 17 ceasefire MOU and the energy premium
-    collapsed (WTI below $69), the Fed turned hawkish at Warsh first FOMC (dot plot
-    flipped to a 2026 hike, core PCE 3.4%), equities recovered and VIX collapsed to
-    ~16.5). Same seven wv.active theses as 1.0.2, so a patch - and no securities bump
-    (every vehicle is already in 2.3.0). All baskets hold structurally; the only
-    alignment-level change is the equity UVIX hedge easing 0.72 to 0.70 as vol
-    collapsed. Rationale refreshed to the 2.2.5 regime. Superseded by the next
-    operator refresh.
+    snapshot 3.0.1 (Thursday July 2 - the Iran de-escalation deepened (OFAC General
+    License X, June 29 halt-hostilities, WTI below $69), May PCE core ticked to 3.4%,
+    Warsh reinforced the hawkish regime at Sintra, equities recovered and VIX collapsed
+    to ~16.5, gold sold off below $4,000 then bounced). Same seven wv.active theses as
+    1.1.0, so a patch - and no securities bump. All baskets hold structurally; the only
+    alignment-level change is the equity UVIX hedge easing 0.72 to 0.70 as vol collapsed
+    further. Rationale refreshed to the 3.0.1 regime. Superseded by the next operator
+    refresh.
   imports:
     - publisher: kanonak.org
       packages:
@@ -37,27 +36,25 @@ alignments:
           alias: sec
         - package: snapshots
           match: '='
-          version: 2.2.5
+          version: 3.0.1
           alias: ws
 
 view:
   type: align.Alignment
-  label: Thesis alignments (1.0.3 - patch refresh against snapshot 2.2.5, the Thursday July 2 post-FOMC / post-ceasefire moment - the Iran-Israel war de-escalated and the energy premium collapsed (WTI below $69), the Fed turned hawkish (dot plot flipped to a 2026 hike), equities recovered and VIX collapsed to ~16.5; all seven baskets hold structurally, the equity UVIX hedge eases 0.72 to 0.70 on the vol collapse, rationale refreshed to the 2.2.5 regime)
+  label: Thesis alignments (1.1.1 - patch refresh against snapshot 3.0.1, the Thursday July 2 moment - the Iran de-escalation deepened and WTI fell below $69, May PCE core ticked to 3.4%, Warsh reinforced the hawkish regime at Sintra, equities recovered and VIX collapsed to ~16.5; all seven baskets hold structurally, the equity UVIX hedge eases 0.72 to 0.70 on the vol collapse, rationale refreshed to the 3.0.1 regime)
   alignmentObservedAt: 2026-07-02T12:52:00Z
   alignmentNarrative: |
-    Patch refresh against [[ws.view|worldview snapshot 2.2.5]] (observedAt 2026-07-02T12:45:52Z, the Thursday post-FOMC / post-ceasefire moment integrating the June 11 to July 2 window). Same seven `wv.active` theses as 1.0.2, so this is a patch - no `ThesisAlignment` added or dropped - and no securities bump, because every vehicle these baskets use is already in securities 2.3.0. The window repriced the worldview's two main axes in OPPOSITE directions, but at the ALIGNMENT level almost nothing moves: `alignmentStrength` measures structural thesis-to-security fit, which is independent of the thesis-confidence drift the snapshot already captured. Snapshot confidence drift for downstream joint math: [[ws.persistent-energy-shock|energy]] 0.78 to 0.68, [[ws.powell-warsh-transition-risk|Warsh]] 0.53 to 0.48, [[ws.gold-debasement-bid|gold]] 0.84 to 0.82, [[ws.equity-melt-up-vs-recession-risk|equity]] 0.75 to 0.77, [[ws.stagflation-risk|stagflation]] 0.86 to 0.85, [[ws.iran-war-rearmament|defense]] 0.88 to 0.87, [[ws.ai-capex-cycle-with-china-tail|ai-capex]] 0.87 held.
+    Patch refresh against [[ws.view|worldview snapshot 3.0.1]] (observedAt 2026-07-02T12:45:52Z). Same seven `wv.active` theses as 1.1.0 - the [[ws.powell-warsh-transition-risk|Fed-transition thesis]] stays retired and [[ws.hawkish-warsh-regime]] carries the higher-for-longer story - so this is a patch, no `ThesisAlignment` added or dropped, and no securities bump. The window continued both trends 3.0.0 identified (de-escalation, hawkish Warsh), so at the ALIGNMENT level almost nothing moves: `alignmentStrength` is structural fit, independent of the thesis-confidence drift the snapshot already carries. Snapshot drift for downstream joint math: [[ws.persistent-energy-shock|energy]] 0.50 to 0.45, [[ws.gold-debasement-bid|gold]] 0.88 to 0.85, [[ws.hawkish-warsh-regime|hawkish-Warsh]] 0.72 to 0.76, [[ws.equity-melt-up-vs-recession-risk|equity]] 0.76 to 0.78, [[ws.stagflation-risk|stagflation]] 0.88 to 0.87, [[ws.iran-war-rearmament|defense]] 0.84 to 0.83, [[ws.ai-capex-cycle-with-china-tail|ai-capex]] 0.88 held.
 
-    **The war de-escalates and oil collapses - a thesis-confidence move, not an alignment move.** [[ws.persistent-energy-shock]] fell to 0.68 on the [[ws.ev-islamabad-mou-ceasefire-jun17|June 17 ceasefire MOU]], the [[ws.ev-ofac-general-license-x-jun22|OFAC General License X]], and [[ws.ev-wti-below-69-jul1|WTI below $69]]. But the long-energy stack ([[sec.xle]] primary, [[sec.xom]] / [[sec.cvx]] alternates) expresses the thesis exactly as strongly whether or not conviction in it is high - so ranks, roles, directions, and strengths hold, and the confidence drop flows to the downstream allocator through the snapshot band, not through this file. Same treatment [[gold-debasement-bid-alignment|the gold basket]] gets.
+    **Energy - a thesis-confidence move, not an alignment move.** [[ws.persistent-energy-shock]] fell to 0.45 on [[ws.ev-ofac-general-license-x-jun22|the OFAC license]], [[ws.ev-us-iran-halt-hostilities-jun29|the June 29 halt-hostilities]], and [[ws.ev-wti-below-69-jul1|WTI below $69]]. The long-energy stack ([[sec.xle]] / [[sec.xom]] / [[sec.cvx]]) expresses the thesis exactly as strongly regardless of conviction, so ranks and strengths hold and the confidence drop flows downstream through the snapshot band. Same treatment [[gold-debasement-bid-alignment|the gold basket]] gets after its sub-$4,000 dip.
 
-    **The Fed turns hawkish and the transition resolves benignly.** [[ws.stagflation-risk]] (0.85) got rate-path corroboration from [[ws.ev-fomc-jun17-hold-hawkish-dots|the dot-plot flip to a 2026 hike]] and [[ws.ev-may-pce-core-34-jun25|core PCE at 3.4%]] - the short-[[sec.tlt]] / short-[[sec.ief]] legs are more apt, though the long-[[sec.xle]] passthrough leg softened as oil fell. [[ws.powell-warsh-transition-risk]] fell to 0.48 as [[ws.ev-warsh-sintra-independence-jul1|Warsh pledged independence and price stability]] - an independent, hawkish chair rather than a dovish instrument - so the long-[[sec.uvix]] / managed-futures / short-[[sec.tlt]] uncertainty basket holds structurally but its regime context is less apt as the risk abates.
+    **The hawkish-Warsh basket gets more apt as the regime confirms.** [[ws.hawkish-warsh-regime]] rose to 0.76 on [[ws.ev-warsh-sintra-independence-jul1|Warsh's Sintra independence and price-stability pledge]] and [[ws.ev-fedwatch-dec-hike-66pct-jun|a December hike priced into the dots]]. Its rate-up basket - short [[sec.tlt]] / short [[sec.ief]] inverse-expressions, long [[sec.dbmf]] / [[sec.kmlm]] trend carry - is unchanged, but its regime context is now firmly confirmed rather than nascent. [[ws.stagflation-risk]] (0.87) shares the short-rate legs; those overlaps dedupe downstream in the fund's driver-union on the `rate-path` driver.
 
-    **Gold and defense - structural stacks unchanged.** [[ws.gold-debasement-bid]] (0.82) saw gold dip below $4,000 ([[ws.ev-gold-below-4000-jun30]]) before bouncing, a confidence input the snapshot's wider band already carries; the [[sec.gld]] / [[sec.iau]] / [[sec.gdx]] fit to the DEBASEMENT thesis is reaffirmed by [[ws.ev-wgc-midyear-outlook-jul1|the WGC mid-year outlook]] and unchanged. [[ws.iran-war-rearmament]] (0.87) cooled on the ceasefire but the procurement cycle firmed ([[ws.ev-defense-closes-jul1|primes held firm]]), so the [[sec.lmt]] / [[sec.rtx]] / [[sec.noc]] basket holds.
+    **Gold, defense, AI - structural stacks unchanged.** [[ws.gold-debasement-bid]] (0.85) - the [[sec.gld]] / [[sec.iau]] / [[sec.gdx]] fit is reaffirmed by [[ws.ev-wgc-midyear-outlook-jul1|the WGC mid-year outlook]] despite the price dip. [[ws.iran-war-rearmament]] (0.83) - [[sec.lmt]] / [[sec.rtx]] / [[sec.noc]] hold as [[ws.ev-defense-closes-jul1|the primes stayed firm]]. [[ws.ai-capex-cycle-with-china-tail]] (0.88) - the five-name supplier stack holds; the [[ws.ev-china-export-control-retaliation-jun22|re-armed China tail]] and [[ws.ev-semis-selloff-jul1|July 1 selloff]] are snapshot-band / positioning events, not structural re-ranks.
 
-    **AI capex - demand confirmed, tail re-armed, basket unchanged.** [[ws.ai-capex-cycle-with-china-tail]] held at 0.87. Demand durability reconfirmed ([[ws.ev-tsmc-may-rev-30pct-jun10|TSMC +30%]]); the [[ws.ev-china-export-control-retaliation-jun22|re-armed China tail]] widens the snapshot band but does not change which suppliers express the cycle, and the [[ws.ev-semis-selloff-jul1|July 1 semis selloff]] is a positioning event, not a structural re-rank. The five-name supplier stack ([[sec.nvda]] / [[sec.amd]] / [[sec.avgo]] / [[sec.orcl]] / [[sec.intc]]) holds.
+    **The one alignment-level change: the equity vol-hedge eases.** [[ws.equity-melt-up-vs-recession-risk]] rose to 0.78 as [[ws.ev-vix-collapse-165-jul1|VIX collapsed to ~16.5]] and [[ws.ev-spy-qqq-recover-jul1|equities recovered]]. The long-[[sec.spy]] / [[sec.vti]] core is unchanged, but the [[sec.uvix]] hedge slot eases from 0.72 to 0.70 on the vol collapse - the only strength parameter that moves this refresh.
 
-    **The one alignment-level change: the equity vol-hedge eases.** [[ws.equity-melt-up-vs-recession-risk]] rose to 0.77 as [[ws.ev-vix-collapse-165-jul1|VIX collapsed from 22.22 to ~16.5]] and [[ws.ev-spy-qqq-recover-jul1|equities recovered]]. The long-[[sec.spy]] / [[sec.vti]] core is unchanged, but the [[sec.uvix]] hedge slot eases from 0.72 back to 0.70 - the exact mirror of the 1.0.2 nudge UP when vol was approaching the >25 vol-expansion leg. That is the only strength parameter that moves this refresh.
-
-    **What this patch changed.** Only the [[sec.uvix]] hedge strength in the equity alignment (0.72 to 0.70) on the vol collapse. All other baskets, ranks, roles, directions, and strength parameters are unchanged; prose refreshed throughout to the 2.2.5 regime. No securities bump and no Tier-3 additions were needed.
+    **What this patch changed.** Only the [[sec.uvix]] hedge strength in the equity alignment (0.72 to 0.70). All other baskets, ranks, roles, directions, and strength parameters are unchanged; prose refreshed to the 3.0.1 regime. No securities bump, no Tier-3 additions.
   derivedFromSnapshot: ws.view
   hasAlignment:
     - stagflation-risk-alignment
@@ -66,7 +63,7 @@ view:
     - gold-debasement-bid-alignment
     - ai-capex-cycle-with-china-tail-alignment
     - equity-melt-up-vs-recession-risk-alignment
-    - powell-warsh-transition-risk-alignment
+    - hawkish-warsh-regime-alignment
 
 stagflation-risk-alignment:
   type: align.ThesisAlignment
@@ -78,7 +75,7 @@ stagflation-risk-alignment:
     betaAlpha: 12.0
     betaBeta: 10.0
   alignmentRationale: |
-    This is a macro framework with no direct ticker evidence, so the basket is a synthetic expression. The rate-path pillar - short [[sec.tlt]] and short [[sec.ief]] - got direct corroboration from [[ws.ev-fomc-jun17-hold-hawkish-dots|the dot-plot flip to a 2026 hike]] and [[ws.ev-may-pce-core-34-jun25|core PCE ticking to 3.4%]]. Long [[sec.gld]] carries the debasement leg and [[sec.dbmf]] the regime carry; long [[sec.xle]] holds as the inflation-passthrough leg though its context softened with the ~25% oil collapse. Ranks and strengths hold from 1.0.2; modest alignmentConfidence (0.55) reflects the indirect, judgment-based mapping.
+    Macro framework with no direct ticker evidence; synthetic basket. The short-[[sec.tlt]] / short-[[sec.ief]] rate legs got corroboration from [[ws.ev-may-pce-core-34-jun25|core PCE at 3.4%]]; long [[sec.gld]] holds the debasement leg, [[sec.dbmf]] the carry, and long [[sec.xle]] the passthrough leg though its context softened with the ~25% oil collapse. Ranks and strengths hold; the rate legs overlap [[hawkish-warsh-regime-alignment|the hawkish-Warsh basket]] and dedupe downstream. alignmentConfidence 0.55.
   hasAlignedSecurity:
     - alignedSecurity: sec.tlt
       securityRole: align.role-inverse-expression
@@ -170,7 +167,7 @@ persistent-energy-shock-alignment:
     betaAlpha: 22.0
     betaBeta: 3.0
   alignmentRationale: |
-    Clean three-vehicle long-energy stack: [[sec.xle]] primary, [[sec.xom]] and [[sec.cvx]] alternates. Thesis confidence fell hard (0.78 to 0.68) on [[ws.ev-islamabad-mou-ceasefire-jun17|the ceasefire MOU]] and [[ws.ev-wti-below-69-jul1|WTI below $69]] - but that is a THESIS-CONFIDENCE input captured in the snapshot band, NOT an alignment-strength input: if the energy premium re-asserts, these three participate exactly as strongly. Structural fit, ranks, roles, and directions unchanged; high alignmentConfidence (0.88) because the mapping stays unambiguous even as conviction in the thesis fell.
+    Long-energy stack: [[sec.xle]] primary, [[sec.xom]] / [[sec.cvx]] alternates. Thesis confidence fell to 0.45 on [[ws.ev-us-iran-halt-hostilities-jun29|the halt-hostilities]] and [[ws.ev-wti-below-69-jul1|WTI below $69]] - a THESIS-CONFIDENCE input in the snapshot band, NOT an alignment-strength input: if the premium re-asserts, these three participate exactly as strongly. Structural fit, ranks, roles, directions unchanged; alignmentConfidence 0.88.
   hasAlignedSecurity:
     - alignedSecurity: sec.xle
       securityRole: align.role-primary-vehicle
@@ -227,7 +224,7 @@ iran-war-rearmament-alignment:
     betaAlpha: 24.0
     betaBeta: 3.9
   alignmentRationale: |
-    Defense-prime basket - [[sec.lmt]] primary, [[sec.rtx]] and [[sec.noc]] alternates - unchanged. The acute war cooled on the ceasefire, but the thesis rests on the multi-year procurement cycle, which firmed ([[ws.ev-defense-closes-jul1|the primes held firm through the de-escalation]], the FY2027 request rising). Ranks, roles, and strengths hold from 1.0.2.
+    Defense primes - [[sec.lmt]] primary, [[sec.rtx]] / [[sec.noc]] alternates - unchanged. The war cooled but the procurement cycle firmed ([[ws.ev-defense-closes-jul1|primes held firm]], FY2027 request). Ranks and strengths hold.
   hasAlignedSecurity:
     - alignedSecurity: sec.lmt
       securityRole: align.role-primary-vehicle
@@ -286,7 +283,7 @@ gold-debasement-bid-alignment:
     betaAlpha: 24.0
     betaBeta: 3.3
   alignmentRationale: |
-    [[sec.gld]] primary, [[sec.iau]] alternate, [[sec.gdx]] high-beta - unchanged. Gold dipped below $4,000 ([[ws.ev-gold-below-4000-jun30]]) before bouncing, a confidence input the snapshot's wider band already carries; the structural fit of the stack to the DEBASEMENT thesis - reaffirmed by [[ws.ev-wgc-midyear-outlook-jul1|the WGC mid-year outlook and continued central-bank buying]] - is unchanged, so ranks and strengths hold.
+    [[sec.gld]] primary, [[sec.iau]] alternate, [[sec.gdx]] high-beta - unchanged. Gold dipped below $4,000 ([[ws.ev-gold-below-4000-jun30]]) before bouncing, a confidence input the snapshot band carries; the structural fit reaffirmed by [[ws.ev-wgc-midyear-outlook-jul1|the WGC mid-year outlook]] holds.
   hasAlignedSecurity:
     - alignedSecurity: sec.gld
       securityRole: align.role-primary-vehicle
@@ -345,7 +342,7 @@ ai-capex-cycle-with-china-tail-alignment:
     betaAlpha: 17.0
     betaBeta: 3.2
   alignmentRationale: |
-    Five-name supplier basket - [[sec.nvda]] primary, [[sec.amd]] / [[sec.avgo]] / [[sec.orcl]] alternates, [[sec.intc]] high-beta - holds. Demand durability reconfirmed ([[ws.ev-tsmc-may-rev-30pct-jun10|TSMC +30% YoY]]); the [[ws.ev-china-export-control-retaliation-jun22|re-armed China tail]] widens the snapshot band but does not change which suppliers express the cycle, and the [[ws.ev-semis-selloff-jul1|July 1 semis selloff]] is a positioning event, not a structural re-rank. Ranks, roles, and strengths hold from 1.0.2.
+    Five-name supplier basket - [[sec.nvda]] primary, [[sec.amd]] / [[sec.avgo]] / [[sec.orcl]] alternates, [[sec.intc]] high-beta - holds. Demand durable; the [[ws.ev-china-export-control-retaliation-jun22|re-armed China tail]] widens the snapshot band and [[ws.ev-semis-selloff-jul1|the July 1 selloff]] is a positioning move, neither a structural re-rank.
   hasAlignedSecurity:
     - alignedSecurity: sec.nvda
       securityRole: align.role-primary-vehicle
@@ -440,7 +437,7 @@ equity-melt-up-vs-recession-risk-alignment:
     betaAlpha: 14.0
     betaBeta: 5.5
   alignmentRationale: |
-    Long [[sec.spy]] / [[sec.vti]] core plus a [[sec.uvix]] vol hedge. With [[ws.ev-vix-collapse-165-jul1|VIX collapsing from 22.22 to ~16.5]] and [[ws.ev-spy-qqq-recover-jul1|equities recovering to a strongest-quarter-since-2020 finish]], the melt-up leg is winning and the hedge slot eases from 0.72 back to 0.70 - the exact mirror of the 1.0.2 nudge UP when vol was approaching the >25 vol-expansion leg. The core long ranks and strengths are unchanged; this is the only strength parameter that moves this refresh.
+    Long [[sec.spy]] / [[sec.vti]] core plus a [[sec.uvix]] vol hedge. With [[ws.ev-vix-collapse-165-jul1|VIX collapsing to ~16.5]] and [[ws.ev-spy-qqq-recover-jul1|equities recovering]], the melt-up leg is winning and the hedge slot eases 0.72 to 0.70. The core long ranks and strengths are unchanged; this is the only strength parameter that moves this refresh.
   hasAlignedSecurity:
     - alignedSecurity: sec.spy
       securityRole: align.role-primary-vehicle
@@ -491,79 +488,73 @@ equity-melt-up-vs-recession-risk-alignment:
         ([[ws.ev-thu-premarket-futures-rise-jun11|Thursday futures bounced]]),
         which keeps the band the widest in the basket.
 
-powell-warsh-transition-risk-alignment:
+hawkish-warsh-regime-alignment:
   type: align.ThesisAlignment
-  label: Powell-Warsh transition risk alignment
-  forThesis: ws.powell-warsh-transition-risk
+  label: Hawkish Warsh regime alignment
+  forThesis: ws.hawkish-warsh-regime
   alignmentConfidence:
-    estimateMean: 0.50
-    estimateStdDev: 0.12
-    betaAlpha: 8.0
-    betaBeta: 8.0
+    estimateMean: 0.58
+    estimateStdDev: 0.10
+    betaAlpha: 12.0
+    betaBeta: 8.7
   alignmentRationale: |
-    Uncertainty basket - [[sec.uvix]] primary, [[sec.dbmf]] and [[sec.kmlm]] managed-futures alternates, short [[sec.tlt]] inverse-expression. The transition resolved benignly ([[ws.ev-warsh-sintra-independence-jul1|Warsh's independence and price-stability pledge]], [[ws.ev-fomc-jun17-hold-hawkish-dots|a clean hawkish first FOMC]]), so thesis confidence fell to 0.48; the vol / carry basket structure is unchanged, though its regime context is less apt as the transition risk abates. alignmentConfidence held at 0.50.
+    The rate-up / trend basket - short [[sec.tlt]] and short [[sec.ief]] inverse-expressions on the higher-for-longer path, long [[sec.dbmf]] / [[sec.kmlm]] trend carry. The thesis firmed to 0.76 on [[ws.ev-warsh-sintra-independence-jul1|Warsh's Sintra pledge]] and [[ws.ev-fedwatch-dec-hike-66pct-jun|a December hike priced in]], making the short-rate legs more apt; the basket structure and strengths are unchanged. alignmentConfidence 0.58.
   hasAlignedSecurity:
-    - alignedSecurity: sec.uvix
-      securityRole: align.role-primary-vehicle
-      allocationDirection: align.direction-long
-      alignmentStrength:
-        estimateMean: 0.65
-        estimateStdDev: 0.10
-        betaAlpha: 14.0
-        betaBeta: 7.5
-      securityRationale: |
-        Long [[sec.uvix]] is the cleanest single-ticker expression of
-        Fed-transition uncertainty - vol-expansion is the most direct mechanism
-        by which "policy uncertainty" gets priced. The bi-directional structure
-        ([[ws.ev-warsh-room-to-cut-quote|"room to cut"]] vs
-        [[ws.ev-warsh-historically-hawkish|hawkish record]]) is exactly the
-        asymmetric-outcome shape long-vol benefits from. Mean at the
-        indirect-reasoning cap of 0.65; band wider because UVIX decay cost is
-        meaningful if the June 16-17 FOMC fails to produce a vol-generating move.
-    - alignedSecurity: sec.dbmf
-      securityRole: align.role-alternate-vehicle
-      allocationDirection: align.direction-long
-      alignmentStrength:
-        estimateMean: 0.60
-        estimateStdDev: 0.10
-        betaAlpha: 11.0
-        betaBeta: 7.3
-      securityRationale: |
-        Long [[sec.dbmf]] captures the trend-regime premium managed-futures
-        vehicles extract from a Fed-transition rate-path repricing. The named
-        rate move ([[ws.ev-10y-yield-fri-455-jun5|10Y to 4.55%]] with
-        [[ws.ev-global-bond-yields-multi-year-highs-may18|global yields at multi-year highs]]) is exactly the multi-asset trend [[sec.dbmf|DBMF]]'s
-        strategy rides. Modest mean because the mechanism is one step removed from
-        the explicit thesis text.
     - alignedSecurity: sec.tlt
       securityRole: align.role-inverse-expression
       allocationDirection: align.direction-short
       alignmentStrength:
-        estimateMean: 0.58
+        estimateMean: 0.70
+        estimateStdDev: 0.09
+        betaAlpha: 16.0
+        betaBeta: 6.9
+      securityRationale: |
+        Short [[sec.tlt]] is the cleanest single-ticker expression of
+        [[ws.hawkish-warsh-regime]] - a hawkish, no-cut, hike-biased Fed drives
+        long-duration Treasuries lower, and the [[ws.ev-2y-yield-plus16bp-jun17|16bp 2Y jump]]
+        plus [[ws.ev-10y-yield-jun17-449|the 10Y to ~4.49%]] are the move already
+        underway. **Inverse-expression** (short): the thesis playing out IS long-duration
+        Treasuries falling. Mean just above the indirect-reasoning cap because, unlike a
+        confidence input, the mechanism is unambiguous and the FOMC already confirmed the
+        direction; band tight for the same reason.
+    - alignedSecurity: sec.ief
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.64
+        estimateStdDev: 0.10
+        betaAlpha: 13.0
+        betaBeta: 7.3
+      securityRationale: |
+        Short [[sec.ief]] expresses the same higher-for-longer path on the belly of the
+        curve. Slightly lower mean than [[sec.tlt|TLT]] because intermediate duration moves
+        less per basis point of repricing, but the bear-flattening led by the front end
+        ([[ws.ev-2y-yield-plus16bp-jun17|2Y +16bp]]) makes the 7-10Y sector a direct
+        beneficiary of the hawkish turn. **Inverse-expression**, direction-short.
+    - alignedSecurity: sec.dbmf
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.56
         estimateStdDev: 0.10
         betaAlpha: 10.0
-        betaBeta: 7.2
+        betaBeta: 7.9
       securityRationale: |
-        Short [[sec.tlt]] captures the current rate-up trajectory if the
-        Warsh-as-chair backdrop sustains the bond-market repricing (the latest
-        leg is [[ws.ev-10y-yield-fri-455-jun5|the 10Y to 4.55%]] on the jobs
-        print). **Inverse-expression** because the thesis playing out on the
-        hawkish-backdrop side drives long-duration Treasuries lower.
-        Direction-short carries reversal risk if Warsh delivers a dovish surprise
-        at the June 16-17 FOMC, which is precisely what keeps
-        `alignmentConfidence` on this thesis modest.
+        Long [[sec.dbmf]] captures the rate-trend premium managed-futures vehicles extract
+        from a sustained higher-for-longer regime - such strategies typically run short
+        bonds in exactly this environment, so DBMF aligns with the thesis while diversifying
+        away from a pure outright short. Modest mean: the mechanism is one step removed from
+        the explicit thesis and depends on the trend persisting.
     - alignedSecurity: sec.kmlm
       securityRole: align.role-alternate-vehicle
       allocationDirection: align.direction-long
       alignmentStrength:
-        estimateMean: 0.55
-        estimateStdDev: 0.10
-        betaAlpha: 9.0
-        betaBeta: 7.4
+        estimateMean: 0.50
+        estimateStdDev: 0.11
+        betaAlpha: 8.0
+        betaBeta: 8.0
       securityRationale: |
-        Long [[sec.kmlm]] is the second-managed-futures alternate to
-        [[sec.dbmf|DBMF]], with a different strategy implementation (KFA Mount
-        Lucas vs DBi). Including both diversifies the managed-futures sleeve
-        across implementations - useful given the low alignment confidence on
-        this thesis and the uncertainty over the right managed-futures mix. Mean
-        lowest in the stack as a result.
+        Long [[sec.kmlm]] is the second managed-futures alternate to [[sec.dbmf|DBMF]], a
+        different implementation (KFA Mount Lucas vs DBi). Including both diversifies the
+        trend sleeve across strategies; lowest mean in the stack given the indirect
+        mechanism and the uncertainty over the right managed-futures mix.
