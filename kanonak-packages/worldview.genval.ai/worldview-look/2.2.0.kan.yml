@@ -56,10 +56,6 @@ worldview-look:
           match: ^
           version: 1.0.0
           alias: tok
-        - package: link
-          match: ^
-          version: 1.0.0
-          alias: link
         - package: transformations
           match: ^
           version: 3.17.0
@@ -1503,7 +1499,7 @@ fund.Holding:
         tx.stringLiteral: |-
           </text>
           <text x="370" y="62" text-anchor="end" font-size="28" font-weight="700" fill="#0a0e1a" font-family="var(--kan-font-mono)" opacity="0.7">HOLDING</text>
-          <text x="30" y="152" font-size="21" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">TARGET WEIGHT - FRACTION OF NAV</text>
+          <text x="30" y="152" font-size="21" fill="var(--kan-text-dim)" font-family="var(--kan-font-mono)">TARGET WEIGHT - % OF NAV</text>
           <text x="30" y="230" font-size="76" font-weight="700" fill="var(--kan-text)" font-family="var(--kan-font-mono)">
       - type: tx.NumberFormat
         tx.numberStyle: percent
@@ -1616,7 +1612,7 @@ fund.Holding:
       - type: tx.StringLiteral
         tx.stringLiteral: |-
           </text>
-          <text x="30" y="178" font-size="21" fill="var(--kan-text-faint)" font-family="var(--kan-font-mono)">TARGET WEIGHT - FRACTION OF NAV</text>
+          <text x="30" y="178" font-size="21" fill="var(--kan-text-faint)" font-family="var(--kan-font-mono)">TARGET WEIGHT - % OF NAV</text>
           <text x="30" y="254" font-size="76" font-weight="700" fill="var(--kan-text)" font-family="var(--kan-font-mono)">
       - type: tx.NumberFormat
         tx.numberStyle: percent
