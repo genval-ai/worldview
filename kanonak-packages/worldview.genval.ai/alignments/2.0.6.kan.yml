@@ -1,0 +1,450 @@
+alignments:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 2.0.6
+  label: Alignment data - patch refresh against snapshot 4.0.6
+  comment: >-
+    Patch refresh of the public alignment data, re-derived against worldview
+    snapshot 4.0.6 (Friday October 30 - the defense primes reported record
+    backlogs as PAC-3, Tomahawk and AMRAAM converted to multi-year contracts;
+    Hormuz transits collapsed again and Brent rose about 13% in October to
+    $114.88; the Fed held 10-2 with two dissents for a hike; Q3 GDP grew 3.4%
+    with core PCE at 3.1%; hyperscaler capex set records without raised outlooks;
+    gold fell as yields eased). Same seven wv.active theses as 2.0.5, so a
+    patch, and no basket changes membership. The defense basket firms across
+    the board on contracted munitions; the commodity closes the gap to the
+    producers in energy; the duration shorts and the IWM short ease as yields
+    fell and small caps rallied; ORCL firms on its funding cap. No securities
+    bump. Superseded by the next operator refresh.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+    - publisher: worldview.genval.ai
+      packages:
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+        - package: estimates
+          match: ^
+          version: 1.0.0
+          alias: est
+        - package: securities
+          match: ^
+          version: 2.4.0
+          alias: sec
+        - package: snapshots
+          match: '='
+          version: 4.0.6
+          alias: ws
+
+view:
+  type: align.Alignment
+  label: Thesis alignments (2.0.6 - patch refresh against snapshot 4.0.6, the Friday October 30 moment - record defense backlogs on multi-year munitions contracts, a re-struck energy premium with Brent at $114.88, a 10-2 Fed hold with two dissents for a hike, 3.4% Q3 growth, and an AI sell-off on capex returns; no membership changes, the defense basket firms, USO closes on XLE, ORCL firms on its funding cap, and the duration and small-cap shorts ease)
+  alignmentObservedAt: 2026-10-30T14:36:09Z
+  derivedFromSnapshot: ws.view
+  alignmentNarrative: |
+    Patch refresh against [[ws.view|worldview snapshot 4.0.6]] (observedAt 2026-10-30T14:01:59Z). Same seven `wv.active` theses as 2.0.5 - [[ws.powell-warsh-transition-risk|the Fed-transition thesis]] stays retired - so no `ThesisAlignment` is added or dropped, and no basket changes membership. Snapshot drift since 2.0.5, for downstream joint math: [[ws.iran-war-rearmament|defense]] 0.86 to 0.92, [[ws.persistent-energy-shock|energy]] 0.88 to 0.91, [[ws.hawkish-warsh-regime|hawkish-Warsh]] 0.91 to 0.92, [[ws.stagflation-risk|stagflation]] 0.89 to 0.86, [[ws.ai-capex-cycle-with-china-tail|ai-capex]] 0.89 to 0.87, [[ws.gold-debasement-bid|gold]] 0.82 to 0.79, [[ws.equity-melt-up-vs-recession-risk|equity]] held at 0.70.
+
+    **The defense basket's fit was confirmed by contract.** [[ws.ev-lmt-q3-backlog-292b-oct22|Lockheed's $52.5B PAC-3 multi-year]], [[ws.ev-rtx-q3-backlog-340b-oct20|RTX's Tomahawk and AMRAAM multi-years]] and [[ws.ev-noc-q3-backlog-1096b-oct20|Northrop's platform awards]] tie each name directly to the replenishment cycle, and [[ws.ev-defense-rerating-oct29|the stocks re-rated 7-23%]]. [[sec.lmt]] and [[sec.rtx]] firm three points each as the munitions franchises; [[sec.noc]] firms one as the platform name.
+
+    **Energy: the commodity closes on the producers.** [[ws.ev-energy-complex-oct29|USO rose 9.5% while XLE rose 1.6%]] as [[ws.ev-hormuz-flows-crash-attacks-oct14|the strait closed again]] and [[ws.ev-brent-11488-oct29|Brent rose about 13% in October]] - the reverse of last window. [[sec.uso]] firms to within a point of [[sec.xle]], which keeps primary on liquidity; neither window's relative move is persistent enough to swap the roles.
+
+    **The rate and small-cap shorts give back.** [[ws.ev-uvix-tlt-ief-oct29|TLT rose 3.3% and IEF 1.7%]] as [[ws.ev-10y-505-30y-537-oct28|the long end retraced]], and [[ws.ev-spy-qqq-iwm-oct29|IWM rose 4.7%]] on [[ws.ev-q3-gdp-advance-34-oct29|3.4% growth]]. Short [[sec.tlt]], short [[sec.ief]] and short [[sec.iwm]] all ease.
+
+    **AI: financing eases at Oracle and returns at Alphabet.** [[ws.ev-orcl-investor-day-225b-oct28|Oracle's $20B funding cap]] answers the specific concern that cut [[sec.orcl]] last window, so it firms; [[ws.ev-alphabet-worst-day-oct29|Alphabet's negative free cash flow]] moved the same concern to the hyperscaler buyers, and [[sec.nvda]] eases a point as [[ws.ev-ai-complex-closes-oct29|the chip names turned lower into the window's end]].
+
+    **Basket-level changes at a glance.** No membership changes. Defense firms all three; energy firms USO and CVX and eases XLE; stagflation firms USO and eases XLE, the duration shorts and GLD; AI firms ORCL and MU and eases NVDA; gold eases GDX; equity eases the IWM short, QQQ and UVIX and firms VTI; hawkish-Warsh eases both duration shorts.
+  hasAlignment:
+    - stagflation-risk-alignment
+    - persistent-energy-shock-alignment
+    - iran-war-rearmament-alignment
+    - gold-debasement-bid-alignment
+    - ai-capex-cycle-with-china-tail-alignment
+    - equity-melt-up-vs-recession-risk-alignment
+    - hawkish-warsh-regime-alignment
+
+stagflation-risk-alignment:
+  type: align.ThesisAlignment
+  label: Stagflation risk alignment
+  forThesis: ws.stagflation-risk
+  alignmentConfidence:
+    estimateMean: 0.60
+    estimateStdDev: 0.09
+    betaAlpha: 17.2
+    betaBeta: 11.5
+  alignmentRationale: |
+    Membership unchanged; `alignmentConfidence` eases 0.62 to 0.60 because [[ws.stagflation-risk]] now reads more as an inflationary boom than a stagflation - [[ws.ev-q3-gdp-advance-34-oct29|3.4% growth]] and [[ws.ev-jobless-claims-194k-oct29|claims near 57-year lows]] - and the basket has no instrument for the stag half in either case. The energy leg carries the inflation half most directly this window, so USO firms and moves to the top of the longs; the duration shorts and GLD ease as yields fell.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.tlt
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.78
+        estimateStdDev: 0.08
+        betaAlpha: 20.1
+        betaBeta: 5.7
+      securityRationale: |
+        Eased 0.80 to 0.78. [[ws.ev-uvix-tlt-ief-oct29|TLT rose 3.3%]] as [[ws.ev-10y-505-30y-537-oct28|the long end retraced]] even with [[ws.ev-sep-pce-core-31-oct29|core PCE back up to 3.1%]]. **Inverse-expression** of the rate consequence of persistent inflation; still the largest leg, with less support than last window.
+    - alignedSecurity: sec.uso
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.75
+        estimateStdDev: 0.08
+        betaAlpha: 21.2
+        betaBeta: 7.1
+      securityRationale: |
+        Firmed 0.72 to 0.75. [[ws.ev-energy-complex-oct29|USO rose 9.5%]] as [[ws.ev-brent-11488-oct29|Brent rose about 13% in October]] - the energy input to inflation, expressed directly.
+    - alignedSecurity: sec.xle
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.66
+        estimateStdDev: 0.09
+        betaAlpha: 17.6
+        betaBeta: 9.1
+      securityRationale: |
+        Eased 0.68 to 0.66. [[ws.ev-energy-complex-oct29|XLE rose only 1.6%]] while crude rose, a looser inflation hedge than the commodity this window.
+    - alignedSecurity: sec.ief
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.58
+        estimateStdDev: 0.09
+        betaAlpha: 16.9
+        betaBeta: 12.2
+      securityRationale: |
+        Eased 0.60 to 0.58. [[ws.ev-uvix-tlt-ief-oct29|IEF rose 1.7%]] and [[ws.ev-fomc-oct28-hold-two-hike-dissents|the Fed paused]], leaving the belly short with less near-term support.
+    - alignedSecurity: sec.gld
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.45
+        estimateStdDev: 0.11
+        betaAlpha: 8.8
+        betaBeta: 10.7
+      securityRationale: |
+        Eased 0.48 to 0.45. [[ws.ev-gld-gdx-oct29|GLD fell 2.0% while yields fell]] - gold is not acting as an inflation hedge inside this basket on any rate path.
+
+persistent-energy-shock-alignment:
+  type: align.ThesisAlignment
+  label: Persistent energy shock alignment
+  forThesis: ws.persistent-energy-shock
+  alignmentConfidence:
+    estimateMean: 0.89
+    estimateStdDev: 0.05
+    betaAlpha: 34.0
+    betaBeta: 4.2
+  alignmentRationale: |
+    Membership and order unchanged; `alignmentConfidence` firms 0.88 to 0.89. [[ws.persistent-energy-shock]] was re-struck in the spot market - [[ws.ev-hormuz-flows-crash-attacks-oct14|transits collapsed]] and [[ws.ev-brent-11488-oct29|Brent rose about 13%]] - and [[ws.ev-energy-complex-oct29|USO led the producers]], the reverse of last window. USO firms to within a point of XLE, which keeps primary on liquidity; CVX firms as the strongest producer and XLE eases a point.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.xle
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.89
+        estimateStdDev: 0.05
+        betaAlpha: 34.0
+        betaBeta: 4.2
+      securityRationale: |
+        Eased 0.90 to 0.89. [[ws.ev-energy-complex-oct29|XLE rose 1.6%]] against crude's re-rating; the liquid sector expression still carries the densest evidence. **Primary-vehicle**.
+    - alignedSecurity: sec.uso
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.88
+        estimateStdDev: 0.06
+        betaAlpha: 24.9
+        betaBeta: 3.4
+      securityRationale: |
+        Firmed 0.86 to 0.88 with the band tightened. [[ws.ev-energy-complex-oct29|USO rose 9.5% to 168.19]] as [[ws.ev-hormuz-flows-crash-attacks-oct14|the strait closed again]] - a premium re-struck in the spot price is the commodity vehicle's case.
+    - alignedSecurity: sec.xom
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.85
+        estimateStdDev: 0.06
+        betaAlpha: 29.3
+        betaBeta: 5.2
+      securityRationale: |
+        Held at 0.85. [[ws.ev-energy-complex-oct29|XOM rose 3.5% to 183.29]], tracking the sector.
+    - alignedSecurity: sec.cvx
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.84
+        estimateStdDev: 0.06
+        betaAlpha: 30.5
+        betaBeta: 5.8
+      securityRationale: |
+        Firmed 0.83 to 0.84. [[ws.ev-energy-complex-oct29|CVX rose 4.2% to 231.46]], the strongest producer for a second window.
+
+iran-war-rearmament-alignment:
+  type: align.ThesisAlignment
+  label: Iran war rearmament alignment
+  forThesis: ws.iran-war-rearmament
+  alignmentConfidence:
+    estimateMean: 0.90
+    estimateStdDev: 0.04
+    betaAlpha: 49.7
+    betaBeta: 5.5
+  alignmentRationale: |
+    Membership and order unchanged; `alignmentConfidence` firms 0.87 to 0.90 because each name's tie to [[ws.iran-war-rearmament]] is now a contract rather than an expectation. [[ws.ev-lmt-q3-backlog-292b-oct22|LMT's PAC-3 multi-year]] and [[ws.ev-rtx-q3-backlog-340b-oct20|RTX's Tomahawk and AMRAAM multi-years]] are the munitions replenishment the thesis predicted, so both firm three points; [[ws.ev-noc-q3-backlog-1096b-oct20|NOC's awards]] are platform programmes and it firms one.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.lmt
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.93
+        estimateStdDev: 0.03
+        betaAlpha: 66.3
+        betaBeta: 5.0
+      securityRationale: |
+        Firmed 0.90 to 0.93 with the band tightened. [[ws.ev-lmt-q3-backlog-292b-oct22|A record $292B backlog, up 27% in a quarter on a $52.5B PAC-3 multi-year]], and [[ws.ev-defense-rerating-oct29|a 23.2% re-rating]]. **Primary-vehicle** on the interceptor franchise the war consumed fastest.
+    - alignedSecurity: sec.rtx
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.90
+        estimateStdDev: 0.04
+        betaAlpha: 49.7
+        betaBeta: 5.5
+      securityRationale: |
+        Firmed 0.87 to 0.90 with the band tightened. [[ws.ev-rtx-q3-backlog-340b-oct20|About $23B of Tomahawk and $14B of AMRAAM converted to multi-year contracts, lifting backlog to $340B]] - the munitions lines that 4.0.5 flagged as most exposed to the funding delay are now contracted.
+    - alignedSecurity: sec.noc
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.84
+        estimateStdDev: 0.06
+        betaAlpha: 30.5
+        betaBeta: 5.8
+      securityRationale: |
+        Firmed 0.83 to 0.84. [[ws.ev-noc-q3-backlog-1096b-oct20|Backlog rose to $109.6B on Sentinel, submarine and restricted awards]] and [[ws.ev-defense-rerating-oct29|the stock rose 13.4%]]; platform demand is a looser fit to the Iran replenishment cycle than munitions.
+
+gold-debasement-bid-alignment:
+  type: align.ThesisAlignment
+  label: Gold debasement bid alignment
+  forThesis: ws.gold-debasement-bid
+  alignmentConfidence:
+    estimateMean: 0.86
+    estimateStdDev: 0.05
+    betaAlpha: 40.6
+    betaBeta: 6.6
+  alignmentRationale: |
+    Membership and order unchanged; `alignmentConfidence` eases 0.87 to 0.86. [[ws.gold-debasement-bid]] fell because [[ws.ev-gld-gdx-oct29|gold declined while yields eased]], a fact about the thesis rather than about whether the bullion vehicles express it, so GLD and IAU hold. [[ws.ev-gld-gdx-oct29|GDX fell 2.5% against GLD's 2.0%]] - less amplification than recent windows - and eases a point.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.gld
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.92
+        estimateStdDev: 0.03
+        betaAlpha: 74.3
+        betaBeta: 6.5
+      securityRationale: |
+        Held at 0.92. [[ws.ev-gld-gdx-oct29|GLD tracked bullion to 368.57]]. **Primary liquid vehicle** named in the thesisStatement.
+    - alignedSecurity: sec.iau
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.86
+        estimateStdDev: 0.06
+        betaAlpha: 27.9
+        betaBeta: 4.5
+      securityRationale: |
+        Held at 0.86. Structurally equivalent to [[sec.gld|GLD]] with a lower expense ratio.
+    - alignedSecurity: sec.gdx
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.71
+        estimateStdDev: 0.09
+        betaAlpha: 17.3
+        betaBeta: 7.1
+      securityRationale: |
+        Eased 0.72 to 0.71. [[ws.ev-gld-gdx-oct29|GDX fell 2.5% to 81.33 and traded near 77 on October 30]]. **High-beta-proxy** whose leverage keeps working downward.
+
+ai-capex-cycle-with-china-tail-alignment:
+  type: align.ThesisAlignment
+  label: AI capex cycle alignment
+  forThesis: ws.ai-capex-cycle-with-china-tail
+  alignmentConfidence:
+    estimateMean: 0.84
+    estimateStdDev: 0.06
+    betaAlpha: 30.5
+    betaBeta: 5.8
+  alignmentRationale: |
+    Membership unchanged; `alignmentConfidence` eases 0.85 to 0.84. [[ws.ai-capex-cycle-with-china-tail]] eased on [[ws.ev-hyperscaler-capex-q3-no-raise-oct28|record capex without raised outlooks]] and [[ws.ev-alphabet-worst-day-oct29|Alphabet's negative free cash flow]]. The financing concern moved from the supplier side to the buyer side: [[ws.ev-orcl-investor-day-225b-oct28|Oracle's $20B funding cap]] eases it at ORCL, which firms, while NVDA eases a point as [[ws.ev-ai-complex-closes-oct29|the chip names turned lower at the window's end]]. MU firms a point on a positive window.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.nvda
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.89
+        estimateStdDev: 0.04
+        betaAlpha: 53.6
+        betaBeta: 6.6
+      securityRationale: |
+        Eased 0.90 to 0.89. [[ws.ev-ai-complex-closes-oct29|NVDA fell 3.5% on the window and traded near 207 on October 30]] as [[ws.ev-alphabet-worst-day-oct29|Alphabet's results raised the return-on-capex question]]. **Primary-vehicle** on liquidity and breadth.
+    - alignedSecurity: sec.amd
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.88
+        estimateStdDev: 0.05
+        betaAlpha: 36.3
+        betaBeta: 4.9
+      securityRationale: |
+        Held at 0.88. [[ws.ev-ai-complex-closes-oct29|AMD was down 0.8% to October 29 and fell about 9% on October 30]] - high momentum risk in both directions, with the structural fit unchanged.
+    - alignedSecurity: sec.avgo
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.87
+        estimateStdDev: 0.05
+        betaAlpha: 38.5
+        betaBeta: 5.8
+      securityRationale: |
+        Held at 0.87. [[ws.ev-ai-complex-closes-oct29|AVGO was flat to October 29]]; custom silicon for the hyperscalers that are still spending at record levels.
+    - alignedSecurity: sec.orcl
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.77
+        estimateStdDev: 0.09
+        betaAlpha: 16.1
+        betaBeta: 4.8
+      securityRationale: |
+        Firmed 0.74 to 0.77. [[ws.ev-orcl-investor-day-225b-oct28|A $20B cap on new funding, positive free cash flow from fiscal 2028 and a $225B fiscal-2030 revenue target]] answer the financing concern that marked it down in 2.0.5; [[ws.ev-ai-complex-closes-oct29|the stock rose 6.9% on the window]].
+    - alignedSecurity: sec.mu
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.76
+        estimateStdDev: 0.10
+        betaAlpha: 13.1
+        betaBeta: 4.1
+      securityRationale: |
+        Firmed 0.75 to 0.76. [[ws.ev-ai-complex-closes-oct29|MU rose 2.2% to October 29 after reaching 983 on October 28]]. **High-beta-proxy** on memory pricing, with a wide band for its swings.
+
+equity-melt-up-vs-recession-risk-alignment:
+  type: align.ThesisAlignment
+  label: Equity melt-up versus recession risk alignment
+  forThesis: ws.equity-melt-up-vs-recession-risk
+  alignmentConfidence:
+    estimateMean: 0.72
+    estimateStdDev: 0.08
+    betaAlpha: 22.0
+    betaBeta: 8.5
+  alignmentRationale: |
+    Membership unchanged; `alignmentConfidence` eases 0.74 to 0.72. [[ws.equity-melt-up-vs-recession-risk]] held while its leadership rotated: [[ws.ev-spy-qqq-iwm-oct29|IWM rose 4.7% while QQQ fell 1.9%]] on [[ws.ev-q3-gdp-advance-34-oct29|3.4% growth]] and [[ws.ev-alphabet-worst-day-oct29|an AI sell-off]]. The IWM short and QQQ both ease on that rotation and VTI firms on its small-cap tail. UVIX eases a point - [[ws.ev-uvix-tlt-ief-oct29|it spiked 16% at the October 23 high but finished flat]].
+  hasAlignedSecurity:
+    - alignedSecurity: sec.spy
+      securityRole: align.role-primary-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.85
+        estimateStdDev: 0.05
+        betaAlpha: 42.5
+        betaBeta: 7.5
+      securityRationale: |
+        Held at 0.85. [[ws.ev-spy-qqq-iwm-oct29|SPY was flat at 769.36]]. **Primary-vehicle** for an index-level thesis.
+    - alignedSecurity: sec.uvix
+      securityRole: align.role-hedge
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.77
+        estimateStdDev: 0.08
+        betaAlpha: 20.5
+        betaBeta: 6.1
+      securityRationale: |
+        Eased 0.78 to 0.77. [[ws.ev-uvix-tlt-ief-oct29|UVIX spiked to 40.56 on October 23 and finished flat]] with [[ws.ev-vix-range-oct16-oct29|the VIX peaking near 20]]. **Hedge** that paid intra-window without a sustained volatility regime.
+    - alignedSecurity: sec.vti
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.75
+        estimateStdDev: 0.07
+        betaAlpha: 27.9
+        betaBeta: 9.3
+      securityRationale: |
+        Firmed 0.74 to 0.75. The total-market alternate's small-cap tail [[ws.ev-spy-qqq-iwm-oct29|rose 4.7%]], a help rather than a drag this window.
+    - alignedSecurity: sec.iwm
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.70
+        estimateStdDev: 0.09
+        betaAlpha: 17.4
+        betaBeta: 7.5
+      securityRationale: |
+        Eased 0.74 to 0.70 with the band widened. [[ws.ev-spy-qqq-iwm-oct29|IWM rose 4.7% to a window high]] as [[ws.ev-q3-gdp-advance-34-oct29|growth beat]] and [[ws.ev-jobless-claims-194k-oct29|claims stayed near 57-year lows]] - the recession channel this short expresses weakened, ending six windows of small-cap underperformance.
+    - alignedSecurity: sec.qqq
+      securityRole: align.role-high-beta-proxy
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.70
+        estimateStdDev: 0.09
+        betaAlpha: 17.4
+        betaBeta: 7.5
+      securityRationale: |
+        Eased 0.72 to 0.70. [[ws.ev-spy-qqq-iwm-oct29|QQQ fell 1.9% and traded near 697 on October 30]] as [[ws.ev-alphabet-worst-day-oct29|the AI leadership sold off]]. **High-beta-proxy** for the melt-up leg whose overlap with the AI basket cut against it again.
+
+hawkish-warsh-regime-alignment:
+  type: align.ThesisAlignment
+  label: Hawkish Warsh regime alignment
+  forThesis: ws.hawkish-warsh-regime
+  alignmentConfidence:
+    estimateMean: 0.72
+    estimateStdDev: 0.08
+    betaAlpha: 22.0
+    betaBeta: 8.5
+  alignmentRationale: |
+    Membership and order unchanged; `alignmentConfidence` eases 0.73 to 0.72. [[ws.hawkish-warsh-regime]] firmed on [[ws.ev-fomc-oct28-hold-two-hike-dissents|two hike dissents and December priced]], but the duration shorts expressing it lost ground as [[ws.ev-10y-505-30y-537-oct28|the long end retraced from its 24-year high]] and [[ws.ev-uvix-tlt-ief-oct29|TLT rose 3.3%]]. A regime that holds the front end while the long end eases is better expressed at the belly than in duration, so TLT eases more than IEF. The managed-futures legs hold.
+  hasAlignedSecurity:
+    - alignedSecurity: sec.tlt
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.83
+        estimateStdDev: 0.07
+        betaAlpha: 23.1
+        betaBeta: 4.7
+      securityRationale: |
+        Eased 0.85 to 0.83 with the band widened. [[ws.ev-uvix-tlt-ief-oct29|TLT rose 3.3% to 81.49]] as [[ws.ev-10y-505-30y-537-oct28|the thirty-year fell to 5.37% from 5.52%]]. **Inverse-expression** of a durable regime whose long-end premium has partly unwound.
+    - alignedSecurity: sec.ief
+      securityRole: align.role-inverse-expression
+      allocationDirection: align.direction-short
+      alignmentStrength:
+        estimateMean: 0.72
+        estimateStdDev: 0.08
+        betaAlpha: 22.0
+        betaBeta: 8.5
+      securityRationale: |
+        Eased 0.73 to 0.72. [[ws.ev-uvix-tlt-ief-oct29|IEF rose 1.7%]], but [[ws.ev-fomc-oct28-hold-two-hike-dissents|December is priced for a hike]], which supports the belly short more than the duration short.
+    - alignedSecurity: sec.dbmf
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.58
+        estimateStdDev: 0.10
+        betaAlpha: 13.5
+        betaBeta: 9.8
+      securityRationale: |
+        Held at 0.58. Managed-futures replication should carry short-bond trend exposure; no direct evidence, so the band stays thin.
+    - alignedSecurity: sec.kmlm
+      securityRole: align.role-alternate-vehicle
+      allocationDirection: align.direction-long
+      alignmentStrength:
+        estimateMean: 0.52
+        estimateStdDev: 0.11
+        betaAlpha: 10.2
+        betaBeta: 9.4
+      securityRationale: |
+        Held at 0.52. A second trend-following vehicle; kept at the bottom as a diversifier.
