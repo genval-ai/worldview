@@ -2,10 +2,10 @@ alignments:
   type: Package
   publisher: worldview.genval.ai
   version: 2.0.6
-  label: Alignment data - patch refresh against snapshot 4.0.6
+  label: Alignment data - patch refresh against snapshot 4.1.0
   comment: >-
     Patch refresh of the public alignment data, re-derived against worldview
-    snapshot 4.0.6 (Friday October 30 - the defense primes reported record
+    snapshot 4.1.0 (Friday October 30 - the defense primes reported record
     backlogs as PAC-3, Tomahawk and AMRAAM converted to multi-year contracts;
     Hormuz transits collapsed again and Brent rose about 13% in October to
     $114.88; the Fed held 10-2 with two dissents for a hike; Q3 GDP grew 3.4%
@@ -39,16 +39,16 @@ alignments:
           alias: sec
         - package: snapshots
           match: '='
-          version: 4.0.6
+          version: 4.1.0
           alias: ws
 
 view:
   type: align.Alignment
-  label: Thesis alignments (2.0.6 - patch refresh against snapshot 4.0.6, the Friday October 30 moment - record defense backlogs on multi-year munitions contracts, a re-struck energy premium with Brent at $114.88, a 10-2 Fed hold with two dissents for a hike, 3.4% Q3 growth, and an AI sell-off on capex returns; no membership changes, the defense basket firms, USO closes on XLE, ORCL firms on its funding cap, and the duration and small-cap shorts ease)
+  label: Thesis alignments (2.0.6 - patch refresh against snapshot 4.1.0, the Friday October 30 moment - record defense backlogs on multi-year munitions contracts, a re-struck energy premium with Brent at $114.88, a 10-2 Fed hold with two dissents for a hike, 3.4% Q3 growth, and an AI sell-off on capex returns; no membership changes, the defense basket firms, USO closes on XLE, ORCL firms on its funding cap, and the duration and small-cap shorts ease)
   alignmentObservedAt: 2026-10-30T14:36:09Z
   derivedFromSnapshot: ws.view
   alignmentNarrative: |
-    Patch refresh against [[ws.view|worldview snapshot 4.0.6]] (observedAt 2026-10-30T14:01:59Z). Same seven `wv.active` theses as 2.0.5 - [[ws.powell-warsh-transition-risk|the Fed-transition thesis]] stays retired - so no `ThesisAlignment` is added or dropped, and no basket changes membership. Snapshot drift since 2.0.5, for downstream joint math: [[ws.iran-war-rearmament|defense]] 0.86 to 0.92, [[ws.persistent-energy-shock|energy]] 0.88 to 0.91, [[ws.hawkish-warsh-regime|hawkish-Warsh]] 0.91 to 0.92, [[ws.stagflation-risk|stagflation]] 0.89 to 0.86, [[ws.ai-capex-cycle-with-china-tail|ai-capex]] 0.89 to 0.87, [[ws.gold-debasement-bid|gold]] 0.82 to 0.79, [[ws.equity-melt-up-vs-recession-risk|equity]] held at 0.70.
+    Patch refresh against [[ws.view|worldview snapshot 4.1.0]] (observedAt 2026-10-30T14:01:59Z). Same seven `wv.active` theses as 2.0.5 - [[ws.powell-warsh-transition-risk|the Fed-transition thesis]] stays retired - so no `ThesisAlignment` is added or dropped, and no basket changes membership. Snapshot drift since 2.0.5, for downstream joint math: [[ws.iran-war-rearmament|defense]] 0.86 to 0.92, [[ws.persistent-energy-shock|energy]] 0.88 to 0.91, [[ws.hawkish-warsh-regime|hawkish-Warsh]] 0.91 to 0.92, [[ws.stagflation-risk|stagflation]] 0.89 to 0.86, [[ws.ai-capex-cycle-with-china-tail|ai-capex]] 0.89 to 0.87, [[ws.gold-debasement-bid|gold]] 0.82 to 0.79, [[ws.equity-melt-up-vs-recession-risk|equity]] held at 0.70.
 
     **The defense basket's fit was confirmed by contract.** [[ws.ev-lmt-q3-backlog-292b-oct22|Lockheed's $52.5B PAC-3 multi-year]], [[ws.ev-rtx-q3-backlog-340b-oct20|RTX's Tomahawk and AMRAAM multi-years]] and [[ws.ev-noc-q3-backlog-1096b-oct20|Northrop's platform awards]] tie each name directly to the replenishment cycle, and [[ws.ev-defense-rerating-oct29|the stocks re-rated 7-23%]]. [[sec.lmt]] and [[sec.rtx]] firm three points each as the munitions franchises; [[sec.noc]] firms one as the platform name.
 

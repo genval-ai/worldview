@@ -1,7 +1,7 @@
 snapshots:
   type: Package
   publisher: worldview.genval.ai
-  version: 4.0.6
+  version: 4.1.0
   imports:
     - publisher: kanonak.org
       packages:
@@ -62,10 +62,10 @@ snapshots:
 
 view:
   type: wv.WorldviewSnapshot
-  label: 'Macro worldview (4.0.6 - Friday October 30 patch, four days before the midterms - the defense primes reported record backlogs as PAC-3, Tomahawk and AMRAAM converted to multi-year contracts and LMT rose 23%; Hormuz transits collapsed again, attacks reached their busiest month since March and Brent rose about 13% in October to $114.88; the Fed held 10-2 with two dissents for a hike; Q3 GDP grew 3.4% with core PCE at 3.1%; hyperscaler capex set records without raised outlooks and Alphabet had its worst day on record; gold fell as yields eased. No thesis added, retired or invalidated; no invalidation condition fires)'
+  label: 'Macro worldview (4.1.0 - Friday October 30 minor, four days before the midterms - the defense primes reported record backlogs as PAC-3, Tomahawk and AMRAAM converted to multi-year contracts and LMT rose 23%; Hormuz transits collapsed again, attacks reached their busiest month since March and Brent rose about 13% in October to $114.88; the Fed held 10-2 with two dissents for a hike; Q3 GDP grew 3.4% with core PCE at 3.1%; hyperscaler capex set records without raised outlooks and Alphabet had its worst day on record; gold fell as yields eased. No thesis added, retired or invalidated; no invalidation condition fires)'
   observedAt: 2026-10-30T14:01:59Z
   narrative: |
-    4.0.6 refresh, taken Friday October 30 ~10:02 AM ET, four days before the US midterms. The window runs from the afternoon of [[v405.view|4.0.5]] on October 15 through Warsh's Bangkok remarks, the defense primes' third-quarter reports of October 20-22, the collapse and partial recovery of Hormuz transits, the October 28 FOMC, the hyperscalers' third-quarter capex, and Q3 GDP and September PCE on October 29. **This is a patch.** No thesis is added, retired or invalidated, and no invalidation condition fires. Net moves: [[iran-war-rearmament]] +0.06 to 0.92 (band 0.07 to 0.05), [[persistent-energy-shock]] +0.03 to 0.91 (band 0.06 to 0.05), [[hawkish-warsh-regime]] +0.01 to 0.92 (band held 0.04), [[stagflation-risk]] -0.03 to 0.86 (band 0.06 to 0.07), [[ai-capex-cycle-with-china-tail]] -0.02 to 0.87 (band 0.06 to 0.07), [[gold-debasement-bid]] -0.03 to 0.79 (band 0.08 to 0.09), [[equity-melt-up-vs-recession-risk]] held at 0.70 (band 0.09).
+    4.1.0 refresh, taken Friday October 30 ~10:02 AM ET, four days before the US midterms. The window runs from the afternoon of [[v405.view|4.0.5]] on October 15 through Warsh's Bangkok remarks, the defense primes' third-quarter reports of October 20-22, the collapse and partial recovery of Hormuz transits, the October 28 FOMC, the hyperscalers' third-quarter capex, and Q3 GDP and September PCE on October 29. **This is a minor**, because it adds new evidence terms (27), which the protocol versions as a minor; this version was first committed as 4.0.6, never served, and re-versioned before publishing. No thesis is added, retired or invalidated, and no invalidation condition fires. Net moves: [[iran-war-rearmament]] +0.06 to 0.92 (band 0.07 to 0.05), [[persistent-energy-shock]] +0.03 to 0.91 (band 0.06 to 0.05), [[hawkish-warsh-regime]] +0.01 to 0.92 (band held 0.04), [[stagflation-risk]] -0.03 to 0.86 (band 0.06 to 0.07), [[ai-capex-cycle-with-china-tail]] -0.02 to 0.87 (band 0.06 to 0.07), [[gold-debasement-bid]] -0.03 to 0.79 (band 0.08 to 0.09), [[equity-melt-up-vs-recession-risk]] held at 0.70 (band 0.09).
 
     **The rearmament cycle was contracted.** [[iran-war-rearmament]] makes the largest move of the refresh. [[ev-lmt-q3-backlog-292b-oct22|Lockheed's backlog rose 27% in a quarter to a record $292B on a $52.5B PAC-3 multi-year award]], [[ev-rtx-q3-backlog-340b-oct20|RTX's reached $340B as Tomahawk and AMRAAM framework agreements converted into multi-year production contracts]], and [[ev-noc-q3-backlog-1096b-oct20|Northrop's rose to $109.6B]]. [[ev-defense-rerating-oct29|LMT rose 23.2%, NOC 13.4% and RTX 6.9%]] in a window with no US strikes - the market paying for contracts, not escalation.
 

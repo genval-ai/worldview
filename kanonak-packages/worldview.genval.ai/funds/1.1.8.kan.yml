@@ -2,10 +2,10 @@ funds:
   type: Package
   publisher: worldview.genval.ai
   version: 1.1.8
-  label: Fund data - driver-union reweight against snapshot 4.0.6 + alignments 2.0.6
+  label: Fund data - driver-union reweight against snapshot 4.1.0 + alignments 2.0.6
   comment: >-
     Patch reweight of the public fund data, re-derived by the driver-union method from
-    alignments 2.0.6 against worldview snapshot 4.0.6 (Friday October 30 - record defense
+    alignments 2.0.6 against worldview snapshot 4.1.0 (Friday October 30 - record defense
     backlogs as PAC-3, Tomahawk and AMRAAM converted to multi-year contracts; Hormuz transits
     collapsed again and Brent rose about 13% in October to $114.88; the Fed held 10-2 with two
     dissents for a hike; Q3 GDP grew 3.4% with core PCE at 3.1%; hyperscaler capex set records
@@ -41,12 +41,12 @@ funds:
           alias: sec
         - package: snapshots
           match: '='
-          version: 4.0.6
+          version: 4.1.0
           alias: ws
 
 genval-worldview-fund:
   type: fund.Fund
-  label: "Genval Worldview Fund (1.1.8 - driver-union reweight against snapshot 4.0.6 and alignments 2.0.6; defense gains about 10% per name on contracted munitions, energy extends its lead through USO on a re-closed Hormuz, and gold, AI and the duration and small-cap shorts give back; 24 holdings, gross 0.9998, net 0.7592, cash 0.1205)"
+  label: "Genval Worldview Fund (1.1.8 - driver-union reweight against snapshot 4.1.0 and alignments 2.0.6; defense gains about 10% per name on contracted munitions, energy extends its lead through USO on a re-closed Hormuz, and gold, AI and the duration and small-cap shorts give back; 24 holdings, gross 0.9998, net 0.7592, cash 0.1205)"
   fundObservedAt: 2026-10-30T14:38:49Z
   fund.derivedFromSnapshot: ws.view
   derivedFromAlignment: ca.view
@@ -55,7 +55,7 @@ genval-worldview-fund:
   netExposure: 0.7592
   cashWeight: 0.1205
   fundNarrative: |
-    Driver-union reweight from [[ca.view|alignments 2.0.6]] against [[ws.view|worldview snapshot 4.0.6]] (observedAt 2026-10-30T14:01:59Z). Same seven `wv.active` theses, the same 24 holdings and the same `fund.method-driver-union` as 1.1.7, so this is a patch with no turnover. Gross 0.9998, net 0.7592, cash 0.1205.
+    Driver-union reweight from [[ca.view|alignments 2.0.6]] against [[ws.view|worldview snapshot 4.1.0]] (observedAt 2026-10-30T14:01:59Z). Same seven `wv.active` theses, the same 24 holdings and the same `fund.method-driver-union` as 1.1.7, so this is a patch with no turnover. Gross 0.9998, net 0.7592, cash 0.1205.
 
     **Defense is the largest gain in the book.** [[ws.iran-war-rearmament]] stepped 0.86 to 0.92 on [[ws.ev-lmt-q3-backlog-292b-oct22|the PAC-3 multi-year]] and [[ws.ev-rtx-q3-backlog-340b-oct20|the Tomahawk and AMRAAM multi-years]], and the alignment firmed all three primes: [[sec.lmt]] 10.2% to 4.88%, [[sec.rtx]] 10.3% to 4.72%, [[sec.noc]] 7.8% to 4.41%. The theme rises from 12.80% to 14.01% of gross.
 
