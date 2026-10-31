@@ -25,8 +25,11 @@ jobs:
         with:
           node-version: '20'
 
+      # Pinned: 8.6.0+ validates imports at their stated floor, which fails
+      # published versions here. Move the pin forward once a release reads the
+      # newest version in each range again.
       - name: Install kanonak CLI
-        run: npm install -g @kanonak-protocol/cli
+        run: npm install -g @kanonak-protocol/cli@8.5.1
 
       - name: Validate packages
         run: |
