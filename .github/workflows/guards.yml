@@ -1,0 +1,44 @@
+name: Guards
+
+# Checks that refuse a change before it can break a published version. Runs on every pull request,
+# and the publish workflow calls it before it builds anything. Each guard names, in its own file,
+# the CLI feature that retires it.
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install the pinned kanonak tooling
+        working-directory: .github/kanonak
+        run: npm ci --no-audit --no-fund
+
+      - name: Published versions are never deleted or changed
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          base="${PR_BASE:-${PUSH_BEFORE:-}}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            base="$(git rev-parse HEAD^)"
+          fi
+          bash .github/kanonak/published-immutable.sh "$base" HEAD
+
+      - name: Every import of our own publisher names a version we contain
+        run: node .github/kanonak/own-imports-exist.mjs kanonak-packages/worldview.genval.ai

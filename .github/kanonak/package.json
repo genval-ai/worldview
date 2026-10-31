@@ -1,0 +1,15 @@
+{
+  "name": "worldview-kanonak-tooling",
+  "private": true,
+  "description": "The exact kanonak CLI and SDK the publish workflow and its guards run. Installed with npm ci from the lockfile, so a new SDK release cannot change CI without a commit here. CLI 8.5.1 is the last release that validates each import at the newest version its range admits; move it forward once a release does that again.",
+  "type": "module",
+  "dependencies": {
+    "@kanonak-protocol/cli": "8.5.1",
+    "@kanonak-protocol/sdk": "8.11.0",
+    "@kanonak-protocol/types": "8.11.0"
+  },
+  "overrides": {
+    "@kanonak-protocol/sdk": "8.11.0",
+    "@kanonak-protocol/types": "8.11.0"
+  }
+}

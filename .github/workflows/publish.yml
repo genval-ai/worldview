@@ -15,7 +15,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  guards:
+    uses: ./.github/workflows/guards.yml
+
   build:
+    needs: guards
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,11 +29,14 @@ jobs:
         with:
           node-version: '20'
 
-      # Pinned: 8.6.0+ validates imports at their stated floor, which fails
-      # published versions here. Move the pin forward once a release reads the
-      # newest version in each range again.
-      - name: Install kanonak CLI
-        run: npm install -g @kanonak-protocol/cli@8.5.1
+      # The exact CLI and SDK come from .github/kanonak's lockfile, so a new
+      # SDK release can't change this workflow without a commit. Its
+      # package.json says why the CLI is held at 8.5.1 and when to move it.
+      - name: Install the pinned kanonak tooling
+        working-directory: .github/kanonak
+        run: |
+          npm ci --no-audit --no-fund
+          echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Validate packages
         run: |

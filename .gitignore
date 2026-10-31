@@ -24,3 +24,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Pinned kanonak tooling installs here (npm ci)
+.github/kanonak/node_modules/
