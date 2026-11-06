@@ -29,20 +29,14 @@ jobs:
         with:
           node-version: '20'
 
-      # The exact CLI and SDK come from .github/kanonak's lockfile, so a new
-      # SDK release can't change this workflow without a commit. Its
-      # package.json says why the CLI is held at 8.5.1 and when to move it.
+      # The exact CLI comes from .github/kanonak's lockfile, so a new release
+      # can't change this workflow without a commit. The guards validated
+      # every package before this job started.
       - name: Install the pinned kanonak tooling
         working-directory: .github/kanonak
         run: |
           npm ci --no-audit --no-fund
           echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
-
-      - name: Validate packages
-        run: |
-          set -euo pipefail
-          find kanonak-packages/worldview.genval.ai -name '*.kan.yml' -print0 | \
-            xargs -0 -P 4 -I {} kanonak validate "{}"
 
       - name: Publish resources via the look layer
         run: |
