@@ -1,9 +1,9 @@
 {
   "name": "worldview-kanonak-tooling",
   "private": true,
-  "description": "The kanonak CLI the publish workflow and its guards run, installed with npm ci from the lockfile, so a new release can't change CI without a commit here. Since 8.16.0 its publish refuses to drop or change a version the origin serves, and since 8.12.0 its validate reads each import at the newest version its range admits.",
+  "description": "The kanonak CLI the publish, guards and wiki workflows run, installed with npm ci from the lockfile, so a new release can't change CI without a commit here. Since 8.16.0 its publish refuses to drop or change a version the origin serves, since 8.12.0 its validate reads each import at the newest version its range admits, and since 8.21.0 its wiki draws every band these packages' looks use.",
   "type": "module",
   "dependencies": {
-    "@kanonak-protocol/cli": "^8.19.0"
+    "@kanonak-protocol/cli": "^8.21.0"
   }
 }
