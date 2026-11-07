@@ -1,8 +1,7 @@
 name: Guards
 
 # Checks that refuse a change before it can break a published version. Runs on every pull request,
-# and the publish workflow calls it before it builds anything. Each guard names, in its own file,
-# the CLI feature that retires it.
+# and the publish workflow calls it before it builds anything. Both are the CLI's own.
 
 on:
   pull_request:
@@ -16,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -26,19 +23,19 @@ jobs:
 
       - name: Install the pinned kanonak tooling
         working-directory: .github/kanonak
-        run: npm ci --no-audit --no-fund
+        run: |
+          npm ci --no-audit --no-fund
+          echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
 
-      - name: Published versions are never deleted or changed
-        env:
-          PR_BASE: ${{ github.event.pull_request.base.sha }}
-          PUSH_BEFORE: ${{ github.event.before }}
+      # An import of a version that exists nowhere fails here, since validate reads each import at the
+      # newest version its range admits.
+      - name: Validate packages
         run: |
           set -euo pipefail
-          base="${PR_BASE:-${PUSH_BEFORE:-}}"
-          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
-            base="$(git rev-parse HEAD^)"
-          fi
-          bash .github/kanonak/published-immutable.sh "$base" HEAD
+          find kanonak-packages/worldview.genval.ai -name '*.kan.yml' -print0 | \
+            xargs -0 -P 4 -I {} kanonak validate "{}"
 
-      - name: Every import of our own publisher names a version we contain
-        run: node .github/kanonak/own-imports-exist.mjs kanonak-packages/worldview.genval.ai
+      # A version the origin serves that the workspace drops or changes fails here, named. validate can't
+      # catch a drop, since it reads a version the workspace lacks from the origin.
+      - name: Published versions are never deleted or changed
+        run: kanonak publish --workspace kanonak-packages/worldview.genval.ai --check
