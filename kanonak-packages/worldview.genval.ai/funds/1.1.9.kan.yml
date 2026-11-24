@@ -1,0 +1,364 @@
+funds:
+  type: Package
+  publisher: worldview.genval.ai
+  version: 1.1.9
+  label: Fund data - driver-union reweight against snapshot 4.2.0 + alignments 2.0.7
+  comment: >-
+    Patch reweight of the public fund data, re-derived by the driver-union method from
+    alignments 2.0.7 against worldview snapshot 4.2.0 (Tuesday November 24 - Democrats won
+    both chambers and the defense names fell on budget fears; the October minutes, Waller
+    and a certain December hike firmed the hawkish regime; Brent fell about 22% to a
+    three-month low as the IEA forecast a surplus; Nvidia beat, lost and regained its CEO;
+    the S&P 500 corrected with the VIX above 30, then had its best day since April 2025).
+    Same seven active theses, same 24 holdings and same method as 1.1.8, so a patch with no
+    turnover. The duration shorts grow as the hawkish regime firms; gold, equity and energy
+    give back; net exposure falls to 74.1 percent. No securities bump.
+    Superseded by the next operator refresh.
+  imports:
+    - publisher: kanonak.org
+      packages:
+        - package: core-rdf
+          match: ^
+          version: 1.1.0
+          alias: rdfs
+        - package: core-kanonak
+          match: ^
+          version: 2.4.0
+          alias: kanonak
+    - publisher: worldview.genval.ai
+      packages:
+        - package: fund
+          match: ^
+          version: 1.0.0
+          alias: fund
+        - package: alignment
+          match: ^
+          version: 1.0.0
+          alias: align
+        - package: alignments
+          match: '='
+          version: 2.0.7
+          alias: ca
+        - package: securities
+          match: ^
+          version: 2.4.0
+          alias: sec
+        - package: snapshots
+          match: '='
+          version: 4.2.0
+          alias: ws
+
+genval-worldview-fund:
+  type: fund.Fund
+  label: "Genval Worldview Fund (1.1.9 - driver-union reweight against snapshot 4.2.0 and alignments 2.0.7; the duration shorts grow as a December hike is priced as certain, gold, equity and energy give back, and AI edges up as its confidence eased less than the book; 24 holdings, gross 0.9998, net 0.7412, cash 0.1295)"
+  fundObservedAt: 2026-11-24T05:13:49Z
+  fund.derivedFromSnapshot: ws.view
+  derivedFromAlignment: ca.view
+  weightingMethod: fund.method-driver-union
+  grossExposure: 0.9998
+  netExposure: 0.7412
+  cashWeight: 0.1295
+  fundNarrative: |
+    Driver-union reweight from [[ca.view|alignments 2.0.7]] against [[ws.view|worldview snapshot 4.2.0]] (observedAt 2026-11-24T04:31:02Z). Same seven `wv.active` theses, the same 24 holdings and the same `fund.method-driver-union` as 1.1.8, so this is a patch with no turnover. Gross 0.9998, net 0.7412, cash 0.1295.
+
+    **Six of seven theses eased, so most of the move is relative.** Every confidence fell except [[ws.hawkish-warsh-regime]], 0.92 to 0.94, and weights are normalised to the same gross budget, so a holding gains when its thesis eased less than the book. That is why the AI names edge up although [[ws.ai-capex-cycle-with-china-tail]] eased 0.87 to 0.82, and why energy barely moves although [[ws.persistent-energy-shock]] eased 0.91 to 0.83.
+
+    **The duration shorts grow.** [[ws.ev-fomc-minutes-oct-further-hikes-nov18|The minutes]], [[ws.ev-waller-half-point-december-nov18|Waller's half point]] and [[ws.ev-nvda-31pct-day-dec-hike-certain-nov23|a certain December hike]] firmed the hawkish regime, and the alignment firmed short [[sec.ief]] in both rate baskets: IEF to 4.88% short and [[sec.tlt]] to 5.52% short. Duration shorts are 10.40% of gross against 9.24%.
+
+    **Gold, equity and energy give back.** [[ws.gold-debasement-bid]] fell to 0.68 as [[ws.ev-gold-14-month-low-3739-nov18|gold reached a 14-month low]], and gold falls from 12.05% to 11.24% of gross. [[ws.equity-melt-up-vs-recession-risk]] fell to 0.60 through [[ws.ev-spx-correction-vix-above-30-nov20|the correction]], and the equity longs fall from 12.24% to 11.60%, with [[sec.uvix]] holding its weight as the alignment firmed the hedge. Energy is 22.83% against 23.21%, and [[sec.uso]] stays the largest holding at 7.18%.
+
+    **Theme rollup by gross weight.** Energy 22.83% (USO, XLE, XOM, CVX); AI 21.11% (NVDA, AMD, AVGO, ORCL, MU); Defense 13.86% (LMT, RTX, NOC); Gold 11.24% (GLD, IAU, GDX); Equity long 11.60% (SPY, VTI, QQQ, UVIX); Equity short 2.53% (IWM); Duration shorts 10.40% (TLT, IEF); Managed futures 6.41% (DBMF, KMLM). Net 74.1%, down from 75.9% as the duration shorts grew.
+  hasHolding:
+    - holding-uso
+    - holding-xle
+    - holding-tlt
+    - holding-ief
+    - holding-lmt
+    - holding-rtx
+    - holding-gld
+    - holding-nvda
+    - holding-avgo
+    - holding-xom
+    - holding-amd
+    - holding-cvx
+    - holding-noc
+    - holding-orcl
+    - holding-mu
+    - holding-iau
+    - holding-dbmf
+    - holding-spy
+    - holding-uvix
+    - holding-kmlm
+    - holding-gdx
+    - holding-vti
+    - holding-qqq
+    - holding-iwm
+
+holding-uso:
+  type: fund.Holding
+  heldSecurity: sec.uso
+  targetWeight: 0.0718
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    7.18% long, down from 7.42% (-3.2%). Both theses that hold it eased - [[ws.persistent-energy-shock]] 0.91 to 0.83 and [[ws.stagflation-risk]] 0.86 to 0.83 - and the alignment cut USO to 0.68 in the stagflation basket after [[ws.ev-iea-omr-q4-surplus-17mbd-nov13|the IEA forecast a surplus]]; it stays at the top of the book because every other thesis's weight fell with it. Driver-union dedup: `inflation-debasement` is shared, counted once at [[ws.stagflation-risk]], while its other channels add.
+
+holding-xle:
+  type: fund.Holding
+  heldSecurity: sec.xle
+  targetWeight: 0.0695
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    6.95% long, down from 7.02% (-1.0%). The energy thesis eased 0.91 to 0.83 on [[ws.ev-brent-8937-three-month-low-nov23|Brent's 22% fall]], and the alignment eased XLE to 0.62 in the stagflation basket; the producers hold their fit in the energy basket, so the weight barely moves. Driver-union dedup: `inflation-debasement` is shared, counted once at [[ws.stagflation-risk]], while its other channels add.
+
+holding-tlt:
+  type: fund.Holding
+  heldSecurity: sec.tlt
+  targetWeight: -0.0552
+  holdingDirection: align.direction-short
+  holdingRole: align.role-inverse-expression
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    5.52% short, up from 5.05% (+9.3%). The short grows: [[ws.hawkish-warsh-regime]] firmed 0.92 to 0.94 on [[ws.ev-fomc-minutes-oct-further-hikes-nov18|minutes expecting further hikes]] and a certain December hike, while both baskets held TLT's strength. Driver-union dedup: `inflation-debasement` is shared, counted once at [[ws.stagflation-risk]]; `rate-path` is shared, counted once at [[ws.hawkish-warsh-regime]]; `monetary-credibility` is shared, counted once at [[ws.hawkish-warsh-regime]], while its other channels add.
+
+holding-ief:
+  type: fund.Holding
+  heldSecurity: sec.ief
+  targetWeight: -0.0488
+  holdingDirection: align.direction-short
+  holdingRole: align.role-inverse-expression
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    4.88% short, up from 4.19% (+16.5%). The short grows most of any holding: the alignment firmed IEF in both rate baskets, to 0.76 in hawkish-Warsh and 0.63 in stagflation, as [[ws.ev-waller-half-point-december-nov18|a half-point December hike]] came under discussion and the hiking path presses the belly. Driver-union dedup: `inflation-debasement` is shared, counted once at [[ws.stagflation-risk]]; `rate-path` is shared, counted once at [[ws.hawkish-warsh-regime]]; `monetary-credibility` is shared, counted once at [[ws.hawkish-warsh-regime]], while its other channels add.
+
+holding-lmt:
+  type: fund.Holding
+  heldSecurity: sec.lmt
+  targetWeight: 0.0485
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    4.85% long, down from 4.88% (-0.6%). [[ws.iran-war-rearmament]] eased 0.92 to 0.86 and the alignment eased LMT to 0.91 after [[ws.ev-defense-stocks-slide-democratic-sweep-nov4|the defense names fell on the Democratic sweep]]; renormalisation against a book that fell almost everywhere leaves it nearly flat.
+
+holding-rtx:
+  type: fund.Holding
+  heldSecurity: sec.rtx
+  targetWeight: 0.0469
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    4.69% long, down from 4.72% (-0.6%). [[ws.iran-war-rearmament]] eased to 0.86 and the alignment eased RTX to 0.88 on appropriations risk; nearly flat after renormalisation.
+
+holding-gld:
+  type: fund.Holding
+  heldSecurity: sec.gld
+  targetWeight: 0.0466
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.stagflation-risk
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    4.66% long, down from 4.98% (-6.4%). Both theses that hold it eased - [[ws.gold-debasement-bid]] 0.79 to 0.68 as [[ws.ev-gold-14-month-low-3739-nov18|gold reached a 14-month low]], and [[ws.stagflation-risk]] to 0.83 with GLD cut to 0.40 inside it. Driver-union dedup: `inflation-debasement` is shared, counted once at [[ws.gold-debasement-bid]]; `monetary-credibility` is shared, counted once at [[ws.gold-debasement-bid]], while its other channels add.
+
+holding-nvda:
+  type: fund.Holding
+  heldSecurity: sec.nvda
+  targetWeight: 0.0453
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    4.53% long, up from 4.41% (+2.7%). [[ws.ai-capex-cycle-with-china-tail]] eased 0.87 to 0.82, but the alignment held NVDA at 0.89 on [[ws.ev-nvda-q3-fy27-1158b-guide-130b-nov17|its beat]], so it gains against a book whose other confidences fell further.
+
+holding-avgo:
+  type: fund.Holding
+  heldSecurity: sec.avgo
+  targetWeight: 0.0442
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    4.42% long, up from 4.31% (+2.6%). Held at 0.87 in the alignment as the chip name least exposed to [[ws.ev-bis-china-data-center-rule-nov16|the third-country rule]]; up on renormalisation.
+
+holding-xom:
+  type: fund.Holding
+  heldSecurity: sec.xom
+  targetWeight: 0.0438
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    4.38% long, down from 4.41% (-0.7%). The energy thesis eased to 0.83 with XOM held at 0.85; nearly flat after renormalisation.
+
+holding-amd:
+  type: fund.Holding
+  heldSecurity: sec.amd
+  targetWeight: 0.0437
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    4.37% long, up from 4.36% (+0.2%). The alignment eased AMD to 0.86 on [[ws.ev-bis-china-data-center-rule-nov16|the BIS rule]], offsetting renormalisation; flat.
+
+holding-cvx:
+  type: fund.Holding
+  heldSecurity: sec.cvx
+  targetWeight: 0.0432
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.persistent-energy-shock
+  holdingRationale: |
+    4.32% long, down from 4.36% (-0.9%). The energy thesis eased to 0.83 with CVX held at 0.84; nearly flat after renormalisation.
+
+holding-noc:
+  type: fund.Holding
+  heldSecurity: sec.noc
+  targetWeight: 0.0432
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.iran-war-rearmament
+  holdingRationale: |
+    4.32% long, down from 4.41% (-2.0%). [[ws.iran-war-rearmament]] eased to 0.86 and the alignment eased NOC most of the three primes, to 0.81, as the platform name most exposed to appropriations.
+
+holding-orcl:
+  type: fund.Holding
+  heldSecurity: sec.orcl
+  targetWeight: 0.0392
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    3.92% long, up from 3.82% (+2.6%). Held at 0.77 in the alignment; up on renormalisation as [[ws.ai-capex-cycle-with-china-tail]] eased less than the book.
+
+holding-mu:
+  type: fund.Holding
+  heldSecurity: sec.mu
+  targetWeight: 0.0387
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.ai-capex-cycle-with-china-tail
+  holdingRationale: |
+    3.87% long, up from 3.77% (+2.7%). Held at 0.76 in the alignment; up on renormalisation as [[ws.ai-capex-cycle-with-china-tail]] eased less than the book.
+
+holding-iau:
+  type: fund.Holding
+  heldSecurity: sec.iau
+  targetWeight: 0.0363
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    3.63% long, down from 3.87% (-6.2%). [[ws.gold-debasement-bid]] eased 0.79 to 0.68 with IAU held at 0.86 in the alignment.
+
+holding-dbmf:
+  type: fund.Holding
+  heldSecurity: sec.dbmf
+  targetWeight: 0.0338
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    3.38% long, up from 3.04% (+11.2%). [[ws.hawkish-warsh-regime]] firmed 0.92 to 0.94, the one thesis to firm, with DBMF held at 0.58; it gains on renormalisation.
+
+holding-spy:
+  type: fund.Holding
+  heldSecurity: sec.spy
+  targetWeight: 0.0316
+  holdingDirection: align.direction-long
+  holdingRole: align.role-primary-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    3.16% long, down from 3.39% (-6.8%). [[ws.equity-melt-up-vs-recession-risk]] fell 0.70 to 0.60 as [[ws.ev-spx-correction-vix-above-30-nov20|the S&P 500 corrected]], with SPY held at 0.85 in the alignment.
+
+holding-uvix:
+  type: fund.Holding
+  heldSecurity: sec.uvix
+  targetWeight: 0.0305
+  holdingDirection: align.direction-long
+  holdingRole: align.role-hedge
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    3.05% long, down from 3.07% (-0.7%). The equity thesis fell to 0.60, but the alignment firmed the hedge to 0.82 after [[ws.ev-spx-correction-vix-above-30-nov20|the VIX rose above 30]], so it holds its weight.
+
+holding-kmlm:
+  type: fund.Holding
+  heldSecurity: sec.kmlm
+  targetWeight: 0.0303
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.hawkish-warsh-regime
+  holdingRationale: |
+    3.03% long, up from 2.73% (+11.0%). [[ws.hawkish-warsh-regime]] firmed to 0.94 with KMLM held at 0.52; it gains on renormalisation.
+
+holding-gdx:
+  type: fund.Holding
+  heldSecurity: sec.gdx
+  targetWeight: 0.0295
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.gold-debasement-bid
+  holdingRationale: |
+    2.95% long, down from 3.20% (-7.8%). [[ws.gold-debasement-bid]] eased to 0.68 and the alignment eased GDX to 0.70 as [[ws.ev-gold-3658-nov24|gold traded about 9% below October 29]].
+
+holding-vti:
+  type: fund.Holding
+  heldSecurity: sec.vti
+  targetWeight: 0.0279
+  holdingDirection: align.direction-long
+  holdingRole: align.role-alternate-vehicle
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    2.79% long, down from 2.99% (-6.7%). The equity thesis fell to 0.60 with VTI held at 0.75.
+
+holding-qqq:
+  type: fund.Holding
+  heldSecurity: sec.qqq
+  targetWeight: 0.0260
+  holdingDirection: align.direction-long
+  holdingRole: align.role-high-beta-proxy
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    2.60% long, down from 2.79% (-6.8%). The equity thesis fell to 0.60 with QQQ held at 0.70.
+
+holding-iwm:
+  type: fund.Holding
+  heldSecurity: sec.iwm
+  targetWeight: -0.0253
+  holdingDirection: align.direction-short
+  holdingRole: align.role-inverse-expression
+  servesThesis:
+    - ws.equity-melt-up-vs-recession-risk
+  holdingRationale: |
+    2.53% short, down from 2.79% (-9.3%). The short shrinks: the equity thesis fell to 0.60 and the alignment eased the short to 0.68 as [[ws.ev-oct-nfp-165k-nov6|payrolls of 165,000]] weakened the recession channel.
