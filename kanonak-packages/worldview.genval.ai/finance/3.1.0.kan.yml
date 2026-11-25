@@ -45,9 +45,8 @@ finance:
 #      MarketData, Corporate, Analyst, CentralBank, InstitutionalFlow.
 #   3. Their type-specific properties.
 #   4. Institution subclasses (CentralBank-the-class as subclass of
-#      wv.Institution; AnalystInstitution; ConsensusAggregator, a subclass
-#      of AnalystInstitution since 3.1.0) plus seeded named instances of
-#      each.
+#      wv.Institution; AnalystInstitution; ConsensusAggregator) plus seeded
+#      named instances of each.
 #   5. Seeded named instances for the magic-string vocabularies the audit
 #      called out: MarketMetric, CorporateMetric, FiscalPeriod, ForecastHorizon,
 #      finance-specific Policy additions, Indicator, MarketEvent, Role.
@@ -257,13 +256,16 @@ reportingPeriod:
 analystInstitution:
   type: owl.ObjectProperty
   domain: AnalystEvidence
-  range: AnalystInstitution
+  range: wv.Institution
   label: Analyst Institution
   comment: >
-    The institution publishing the rating or forecast. References an
-    AnalystInstitution named instance (not a free-form string). Aggregator
-    consensuses (Bloomberg consensus, FactSet aggregation) are typed as
-    ConsensusAggregator subclass.
+    The institution publishing the rating or forecast, as a named instance
+    (not a free-form string). A primary house's view is an
+    AnalystInstitution, and an aggregator's consensus (Bloomberg
+    consensus, FactSet aggregation, market consensus) a
+    ConsensusAggregator. Its range is wv.Institution since 3.1.0, which
+    both classes are, so it admits the aggregators the snapshots already
+    cite.
 
 forecastTarget:
   type: owl.ObjectProperty
@@ -389,15 +391,13 @@ AnalystInstitution:
 
 ConsensusAggregator:
   type: rdfs.Class
-  subClassOf: AnalystInstitution
+  subClassOf: wv.Institution
   label: Consensus Aggregator
   comment: >
     An aggregator of multiple analysts' or institutions' views (Bloomberg
-    consensus, FactSet aggregation, market consensus). A subclass of
-    AnalystInstitution since 3.1.0, so an aggregator is a value
-    analystInstitution admits, as its comment always said; still a class
-    of its own, so worldview readers can filter "analyst views from
-    primary houses only" vs "consensus aggregations".
+    consensus, FactSet aggregation, market consensus). Distinct subclass
+    so worldview readers can filter "analyst views from primary houses
+    only" vs "consensus aggregations".
 
 
 # =============================================================================
